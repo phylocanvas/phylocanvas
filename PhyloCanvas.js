@@ -308,6 +308,23 @@ PhyloCanvas.Branch.prototype = {
 		}
 		return false;
 	},
+	drawLabel : function()
+	{
+	   // var  h = (/this.tree.zoom) ;
+	    try{
+		this.canvas.font = (this.tree.textSize/this.tree.zoom) + "px sans-serif"
+
+		var lbl = this.id;
+		
+		var dim = this.canvas.measureText(lbl);
+		var tx = this.centerx + (dim.width *(0.5 * Math.cos(this.angle) - 0.5 )) + ((5 + this.radius * 2)* Math.cos(this.angle));
+		var ty = this.centery +(this.tree.textSize * (0.5 * Math.sin(this.angle)) + 0.5) +  ((5 + this.radius * 2)* Math.sin(this.angle));
+		this.canvas.beginPath();
+		this.canvas.fillStyle = (this.selected)?  this.tree.selectedColor : this.tree.branchColor;
+		this.canvas.fillText(lbl, tx ,ty);
+		this.canvas.closePath();
+		}catch(e){alert(e);}
+	},
 	drawNode : function()
 	{
 		var  r = (this.radius * this.tree.baseNodeSize) + (this.selected ? this.tree.selectedNodeSizeIncrease : 0); //r = node radius
@@ -348,11 +365,13 @@ PhyloCanvas.Branch.prototype = {
 		else if(this.leaf)
 		{
 			this.tree.nodeRenderers[this.nodeShape](this);
+			this.canvas.stroke();
+			this.canvas.fill();
+			if(this.tree.showLabels) this.drawLabel();
 		}
-		this.canvas.stroke();
-		this.canvas.fill();
+	
 		this.canvas.closePath();
-
+		
 		
 		 if(this.highlighted)
 		 {
