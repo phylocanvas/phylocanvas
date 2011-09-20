@@ -102,8 +102,8 @@ PhyloCanvas =
          cl.id = div.id + 'pCanvas';
          cl.style.position = 'relative';
          cl.style.backgroundColor = '#FFFFFF';
-         cl.height = div.height;
-         cl.width = div.width;
+         cl.height = div.clientHeight;
+         cl.width = div.clientWidth;
          cl.style.zIndex = '1';
          this.canvasEl.appendChild(cl);
       
@@ -142,7 +142,7 @@ PhyloCanvas =
          this.showLabels = true;
 		 this.showBootstraps = false;
 		 
-         this.treeType = PhyloCanvas.TreeType.RECTANGULAR;
+         this.treeType = 'radial';
          this.maxBranchLength = 0;
          this.lineWidth = 1.0;
          this.textSize = 10;
@@ -153,7 +153,7 @@ PhyloCanvas =
          this.maxY = -1.0* Number.MAX_VALUE;
          
 		 this.unselectOnClickAway = true;
-		 this.rightClickZoom = false;
+		 this.rightClickZoom = true;
 		 
          this.onselected = null;
 		
