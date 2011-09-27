@@ -147,6 +147,8 @@ PhyloCanvas =
          this.branchColor = "rgba(0,0,0,1)";
          this.branchScalar = 1.0;
 		 
+		 this.internalNodesSelectable = true;
+		 
          this.showLabels = true;
 		 this.showBootstraps = false;
 		 
@@ -154,7 +156,8 @@ PhyloCanvas =
          this.maxBranchLength = 0;
          this.lineWidth = 1.0;
          this.textSize = 10;
-      
+		 this.font = "sans-serif";
+	  
          this.minX = Number.MAX_VALUE;
          this.maxX = -1.0 * Number.MAX_VALUE;
          this.minY = Number.MAX_VALUE;
@@ -307,7 +310,7 @@ PhyloCanvas.Branch.prototype = {
 		}
 		for(var i = this.children.length - 1; i >= 0; i--)
 		{
-			cld = this.children[i].clicked(x,y);
+			cld = this.children[i].clicked(x,y);			
 			if(cld) return cld;
 		}
 		return false;
@@ -316,7 +319,7 @@ PhyloCanvas.Branch.prototype = {
 	{
 	   // var  h = (/this.tree.zoom) ;
 	    try{
-		this.canvas.font = (this.tree.textSize/this.tree.zoom) + "px sans-serif"
+		this.canvas.font = Math.max(Math.round(this.tree.textSize/this.tree.zoom), 4) + "pt " + this.tree.font;
 
 		var lbl = this.id;
 		
@@ -331,11 +334,11 @@ PhyloCanvas.Branch.prototype = {
 	},
 	drawNode : function()
 	{
-		var  r = (this.radius * this.tree.baseNodeSize) + (this.selected ? this.tree.selectedNodeSizeIncrease : 0); //r = node radius
+		var  r = (this.radius + this.tree.baseNodeSize) + (this.selected ? this.tree.selectedNodeSizeIncrease : 0); //r = node radius
 		var theta = this.radius * this.tree.baseNodeSize; //theta = translation to center of node... ensures that the node edge is at the end of the branch so the branches don't look shorter than  they should
 		
-		 var cx = (theta * Math.cos(this.angle))+this.centerx;
-		 var cy = (theta * Math.sin(this.angle))+this.centery;
+		 var cx = this.leaf ? (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
+		 var cy = this.leaf ? (theta * Math.sin(this.angle)) + this.centery : this.centery;
 		
 		this.canvas.beginPath();
 		this.canvas.fillStyle = this.selected ? this.tree.selectedColor:this.color ;
@@ -617,16 +620,17 @@ PhyloCanvas.Tree.prototype = {
 		return id;
 	},
 	nodeRenderers : {
-		circle : function (node) { 
-			node.canvas.arc(node.centerx + node.radius * Math.cos(node.angle), node.centery + node.radius * Math.sin(node.angle), node.radius, 0, PhyloCanvas.Angles.FULL, false); 
+		circle : function (node) {
+			var r = node.radius * node.tree.baseNodeSize;
+			node.canvas.arc(node.centerx + r * Math.cos(node.angle), node.centery + r * Math.sin(node.angle), r, 0, PhyloCanvas.Angles.FULL, false); 
 		},
 		square : function (node) 
 		{ 
-			
-			var x1 = node.centerx - node.radius;
-			var x2 = node.centerx + node.radius;
-			var y1 = node.centery - node.radius;
-			var y2 = node.centery + node.radius;
+			var r = node.radius * node.tree.baseNodeSize;
+			var x1 = (node.centerx  + r * Math.cos(node.angle)) - r;
+			var x2 = (node.centerx  + r * Math.cos(node.angle)) + r;
+			var y1 = (node.centery  + r * Math.sin(node.angle)) - r;
+			var y2 = (node.centery  + r * Math.sin(node.angle)) + r;
 			node.canvas.moveTo(x1, y1);
 			node.canvas.lineTo(x1, y2);
 			node.canvas.lineTo(x2, y2);
@@ -634,27 +638,34 @@ PhyloCanvas.Tree.prototype = {
 			node.canvas.lineTo(x1, y1);
 		},
 		star: function (node) 
-		{ 
-			node.canvas.moveTo(node.centerx, node.centery + node.radius);
+		{
+			var r = node.radius * node.tree.baseNodeSize;
+			var cx = node.centerx + r * Math.cos(node.angle);
+			var cy = node.centery + r * Math.sin(node.angle); 
+			
+			node.canvas.moveTo(cx, cy);
 			var alpha = (2 * Math.PI) / 10;
-			var rb = node.radius * 1.5;
+			var rb = r * 1.75;
 			for(var i = 11; i != 0; i--)
 			{
-				var ra = i % 2 == 1 ? rb: node.radius;
+				var ra = i % 2 == 1 ? rb: r;
 				var omega = alpha * i;
-				node.canvas.lineTo(node.centerx + (ra * Math.sin(omega)), node.centery + (ra * Math.cos(omega)));
+				node.canvas.lineTo(cx + (ra * Math.sin(omega)), cy + (ra * Math.cos(omega)));
 			}
 		},
 		triangle : function (node) 
-		{ 
-			var x1 = node.centerx - node.radius;
-			var x2 = node.centerx + node.radius;
-			var y1 =node.centery - node.radius;
-			var y2 = node.centery + node.radius;
-			node.canvas.moveTo(node.centerx, y1);
+		{
+			var r = node.radius * node.tree.baseNodeSize;
+			var cx = node.centerx + r * Math.cos(node.angle);
+			var cy = node.centery + r * Math.sin(node.angle) 
+			var x1 = cx - r;
+			var x2 = cx + r;
+			var y1 = cy - r;
+			var y2 = cy + r;
+			node.canvas.moveTo(cx, y1);
 			node.canvas.lineTo(x2, y2);
 			node.canvas.lineTo(x1, y2);
-			node.canvas.lineTo(node.centerx, y1);
+			node.canvas.lineTo(cx, y1);
 		}
 	},
 	prerenderers : 
@@ -666,13 +677,14 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.centerx = 0;
 			tree.root.centery = 0;
 			tree.branchScalar = 1000;
-			tree.leaves[0].angle = 0;
-			tree.leaves[0].centery = 0;
-			for(var i = 1; i < tree.leaves.length; i++)
+			//tree.leaves[0].angle = 0;
+			//tree.leaves[0].centery = 0;
+			//tree.leaves[0].centerx = tree.leaves[0].totalBranchLength * tree.branchScalar;
+			for(var i = 0; i < tree.leaves.length; i++)
 			{
 				tree.leaves[i].angle = 0;
-				tree.leaves[i].centery = tree.leaves[i-1].centery + (2 * tree.leaves[i].radius) + 10;
-				tree.leaves[i].centerx = tree.leaves[i].totalBranchLength;
+				tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery  + (2 * tree.leaves[i].radius) + 10: 0);
+				tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
 				
 				for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
 				{
@@ -694,15 +706,17 @@ PhyloCanvas.Tree.prototype = {
 			var maxy = tree.leaves[tree.leaves.length - 1].centery + tree.leaves[tree.leaves.length - 1].radius;
 			
 			var minx = 0;
-			var maxx = tree.maxBranchLength + (tree.leaves[0].radius * 2);
+			var maxx = (tree.maxBranchLength * tree.branchScalar) + (tree.leaves[0].radius * 2);
 			
 			tree.root.startx = tree.root.centerx;
 			tree.root.starty = tree.root.centery;
+			tree.zoom = Math.min((tree.canvas.canvas.width -50) / (maxx), (tree.canvas.canvas.height -50) / (maxy - miny));
+			//tree.offsetx = tree.canvas.canvas.width/2 - (maxx - minx) /2;
+			//tree.offsety = miny + 20;
+			tree.offsetx = tree.canvas.canvas.width/2 - ((maxx - minx)*tree.zoom /2) ;
+			tree.offsety = tree.canvas.canvas.height/2 - ((maxy - miny)*tree.zoom /2) ;
 			
-			tree.offsetx = tree.canvas.canvas.width/2 - (maxx - minx) /2;
-			tree.offsety = miny + 20;
-			
-			tree.zoom = Math.min((tree.canvas.canvas.width - 20) / (maxx - minx), (tree.canvas.canvas.height - 20) / (maxy - miny));
+			//tree.zoom = Math.min((tree.canvas.canvas.width - 20) / (maxx - minx), (tree.canvas.canvas.height - 20) / (maxy - miny));
 		}, 
 		circular : function(tree)
 		{
@@ -855,13 +869,13 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.centerx = 0;
 			tree.root.centery = 0;
 			tree.branchScalar = 1000;
-			tree.leaves[0].angle =PhyloCanvas.Angles.QUARTER;
-			tree.leaves[0].centerx = 0;
-			tree.leaves[0].centery = tree.leaves[0].totalBranchLength * tree.branchScalar;
-			for(var i = 1; i < tree.leaves.length; i++)
+			//tree.leaves[0].angle =PhyloCanvas.Angles.QUARTER;
+			//tree.leaves[0].centerx = 0;
+			//tree.leaves[0].centery = tree.leaves[0].totalBranchLength * tree.branchScalar;
+			for(var i = 0; i < tree.leaves.length; i++)
 			{
 				tree.leaves[i].angle = PhyloCanvas.Angles.QUARTER;
-				tree.leaves[i].centerx = tree.leaves[i-1].centerx + (2 * tree.leaves[i].radius) + 10;
+				tree.leaves[i].centerx = (i > 0 ?tree.leaves[i-1].centerx + (2 * tree.leaves[i].radius) + 10 : 0);
 				tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
 				
 				for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
@@ -899,7 +913,7 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.starty = tree.root.centery;
 			
 			tree.offsety = tree.canvas.canvas.height/2 - ((maxy - miny)*tree.zoom /2) ;
-			tree.offsetx = minx + 50;
+			tree.offsetx = tree.canvas.canvas.width/2 - ((maxx - minx)*tree.zoom /2) ;
 			
 			
 		}
@@ -1171,50 +1185,30 @@ PhyloCanvas.Tree.prototype = {
 			switch(nwk[i])
 			{
 			  case '(': //new Child
-			  
+			   
 				var nd = new PhyloCanvas.Branch();
-				nd.id = this.genId();
+				//nd.id = this.genId();
 				curNode.leaf = false;
 				curNode.addChild(nd);
 			    this.branches[curNode.id] = curNode;
 				curNode = nd;
 				break;
 			  case ')': //return to parent
-				  if(this.branches[curNode.id])
-				  {
-				   if(curNode != this.branches[curNode.id] ) throw "Two nodes on this tree share the id " + curNode.id;
-				  }
-				  else
-				  {
-					this.branches[curNode.id] = curNode;
-				  }
+				  this.saveNode(curNode);
 				 if(curNode.leaf) this.leaves.push(curNode);
 				 curNode = curNode.parent;
 				 break;
 			  case ',': //new sibiling
 				 var nd = new PhyloCanvas.Branch();
-				 nd.id = this.genId();
+				// nd.id = this.genId();
 				 if(curNode.leaf) this.leaves.push(curNode);
-				 if(this.branches[curNode.id])
-				{
-				 if(curNode != this.branches[curNode.id] ) throw "Two nodes on this tree share the id " + curNode.id;
-				}
-				else
-				{
-				  this.branches[curNode.id] = curNode;
-				}
+				  this.saveNode(curNode);
 				 curNode.parent.addChild(nd);
 				 curNode = nd;
 				 break;
 			  case ';':
 				// this.root.setTotalLength();
-				if(this.branches[curNode.id])
-				{
-				 if(curNode.id != "root") throw "Two nodes on this tree share the id " + curNode.id;
-				}else
-				{
-				  this.branches[curNode.id] = curNode;
-				}
+				this.saveNode(curNode);
 				 for (var l = 0; l < this.leaves.length; l++)
 				{
 					if(this.leaves[l].totalBranchLength > this.maxBranchLength)
@@ -1241,6 +1235,17 @@ PhyloCanvas.Tree.prototype = {
 		this.maxBranchLength = 0;
 		this.root.setTotalLength();
 	},
+	saveNode : function(node)
+	{
+	  if(!node.id || node.id == "") node.id=genId();
+	  if(this.branches[node.id])
+	  {
+	   if(node != this.branches[node.id])  throw "Two nodes on this tree share the id " + node.id;
+	  }else
+	  {
+		this.branches[node.id] = node;
+	  }
+	},
 	setSize: function(width, height)
 	{
 		this.canvas.canvas.width = width;
@@ -1263,6 +1268,37 @@ PhyloCanvas.Tree.prototype = {
 		this.treeType = type;
 		this.draw();
 	},
+	hideLabels : function()
+	{
+	  this.showLabels = false;
+	  this.draw();
+	},
+	displayLabels : function()
+	{
+	  this.showLabels = true;
+	  this.draw();
+	},
+	toggleLabels : function()
+	{
+	  this.showLabels = !this.showLabels;
+	  this.draw();
+	},
+	setFont : function(font)
+	{
+	  this.font = font;
+	  this.draw();
+	},
+	setTextSize : function(size)
+	{
+	  this.textSize = Number(size);
+	  this.draw();
+	},
+	setNodeSize : function(size)
+	{
+	  this.baseNodeSize = Number(size);
+	  this.draw();
+	},
+	//internal 
 	clicked : function(e)
 	{
 		try{
@@ -1272,8 +1308,11 @@ PhyloCanvas.Tree.prototype = {
 			if(nd)
 			{
 			   this.root.setSelected(false, true);
-			   nd.setSelected(true, true);
-			   if(this.onselected) this.onselected(nd.getLabel());
+			   if(this.internalNodesSelectable || nd.leaf)
+			   {
+				  nd.setSelected(true, true);
+				  if(this.onselected) this.onselected(nd.id);
+			   }
 			}
 			else if(this.unselectOnClickAway) 
 			{
@@ -1351,7 +1390,7 @@ PhyloCanvas.Tree.prototype = {
 		{
 		   e = event;
 		   var nd = this.root.clicked((e.clientX * 1.0 - getX(this.canvas.canvas) - this.offsetx  + window.pageXOffset) / this.zoom, (e.clientY *1.0 - getY(this.canvas.canvas) - this.offsety + window.pageYOffset) /this.zoom);
-		   if(nd)
+		   if(nd && (this.internalNodesSelectable || nd.leaf))
 		   {
 			  this.root.setHighlighted(false);
 			  nd.setHighlighted(true);
