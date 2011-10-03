@@ -1,3 +1,15 @@
+/**
+ * PhyloCanvas - A Javascript and HTML5 Canvas Phylogenetic tree drawing tool.
+ * 
+ * @author Chris Powell (c.powell@imperial.ac.uk)
+ */
+
+/**
+ * Get the y coordinate of oElement
+ * 
+ * @param oElement - The element to get the Y position of.
+ * 
+ */
 function getY( oElement )
 {
  var iReturnValue = 0;
@@ -8,6 +20,12 @@ function getY( oElement )
  return iReturnValue;
 }
 
+/**
+ * Get the x coordinate of oElement
+ * 
+ * @param oElement - The element to get the X position of.
+ * 
+ */
 function getX( oElement )
 {
  var iReturnValue = 0;
@@ -18,12 +36,15 @@ function getX( oElement )
  return iReturnValue;
 }
 
+	/**
+ * The PhyloCanvas library
+ */	
 PhyloCanvas = 
-{
-   
+{ 
+
 	createHandler : function(obj, func)
 	{
-		return (function(e){return obj[func](e);})
+		return (function(e){return obj[func](e);});
 	},
 	//Non-static members
 	Angles:{
@@ -38,6 +59,13 @@ PhyloCanvas =
 		"o" : "circle",
 		"t" : "triangle"
 	},
+	/**
+	 * Creates a branch
+	 * 
+	 * @constructor
+	 * @this {PhyloCanvas.Branch}
+	 * 
+	 */
 	Branch : function()
 	{
 		this.id = "";
@@ -141,7 +169,7 @@ PhyloCanvas =
          this.canvas = cl.getContext('2d');
 
 		 //this.canvas.translate(this.canvas.canvas.width/2, this.canvas.height/2);
-         this.canvas.canvas.onselectstart = function () { return false; }
+         this.canvas.canvas.onselectstart = function () { return false; };
          this.canvas.fillStyle = "#000000";
          this.canvas.strokeStyle = "#000000";
 		 this.canvas.save();
@@ -188,7 +216,7 @@ PhyloCanvas =
 		this.canvas.canvas.addEventListener('DOMMouseScroll', PhyloCanvas.createHandler(this, "scroll"));
 		
 	}
-}
+};
 
 //static members
 PhyloCanvas.ContextMenu.prototype = {
@@ -242,9 +270,9 @@ PhyloCanvas.Loader.prototype = {
              this.ctx.restore();
              
              this.ctx.translate(0,0); 
-             this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4)
+             this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4);
             
-             this.ctx.save()
+             this.ctx.save();
              this.ctx.clearRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
             this.ctx.translate(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
              
@@ -268,7 +296,7 @@ PhyloCanvas.Loader.prototype = {
 		 {
 			 
 			clearInterval(this.drawer);
-			this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4)
+			this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4);
 			 this.ctx.restore();
              
              this.ctx.translate(0,0); 
@@ -300,6 +328,10 @@ PhyloCanvas.Loader.prototype = {
 };
 PhyloCanvas.Navigator.prototype = {};
 PhyloCanvas.Branch.prototype = {
+	/*
+	 * @function addChild 
+	 * @description add a child branch to this branch
+	 */
 	addChild : function(node)
 	{
 		node.parent = this;
@@ -355,7 +387,7 @@ PhyloCanvas.Branch.prototype = {
 		this.canvas.fillStyle = this.selected ? this.tree.selectedColor:this.color ;
 		if((r * this.tree.zoom) < 5)
 		{
-		   var e =  (5 / this.tree.zoom)
+		   var e =  (5 / this.tree.zoom);
 		   this.minx = cx - e;
 		   this.maxx = cx + e;
 		   this.miny = cy - e;
@@ -542,6 +574,7 @@ PhyloCanvas.Branch.prototype = {
 		}
 		 
 		this.branchLength = parseFloat(str);
+		if(this.branchLength < 0) this.branchLength = 0;
 		return idx;
 	},
 	collapse : function()
@@ -601,13 +634,13 @@ PhyloCanvas.Tree.prototype = {
 		
 		this.canvas.clearRect(0,0,this.canvas.canvas.width,this.canvas.canvas.height);
 		this.canvas.lineCap = "round";
-		this.canvas.lineJoin = "round"
+		this.canvas.lineJoin = "round";
 		
 		this.canvas.strokeStyle = this.branchColor;
 		this.canvas.save();
 		
-		 this.canvas.translate(this.canvas.canvas.width /2,this.canvas.canvas.height / 2);
-		var maxDim = (this.canvas.canvas.width < this.canvas.canvas.height ? this.canvas.canvas.width : this.canvas.canvas.height);
+		this.canvas.translate(this.canvas.canvas.width /2,this.canvas.canvas.height / 2);
+		//var maxDim = (this.canvas.canvas.width < this.canvas.canvas.height ? this.canvas.canvas.width : this.canvas.canvas.height);
 		
 		if(!this.drawn)
 		{
@@ -753,9 +786,10 @@ PhyloCanvas.Tree.prototype = {
 			tree.branchScalar = 1000;
 			// work out radius of tree and the make branch scalar proportinal to the 
 			var r = (tree.leaves.length * tree.leaves[0].radius * 2) /PhyloCanvas.Angles.FULL;
-		
+			if(tree.branchScalar * tree.maxBranchLength > r)
+			{
 				r = tree.branchScalar * tree.maxBranchLength;
-		
+			}
 			
 			var step = PhyloCanvas.Angles.FULL / tree.leaves.length;
 			
@@ -862,8 +896,8 @@ PhyloCanvas.Tree.prototype = {
 						nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(PhyloCanvas.Angles.FORTYFIVE));
 						for(var j = 0; j < nd.parent.children.length; j++)
 						{
-							nd.parent.children[j].startx = nd.parent.centerx
-							nd.parent.children[j].starty = nd.parent.centery
+							nd.parent.children[j].startx = nd.parent.centerx;
+							nd.parent.children[j].starty = nd.parent.centery;
 						}
 					}
 					else
@@ -1187,15 +1221,19 @@ PhyloCanvas.Tree.prototype = {
 	},
 	setZoom : function(z)
 	{
-		if(z > -100 && z < 100){
+		if(z > -2 && z < 2){
 			var oz = this.zoom;
 			this.zoom = Math.pow(10, z);
 			
-			this.offsetx = (this.offsetx / oz) * this.zoom;
+			this.offsetx = (this.offsetx/oz) * this.zoom ;
 			this.offsety = (this.offsety / oz) * this.zoom;
 			
 			this.draw();
 		}
+	},
+	getPngUrl : function()
+	{
+		return this.canvas.canvas.toDataURL();		
 	},
 	parseNwk : function(nwk)
 	{		
@@ -1331,7 +1369,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	translateClickX : function(x)
 	{
-	  x = (x - getX(this.canvas.canvas)  + window.pageXOffset)
+	  x = (x - getX(this.canvas.canvas)  + window.pageXOffset);
 	  x -= this.canvas.canvas.width/2;
 	  x -= this.offsetx;
 	  x = x / this.zoom;
@@ -1440,9 +1478,14 @@ PhyloCanvas.Tree.prototype = {
 		}
 		else if(this.zoomPickedUp)
 		{
-		   
+		   //var oz = this.zoom;
 		   this.d =  ((this.starty - event.clientY) / 100);
+		   x = this.translateClickX(this.startx);
 		   this.setZoom(this.origZoom + this.d);
+		   
+		 
+		   
+		   this.draw();
 		   //this.offsetx = this.origx - (this.startx / this.oz + this.origx - this.startx / (this.oz * this.zoom));
 		   //this.offsety = this.origy - (this.starty / this.oz + this.origy - this.starty / (this.oz * this.zoom));;
 		}
