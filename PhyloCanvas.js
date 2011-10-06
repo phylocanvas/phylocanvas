@@ -512,7 +512,7 @@ PhyloCanvas.Branch.prototype = {
 		}
 		else
 		{
-			this.branchLength = 0.01;
+			this.branchLength = 0;
 		}
 		if(!this.id || this.id == "") this.id = this.tree.genId();
 		return idx;
@@ -640,12 +640,9 @@ PhyloCanvas.Tree.prototype = {
 		this.canvas.save();
 		
 		this.canvas.translate(this.canvas.canvas.width /2,this.canvas.canvas.height / 2);
-		//var maxDim = (this.canvas.canvas.width < this.canvas.canvas.height ? this.canvas.canvas.width : this.canvas.canvas.height);
 		
 		if(!this.drawn)
 		{
-			this.maxBranchLength = 0;
-			this.root.setTotalLength();
 			this.prerenderers[this.treeType](this);
 		}
 		this.canvas.translate(this.offsetx, this.offsety);
@@ -735,14 +732,12 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.starty = 0;
 			tree.root.centerx = 0;
 			tree.root.centery = 0;
-			tree.branchScalar = 1000;
-			//tree.leaves[0].angle = 0;
-			//tree.leaves[0].centery = 0;
-			//tree.leaves[0].centerx = tree.leaves[0].totalBranchLength * tree.branchScalar;
+			tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+			var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].radius + 2) * 2);
 			for(var i = 0; i < tree.leaves.length; i++)
 			{
 				tree.leaves[i].angle = 0;
-				tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery  + (2 * tree.leaves[i].radius) + 10: 0);
+				tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery  + ystep : 0);
 				tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
 				
 				for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
@@ -761,6 +756,7 @@ PhyloCanvas.Tree.prototype = {
 					}
 				}
 			}
+			
 			var miny = tree.leaves[0].centery - tree.leaves[0].radius;
 			var maxy = tree.leaves[tree.leaves.length - 1].centery + tree.leaves[tree.leaves.length - 1].radius;
 			
@@ -769,7 +765,7 @@ PhyloCanvas.Tree.prototype = {
 			
 			tree.root.startx = tree.root.centerx;
 			tree.root.starty = tree.root.centery;
-			tree.zoom = Math.min((tree.canvas.canvas.width -50) / (maxx), (tree.canvas.canvas.height -50) / (maxy - miny));
+			tree.zoom = Math.min((tree.canvas.canvas.width -100) / (maxx), (tree.canvas.canvas.height - 100) / (maxy - miny));
 			//tree.offsetx = tree.canvas.canvas.width/2 - (maxx - minx) /2;
 			//tree.offsety = miny + 20;
 			tree.offsetx =  - ((maxx - minx)*tree.zoom /2) ;
@@ -783,12 +779,16 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.starty = 0;
 			tree.root.centerx = 0;
 			tree.root.centery = 0;
-			tree.branchScalar = 1000;
+			tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height)/tree.maxBranchLength;
 			// work out radius of tree and the make branch scalar proportinal to the 
-			var r = (tree.leaves.length * tree.leaves[0].radius * 2) /PhyloCanvas.Angles.FULL;
+			var r = (tree.leaves.length * tree.leaves[0].radius * 2)/PhyloCanvas.Angles.FULL;
 			if(tree.branchScalar * tree.maxBranchLength > r)
 			{
 				r = tree.branchScalar * tree.maxBranchLength;
+			}
+			else
+			{
+				tree.branchScalar = r / tree.maxBranchLength;
 			}
 			
 			var step = PhyloCanvas.Angles.FULL / tree.leaves.length;
@@ -828,11 +828,11 @@ PhyloCanvas.Tree.prototype = {
 			tree.offsetx = 0;
 			tree.offsety = 0;
 			
-			tree.zoom = (Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) - tree.leaves[0].radius - 50 ) / (r * 2);
+			tree.zoom = (Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) - 50  - tree.leaves[0].radius) / (r * 2);
 		},
 		radial : function(tree)
 		{
-			tree.branchScalar = 1000;
+			tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
 			//tree.root.setTotalLength();
 			
 			var step = PhyloCanvas.Angles.FULL / tree.leaves.length;
@@ -882,10 +882,11 @@ PhyloCanvas.Tree.prototype = {
 		},
 		diagonal : function(tree)
 		{
+			var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].radius + 2) * 2); 
 			for(var i = 0; i < tree.leaves.length; i++)
 			{
 				tree.leaves[i].centerx = 0;
-				tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery + (2 * tree.leaves[i].radius) + 10 : 0);
+				tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery + ystep : 0);
 				tree.leaves[i].angle = 0;
 				
 				for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
@@ -909,15 +910,15 @@ PhyloCanvas.Tree.prototype = {
 			
 			var miny = tree.leaves[0].centery - tree.leaves[0].radius;
 			var maxy = tree.leaves[tree.leaves.length - 1].centery + tree.leaves[tree.leaves.length - 1].radius;
-			
+		
 			var minx = 0;
 			var maxx = tree.maxBranchLength + (tree.leaves[0].radius * 2);
-			
+		
 			tree.root.startx = tree.root.centerx;
 			tree.root.starty = tree.root.centery;
 			
 			tree.offsetx = - (maxx - minx) /2;
-			tree.offsety = miny + 20;
+			tree.offsety = -maxy/2;
 			
 			tree.zoom = Math.min((tree.canvas.canvas.width -20) / (maxx - minx), (tree.canvas.canvas.height -20) / (maxy - miny));
 			
@@ -928,14 +929,13 @@ PhyloCanvas.Tree.prototype = {
 			tree.root.starty = 0;
 			tree.root.centerx = 0;
 			tree.root.centery = 0;
-			tree.branchScalar = 1000;
-			//tree.leaves[0].angle =PhyloCanvas.Angles.QUARTER;
-			//tree.leaves[0].centerx = 0;
-			//tree.leaves[0].centery = tree.leaves[0].totalBranchLength * tree.branchScalar;
+			tree.branchScalar = tree.canvas.canvas.height/tree.maxBranchLength;
+			var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].radius +2) * 2);
+				
 			for(var i = 0; i < tree.leaves.length; i++)
 			{
 				tree.leaves[i].angle = PhyloCanvas.Angles.QUARTER;
-				tree.leaves[i].centerx = (i > 0 ?tree.leaves[i-1].centerx + (2 * tree.leaves[i].radius) + 10 : 0);
+				tree.leaves[i].centerx = (i > 0 ?tree.leaves[i-1].centerx + xstep : 0);
 				tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
 				
 				for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
@@ -1235,8 +1235,57 @@ PhyloCanvas.Tree.prototype = {
 	{
 		return this.canvas.canvas.toDataURL();		
 	},
+	parseNexus : function(str, name)
+	{
+		if(!str.match(/^#nexus/i))
+		{
+			 throw "the string provided was not a nexus string";
+		}
+		//Get everything between BEGIN TREES and next END;
+		var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i,'').replace(/END;/i,'');
+		//get translate section
+		var translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
+		
+		//remove translate section from tree section
+		treeSection = treeSection.replace(translateSection, '');
+		//parse translate section into kv pairs
+		translateSection = translateSection.replace(/translate|;/gi, '');
+		
+		var tIntArr = translateSection.split(',');
+		var rObj = {};
+		var ia;
+		for(var i = 0; i < tIntArr.length; i++)
+		{
+			ia = tIntArr[i].replace('\n', '').split(" ");
+			rObj[ia[0].trim()] = ia[1].trim();
+		}
+		
+		//find each line starting with tree.
+		var tArr = treeSection.split('\n');
+		var trees = {};		
+		//id name is '' or does not exist, ask user to choose which tree.
+		for(var i = 0; i < tArr.length; i++)
+		{
+			if(tArr[i].trim() == "") continue;
+			var str = tArr[i].replace(/tree\s/i,'');
+			trees[str.match(/^\w+/)[0]] = str.match(/ [\S]*$/)[0];
+		}
+		if(!trees[name]) throw "tree " + name + " does not exist in this NEXUS file";
+		//parseNwk
+		//alert(trees[name]);
+		this.parseNwk(trees[name].trim());
+		//translate in accordance with translate block
+		for(var n in rObj)
+		{
+			var b = this.branches[n];
+			delete this.branches[n];
+			b.id = rObj[n];
+			this.branches[b.id] = b;
+		}
+	},
 	parseNwk : function(nwk)
 	{		
+		//alert(nwk);
 	  if(!this.loader.drawer)this.loader.run();
 		this.loader.resize();
 		this.root = false;
@@ -1285,7 +1334,7 @@ PhyloCanvas.Tree.prototype = {
 						this.maxBranchLength = this.leaves[l].totalBranchLength;
 					}
 				}
-				 return;
+				 break;
 			  default:
 				 	try
 				 	{
@@ -1300,13 +1349,24 @@ PhyloCanvas.Tree.prototype = {
 				 break;
 		   }
 		}
+				
+		
 		this.root.branchLength = 0;
 		this.maxBranchLength = 0;
 		this.root.setTotalLength();
+		
+		if(this.maxBranchLength == 0)
+		{
+			for(var x in this.branches)
+			{
+				this.branches[x].branchLength = 0.01;
+			}
+			this.root.setTotalLength();
+		}
 	},
 	saveNode : function(node)
 	{
-	  if(!node.id || node.id == "") node.id=genId();
+	  if(!node.id || node.id == "") node.id=node.tree.genId();
 	  if(this.branches[node.id])
 	  {
 	   if(node != this.branches[node.id])  throw "Two nodes on this tree share the id " + node.id;
