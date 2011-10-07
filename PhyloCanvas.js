@@ -41,7 +41,6 @@ function getX( oElement )
  */	
 PhyloCanvas = 
 { 
-
 	createHandler : function(obj, func)
 	{
 		return (function(e){return obj[func](e);});
@@ -1235,12 +1234,103 @@ PhyloCanvas.Tree.prototype = {
 	{
 		return this.canvas.canvas.toDataURL();		
 	},
+	load : function(tree, name, format)
+	{
+		if(format)
+		{
+			if(format.match(/nexus/i))
+			{
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', loadFileCallback, {format:'nexus', name:name});}
+				else{this.parseNexus(tree, name);}
+			}
+			else if(format.match(/newick/i))
+			{
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', loadFileCallback, {format:'newick'});}
+				else{this.parseNwk(tree, name);}
+			}
+		}
+		else
+		{
+			if(tree.match(/\.n(ex|xs)$/))
+			{
+				this.AJAX(tree, 'GET', '', loadFileCallback, {format:'nexus', name:name});
+			}
+			else if(tree.match(/\.nwk$/))
+			{
+				this.AJAX(tree, 'GET', '', loadFileCallback, {format:'newick'});
+			}
+			else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]&]+$/i))
+			{
+				this.parseNexus(tree, name);
+			}
+			else if(tree.match(/^[\w\.\*\:(\),-]+;$/gi))
+			{
+				this.parseNwk(tree, name);
+			}
+		}
+	},
+	AJAX : function(url, method, params, callback, callbackPars, errorCallback)
+	{
+	  var xmlhttp;
+	  if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp=new XMLHttpRequest();
+	  }
+	  else
+	  {// code for IE6, IE5
+	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	  
+	  xmlhttp.onreadystatechange=function()
+	  {
+		if (xmlhttp.readyState==4)
+		{
+			if(xmlhttp.status==200)
+			{
+				callback(xmlhttp, callbackPars);
+			}
+			else
+			{
+				if(errorCallback) errorCallback(xmlhttp, callbackPars);
+			}
+		}
+	  };
+	  xmlhttp.open(method,url,true);
+	  if(method == "GET")
+	  {
+		xmlhttp.send();
+	  }
+	  else
+	  {
+		xmlhttp.send(params);
+	  }
+	},
+	loadFileCallback : function(response, opts)
+	{
+		if(opts.format.match(/nexus/i))
+		{
+			this.parseNexus(reponse.responseText, opts.name);
+		}
+		else if(opts.format.match(/newick/i))
+		{
+			this.parseNwk(response.responseText);
+		}
+		else
+		{
+			throw "file type not recognised by PhyloCanvas";
+		}
+	},
 	parseNexus : function(str, name)
 	{
-		if(!str.match(/^#nexus/i))
+		if(!str.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]&]+$/i))
 		{
 			 throw "the string provided was not a nexus string";
 		}
+		else if(!str.match(/BEGIN TREES/gi))
+		{
+			throw "The nexus file does not contain a tree block";
+		}
+			
 		//Get everything between BEGIN TREES and next END;
 		var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i,'').replace(/END;/i,'');
 		//get translate section
@@ -1285,6 +1375,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	parseNwk : function(nwk)
 	{		
+		if(!nwk.match(/^[\w\.\*\:(\),-]+;$/gi)) throw "String is not a valid nwk";
 		//alert(nwk);
 	  if(!this.loader.drawer)this.loader.run();
 		this.loader.resize();
@@ -1538,16 +1629,10 @@ PhyloCanvas.Tree.prototype = {
 		}
 		else if(this.zoomPickedUp)
 		{
-		   //var oz = this.zoom;
 		   this.d =  ((this.starty - event.clientY) / 100);
 		   x = this.translateClickX(this.startx);
 		   this.setZoom(this.origZoom + this.d);
-		   
-		 
-		   
 		   this.draw();
-		   //this.offsetx = this.origx - (this.startx / this.oz + this.origx - this.startx / (this.oz * this.zoom));
-		   //this.offsety = this.origy - (this.starty / this.oz + this.origy - this.starty / (this.oz * this.zoom));;
 		}
 		else
 		{
