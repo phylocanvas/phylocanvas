@@ -434,7 +434,7 @@ PhyloCanvas.Branch.prototype = {
 		   var l = this.canvas.lineWidth;
 		   this.canvas.strokeStyle = this.tree.highlightColor;
 		   this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-		   this.canvas.arc(cx, cy, this.radius + ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, PhyloCanvas.Angles.FULL, false);
+		   this.canvas.arc(cx, cy, this.radius + (((5/this.tree.zoom) + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, PhyloCanvas.Angles.FULL, false);
 		   this.canvas.stroke();
 		   this.canvas.lineWidth = l;
 		   this.canvas.strokeStyle = this.tree.branchColor;
@@ -590,7 +590,7 @@ PhyloCanvas.Branch.prototype = {
    },
 	setNodeColourAndShape : function(nids, color, shape, size)
 	{
-		var re = new RegExp("(^|,)" + this.label + "(,|$)", "g");
+		var re = new RegExp("(^|,)" + this.id + "(,|$)", "g");
 		if( nids === true ||nids.match(re))
 		{
 		   if(nids !== true)nids.replace(re, "");
@@ -1259,11 +1259,11 @@ PhyloCanvas.Tree.prototype = {
 			{
 				this.AJAX(tree, 'GET', '', loadFileCallback, {format:'newick'});
 			}
-			else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]&]+$/i))
+			else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i))
 			{
 				this.parseNexus(tree, name);
 			}
-			else if(tree.match(/^[\w\.\*\:(\),-]+;$/gi))
+			else if(tree.match(/^[\w\.\*\:(\),-\/]+;$/gi))
 			{
 				this.parseNwk(tree, name);
 			}
@@ -1322,7 +1322,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	parseNexus : function(str, name)
 	{
-		if(!str.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]&]+$/i))
+		if(!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i))
 		{
 			 throw "the string provided was not a nexus string";
 		}
@@ -1375,7 +1375,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	parseNwk : function(nwk)
 	{		
-		if(!nwk.match(/^[\w\.\*\:(\),-]+;$/gi)) throw "String is not a valid nwk";
+		if(!nwk.match(/^[\w\.\*\:(\),-\/]+;$/gi)) throw "String is not a valid nwk";
 		//alert(nwk);
 	  if(!this.loader.drawer)this.loader.run();
 		this.loader.resize();
@@ -1460,7 +1460,17 @@ PhyloCanvas.Tree.prototype = {
 	  if(!node.id || node.id == "") node.id=node.tree.genId();
 	  if(this.branches[node.id])
 	  {
-	   if(node != this.branches[node.id])  throw "Two nodes on this tree share the id " + node.id;
+	   if(node != this.branches[node.id]) 
+		{
+			if(!this.leaf && node.id.match(/^[0-9]{1,3}(\.[0-9]+)?$/))
+			{
+				node.id = this.genId();
+			}
+			else
+			{
+				throw "Two nodes on this tree share the id " + node.id;
+			}
+		}
 	  }else
 	  {
 		this.branches[node.id] = node;
@@ -1486,6 +1496,11 @@ PhyloCanvas.Tree.prototype = {
 	{
 		this.drawn = false;
 		this.treeType = type;
+		this.draw();
+	},
+	setNodeColourAndShape: function(nids, color, shape, size)
+	{
+		this.root.setNodeColourAndShape(nids, color, shape, size);
 		this.draw();
 	},
 	hideLabels : function()
@@ -1517,6 +1532,23 @@ PhyloCanvas.Tree.prototype = {
 	{
 	  this.baseNodeSize = Number(size);
 	  this.draw();
+	},
+	selectNodes : function(nIds)
+	{
+		this.root.setSelected(false, true);
+			var ns = nIds.split(",");
+			
+			for(var i = 0; i < this.leaves.length; i++ )
+			{
+				for(var j = 0; j < ns.length; j++)
+				{
+					this.leaves[i].setSelected(ns[j] == this.leaves[i].id, false);
+				}
+			}
+			this.draw();
+			
+			if(this.onselected) this.onselected(nIds);
+		
 	},
 	translateClickX : function(x)
 	{
