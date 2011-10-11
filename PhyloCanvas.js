@@ -342,7 +342,6 @@ PhyloCanvas.Branch.prototype = {
 	},
 	clicked : function(x,y)
 	{
-		
 		if(x < (this.maxx ) && x > (this.minx ))
 		{
 			if(y < (this.maxy ) && y > (this.miny ))
@@ -376,7 +375,7 @@ PhyloCanvas.Branch.prototype = {
 	},
 	drawNode : function()
 	{
-		var  r = (this.radius + this.tree.baseNodeSize) + (this.selected ? this.tree.selectedNodeSizeIncrease : 0); //r = node radius
+		var  r = (this.radius * this.tree.baseNodeSize); //r = node radius
 		var theta = this.radius * this.tree.baseNodeSize; //theta = translation to center of node... ensures that the node edge is at the end of the branch so the branches don't look shorter than  they should
 		
 		 var cx = this.leaf ? (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
@@ -419,9 +418,7 @@ PhyloCanvas.Branch.prototype = {
 			this.canvas.save();
 			this.canvas.translate(this.centerx, this.centery);
 			this.canvas.rotate(this.angle);
-			
 			this.tree.nodeRenderers[this.nodeShape](this);
-			
 			this.canvas.restore();
 			if(this.tree.showLabels) this.drawLabel();
 		}
@@ -431,14 +428,32 @@ PhyloCanvas.Branch.prototype = {
 		
 		 if(this.highlighted)
 		 {
-		   var l = this.canvas.lineWidth;
-		   this.canvas.strokeStyle = this.tree.highlightColor;
-		   this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-		   this.canvas.arc(cx, cy, this.radius + (((5/this.tree.zoom) + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, PhyloCanvas.Angles.FULL, false);
-		   this.canvas.stroke();
-		   this.canvas.lineWidth = l;
-		   this.canvas.strokeStyle = this.tree.branchColor;
+			 this.canvas.beginPath();
+			 var l = this.canvas.lineWidth;
+			 this.canvas.strokeStyle = this.tree.highlightColor;
+			 this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
+			 this.canvas.arc(cx, cy, (this.leaf? this.radius * this.tree.baseNodeSize : 0)+ ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, PhyloCanvas.Angles.FULL, false);
+			 this.canvas.stroke();
+			 this.canvas.lineWidth = l;
+			 this.canvas.strokeStyle = this.tree.branchColor;
+			 this.canvas.beginPath();
 		 }
+	},
+	getChildIds : function()
+	{
+		if(this.leaf)
+		{
+			return this.id;
+		}
+		else
+		{
+			var children = [];
+			for(var x = 0; x < this.children.length; x++)
+			{
+				children.push(this.children[x].getChildIds());
+			}
+			return children.join(",");
+		}
 	},
 	getChildCount : function()
 	{
@@ -588,23 +603,6 @@ PhyloCanvas.Branch.prototype = {
    {
 	   this.collapsed ? this.expand() : this.collapse();
    },
-	setNodeColourAndShape : function(nids, color, shape, size)
-	{
-		var re = new RegExp("(^|,)" + this.id + "(,|$)", "g");
-		if( nids === true ||nids.match(re))
-		{
-		   if(nids !== true)nids.replace(re, "");
-		   if(color)this.color = color;
-		   if(PhyloCanvas.Shapes[shape])this.nodeShape = PhyloCanvas.Shapes[shape];
-		   if(size > 1) this.radius = size;
-		}
-		for(var i = 0; i < this.children.length; i++)
-		{
-		   nids = this.children[i].setNodeColourAndShape(nids, color, shape, size);
-		   if(nids == "") break;
-		}
-		return nids;
-	},
 	setTotalLength : function()
 	{
 		if(this.parent)
@@ -1319,6 +1317,7 @@ PhyloCanvas.Tree.prototype = {
 		{
 			throw "file type not recognised by PhyloCanvas";
 		}
+		this.draw();
 	},
 	parseNexus : function(str, name)
 	{
@@ -1382,7 +1381,6 @@ PhyloCanvas.Tree.prototype = {
 		this.root = false;
 		this.leaves = [];
 		this.branches = {};
-		this.root = null;
 		this.drawn = false;
 		var curNode = new PhyloCanvas.Branch();
 		curNode.id = "root";
@@ -1500,8 +1498,20 @@ PhyloCanvas.Tree.prototype = {
 	},
 	setNodeColourAndShape: function(nids, color, shape, size)
 	{
-		this.root.setNodeColourAndShape(nids, color, shape, size);
-		this.draw();
+		var arr = nids.split(",");
+		if(nids != "")
+		{
+			for(var i = 0; i <  arr.length; i++)
+			{
+				if(this.branches[arr[i]])
+				{
+					if(color)this.branches[arr[i]].color = color;
+					if(shape)this.branches[arr[i]].nodeShape = PhyloCanvas.Shapes[shape] ? PhyloCanvas.Shapes[shape] : shape;
+					if(size) this.branches[arr[i]].radius = size;
+				}
+			}
+			this.draw();
+		}
 	},
 	hideLabels : function()
 	{
@@ -1569,11 +1579,6 @@ PhyloCanvas.Tree.prototype = {
 	//internal 
 	clicked : function(e)
 	{
-	   
-
-	    
-		
-	 
 	  //this.canvas.fill();
 	  if(e.button == 0)
 	  {
@@ -1587,7 +1592,7 @@ PhyloCanvas.Tree.prototype = {
 			   if(this.internalNodesSelectable || nd.leaf)
 			   {
 				  nd.setSelected(true, true);
-				  if(this.onselected) this.onselected(nd.id);
+				  if(this.onselected) this.onselected(nd.getChildIds());
 			   }
 			}
 			else if(this.unselectOnClickAway && !this.dragging)
@@ -1661,7 +1666,7 @@ PhyloCanvas.Tree.prototype = {
 		}
 		else if(this.zoomPickedUp)
 		{
-		   this.d =  ((this.starty - event.clientY) / 100);
+		   this.d = ((this.starty - event.clientY) / 100);
 		   x = this.translateClickX(this.startx);
 		   this.setZoom(this.origZoom + this.d);
 		   this.draw();
@@ -1675,7 +1680,6 @@ PhyloCanvas.Tree.prototype = {
 		   {
 			  this.root.setHighlighted(false);
 			  nd.setHighlighted(true);
-			 
 		   }
 		   else
 		   {
