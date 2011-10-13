@@ -288,8 +288,6 @@ PhyloCanvas.ContextMenu.prototype = {
 		}
 };
 PhyloCanvas.Loader.prototype = {
-		
-	           
          run : function() 
          {
              var i = 0;
@@ -1065,6 +1063,18 @@ PhyloCanvas.Tree.prototype = {
 	  if(!this.drawn) return false;
 	  this.pickedup = false;
 	  this.zoomPickedUp = false;
+	},
+	findBranch : function(patt)
+	{
+		this.root.setHighlighted(false);
+		for(var i = 0; i < this.leaves.length; i++)
+		{
+			if(this.leaves[i].id.match(new RegExp(patt, 'i')))
+			{
+				this.leaves[i].setHighlighted(true);
+			}
+		}
+		this.draw();
 	},
 	genId : function()
 	{
