@@ -144,9 +144,21 @@ PhyloCanvas =
   
         this.message = "Loading ...";
 	},
-	Navigator : function()
+	Navigator : function(tree)
 	{
+		this.tree = tree;
+		this.cel = document.createElement('canvas');
+		this.cel.id = this.tree.canvasEl.id + 'Navi';
+		this.cel.style.zIndex = '100';
+		this.cel.style.backgroundColor = '#FFFFFF';
+		this.cel.width = this.tree.canvas.canvas.width / 4;
+		this.cel.height = this.tree.canvas.canvas.height / 4;
+		this.cel.style.position = 'absolute';
+		this.cel.style.bottom = '0px';
+		this.cel.style.right = '0px';
+		this.tree.canvasEl.appendChild(this.cel);
 		
+		this.ctx = this.cel.getContext('2d');
 	},
 	Tree : function(div)
 	{
@@ -184,11 +196,9 @@ PhyloCanvas =
          this.origy;
 		 
          this.loader.run();
-         this.navigator = new PhyloCanvas.Navigator(div);
 
          this.canvas = cl.getContext('2d');
 
-		 //this.canvas.translate(this.canvas.canvas.width/2, this.canvas.height/2);
          this.canvas.canvas.onselectstart = function () { return false; };
          this.canvas.fillStyle = "#000000";
          this.canvas.strokeStyle = "#000000";
@@ -219,7 +229,7 @@ PhyloCanvas =
 		 this.rightClickZoom = true;
 		 
          this.onselected = null;
-		
+         this.navigator = new PhyloCanvas.Navigator(this);
 		 //if(this.showControls) this.drawControls();
 		this.canvas.canvas.oncontextmenu = PhyloCanvas.createHandler(this, "clicked");
 		this.canvas.canvas.onclick = PhyloCanvas.createHandler(this, "clicked");
@@ -262,9 +272,11 @@ PhyloCanvas.ContextMenu.prototype = {
 					d.addEventListener('click', PhyloCanvas.createHandler(this.tree, this.elements[i].handler));
 				}
 				d.style.cursor = 'pointer';
-				d.style.padding = '0.3em 0.3em 0.3em 0.3em';
+				d.style.padding = '0.3em 0.5em 0.3em 0.5em';
 				d.style.fontFamily = this.tree.font;
+				d.style.fontSize = this.tree.textSize + 'pt';
 				d.addEventListener('click', PhyloCanvas.createHandler(this, 'close'));
+				d.addEventListener('contextmenu', function(e){e.preventDefault();});
 				d.addEventListener('mouseover', PhyloCanvas.createHandler(d, this.mouseover));
 				d.addEventListener('mouseout', PhyloCanvas.createHandler(d, this.mouseout));
 				this.div.appendChild(d);
@@ -389,7 +401,12 @@ PhyloCanvas.Loader.prototype = {
 			this.ctx.fillText(message, -(this.ctx.measureText(message).width / 2), this.loader_radius + 50, this.loader_radius * 2);
 		 }
 };
-PhyloCanvas.Navigator.prototype = {};
+PhyloCanvas.Navigator.prototype = {
+		drawFrame : function()
+		{
+			
+		}
+};
 PhyloCanvas.Branch.prototype = {
 	/*
 	 * @function addChild 
@@ -757,7 +774,7 @@ PhyloCanvas.Tree.prototype = {
 			{
 				node.children[i].startx = node.centerx;
 				node.children[i].starty = node.centery;
-				if(node.children[i].selected && !collapse)
+				if(node.children[i].selected && !node.collapsed)
 				{
 				 tree.selectedNodes.push(node.children[i]);
 				}
@@ -844,7 +861,7 @@ PhyloCanvas.Tree.prototype = {
 			}
 			for(var i = 0 ; i < node.children.length; i++)
 			{
-				if(node.children[i].selected && !collapse)
+				if(node.children[i].selected && !node.collapsed)
 				{
 				  node.tree.selectedNodes.push(node.children[i]);
 				}
@@ -884,7 +901,7 @@ PhyloCanvas.Tree.prototype = {
 			{
 				node.children[i].startx = node.centerx;
 				node.children[i].starty = node.centery;
-				if(node.children[i].selected && !collapse)
+				if(node.children[i].selected && !node.collapsed)
 				{
 				  node.tree.selectedNodes.push(node.children[i]);
 				}
@@ -1066,12 +1083,12 @@ PhyloCanvas.Tree.prototype = {
 	},
 	findBranch : function(patt)
 	{
-		this.root.setHighlighted(false);
+		this.root.setSelected(false, true);
 		for(var i = 0; i < this.leaves.length; i++)
 		{
 			if(this.leaves[i].id.match(new RegExp(patt, 'i')))
 			{
-				this.leaves[i].setHighlighted(true);
+				this.leaves[i].setSelected(true, true);
 			}
 		}
 		this.draw();
