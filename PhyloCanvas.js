@@ -1117,12 +1117,12 @@ PhyloCanvas.Tree.prototype = {
 		{
 			if(format.match(/nexus/i))
 			{
-				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', loadFileCallback, {format:'nexus', name:name});}
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name});}
 				else{this.parseNexus(tree, name);}
 			}
 			else if(format.match(/newick/i))
 			{
-				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', loadFileCallback, {format:'newick'});}
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'});}
 				else{this.parseNwk(tree, name);}
 			}
 		}
@@ -1130,11 +1130,11 @@ PhyloCanvas.Tree.prototype = {
 		{
 			if(tree.match(/\.n(ex|xs)$/))
 			{
-				this.AJAX(tree, 'GET', '', loadFileCallback, {format:'nexus', name:name});
+				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name});
 			}
 			else if(tree.match(/\.nwk$/))
 			{
-				this.AJAX(tree, 'GET', '', loadFileCallback, {format:'newick'});
+				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'});
 			}
 			else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i))
 			{
