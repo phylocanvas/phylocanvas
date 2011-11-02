@@ -702,7 +702,7 @@ PhyloCanvas.Branch.prototype = {
 	}
 };
 PhyloCanvas.Tree.prototype = {
-	AJAX : function(url, method, params, callback, callbackPars, errorCallback)
+	AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
 	{
 	  var xmlhttp;
 	  if (window.XMLHttpRequest)
@@ -720,11 +720,11 @@ PhyloCanvas.Tree.prototype = {
 		{
 			if(xmlhttp.status==200)
 			{
-				callback(xmlhttp, callbackPars);
+				callback(xmlhttp, callbackPars, scope);
 			}
 			else
 			{
-				if(errorCallback) errorCallback(xmlhttp, callbackPars);
+				if(errorCallback) errorCallback(xmlhttp, callbackPars, scope);
 			}
 		}
 	  };
@@ -1113,16 +1113,17 @@ PhyloCanvas.Tree.prototype = {
 	},
 	load : function(tree, name, format)
 	{
+		var tr = this;
 		if(format)
 		{
 			if(format.match(/nexus/i))
 			{
-				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name});}
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);}
 				else{this.parseNexus(tree, name);}
 			}
 			else if(format.match(/newick/i))
 			{
-				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'});}
+				if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);}
 				else{this.parseNwk(tree, name);}
 			}
 		}
@@ -1130,11 +1131,11 @@ PhyloCanvas.Tree.prototype = {
 		{
 			if(tree.match(/\.n(ex|xs)$/))
 			{
-				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name});
+				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);
 			}
 			else if(tree.match(/\.nwk$/))
 			{
-				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'});
+				this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);
 			}
 			else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i))
 			{
@@ -1146,21 +1147,21 @@ PhyloCanvas.Tree.prototype = {
 			}
 		}
 	},
-	loadFileCallback : function(response, opts)
+	loadFileCallback : function(response, opts, scope)
 	{
 		if(opts.format.match(/nexus/i))
 		{
-			this.parseNexus(reponse.responseText, opts.name);
+			scope.parseNexus(reponse.responseText, opts.name);
 		}
 		else if(opts.format.match(/newick/i))
 		{
-			this.parseNwk(response.responseText);
+			scope.parseNwk(response.responseText);
 		}
 		else
 		{
 			throw "file type not recognised by PhyloCanvas";
 		}
-		this.draw();
+		scope.draw();
 	},
 	nodePrerenderers : 
 	{
