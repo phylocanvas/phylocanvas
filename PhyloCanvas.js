@@ -170,7 +170,10 @@ PhyloCanvas =
 		this.loader = new PhyloCanvas.Loader(div);
 		this.root = false;
 		
+		this.lastId = 0;
 		
+		this.origBL = {};
+		this.origP = {};
 		
 		this.canvasEl = div;
 		this.canvasEl.style.position = 'relative';
@@ -678,6 +681,14 @@ PhyloCanvas.Branch.prototype = {
 	{
 		this.tree.redrawFromBranch(this);
 	},
+	saveChildren : function()
+	{
+		for(var i = 0; i < this.children.length; i ++)
+		{
+			this.tree.saveNode(this.children[i]);
+			this.children[i].saveChildren();
+		}
+	},
 	collapse : function()
    {
 	   this.collapsed = this.leaf === false; // don't collapse the node if it is a leaf... that would be silly!
@@ -1107,12 +1118,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	genId : function()
 	{
-		var id = "pcn0";
-		for(var i = 1; this.branches[id] ;i++)
-		{
-			id = "pcn" + i;
-		}
-		return id;
+		return "pcn" + this.lastId++;
 	},
 	getPngUrl : function()
 	{
@@ -1125,7 +1131,6 @@ PhyloCanvas.Tree.prototype = {
 	},
 	load : function(tree, name, format)
 	{
-		var tr = this;
 		if(format)
 		{
 			if(format.match(/nexus/i))
@@ -1317,71 +1322,72 @@ PhyloCanvas.Tree.prototype = {
 	parseNwk : function(nwk)
 	{		
 		if(!nwk.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) throw "String is not a valid nwk";
-		//alert(nwk);
-	  if(!this.loader.drawer)this.loader.run();
-		this.loader.resize();
-		this.root = false;
-		this.leaves = [];
-		this.branches = {};
-		this.drawn = false;
-		var curNode = new PhyloCanvas.Branch();
-		curNode.id = "root";
-		this.branches.root = curNode;
-		this.setRoot(curNode);
 		
-		for(var i = 0; i < nwk.length; i++)
-		{
-			switch(nwk[i])
+		this.origBranches = false;
+		this.origLeaves = false;
+		this.origRoot = false;
+		this.origBL = {};
+		this.origP = {};
+		//alert(nwk);
+		if(!this.loader.drawer)this.loader.run();
+			this.loader.resize();
+			this.root = false;
+			this.leaves = [];
+			this.branches = {};
+			this.drawn = false;
+			var curNode = new PhyloCanvas.Branch();
+			curNode.id = "root";
+			this.branches.root = curNode;
+			this.setRoot(curNode);
+			
+			for(var i = 0; i < nwk.length; i++)
 			{
-			  case '(': //new Child
-			   
-				var nd = new PhyloCanvas.Branch();
-				//nd.id = this.genId();
-				curNode.leaf = false;
-				curNode.addChild(nd);
-			    this.branches[curNode.id] = curNode;
-				curNode = nd;
-				break;
-			  case ')': //return to parent
-				  this.saveNode(curNode);
-				 if(curNode.leaf) this.leaves.push(curNode);
-				 curNode = curNode.parent;
-				 break;
-			  case ',': //new sibiling
-				 var nd = new PhyloCanvas.Branch();
-				// nd.id = this.genId();
-				 if(curNode.leaf) this.leaves.push(curNode);
-				  this.saveNode(curNode);
-				 curNode.parent.addChild(nd);
-				 curNode = nd;
-				 break;
-			  case ';':
-				// this.root.setTotalLength();
-				this.saveNode(curNode);
-				 for (var l = 0; l < this.leaves.length; l++)
+				switch(nwk[i])
 				{
-					if(this.leaves[l].totalBranchLength > this.maxBranchLength)
-					{
-						this.maxBranchLength = this.leaves[l].totalBranchLength;
-					}
+					case '(': //new Child
+						var nd = new PhyloCanvas.Branch();
+						curNode.leaf = false;
+						curNode.addChild(nd);
+						curNode = nd;
+						break;
+					case ')': //return to parent
+						if(curNode.leaf) this.leaves.push(curNode);
+						curNode = curNode.parent;
+						break;
+					case ',': //new sibiling
+						var nd = new PhyloCanvas.Branch();
+						if(curNode.leaf) this.leaves.push(curNode);
+						curNode.parent.addChild(nd);
+						curNode = nd;
+						break;
+					case ';':
+						for (var l = 0; l < this.leaves.length; l++)
+						{
+							if(this.leaves[l].totalBranchLength > this.maxBranchLength)
+							{
+								this.maxBranchLength = this.leaves[l].totalBranchLength;
+							}
+						}
+						break;
+					default:
+					 	try
+					 	{
+							i = curNode.parseNwk(nwk, i);
+							i--;
+						}
+						catch(e)
+						{
+							alert( "Error parsing nwk file" + e );
+							return;
+						}
+					 break;
 				}
-				 break;
-			  default:
-				 	try
-				 	{
-						i = curNode.parseNwk(nwk, i);
-						i--;
-					}
-					catch(e)
-					{
-						alert( "Error parsing nwk file" + e );
-						return;
-					}
-				 break;
-		   }
 		}
 				
+		this.saveNode(this.root);
+		this.root.saveChildren();
 		
+			
 		this.root.branchLength = 0;
 		this.maxBranchLength = 0;
 		this.root.setTotalLength();
@@ -1693,13 +1699,13 @@ PhyloCanvas.Tree.prototype = {
 		if(!this.origBranches) this.origBranches = this.branches;
 		if(!this.origLeaves) this.origLeaves = this.leaves;
 		if(!this.origRoot) this.origRoot = this.root;
-		if(!this.origBL) this.origBL = node.branchLength;
-		if(!this.origP) this.origP = node.parent;
+		this.origBL[node.id] = node.branchLength;
+		this.origP[node.id] = node.parent;
 		
 		
 		this.root = node;
-		this.root.startx = 0;
-		this.root.starty = 0;
+		//this.root.startx = 0;
+	//	this.root.starty = 0;
 		this.root.branchLength = 0;
 		this.root.parent = false;
 		
@@ -1724,10 +1730,17 @@ PhyloCanvas.Tree.prototype = {
 	},
 	redrawOriginalTree : function()
 	{
-		this.totalBranchLength = 0;
-		this.root.parent = this.origP;
-		this.root.branchLength = this.origBL;
+		//this.totalBranchLength = 0;
+		//this.root.parent = this.origP;
+		//this.root.branchLength = this.origBL;
 		this.branches = this.origBranches;
+		for(var n in this.origBL)
+		{
+			this.branches[n].branchLength = this.origBL[n];
+			this.branches[n].parent = this.origP[n];
+		}
+		
+		
 		this.leaves = this.origLeaves;
 		this.root = this.origRoot;
 		this.root.setTotalLength();
@@ -1740,18 +1753,20 @@ PhyloCanvas.Tree.prototype = {
 	  if(!node.id || node.id == "") node.id=node.tree.genId();
 	  if(this.branches[node.id])
 	  {
-	   if(node != this.branches[node.id]) 
-		{
-			if(!this.leaf && node.id.match(/^[0-9]{1,3}(\.[0-9]+)?$/))
+		  if(node != this.branches[node.id]) 
+		  {
+			if(!this.leaf)
 			{
 				node.id = this.genId();
+				this.branches[node.id] = node;
 			}
 			else
 			{
 				throw "Two nodes on this tree share the id " + node.id;
 			}
 		}
-	  }else
+	  }
+	  else
 	  {
 		this.branches[node.id] = node;
 	  }
