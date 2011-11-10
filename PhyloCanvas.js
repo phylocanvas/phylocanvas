@@ -116,6 +116,9 @@ PhyloCanvas =
 		  text:'Collapse/Expand branch',handler: 'toggleCollapsed', internal: true, leaf:false
 	  },
 	  {
+		  text:'Redraw Subtree',handler: 'redrawTreeFromBranch', internal: true, leaf:false
+	  },
+	  {
 		  text:'Show Labels',handler: 'displayLabels', internal: false, leaf:false
 	  },
 	  {
@@ -442,7 +445,7 @@ PhyloCanvas.Branch.prototype = {
 	    try{
 		this.canvas.font = Math.max(Math.round(this.tree.textSize/this.tree.zoom), 4) + "pt " + this.tree.font;
 
-		var lbl = this.id;
+		var lbl = this.label ? this.label : this.id;
 		
 		var dim = this.canvas.measureText(lbl);
 		var tx = this.centerx + (dim.width *(0.5 * Math.cos(this.angle) - 0.5 )) + ((5 + this.radius * 2)* Math.cos(this.angle));
@@ -671,6 +674,10 @@ PhyloCanvas.Branch.prototype = {
 		if(this.branchLength < 0) this.branchLength = 0;
 		return idx;
 	},
+	redrawTreeFromBranch : function()
+	{
+		this.tree.redrawFromBranch(this);
+	},
 	collapse : function()
    {
 	   this.collapsed = this.leaf === false; // don't collapse the node if it is a leaf... that would be silly!
@@ -685,6 +692,7 @@ PhyloCanvas.Branch.prototype = {
    },
 	setTotalLength : function()
 	{
+		
 		if(this.parent)
 		{
 			this.totalBranchLength = this.parent.totalBranchLength +  this.branchLength;
@@ -692,8 +700,8 @@ PhyloCanvas.Branch.prototype = {
 		}
 		else
 		{
-		 this.totalBranchLength = this.branchLength;
-		 if(this.totalBranchLength > this.tree.maxBranchLength) this.tree.maxBranchLength = this.totalBranchLength;
+			 this.totalBranchLength = this.branchLength;
+			 this.tree.maxBranchLength = this.totalBranchLength;
 		}
 		for(var c = 0; c < this.children.length ; c++)
 		{
@@ -928,8 +936,12 @@ PhyloCanvas.Tree.prototype = {
 			
 			if(!collapse){
 				node.canvas.beginPath();
-				node.canvas.moveTo(node.startx , node.starty);
-				node.canvas.lineTo(node.centerx, node.starty);
+				if(node != node.tree.root) 
+				{
+					node.canvas.moveTo(node.startx , node.starty);
+					node.canvas.lineTo(node.centerx, node.starty);
+				}
+				
 				node.canvas.lineTo(node.centerx, node.centery);
 				node.canvas.stroke();
 				
@@ -1140,7 +1152,7 @@ PhyloCanvas.Tree.prototype = {
 			{
 				this.parseNexus(tree, name);
 			}
-			else if(tree.match(/^[\w\.\*\:(\),-\/]+;$/gi))
+			else if(tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi))
 			{
 				this.parseNwk(tree, name);
 			}
@@ -1303,7 +1315,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	parseNwk : function(nwk)
 	{		
-		if(!nwk.match(/^[\w\.\*\:(\),-\/]+;$/gi)) throw "String is not a valid nwk";
+		if(!nwk.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) throw "String is not a valid nwk";
 		//alert(nwk);
 	  if(!this.loader.drawer)this.loader.run();
 		this.loader.resize();
@@ -1658,7 +1670,70 @@ PhyloCanvas.Tree.prototype = {
 			
 		}
 	},
-	
+	redrawGetNodes: function(node)
+	{
+		for(var i = 0; i < node.children.length; i++)
+		{
+			this.branches[node.children[i].id] = node.children[i];
+			if(node.children[i].leaf) 
+			{
+				this.leaves.push(node.children[i]);
+			}
+			else
+			{
+				this.redrawGetNodes(node.children[i]);
+			}
+		}
+	},
+	redrawFromBranch: function(node)
+	{
+		this.totalBranchLength = 0;
+		
+		if(!this.origBranches) this.origBranches = this.branches;
+		if(!this.origLeaves) this.origLeaves = this.leaves;
+		if(!this.origRoot) this.origRoot = this.root;
+		if(!this.origBL) this.origBL = node.branchLength;
+		if(!this.origP) this.origP = node.parent;
+		
+		
+		this.root = node;
+		this.root.startx = 0;
+		this.root.starty = 0;
+		this.root.branchLength = 0;
+		this.root.parent = false;
+		
+		this.branches = {};
+		this.leaves = [];
+		for(var i = 0; i < this.root.children.length; i++)
+		{
+			this.branches[this.root.children[i].id] = this.root.children[i];
+			if(this.root.children[i].leaf) 
+			{
+				this.leaves.push(this.root.children[i]);
+			}
+			else
+			{
+				this.redrawGetNodes(this.root.children[i]);
+			}
+		}
+		this.root.setTotalLength();
+		this.prerenderers[this.treeType](this);
+		this.draw();
+		
+	},
+	redrawOriginalTree : function()
+	{
+		this.totalBranchLength = 0;
+		this.root.parent = this.origP;
+		this.root.branchLength = this.origBL;
+		this.branches = this.origBranches;
+		this.leaves = this.origLeaves;
+		this.root = this.origRoot;
+		this.root.setTotalLength();
+		this.prerenderers[this.treeType](this);
+		this.draw();
+		
+	},
 	saveNode : function(node)
 	{
 	  if(!node.id || node.id == "") node.id=node.tree.genId();
@@ -1777,8 +1852,6 @@ PhyloCanvas.Tree.prototype = {
 	  this.showLabels = !this.showLabels;
 	  this.draw();
 	},
-	
-	
 	translateClickX : function(x)
 	{
 	  x = (x - getX(this.canvas.canvas)  + window.pageXOffset);
