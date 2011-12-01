@@ -77,7 +77,7 @@ PhyloCanvas =
 		 * The angle (clockwise from horizontal (center to right) to the node's centre
 		 */
 		this.angle = 0;
-		this.branchLength =  0;
+		this.branchLength = false;
 		this.canvas;
 		this.centerx = 0;
 		this.centery = 0;
@@ -237,6 +237,7 @@ PhyloCanvas =
          this.onselected = null;
          this.navigator = new PhyloCanvas.Navigator(this);
 		 //if(this.showControls) this.drawControls();
+        //window.onresize = PhyloCanvas.createHandler(this, "autoSize");
 		this.canvas.canvas.oncontextmenu = PhyloCanvas.createHandler(this, "clicked");
 		this.canvas.canvas.onclick = PhyloCanvas.createHandler(this, "clicked");
 		this.canvas.canvas.ondblclick =  PhyloCanvas.createHandler(this, "dblclicked");
@@ -1067,7 +1068,13 @@ PhyloCanvas.Tree.prototype = {
 	draw : function()
 	{
 		this.selectedNodes = [];
-		 
+		
+		if(this.maxBranchLength == 0)
+		{
+			//this.loader.fail("All branches in the tree are identical.");
+			return;
+		}
+		
 		this.canvas.restore();
 		
 		
@@ -1321,7 +1328,7 @@ PhyloCanvas.Tree.prototype = {
 	},
 	parseNwk : function(nwk)
 	{		
-		if(!nwk.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) throw "String is not a valid nwk";
+		//if(!nwk.match(/^[\w\.\*\:(\),-_\/]+;\s?$/gi)) throw "String is not a valid nwk";
 		
 		this.origBranches = false;
 		this.origLeaves = false;
@@ -1394,11 +1401,7 @@ PhyloCanvas.Tree.prototype = {
 		
 		if(this.maxBranchLength == 0)
 		{
-			for(var x in this.branches)
-			{
-				this.branches[x].branchLength = 0.01;
-			}
-			this.root.setTotalLength();
+			this.loader.fail("All branches in the tree are identical.");
 		}
 	},
 	pickup : function(event)
@@ -1730,9 +1733,8 @@ PhyloCanvas.Tree.prototype = {
 	},
 	redrawOriginalTree : function()
 	{
-		//this.totalBranchLength = 0;
-		//this.root.parent = this.origP;
-		//this.root.branchLength = this.origBL;
+		if(!this.origBranches) return;
+        
 		this.branches = this.origBranches;
 		for(var n in this.origBL)
 		{
@@ -1841,6 +1843,10 @@ PhyloCanvas.Tree.prototype = {
 		this.treeType = type;
 		this.draw();
 	},
+	/*autoSize : function()
+	{
+		this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
+	},*/
 	setSize: function(width, height)
 	{
 		this.canvas.canvas.width = width;
@@ -1849,7 +1855,7 @@ PhyloCanvas.Tree.prototype = {
 			this.drawn = false;
 			this.draw();
 		 }
-		  this.loader.resize();
+		 this.loader.resize();
 	},
 	setZoom : function(z)
 	{
