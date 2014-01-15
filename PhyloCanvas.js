@@ -5,44 +5,45 @@
  * @modified 14/01/14
  */
 
-/**
- * Get the y coordinate of oElement
- * 
- * @param oElement - The element to get the Y position of.
- * 
- */
-function getY( oElement )
-{
- var iReturnValue = 0;
- while( oElement != null ) {
-	iReturnValue += oElement.offsetTop;
-	oElement = oElement.offsetParent;
- }
- return iReturnValue;
-}
 
-/**
- * Get the x coordinate of oElement
- * 
- * @param oElement - The element to get the X position of.
- * 
- */
-function getX( oElement )
-{
- var iReturnValue = 0;
- while( oElement != null ) {
-	iReturnValue += oElement.offsetLeft;
-	oElement = oElement.offsetParent;
- }
- return iReturnValue;
-}
 
 var PhyloCanvas = (function(){
         /**
+         * Get the y coordinate of oElement
+         * 
+         * @param oElement - The element to get the Y position of.
+         * 
+         */
+        function getY( oElement )
+        {
+         var iReturnValue = 0;
+         while( oElement != null ) {
+            iReturnValue += oElement.offsetTop;
+            oElement = oElement.offsetParent;
+         }
+         return iReturnValue;
+        }
+        
+        /**
+         * Get the x coordinate of oElement
+         * 
+         * @param oElement - The element to get the X position of.
+         * 
+         */
+        function getX( oElement )
+        {
+         var iReturnValue = 0;
+         while( oElement != null ) {
+            iReturnValue += oElement.offsetLeft;
+            oElement = oElement.offsetParent;
+         }
+         return iReturnValue;
+        }
+    
+        /**
          * @namespace PhyloCanvas
          */
-        var PhyloCanvas = {};
-        /** @lends PhyloCanvas */
+
     
 
         /**
@@ -51,7 +52,7 @@ var PhyloCanvas = (function(){
          * @memberof PhyloCanvas
          * @constant
          */
-        PhyloCanvas.Angles={
+        var Angles={
             /**
              * @constant
              * @type double
@@ -85,7 +86,7 @@ var PhyloCanvas = (function(){
          * @param {String} func the name of the function to be called
          * @retuns {function}
          */
-        PhyloCanvas.createHandler = function(obj, func)
+        function createHandler(obj, func)
         {
             
             if(typeof func == typeof "aaa")
@@ -103,7 +104,7 @@ var PhyloCanvas = (function(){
          * @enum
          * @memberof PhyloCanvas
          */
-        PhyloCanvas.Shapes = {
+        var Shapes = {
             "x" : "star",
             "s" : "square",
             "o" : "circle",
@@ -118,7 +119,7 @@ var PhyloCanvas = (function(){
          * @public
          * 
          */
-        PhyloCanvas.Branch = function()
+        var Branch = function()
         {
             
             /**
@@ -191,7 +192,7 @@ var PhyloCanvas = (function(){
             /**
              * the angle that the last child of this brach 'splays' at, used for circular and radial trees
              */
-            this.minChildAngle = PhyloCanvas.Angles.FULL;
+            this.minChildAngle = Angles.FULL;
             
             /**
              * What kind of teminal should be drawn on this node
@@ -215,7 +216,16 @@ var PhyloCanvas = (function(){
              * true if this branch is currently selected
              */
             this.selected = false;
+            
+            /**
+             * the x position of the start of the branch
+             * @type double
+             */
             this.startx = 0;
+            /**
+             * the y position of the start of the branch
+             * @type double
+             */
             this.starty = 0;
             /**
              * The length from the root of the tree to the tip of this branch
@@ -223,7 +233,7 @@ var PhyloCanvas = (function(){
             this.totalBranchLength = 0;
             /**
              * The tree object that this branch is part of
-             * @type PhyloCanvas.Tree
+             * @type Tree
              */
             this.tree = {};
         };
@@ -236,10 +246,10 @@ var PhyloCanvas = (function(){
          * @memberOf PhyloCanvas
          * 
          */
-        PhyloCanvas.ContextMenu = function(tree)
+        ContextMenu = function(tree)
         {
          /**
-          * The PhyloCanvas.Tree object that this context menu influences
+          * The Tree object that this context menu influences
           */
           this.tree = tree;
           /**
@@ -274,7 +284,7 @@ var PhyloCanvas = (function(){
          * @constructor
          * @memberof PhyloCanvas
          */
-        PhyloCanvas.Loader = function(div)
+        Loader = function(div)
         {
             this.div = div;
             this.cl = document.createElement('canvas');
@@ -301,7 +311,7 @@ var PhyloCanvas = (function(){
          * @constructor
          * @memberof PhyloCanvas
          */
-        PhyloCanvas.Navigator = function(tree)
+        Navigator = function(tree)
         {
             this.tree = tree;
             this.cel = document.createElement('canvas');
@@ -337,22 +347,43 @@ var PhyloCanvas = (function(){
          * @example
          *  new PhyloCanvas.Tree(div);
          */
-        PhyloCanvas.Tree = function(div)
+        Tree = function(div)
         {
             // if the ID is provided get the element, if not assume div
             if(typeof div == 'string') div = document.getElementById(div);
             
+            /**
+             * 
+             * Dictionary of all branches indexed by Id
+             */
             this.branches = {};
+            /**
+             * 
+             * List of leaves
+             */
             this.leaves = [];
-            this.loader = new PhyloCanvas.Loader(div);
+            /**
+             * Loading dialog displayed while waiting for the tree
+             */
+            this.loader = new Loader(div);
+            /**
+             * The root node of the tree (not neccesarily a root in the Phylogenetic sense)
+             */
             this.root = false;
             
+            /**
+             * 
+             * used for auto ids for internal nodes
+             * @private 
+             */
             this.lastId = 0;
             
             this.origBL = {};
             this.origP = {};
             
             this.canvasEl = div;
+            
+            //Set up the div and canvas element
             this.canvasEl.style.position = 'relative';
             var cl = document.createElement('canvas');
             cl.id = div.id + 'pCanvas';
@@ -362,7 +393,11 @@ var PhyloCanvas = (function(){
             cl.width = div.clientWidth;
             cl.style.zIndex = '1';
             this.canvasEl.appendChild(cl);
-            this.contextMenu = new PhyloCanvas.ContextMenu(this);
+            
+            /***
+             * Right click menu
+             */
+            this.contextMenu = new ContextMenu(this);
             this.drawn = false;
         
              this.selectedNodes = [];
@@ -413,24 +448,24 @@ var PhyloCanvas = (function(){
              
              this.onselected = null;
              if(this.use_navigator){
-                 this.navigator = new PhyloCanvas.Navigator(this);
+                 this.navigator = new Navigator(this);
              }
              //if(this.showControls) this.drawControls();
-            //window.onresize = PhyloCanvas.createHandler(this, "autoSize");
-            this.canvas.canvas.oncontextmenu = PhyloCanvas.createHandler(this, "clicked");
-            this.canvas.canvas.onclick = PhyloCanvas.createHandler(this, "clicked");
-            //this.canvas.canvas.ondblclick =  PhyloCanvas.createHandler(this, "dblclicked");
-            this.canvas.canvas.onmousedown =  PhyloCanvas.createHandler(this, "pickup");
-            this.canvas.canvas.onmouseup =  PhyloCanvas.createHandler(this, "drop");
-            this.canvas.canvas.onmouseout =  PhyloCanvas.createHandler(this, "drop");
-            this.canvas.canvas.onmousemove =  PhyloCanvas.createHandler(this, "drag");
-            this.canvas.canvas.onmousewheel = PhyloCanvas.createHandler(this, "scroll");
-            this.canvas.canvas.addEventListener('DOMMouseScroll', PhyloCanvas.createHandler(this, "scroll"));
+            //window.onresize = createHandler(this, "autoSize");
+            this.canvas.canvas.oncontextmenu = createHandler(this, "clicked");
+            this.canvas.canvas.onclick = createHandler(this, "clicked");
+            //this.canvas.canvas.ondblclick =  createHandler(this, "dblclicked");
+            this.canvas.canvas.onmousedown =  createHandler(this, "pickup");
+            this.canvas.canvas.onmouseup =  createHandler(this, "drop");
+            this.canvas.canvas.onmouseout =  createHandler(this, "drop");
+            this.canvas.canvas.onmousemove =  createHandler(this, "drag");
+            this.canvas.canvas.onmousewheel = createHandler(this, "scroll");
+            this.canvas.canvas.addEventListener('DOMMouseScroll', createHandler(this, "scroll"));
         };
 
     
     //static members
-    PhyloCanvas.ContextMenu.prototype = {
+    ContextMenu.prototype = {
             close : function()
             {
                 this.div.style.display = 'none';
@@ -451,20 +486,20 @@ var PhyloCanvas = (function(){
                     d.appendChild(document.createTextNode(this.elements[i].text));
                     if(this.elements[i].leaf || this.elements[i].internal)
                     {
-                        d.addEventListener('click', PhyloCanvas.createHandler(nd, this.elements[i].handler));
+                        d.addEventListener('click', createHandler(nd, this.elements[i].handler));
                     }
                     else
                     {
-                        d.addEventListener('click', PhyloCanvas.createHandler(this.tree, this.elements[i].handler));
+                        d.addEventListener('click', createHandler(this.tree, this.elements[i].handler));
                     }
                     d.style.cursor = 'pointer';
                     d.style.padding = '0.3em 0.5em 0.3em 0.5em';
                     d.style.fontFamily = this.tree.font;
                     d.style.fontSize = this.tree.textSize + 'pt';
-                    d.addEventListener('click', PhyloCanvas.createHandler(this, 'close'));
+                    d.addEventListener('click', createHandler(this, 'close'));
                     d.addEventListener('contextmenu', function(e){e.preventDefault();});
-                    d.addEventListener('mouseover', PhyloCanvas.createHandler(d, this.mouseover));
-                    d.addEventListener('mouseout', PhyloCanvas.createHandler(d, this.mouseout));
+                    d.addEventListener('mouseover', createHandler(d, this.mouseover));
+                    d.addEventListener('mouseout', createHandler(d, this.mouseout));
                     this.div.appendChild(d);
                 }
                 if(x && y)
@@ -488,7 +523,7 @@ var PhyloCanvas = (function(){
     /**
      * Prototype for the loading spinner.
      */ 
-    PhyloCanvas.Loader.prototype = {
+    Loader.prototype = {
              run : function() 
              {
                  var i = 0;
@@ -590,7 +625,7 @@ var PhyloCanvas = (function(){
              }
     };
     
-    PhyloCanvas.Navigator.prototype = {
+    Navigator.prototype = {
             drawFrame : function()
             {
                 this.ctx.restore();
@@ -643,19 +678,10 @@ var PhyloCanvas = (function(){
             }
     };
     
-    PhyloCanvas.Branch.prototype = {
-        /**	
-         * @function addChild 
-         * @description add a child branch to this branch
-         */
-        addChild : function(node)
-        {
-            node.parent = this;
-            node.childNo = this.children.length;
-            node.canvas = this.canvas;
-            node.tree = this.tree;
-            this.children.push(node);
-        },
+    
+    Branch.prototype = {
+        
+        
         clicked : function(x,y)
         {
             if(this.dragging) return;
@@ -717,8 +743,8 @@ var PhyloCanvas = (function(){
             }
             if(this.collapsed)
             {
-                var x1 = ((this.radius * 10) /this.tree.zoom) * Math.cos(this.angle - PhyloCanvas.Angles.QUARTER);
-                var y1 = ((this.radius * 10) /this.tree.zoom) * Math.sin(this.angle - PhyloCanvas.Angles.QUARTER);
+                var x1 = ((this.radius * 10) /this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
+                var y1 = ((this.radius * 10) /this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
                 var x2 = ((this.radius * 10) /this.tree.zoom) * Math.cos(this.angle);
                 var y2 = ((this.radius * 10) /this.tree.zoom) * Math.sin(this.angle);
                 this.canvas.beginPath();
@@ -748,7 +774,7 @@ var PhyloCanvas = (function(){
                  var l = this.canvas.lineWidth;
                  this.canvas.strokeStyle = this.tree.highlightColor;
                  this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-                 this.canvas.arc(cx, cy, (this.leaf? this.radius * this.tree.baseNodeSize : 0)+ ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, PhyloCanvas.Angles.FULL, false);
+                 this.canvas.arc(cx, cy, (this.leaf? this.radius * this.tree.baseNodeSize : 0)+ ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, Angles.FULL, false);
                  this.canvas.stroke();
                  this.canvas.lineWidth = l;
                  this.canvas.strokeStyle = this.tree.branchColor;
@@ -824,7 +850,7 @@ var PhyloCanvas = (function(){
             this.centery = 0;
             this.angle = null;
             //this.totalBranchLength = 0;
-            this.minChildAngle = PhyloCanvas.Angles.FULL;
+            this.minChildAngle = Angles.FULL;
             this.maxChildAngle = 0;
             for(cld in this.children)
             {
@@ -874,7 +900,7 @@ var PhyloCanvas = (function(){
                          break;
                       case "nsh" : 
                       
-                        if(PhyloCanvas.Shapes[bits[b+1]]) this.nodeShape = PhyloCanvas.Shapes[bits[b+1]];
+                        if(Shapes[bits[b+1]]) this.nodeShape = Shapes[bits[b+1]];
                         else if(this.nodeRenderers[bits[b+1]]) this.nodeShape = bits[b+1];
                         else this.nodeShape = "circle";
                          // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node shape is : ' + bits[b+1]);
@@ -950,7 +976,23 @@ var PhyloCanvas = (function(){
             }
         }
     };
-    PhyloCanvas.Tree.prototype = {
+    
+     /**	
+     * 
+     *  add a child branch to this branch
+     * @param node {Branch} the node to add as a child
+     * @memberof Branch
+     */
+    Branch.prototype.addChild = function(node)
+    {
+        node.parent = this;
+        node.childNo = this.children.length;
+        node.canvas = this.canvas;
+        node.tree = this.tree;
+        this.children.push(node);
+    };
+    
+    Tree.prototype = {
         AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
         {
           var xmlhttp;
@@ -1468,7 +1510,7 @@ var PhyloCanvas = (function(){
         nodeRenderers : {
             circle : function (node) {
                 var r = node.radius * node.tree.baseNodeSize;
-                node.canvas.arc(r, 0, r, 0, PhyloCanvas.Angles.FULL, false);
+                node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
                 node.canvas.stroke();
                 node.canvas.fill();
             },
@@ -1591,7 +1633,7 @@ var PhyloCanvas = (function(){
                 this.leaves = [];
                 this.branches = {};
                 this.drawn = false;
-                var curNode = new PhyloCanvas.Branch();
+                var curNode = new Branch();
                 curNode.id = "root";
                 this.branches.root = curNode;
                 this.setRoot(curNode);
@@ -1601,7 +1643,7 @@ var PhyloCanvas = (function(){
                     switch(nwk[i])
                     {
                         case '(': //new Child
-                            var nd = new PhyloCanvas.Branch();
+                            var nd = new Branch();
                             curNode.leaf = false;
                             curNode.addChild(nd);
                             curNode = nd;
@@ -1611,7 +1653,7 @@ var PhyloCanvas = (function(){
                             curNode = curNode.parent;
                             break;
                         case ',': //new sibiling
-                            var nd = new PhyloCanvas.Branch();
+                            var nd = new Branch();
                             if(curNode.leaf) this.leaves.push(curNode);
                             curNode.parent.addChild(nd);
                             curNode = nd;
@@ -1732,7 +1774,7 @@ var PhyloCanvas = (function(){
                 tree.root.centery = 0;
                 tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height)/tree.maxBranchLength;
                 // work out radius of tree and the make branch scalar proportinal to the 
-                var r = (tree.leaves.length * tree.leaves[0].radius * 2)/PhyloCanvas.Angles.FULL;
+                var r = (tree.leaves.length * tree.leaves[0].radius * 2)/Angles.FULL;
                 if(tree.branchScalar * tree.maxBranchLength > r)
                 {
                     r = tree.branchScalar * tree.maxBranchLength;
@@ -1742,7 +1784,7 @@ var PhyloCanvas = (function(){
                     tree.branchScalar = r / tree.maxBranchLength;
                 }
                 
-                var step = PhyloCanvas.Angles.FULL / tree.leaves.length;
+                var step = Angles.FULL / tree.leaves.length;
                 
                 for(var i = 0; i < tree.leaves.length; i++)
                 {
@@ -1786,7 +1828,7 @@ var PhyloCanvas = (function(){
                 tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
                 //tree.root.setTotalLength();
                 
-                var step = PhyloCanvas.Angles.FULL / tree.leaves.length;
+                var step = Angles.FULL / tree.leaves.length;
                 tree.root.startx = 0;
                 tree.root.starty = 0;
                 tree.root.centerx = 0;
@@ -1845,7 +1887,7 @@ var PhyloCanvas = (function(){
                         if(nd.childNo == nd.parent.children.length - 1)
                         {
                             nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-                            nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(PhyloCanvas.Angles.FORTYFIVE));
+                            nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
                             for(var j = 0; j < nd.parent.children.length; j++)
                             {
                                 nd.parent.children[j].startx = nd.parent.centerx;
@@ -1885,7 +1927,7 @@ var PhyloCanvas = (function(){
                     
                 for(var i = 0; i < tree.leaves.length; i++)
                 {
-                    tree.leaves[i].angle = PhyloCanvas.Angles.QUARTER;
+                    tree.leaves[i].angle = Angles.QUARTER;
                     tree.leaves[i].centerx = (i > 0 ?tree.leaves[i-1].centerx + xstep : 0);
                     tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
                     
@@ -1898,7 +1940,7 @@ var PhyloCanvas = (function(){
                         
                         if(nd.childNo == nd.parent.children.length - 1)
                         {
-                            nd.parent.angle = PhyloCanvas.Angles.QUARTER;
+                            nd.parent.angle = Angles.QUARTER;
                             nd.parent.centerx = (nd.parent.centerx + nd.centerx )/2;
                             nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
                             for(var j = 0; j < nd.parent.children.length; j++)
@@ -2074,7 +2116,7 @@ var PhyloCanvas = (function(){
                         if(this.branches[arr[i]])
                         {
                             if(color)this.branches[arr[i]].color = color;
-                            if(shape)this.branches[arr[i]].nodeShape = PhyloCanvas.Shapes[shape] ? PhyloCanvas.Shapes[shape] : shape;
+                            if(shape)this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
                             if(size) this.branches[arr[i]].radius = size;
                         }
                     }
@@ -2163,5 +2205,10 @@ var PhyloCanvas = (function(){
         }
     }
     
-    return PhyloCanvas;
+    return { /*lends PhyloCanvas*/
+        Tree: Tree, 
+        Branch:Branch,
+        Loader:Loader,
+        ContextMenu : ContextMenu
+    };
 })();
