@@ -39,6 +39,21 @@ var PhyloCanvas = (function(){
          }
          return iReturnValue;
         }
+
+        /**
+         * Return backing store pixel ratio of context.
+         * 
+         * @param context - The rendering context of HTMl5 canvas.
+         * 
+         */
+        function getBackingStorePixelRatio(context) {
+            return (context.backingStorePixelRatio ||
+                context.webkitBackingStorePixelRatio ||
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1);
+        }
     
         /**
          * @namespace PhyloCanvas
@@ -461,6 +476,15 @@ var PhyloCanvas = (function(){
             this.canvas.canvas.onmousemove =  createHandler(this, "drag");
             this.canvas.canvas.onmousewheel = createHandler(this, "scroll");
             this.canvas.canvas.addEventListener('DOMMouseScroll', createHandler(this, "scroll"));
+
+            // Adjust canvas size for Retina screen
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(cl.getContext('2d'));
+            if (ratio > 1) {
+                    cl.style.height = cl.height + 'px';
+                    cl.style.width = cl.width + 'px';
+                    cl.width *= ratio;
+                    cl.height *= ratio;
+            }
         };
 
     
@@ -1372,7 +1396,7 @@ var PhyloCanvas = (function(){
             this.canvas.strokeStyle = this.branchColor;
             this.canvas.save();
             
-            this.canvas.translate(this.canvas.canvas.width /2,this.canvas.canvas.height / 2);
+            this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
             
             if(!this.drawn)
             {
