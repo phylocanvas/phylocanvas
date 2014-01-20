@@ -1285,7 +1285,7 @@ var PhyloCanvas = (function(){
                     return;
                 }
                 if(!this.root) return false;
-                var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+                var nd = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
     
                 if(nd)
                 {
