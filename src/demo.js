@@ -1,5 +1,7 @@
 (function(){
    "use strict";
+    window.devicePixelRatio = 2;
+    
     // Construct tree object
     var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
     
