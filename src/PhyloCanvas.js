@@ -4,9 +4,6 @@
  * @author Chris Powell (c.powell@imperial.ac.uk)
  * @modified 14/01/14
  */
-
-
-
 var PhyloCanvas = (function(){
         /**
          * Get the y coordinate of oElement
@@ -38,6 +35,21 @@ var PhyloCanvas = (function(){
             oElement = oElement.offsetParent;
          }
          return iReturnValue;
+        }
+
+        /**
+         * Return backing store pixel ratio of context.
+         * 
+         * @param context - The rendering context of HTMl5 canvas.
+         * 
+         */
+        function getBackingStorePixelRatio(context) {
+            return (context.backingStorePixelRatio ||
+                context.webkitBackingStorePixelRatio ||
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1);
         }
     
         /**
@@ -246,7 +258,7 @@ var PhyloCanvas = (function(){
          * @memberOf PhyloCanvas
          * 
          */
-        ContextMenu = function(tree)
+        var ContextMenu = function(tree)
         {
          /**
           * The Tree object that this context menu influences
@@ -284,7 +296,7 @@ var PhyloCanvas = (function(){
          * @constructor
          * @memberof PhyloCanvas
          */
-        Loader = function(div)
+        var Loader = function(div)
         {
             this.div = div;
             this.cl = document.createElement('canvas');
@@ -311,7 +323,7 @@ var PhyloCanvas = (function(){
          * @constructor
          * @memberof PhyloCanvas
          */
-        Navigator = function(tree)
+        var Navigator = function(tree)
         {
             this.tree = tree;
             this.cel = document.createElement('canvas');
@@ -347,7 +359,7 @@ var PhyloCanvas = (function(){
          * @example
          *  new PhyloCanvas.Tree(div);
          */
-        Tree = function(div)
+        var Tree = function(div)
         {
             // if the ID is provided get the element, if not assume div
             if(typeof div == 'string') div = document.getElementById(div);
@@ -387,10 +399,11 @@ var PhyloCanvas = (function(){
             this.canvasEl.style.position = 'relative';
             var cl = document.createElement('canvas');
             cl.id = div.id + 'pCanvas';
+            cl.className = 'phylocanvas';
             cl.style.position = 'relative';
             cl.style.backgroundColor = '#FFFFFF';
-            cl.height = div.clientHeight;
-            cl.width = div.clientWidth;
+            cl.height = div.clientHeight || 400;
+            cl.width = div.clientWidth || 400;
             cl.style.zIndex = '1';
             this.canvasEl.appendChild(cl);
             
@@ -461,6 +474,15 @@ var PhyloCanvas = (function(){
             this.canvas.canvas.onmousemove =  createHandler(this, "drag");
             this.canvas.canvas.onmousewheel = createHandler(this, "scroll");
             this.canvas.canvas.addEventListener('DOMMouseScroll', createHandler(this, "scroll"));
+
+            // Adjust canvas size for Retina screen
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+            if (ratio > 1) {
+                    this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
+                    this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
+                    this.canvas.canvas.width *= ratio;
+                    this.canvas.canvas.height *= ratio;
+            }
         };
 
     
@@ -1313,12 +1335,15 @@ var PhyloCanvas = (function(){
         },
         drag : function(event)
         {
+            //get window ratio
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+            
             if(!this.drawn) return false;
             
             if(this.pickedup)
             {
-                var xmove = (event.clientX - this.startx);
-                var ymove = (event.clientY - this.starty);
+                var xmove = (event.clientX - this.startx) * ratio;
+                var ymove = (event.clientY - this.starty) * ratio;
                 if(Math.abs(xmove) + Math.abs(ymove) > 5)
                 {
                     this.dragging = true;
@@ -1329,7 +1354,8 @@ var PhyloCanvas = (function(){
                 }
             }
             else if(this.zoomPickedUp)
-            {
+            { 
+                //right click and drag
                this.d = ((this.starty - event.clientY) / 100);
                x = this.translateClickX(this.startx);
                this.setZoom(this.origZoom + this.d);
@@ -1337,7 +1363,8 @@ var PhyloCanvas = (function(){
             }
             else
             {
-               e = event;
+                //hover
+               var e = event;
              
                var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
                if(nd && (this.internalNodesSelectable || nd.leaf))
@@ -1372,7 +1399,7 @@ var PhyloCanvas = (function(){
             this.canvas.strokeStyle = this.branchColor;
             this.canvas.save();
             
-            this.canvas.translate(this.canvas.canvas.width /2,this.canvas.canvas.height / 2);
+            this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
             
             if(!this.drawn)
             {
@@ -2189,19 +2216,30 @@ var PhyloCanvas = (function(){
         },
         translateClickX : function(x)
         {
-          x = (x - getX(this.canvas.canvas)  + window.pageXOffset);
-          x -= this.canvas.canvas.width/2;
-          x -= this.offsetx;
-          x = x / this.zoom;
-          return x;
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+    
+            x = (x - getX(this.canvas.canvas)  + window.pageXOffset);
+            x *= ratio;
+            x -= this.canvas.canvas.width/2;
+            x -= this.offsetx;
+            x = x / this.zoom;
+                
+            console.debug('x=' + x);
+            return x;
         },
         translateClickY : function(y)
         {
-          y = (y - getY(this.canvas.canvas)  + window.pageYOffset) ;
-          y -= this.canvas.canvas.height/2;
-          y -= this.offsety;
-          y = y /this.zoom;
-          return y;
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+            
+            y = (y - getY(this.canvas.canvas)  + window.pageYOffset) ; // account for positioning and scroll
+            y *= ratio;    
+            y -= this.canvas.canvas.height/2;
+            y -= this.offsety;
+            y = y /this.zoom;
+            
+            console.debug('y=' + y + ', y offset = ' + this.offsety);
+            
+            return y;
         }
     }
     
