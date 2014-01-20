@@ -1335,12 +1335,15 @@ var PhyloCanvas = (function(){
         },
         drag : function(event)
         {
+            //get window ratio
+            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+            
             if(!this.drawn) return false;
             
             if(this.pickedup)
             {
-                var xmove = (event.clientX - this.startx);
-                var ymove = (event.clientY - this.starty);
+                var xmove = (event.clientX - this.startx) * ratio;
+                var ymove = (event.clientY - this.starty) * ratio;
                 if(Math.abs(xmove) + Math.abs(ymove) > 5)
                 {
                     this.dragging = true;
@@ -1351,7 +1354,8 @@ var PhyloCanvas = (function(){
                 }
             }
             else if(this.zoomPickedUp)
-            {
+            { 
+                //right click and drag
                this.d = ((this.starty - event.clientY) / 100);
                x = this.translateClickX(this.startx);
                this.setZoom(this.origZoom + this.d);
@@ -1359,7 +1363,8 @@ var PhyloCanvas = (function(){
             }
             else
             {
-               e = event;
+                //hover
+               var e = event;
              
                var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
                if(nd && (this.internalNodesSelectable || nd.leaf))
@@ -2227,8 +2232,6 @@ var PhyloCanvas = (function(){
             var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
             
             y = (y - getY(this.canvas.canvas)  + window.pageYOffset) ; // account for positioning and scroll
-            
-            
             y *= ratio;    
             y -= this.canvas.canvas.height/2;
             y -= this.offsety;
