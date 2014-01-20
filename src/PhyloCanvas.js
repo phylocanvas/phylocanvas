@@ -2224,7 +2224,6 @@ var PhyloCanvas = (function(){
             x -= this.offsetx;
             x = x / this.zoom;
                 
-            console.debug('x=' + x);
             return x;
         },
         translateClickY : function(y)
@@ -2236,8 +2235,6 @@ var PhyloCanvas = (function(){
             y -= this.canvas.canvas.height/2;
             y -= this.offsety;
             y = y /this.zoom;
-            
-            console.debug('y=' + y + ', y offset = ' + this.offsety);
             
             return y;
         }
