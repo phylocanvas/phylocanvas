@@ -5,8 +5,11 @@
     // Construct tree object
     var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
     
-    // load tree via AJAX and render using default params
-    phylocanvas.load('./tree.nwk');
+    phylocanvas.canvasEl.addEventListener('loaded', function(evt){
+        console.debug(evt);   
+        colour();
+        
+    });
     
     function colour(){
         var colours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0,0,255)'];
@@ -20,6 +23,7 @@
         phylocanvas.setTreeType('rectangular');
     }
     
-    colour();
+    // load tree via AJAX and render using default params
+    phylocanvas.load('./tree.nwk');
     
 })();

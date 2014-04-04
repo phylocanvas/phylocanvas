@@ -52,6 +52,36 @@ var PhyloCanvas = (function(){
                 context.backingStorePixelRatio || 1);
         }
     
+    
+        function fireEvent(element, type, params)
+        {
+            var event; // The custom event that will be created
+
+              if (document.createEvent) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent(type, true, true);
+              } else {
+                event = document.createEventObject();
+                event.eventType = type;
+              }
+
+              event.eventName = type;
+
+                if(params)
+                {
+                    for( var param in params )
+                    {
+                        event[param] = params[param];   
+                    }
+                }
+            
+              if (document.createEvent) {
+                element.dispatchEvent(event);
+              } else {
+                element.fireEvent("on" + event.eventType, event);
+              }
+        }
+    
         /**
          * @namespace PhyloCanvas
          */
@@ -1727,8 +1757,8 @@ var PhyloCanvas = (function(){
             this.origBL = {};
             this.origP = {};
             //alert(nwk);
-            if(!this.loader.drawer)this.loader.run();
-                this.loader.resize();
+            //if(!this.loader.drawer)this.loader.run();
+            //    this.loader.resize();
                 this.root = false;
                 this.leaves = [];
                 this.branches = {};
@@ -1793,6 +1823,8 @@ var PhyloCanvas = (function(){
             {
                 this.loader.fail("All branches in the tree are identical.");
             }
+            
+            this.load_completed();
         },
         pickup : function(event)
         {
@@ -2311,6 +2343,14 @@ var PhyloCanvas = (function(){
             
             return y;
         }
+    }
+    
+    Tree.prototype.load_completed = function(){
+        fireEvent(this.canvasEl, 'loaded');
+    }
+    
+    Tree.prototype.render_completed = function(){
+        fireEvent(this.canvasEl, 'rendered');
     }
     
     return { /*lends PhyloCanvas*/
