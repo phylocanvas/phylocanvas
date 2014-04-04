@@ -172,7 +172,7 @@ var PhyloCanvas = (function(){
             /**
              * The colour of the terminal of this node 
              */
-            this.color =  "rgba(0,0,0,1)";
+            this.colour =  "rgba(0,0,0,1)";
             /**
              * an object to hold custom data for this node
              */
@@ -182,11 +182,11 @@ var PhyloCanvas = (function(){
              */
             this.id = "";
             /**
-             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the color of the branch.
+             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the colour of the branch.
              */
             this.interx = 0;
             /**
-             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the color of the branch.
+             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the colour of the branch.
              */
             this.intery = 0;
             /**
@@ -302,7 +302,7 @@ var PhyloCanvas = (function(){
             this.cl = document.createElement('canvas');
             this.cl.id = div.id + 'Loader';
             this.cl.style.position = 'absolute';
-            this.cl.style.backgroundColor = '#FFFFFF';
+            this.cl.style.backgroundColour = '#FFFFFF';
             this.cl.style.top = (div.offsetHeight/4) + "px";  
             this.cl.style.left = (div.offsetWidth/4) + "px";
             this.cl.height = div.offsetHeight/2;
@@ -329,7 +329,7 @@ var PhyloCanvas = (function(){
             this.cel = document.createElement('canvas');
             this.cel.id = this.tree.canvasEl.id + 'Navi';
             this.cel.style.zIndex = '100';
-            this.cel.style.backgroundColor = '#FFFFFF';
+            this.cel.style.backgroundColour = '#FFFFFF';
             this.cel.width = this.tree.canvas.canvas.width / 3;
             this.cel.height = this.tree.canvas.canvas.height / 3;
             this.cel.style.position = 'absolute';
@@ -390,6 +390,11 @@ var PhyloCanvas = (function(){
              */
             this.lastId = 0;
             
+            /**
+             * backColour colour the branches of the tree based on the colour of the tips
+             */
+            this.backColour = false
+            
             this.origBL = {};
             this.origP = {};
             
@@ -401,7 +406,7 @@ var PhyloCanvas = (function(){
             cl.id = div.id + 'pCanvas';
             cl.className = 'phylocanvas';
             cl.style.position = 'relative';
-            cl.style.backgroundColor = '#FFFFFF';
+            cl.style.backgroundColour = '#FFFFFF';
             cl.height = div.clientHeight || 400;
             cl.width = div.clientWidth || 400;
             cl.style.zIndex = '1';
@@ -437,11 +442,11 @@ var PhyloCanvas = (function(){
              
              this.offsetx = this.canvas.canvas.width/2;
              this.offsety = this.canvas.canvas.height/2;
-             this.selectedColor = "rgba(49,151,245,1)";
-             this.highlightColor = "rgba(49,151,245,1)";
+             this.selectedColour = "rgba(49,151,245,1)";
+             this.highlightColour = "rgba(49,151,245,1)";
              this.highlightWidth = 3.0;
              this.selectedNodeSizeIncrease = 0;
-             this.branchColor = "rgba(0,0,0,1)";
+             this.branchColour = "rgba(0,0,0,1)";
              this.branchScalar = 1.0;
              
              this.internalNodesSelectable = true;
@@ -492,8 +497,8 @@ var PhyloCanvas = (function(){
             {
                 this.div.style.display = 'none';
             },
-            mouseover : function(d){d.style.backgroundColor = "#E2E3DF";},
-            mouseout : function(d){d.style.backgroundColor = "transparent";},
+            mouseover : function(d){d.style.backgroundColour = "#E2E3DF";},
+            mouseout : function(d){d.style.backgroundColour = "transparent";},
             open: function(x,y)
             {
                 while(this.div.hasChildNodes()){this.div.removeChild(this.div.firstChild);}
@@ -539,7 +544,7 @@ var PhyloCanvas = (function(){
                 this.div.style.zIndex = 2000;
                 this.div.style.display = 'block';
                 
-                this.div.style.backgroundColor = '#FFFFFF';
+                this.div.style.backgroundColour = '#FFFFFF';
             }
     };
     /**
@@ -647,7 +652,11 @@ var PhyloCanvas = (function(){
              }
     };
     
+    /**
+     *  Overview window 
+     */
     Navigator.prototype = {
+            // 
             drawFrame : function()
             {
                 this.ctx.restore();
@@ -692,6 +701,10 @@ var PhyloCanvas = (function(){
                 this.ctx.scale(z, z);
                 this.ctx.strokeRect(-hw, -hh, w, h);
             },
+        
+            /**
+             *  
+             */
             resize : function(){
                 this.cel.width = this.tree.canvas.canvas.width / 3;
                 this.cel.height = this.tree.canvas.canvas.height / 3;
@@ -733,7 +746,7 @@ var PhyloCanvas = (function(){
             var tx = this.centerx + (dim.width *(0.5 * Math.cos(this.angle) - 0.5 )) + ((5 + this.radius * 2)* Math.cos(this.angle));
             var ty = this.centery +(this.tree.textSize * (0.5 * Math.sin(this.angle)) + 0.5) +  ((5 + this.radius * 2)* Math.sin(this.angle));
             this.canvas.beginPath();
-            this.canvas.fillStyle = (this.selected)?  this.tree.selectedColor : this.tree.branchColor;
+            this.canvas.fillStyle = (this.selected)?  this.tree.selectedColour : this.tree.branchColour;
             this.canvas.fillText(lbl, tx ,ty);
             this.canvas.closePath();
             }catch(e){alert(e);}
@@ -747,7 +760,7 @@ var PhyloCanvas = (function(){
              var cy = this.leaf ? (theta * Math.sin(this.angle)) + this.centery : this.centery;
             
             this.canvas.beginPath();
-            this.canvas.fillStyle = this.selected ? this.tree.selectedColor:this.color ;
+            this.canvas.fillStyle = this.selected ? this.tree.selectedColour:this.colour ;
             if((r * this.tree.zoom) < 5)
             {
                var e =  (5 / this.tree.zoom);
@@ -794,12 +807,12 @@ var PhyloCanvas = (function(){
              {
                  this.canvas.beginPath();
                  var l = this.canvas.lineWidth;
-                 this.canvas.strokeStyle = this.tree.highlightColor;
+                 this.canvas.strokeStyle = this.tree.highlightColour;
                  this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
                  this.canvas.arc(cx, cy, (this.leaf? this.radius * this.tree.baseNodeSize : 0)+ ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, Angles.FULL, false);
                  this.canvas.stroke();
                  this.canvas.lineWidth = l;
-                 this.canvas.strokeStyle = this.tree.branchColor;
+                 this.canvas.strokeStyle = this.tree.branchColour;
                  this.canvas.beginPath();
              }
         },
@@ -927,11 +940,11 @@ var PhyloCanvas = (function(){
                         else this.nodeShape = "circle";
                          // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node shape is : ' + bits[b+1]);
                          break;
-                      case "ncol" : this.color = bits[b+1];
-                         var hexRed = '0x' + this.color.substring(0,2);
-                         var hexGreen = '0x' + this.color.substring(2,4);
-                         var hexBlue = '0x' + this.color.substring(4,6);
-                         this.color = 'rgba('+parseInt(hexRed, 16).toString()+','+parseInt(hexGreen, 16).toString()+','+parseInt(hexBlue, 16).toString()+',1)';
+                      case "ncol" : this.colour = bits[b+1];
+                         var hexRed = '0x' + this.colour.substring(0,2);
+                         var hexGreen = '0x' + this.colour.substring(2,4);
+                         var hexBlue = '0x' + this.colour.substring(4,6);
+                         this.colour = 'rgba('+parseInt(hexRed, 16).toString()+','+parseInt(hexGreen, 16).toString()+','+parseInt(hexBlue, 16).toString()+',1)';
                          // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node Colour is : ' + bits[b+1]);
                          break;
                    }
@@ -999,9 +1012,9 @@ var PhyloCanvas = (function(){
         }
     };
     
-     /**	
+    /**	
      * 
-     *  add a child branch to this branch
+     * add a child branch to this branch
      * @param node {Branch} the node to add as a child
      * @memberof Branch
      */
@@ -1014,7 +1027,65 @@ var PhyloCanvas = (function(){
         this.children.push(node);
     };
     
+    /**
+     * Return the node colour of all the nodes that are children of this one.
+     */
+    Branch.prototype.getChildColours = function()
+    {
+        var colours = [];
+        
+        this.children.forEach(function(branch, n)
+        {
+            if (colours.indexOf(branch.colour) === -1 ) //only add each colour once.
+            {
+                colours.push(branch.colour);   
+            }
+        });
+        
+        return colours;
+    }
+    
+    /**
+     * Get the colour(s) of the branch itself.
+     */
+    Branch.prototype.getColour = function()
+    {
+        if(this.selected)
+        {
+            return this.tree.selectedColour;
+        }
+        else if (this.highlighted)
+        {
+            return this.tree.highlightedColour;   
+        }
+        else if(this.tree.backColour)
+        {
+            if(this.children.length)
+            {
+                var c_cols = this.getChildColours();   
+                
+                if(c_cols.length === 1)
+                {
+                    return c_cols[0]   
+                }
+                else
+                {
+                    return this.tree.branchColour;   
+                }
+            }
+            else
+            {
+                return this.colour;   
+            }
+        }
+        else
+        {
+            return this.tree.branchColour;   
+        }
+    };
+    
     Tree.prototype = {
+        // Included 
         AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
         {
           var xmlhttp;
@@ -1064,15 +1135,15 @@ var PhyloCanvas = (function(){
                 }
                 if(node.selected)
                 {
-                    node.canvas.strokeStyle = tree.selectedColor;//this.parent && this.parent.selected ? this.tree.selectedColor : this.tree.branchColor;
-                    node.canvas.fillStyle = tree.selectedColor;
+                    //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
+                    node.canvas.fillStyle = tree.selectedColour;
                 }
                 else
                 {
-                    node.canvas.strokeStyle = tree.branchColor;
-                    node.canvas.fillStyle = node.color;
+                    node.canvas.fillStyle = node.colour;
                 }
                 
+                node.canvas.strokeStyle = node.getColour();
                 node.canvas.beginPath();
                 
                 if(!collapse){
@@ -1102,15 +1173,15 @@ var PhyloCanvas = (function(){
             },
             circular : function(tree, node, collapse){
                 var  bl = node.totalBranchLength * tree.branchScalar;
-    
+                node.canvas.strokeStyle = node.getColour();
+                
                 if(node.selected){
-                    node.canvas.strokeStyle = node.tree.selectedColor;//this.parent && this.parent.selected ? this.tree.selectedColor : this.tree.branchColor;
-                    node.canvas.fillStyle = node.tree.selectedColor;
+                    //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
+                    node.canvas.fillStyle = node.tree.selectedColour;
                 }
                 else
                 {
-                    node.canvas.strokeStyle = node.tree.branchColor;
-                    node.canvas.fillStyle = node.color;
+                    node.canvas.fillStyle = node.colour;
                 }
                 
                 if(!collapse){
@@ -1121,7 +1192,7 @@ var PhyloCanvas = (function(){
                         node.canvas.lineTo(node.interx, node.intery);
                         node.canvas.stroke();
                         var ss = node.canvas.strokeStyle;
-                        node.canvas.strokeStyle = node.selected ? node.tree.selectedColor :  "rgba(0,0,0,0.5)";
+                        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  "rgba(0,0,0,0.5)";
                         node.canvas.lineTo(node.centerx, node.centery);
                         node.canvas.stroke();
                         node.canvas.strokeStyle = ss;
@@ -1134,11 +1205,11 @@ var PhyloCanvas = (function(){
                     
                     if(node.selected)
                     {
-                        node.canvas.strokeStyle = node.tree.selectedColor;
+                        node.canvas.strokeStyle = node.tree.selectedColour;
                     }
                     else
                     {
-                        node.canvas.strokeStyle = node.tree.branchColor;
+                        node.canvas.strokeStyle = node.tree.branchColour;
                     }
                     
                     if(node.children.length > 1 && !node.collapsed )
@@ -1157,15 +1228,17 @@ var PhyloCanvas = (function(){
                 }
             },
             radial : function(tree, node, collapse){
+                node.canvas.strokeStyle = node.getColour();
+                
                 if(node.selected){
-                    node.canvas.strokeStyle =  node.tree.selectedColor;//node.parent && node.parent.selected ? node.tree.selectedColor : node.tree.branchColor;
-                    node.canvas.fillStyle = node.tree.selectedColor;
+                    node.canvas.fillStyle = node.tree.selectedColour;
                 }
                 else
                 {
-                    node.canvas.strokeStyle = node.tree.branchColor;
-                    node.canvas.fillStyle = node.color;
+                    node.canvas.fillStyle = node.colour;
                 }
+                
+                
                 if(node.parent && !collapse){
                     
                     node.canvas.beginPath();
@@ -1189,15 +1262,15 @@ var PhyloCanvas = (function(){
             },
             diagonal: function(tree, node, collapse){
                 node.angle = 0;
+                node.canvas.strokeStyle = node.getColour();
+                
                 if(node.selected)
                 {
-                    node.canvas.strokeStyle = node.tree.selectedColor;//node.parent && node.parent.selected ? node.tree.selectedColor : node.tree.branchColor;
-                    node.canvas.fillStyle = node.tree.selectedColor;
+                    node.canvas.fillStyle = node.tree.selectedColour;
                 }
                 else
                 {
-                    node.canvas.strokeStyle = node.tree.branchColor;
-                    node.canvas.fillStyle = node.color;
+                    node.canvas.fillStyle = node.colour;
                 }
                 
                 node.canvas.beginPath();
@@ -1228,15 +1301,15 @@ var PhyloCanvas = (function(){
                 }
             },
             hierarchy : function(tree,node,collapse) {
+                node.canvas.strokeStyle = node.getColour();
+                
                 if(node.selected)
                 {
-                    node.canvas.strokeStyle = node.tree.selectedColor;//node.parent && node.parent.selected ? node.tree.selectedColor : node.tree.branchColor;
-                    node.canvas.fillStyle = node.tree.selectedColor;
+                    node.canvas.fillStyle = node.tree.selectedColour;
                 }
                 else
                 {
-                    node.canvas.strokeStyle = node.tree.branchColor;
-                    node.canvas.fillStyle = node.color;
+                    node.canvas.fillStyle = node.colour;
                 }
                 
                 
@@ -1285,7 +1358,7 @@ var PhyloCanvas = (function(){
                     return;
                 }
                 if(!this.root) return false;
-                var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+                var nd = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
     
                 if(nd)
                 {
@@ -1396,7 +1469,7 @@ var PhyloCanvas = (function(){
             this.canvas.lineCap = "round";
             this.canvas.lineJoin = "round";
             
-            this.canvas.strokeStyle = this.branchColor;
+            this.canvas.strokeStyle = this.branchColour;
             this.canvas.save();
             
             this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
@@ -1712,7 +1785,6 @@ var PhyloCanvas = (function(){
             this.saveNode(this.root);
             this.root.saveChildren();
             
-                
             this.root.branchLength = 0;
             this.maxBranchLength = 0;
             this.root.setTotalLength();
@@ -1725,23 +1797,24 @@ var PhyloCanvas = (function(){
         pickup : function(event)
         {
             this.contextMenu.close();
-         if(!this.drawn) return false;
-         this.origx = this.offsetx;
-         this.origy = this.offsety;
-         
-         if(event.button == 0){
-            this.pickedup = true;
-         }
-         if(event.button ==2 && this.rightClickZoom){
-            this.zoomPickedUp = true;
-            this.origZoom = Math.log(this.zoom)/Math.log(10);
-            this.oz = this.zoom;
-            // position in the diagram on which you clicked
+             if(!this.drawn) return false;
+             this.origx = this.offsetx;
+             this.origy = this.offsety;
+
+             if(event.button == 0){
+                this.pickedup = true;
+             }
             
-            
-         }
-         this.startx = event.clientX ;
-         this.starty = event.clientY;
+             if(event.button ==2 && this.rightClickZoom){
+                this.zoomPickedUp = true;
+                this.origZoom = Math.log(this.zoom)/Math.log(10);
+                this.oz = this.zoom;
+                // position in the diagram on which you clicked
+
+
+             }
+             this.startx = event.clientX ;
+             this.starty = event.clientY;
         
         },
         prerenderers : 
@@ -2122,7 +2195,7 @@ var PhyloCanvas = (function(){
           this.font = font;
           this.draw();
         },
-        setNodeColourAndShape: function(nids, color, shape, size, waiting)
+        setNodeColourAndShape: function(nids, colour, shape, size, waiting)
         {
             if(!nids) return;
             
@@ -2142,7 +2215,7 @@ var PhyloCanvas = (function(){
                     {
                         if(this.branches[arr[i]])
                         {
-                            if(color)this.branches[arr[i]].color = color;
+                            if(colour)this.branches[arr[i]].colour = colour;
                             if(shape)this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
                             if(size) this.branches[arr[i]].radius = size;
                         }
@@ -2156,7 +2229,7 @@ var PhyloCanvas = (function(){
                 var to = setInterval(function(){
                    if(this.drawn)
                    {
-                        ctx.setNodeColourAndShape(nids, color, shape, size, true);
+                        ctx.setNodeColourAndShape(nids, colour, shape, size, true);
                         console.debug('clear');
                         clearInterval(to);   
                    }
@@ -2224,7 +2297,6 @@ var PhyloCanvas = (function(){
             x -= this.offsetx;
             x = x / this.zoom;
                 
-            console.debug('x=' + x);
             return x;
         },
         translateClickY : function(y)
@@ -2236,8 +2308,6 @@ var PhyloCanvas = (function(){
             y -= this.canvas.canvas.height/2;
             y -= this.offsety;
             y = y /this.zoom;
-            
-            console.debug('y=' + y + ', y offset = ' + this.offsety);
             
             return y;
         }
