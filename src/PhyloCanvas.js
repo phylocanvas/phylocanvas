@@ -390,6 +390,11 @@ var PhyloCanvas = (function(){
              */
             this.lastId = 0;
             
+            /**
+             * backColor colour the branches of the tree based on the colour of the tips
+             */
+            this.backColor = false
+            
             this.origBL = {};
             this.origP = {};
             
@@ -647,7 +652,11 @@ var PhyloCanvas = (function(){
              }
     };
     
+    /**
+     *  Overview window 
+     */
     Navigator.prototype = {
+            // 
             drawFrame : function()
             {
                 this.ctx.restore();
@@ -692,6 +701,10 @@ var PhyloCanvas = (function(){
                 this.ctx.scale(z, z);
                 this.ctx.strokeRect(-hw, -hh, w, h);
             },
+        
+            /**
+             *  
+             */
             resize : function(){
                 this.cel.width = this.tree.canvas.canvas.width / 3;
                 this.cel.height = this.tree.canvas.canvas.height / 3;
@@ -999,9 +1012,9 @@ var PhyloCanvas = (function(){
         }
     };
     
-     /**	
+    /**	
      * 
-     *  add a child branch to this branch
+     * add a child branch to this branch
      * @param node {Branch} the node to add as a child
      * @memberof Branch
      */
@@ -1014,7 +1027,26 @@ var PhyloCanvas = (function(){
         this.children.push(node);
     };
     
+    /**
+     * Return the node colour of all the nodes that are children of this one.
+     */
+    Branch.prototype.getChildColours = function()
+    {
+        var colours = [];
+        
+        this.children.forEach(function(branch, n)
+        {
+            if (colours.indexOf(branch.color) === -1 ) //only add each colour once.
+            {
+                colours.push(branch.color);   
+            }
+        });
+        
+        return colours;
+    }
+    
     Tree.prototype = {
+        // Included 
         AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
         {
           var xmlhttp;
@@ -1712,7 +1744,6 @@ var PhyloCanvas = (function(){
             this.saveNode(this.root);
             this.root.saveChildren();
             
-                
             this.root.branchLength = 0;
             this.maxBranchLength = 0;
             this.root.setTotalLength();
@@ -1725,23 +1756,24 @@ var PhyloCanvas = (function(){
         pickup : function(event)
         {
             this.contextMenu.close();
-         if(!this.drawn) return false;
-         this.origx = this.offsetx;
-         this.origy = this.offsety;
-         
-         if(event.button == 0){
-            this.pickedup = true;
-         }
-         if(event.button ==2 && this.rightClickZoom){
-            this.zoomPickedUp = true;
-            this.origZoom = Math.log(this.zoom)/Math.log(10);
-            this.oz = this.zoom;
-            // position in the diagram on which you clicked
+             if(!this.drawn) return false;
+             this.origx = this.offsetx;
+             this.origy = this.offsety;
+
+             if(event.button == 0){
+                this.pickedup = true;
+             }
             
-            
-         }
-         this.startx = event.clientX ;
-         this.starty = event.clientY;
+             if(event.button ==2 && this.rightClickZoom){
+                this.zoomPickedUp = true;
+                this.origZoom = Math.log(this.zoom)/Math.log(10);
+                this.oz = this.zoom;
+                // position in the diagram on which you clicked
+
+
+             }
+             this.startx = event.clientX ;
+             this.starty = event.clientY;
         
         },
         prerenderers : 

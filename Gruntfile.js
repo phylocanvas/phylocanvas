@@ -249,6 +249,13 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
+            },
+            scripts: {
+                expand: true,
+                dot: true,
+                cwd: '<%= yeoman.app %>',
+                dest: '.tmp/scripts/',
+                src: '{,*/}*.js'
             }
         },
         modernizr: {
@@ -268,7 +275,8 @@ module.exports = function (grunt) {
             ],
             test: [
                 'less',
-                'copy:styles'
+                'copy:styles',
+                'copy:scripts',
             ],
             dist: [
                 'less',
@@ -295,11 +303,6 @@ module.exports = function (grunt) {
             'connect:livereload',
             'watch'
         ]);
-    });
-
-    grunt.registerTask('server', function () {
-        grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-        grunt.task.run(['serve']);
     });
 
     grunt.registerTask('test', [
