@@ -312,6 +312,7 @@ var PhyloCanvas = (function(){
           this.div.style.display = 'none';
           this.div.style.position = 'fixed';
           this.div.style.border = '1px solid #CCCCCC';
+          this.div.style.background = '#FFFFFF';
           this.div.className = 'contextMenu';
           /**
            * The options in this menu

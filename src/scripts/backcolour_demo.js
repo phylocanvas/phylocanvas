@@ -26,7 +26,7 @@
 
         phylocanvas.showLabels = false;
         phylocanvas.backColour = true;
-        phylocanvas.setTreeType('circular');
+        phylocanvas.setTreeType('rectangular');
     }
 
     // load tree via AJAX and render using default params
