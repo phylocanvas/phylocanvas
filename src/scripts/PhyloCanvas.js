@@ -1096,10 +1096,6 @@ var PhyloCanvas = (function(){
         {
             return this.tree.selectedColour;
         }
-        else if (this.highlighted)
-        {
-            return this.tree.highlightedColour;
-        }
         else if(this.tree.backColour)
         {
             if(this.children.length)
@@ -2170,7 +2166,7 @@ var PhyloCanvas = (function(){
             this.prerenderers[this.treeType](this);
             this.draw();
 
-            if(this.onredrawtree) this.onredrawtree(leafIds);
+            this.redraw();
         },
         redrawOriginalTree : function()
         {
@@ -2370,6 +2366,10 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.loadError = function(message){
         fireEvent(this.canvasEl, 'error', { message: message });
+    }
+
+    Tree.prototype.loadError = function(message){
+        fireEvent(this.canvasEl, 'redrawn', { message: message });
     }
 
     Tree.prototype.addListener = function(event, listener)
