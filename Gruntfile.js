@@ -15,10 +15,7 @@ module.exports = function (grunt) {
 
 //    grunt.initConfig({
 //        // configurable paths
-//        yeoman: {
-//            app: 'src',
-//            dist: 'dist'
-//        },
+//        yeoman: ,
 //        less: {
 //            development: {
 //                options: {
@@ -62,17 +59,7 @@ module.exports = function (grunt) {
 //            }
 //        },
 //        autoprefixer: {
-//            options: {
-//                browsers: ['last 1 version']
-//            },
-//            dist: {
-//                files: [{
-//                    expand: true,
-//                    cwd: '.tmp/styles/',
-//                    src: '{,*/}*.css',
-//                    dest: '.tmp/styles/'
-//                }]
-//            }
+//            
 //        },
 //        // not used since Uglify task does concat,
 //        // but still available if needed
