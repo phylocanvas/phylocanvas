@@ -414,7 +414,7 @@ var PhyloCanvas = (function(){
             /**
              * Loading dialog displayed while waiting for the tree
              */
-            this.loader = new Loader(div);
+            //this.loader = new Loader(div);
             /**
              * The root node of the tree (not neccesarily a root in the Phylogenetic sense)
              */
@@ -438,7 +438,8 @@ var PhyloCanvas = (function(){
             this.canvasEl = div;
 
             //Set up the div and canvas element
-            this.canvasEl.style.position = 'relative';
+            if(window.getComputedStyle(this.canvasEl).position === 'static' )this.canvasEl.style.position = 'relative';
+            this.canvasEl.style.boxSizing = 'border-box';
             var cl = document.createElement('canvas');
             cl.id = div.id + 'pCanvas';
             cl.className = 'phylocanvas';
@@ -502,7 +503,11 @@ var PhyloCanvas = (function(){
              if(this.use_navigator){
                  this.navigator = new Navigator(this);
              }
-             //if(this.showControls) this.drawControls();
+
+            new History(this);
+            this.adjustForPixelRatio();
+
+            //if(this.showControls) this.drawControls();
             //window.onresize = createHandler(this, "autoSize");
             this.addListener('contextmenu', this.clicked.bind(this));
             this.addListener('click', this.clicked.bind(this));
@@ -514,14 +519,14 @@ var PhyloCanvas = (function(){
             this.addListener('mousewheel', this.scroll.bind(this));// = createHandler(this, "scroll");
             this.addListener('DOMMouseScroll', this.scroll.bind(this));//createHandler(this, "scroll"));
 
-            // Adjust canvas size for Retina screen
-            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-            if (ratio > 1) {
-                    this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
-                    this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
-                    this.canvas.canvas.width *= ratio;
-                    this.canvas.canvas.height *= ratio;
-            }
+
+            this.addListener('loaded', function(evt){
+                    this.origBranches = this.branches;
+                    this.origLeaves = this.leaves;
+                    this.origRoot = this.root;
+            }.bind(this))
+
+
         };
 
 
@@ -2175,9 +2180,6 @@ var PhyloCanvas = (function(){
         {
             this.totalBranchLength = 0;
 
-            if(!this.origBranches) this.origBranches = this.branches;
-            if(!this.origLeaves) this.origLeaves = this.leaves;
-            if(!this.origRoot) this.origRoot = this.root;
             this.origBL[node.id] = node.branchLength;
             this.origP[node.id] = node.parent;
 
@@ -2347,13 +2349,14 @@ var PhyloCanvas = (function(){
         },
         setSize: function(width, height)
         {
-            this.canvas.canvas.width = width;
-            this.canvas.canvas.height = height;
+            this.canvas.canvas.style.width = width + 'px';
+            this.canvas.canvas.style.height = height + 'px';
             if(this.drawn){
             //    this.drawn = false;
                 this.draw();
             }
             if(this.navigator)this.navigator.resize();
+            this.adjustForPixelRatio();
         },
         setZoom : function(z)
         {
@@ -2421,8 +2424,71 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.on = Tree.prototype.addListener;
 
+    Tree.prototype.adjustForPixelRatio = function()
+    {
+        // Adjust canvas size for Retina screen
+        var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+
+        this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
+        this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
+
+        if (ratio > 1) {
+            this.canvas.canvas.width *= ratio;
+            this.canvas.canvas.height *= ratio;
+        }
+    }
+
     function History(tree)
     {
+        this.tree = tree;
+
+        this.width = 200;
+
+        this.div = this.createDiv(tree.canvasEl);
+        this.resizeTree(tree);
+
+        this.tree.addListener('subtree', function(evt)
+        {
+            this.addSnapshot(evt.node);
+        }.bind(this));
+
+    }
+
+    History.prototype.createDiv = function(parentDiv)
+    {
+        var div = document.createElement('div');
+        div.style.position = 'absolute';
+        div.style.top = '0';
+        div.style.bottom = '0';
+        div.style.left= '0';
+        div.style.boxSizing = 'border-box';
+        div.style.border= '1px solid #CCCCCC';
+        div.style.width = this.width + 'px'
+
+        parentDiv.appendChild(div);
+        return div
+    }
+
+    History.prototype.resizeTree = function(tree)
+    {
+        console.debug(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
+        tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
+        tree.canvasEl.style.paddingLeft = this.width + 'px';
+    }
+
+    History.prototype.addSnapshot = function(id)
+    {
+        var url = this.tree.getPngUrl(), thumbnail = document.createElement('img');
+
+        thumbnail.width = this.width;
+        thumbnail.src = url;
+        this.div.appendChild(thumbnail);
+
+        addEvent(thumbnail, 'click', function(evt){
+            console.debug(id);
+            this.tree.redrawFromBranch(this.tree.origBranches[id]);
+        }.bind(this));
+
 
     }
 
@@ -2430,6 +2496,7 @@ var PhyloCanvas = (function(){
         Tree: Tree,
         Branch:Branch,
         Loader:Loader,
-        ContextMenu : ContextMenu
+        ContextMenu : ContextMenu,
+        History : History
     };
 })();
