@@ -17,7 +17,7 @@
     }
 
     function colour(response){
-        var colours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0,0,255)'];
+        var colours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(255,255,0)'];
 
         var data = JSON.parse(response.response);
 
@@ -25,7 +25,26 @@
         phylocanvas.setNodeColourAndShape(data.negative, colours[1], 'o');
 
         phylocanvas.showLabels = false;
-        phylocanvas.backColour = true;
+        phylocanvas.backColour = function(node)
+        {
+            if(node.children.length)
+            {
+                var child_cols = node.getChildColours();
+                if(child_cols.length === 1)
+                {
+                    return child_cols[0];
+                }
+                else
+                {
+                    return colours[2];
+                }
+            }
+            else
+            {
+                return node.colour;
+            }
+
+        };
         phylocanvas.setTreeType('rectangular');
     }
 

@@ -1104,7 +1104,7 @@ var PhyloCanvas = (function(){
         {
             return this.tree.selectedColour;
         }
-        else if(this.tree.backColour)
+        else if(this.tree.backColour === true)
         {
             if(this.children.length)
             {
@@ -1123,6 +1123,10 @@ var PhyloCanvas = (function(){
             {
                 return this.colour;
             }
+        }
+        else if(typeof this.tree.backColour === 'function')
+        {
+            return this.tree.backColour(this);
         }
         else
         {
