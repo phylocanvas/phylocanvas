@@ -1,7 +1,7 @@
 module.exports = {
     styles: {
-        files: ['<%= yeoman.app %>/less/{,*/}*.less'],
-        tasks: ['less', 'copy:styles', 'autoprefixer']
+        files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
+        tasks: ['copy:styles', 'autoprefixer']
     },
     livereload: {
         options: {

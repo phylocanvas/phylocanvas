@@ -437,6 +437,8 @@ var PhyloCanvas = (function(){
 
             this.canvasEl = div;
 
+            this.canvasEl.classList.add('pc-container');
+
             //Set up the div and canvas element
             if(window.getComputedStyle(this.canvasEl).position === 'static' )this.canvasEl.style.position = 'relative';
             this.canvasEl.style.boxSizing = 'border-box';
@@ -2484,14 +2486,7 @@ var PhyloCanvas = (function(){
     History.prototype.createDiv = function(parentDiv)
     {
         var div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.top = '0';
-        div.style.bottom = '0';
-        div.style.left= '0';
-        div.style.boxSizing = 'border-box';
-        div.style.border= '1px solid #CCCCCC';
-        div.style.width = this.width + 'px'
-        div.style.overflowY = 'auto';
+        div.classList.add('pc-history');
 
         parentDiv.appendChild(div);
         return div
