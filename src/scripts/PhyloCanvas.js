@@ -2471,7 +2471,6 @@ var PhyloCanvas = (function(){
             this.addSnapshot(evt.node);
         }.bind(this));
 
-
         this.tree.addListener('loaded', this.reset.bind(this));
         this.tree.addListener('typechanged', this.reset.bind(this));
     }
@@ -2515,10 +2514,10 @@ var PhyloCanvas = (function(){
 
         thumbnail.width = this.width;
         thumbnail.src = url;
+        thumbnail.id = "phylocanvas-history-" + id;
 
         // altered 1.0.6-1 : issue #17
         //this.div.appendChild(thumbnail);
-
         var firstThumb = this.div.querySelector('img')
 
         if(firstThumb)
@@ -2530,10 +2529,7 @@ var PhyloCanvas = (function(){
             this.div.appendChild(thumbnail);
         }
 
-        addEvent(thumbnail, 'click', function(evt){
-            console.debug(id);
-            this.tree.redrawFromBranch(this.tree.origBranches[id]);
-        }.bind(this));
+        addEvent(thumbnail, 'click', this.goBackTo.bind(this));
     }
 
     History.prototype.clear = function()
@@ -2544,6 +2540,20 @@ var PhyloCanvas = (function(){
         {
             thumbs[0].remove();
         };
+    }
+
+    History.prototype.goBackTo = function(evt)
+    {
+        var ele = evt.target
+
+        while(ele.previousSibling)
+        {
+            ele.previousSibling.remove();
+        }
+
+        ele.remove();
+
+        this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
     }
 
     return { /*lends PhyloCanvas*/
