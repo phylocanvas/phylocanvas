@@ -515,10 +515,10 @@ var PhyloCanvas = (function(){
             this.addListener('mousedown', this.pickup.bind(this));
             this.addListener('mouseup', this.drop.bind(this));// =  createHandler(this, "drop");
             this.addListener('mouseout', this.drop.bind(this));// =  createHandler(this, "drop");
-            this.addListener('mousemove', this.drag.bind(this)); //=  createHandler(this, "drag");
-            this.addListener('mousewheel', this.scroll.bind(this));// = createHandler(this, "scroll");
-            this.addListener('DOMMouseScroll', this.scroll.bind(this));//createHandler(this, "scroll"));
 
+            addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this)); //=  createHandler(this, "drag");
+            addEvent(this.canvas.canvas,'mousewheel', this.scroll.bind(this));// = createHandler(this, "scroll");
+            addEvent(this.canvas.canvas,'DOMMouseScroll', this.scroll.bind(this));//createHandler(this, "scroll"));
 
             this.addListener('loaded', function(evt){
                     this.origBranches = this.branches;
@@ -1814,56 +1814,56 @@ var PhyloCanvas = (function(){
             this.origBL = {};
             this.origP = {};
 
-                this.root = false;
-                this.leaves = [];
-                this.branches = {};
-                this.drawn = false;
-                var curNode = new Branch();
-                curNode.id = "root";
-                this.branches.root = curNode;
-                this.setRoot(curNode);
+            this.root = false;
+            this.leaves = [];
+            this.branches = {};
+            this.drawn = false;
+            var curNode = new Branch();
+            curNode.id = "root";
+            this.branches.root = curNode;
+            this.setRoot(curNode);
 
-                for(var i = 0; i < nwk.length; i++)
+            for(var i = 0; i < nwk.length; i++)
+            {
+                switch(nwk[i])
                 {
-                    switch(nwk[i])
-                    {
-                        case '(': //new Child
-                            var nd = new Branch();
-                            curNode.leaf = false;
-                            curNode.addChild(nd);
-                            curNode = nd;
-                            break;
-                        case ')': //return to parent
-                            if(curNode.leaf) this.leaves.push(curNode);
-                            curNode = curNode.parent;
-                            break;
-                        case ',': //new sibiling
-                            var nd = new Branch();
-                            if(curNode.leaf) this.leaves.push(curNode);
-                            curNode.parent.addChild(nd);
-                            curNode = nd;
-                            break;
-                        case ';':
-                            for (var l = 0; l < this.leaves.length; l++)
+                    case '(': //new Child
+                        var nd = new Branch();
+                        curNode.leaf = false;
+                        curNode.addChild(nd);
+                        curNode = nd;
+                        break;
+                    case ')': //return to parent
+                        if(curNode.leaf) this.leaves.push(curNode);
+                        curNode = curNode.parent;
+                        break;
+                    case ',': //new sibiling
+                        var nd = new Branch();
+                        if(curNode.leaf) this.leaves.push(curNode);
+                        curNode.parent.addChild(nd);
+                        curNode = nd;
+                        break;
+                    case ';':
+                        for (var l = 0; l < this.leaves.length; l++)
+                        {
+                            if(this.leaves[l].totalBranchLength > this.maxBranchLength)
                             {
-                                if(this.leaves[l].totalBranchLength > this.maxBranchLength)
-                                {
-                                    this.maxBranchLength = this.leaves[l].totalBranchLength;
-                                }
+                                this.maxBranchLength = this.leaves[l].totalBranchLength;
                             }
-                            break;
-                        default:
-                            try
-                            {
-                                i = curNode.parseNwk(nwk, i);
-                                i--;
-                            }
-                            catch(e)
-                            {
-                                this.loadError( "Error parsing nwk file" + e );
-                                return;
-                            }
-                         break;
+                        }
+                        break;
+                    default:
+                        try
+                        {
+                            i = curNode.parseNwk(nwk, i);
+                            i--;
+                        }
+                        catch(e)
+                        {
+                            this.loadError( "Error parsing nwk file" + e );
+                            return;
+                        }
+                        break;
                     }
             }
 
@@ -1876,7 +1876,6 @@ var PhyloCanvas = (function(){
 
             if(this.maxBranchLength == 0)
             {
-
                 this.loadError("All branches in the tree are identical.");
                 return;
             }
@@ -2178,7 +2177,10 @@ var PhyloCanvas = (function(){
         },
         redrawFromBranch: function(node)
         {
+            this.drawn = false;
             this.totalBranchLength = 0;
+
+            this.resetTree();
 
             this.origBL[node.id] = node.branchLength;
             this.origP[node.id] = node.parent;
@@ -2204,6 +2206,7 @@ var PhyloCanvas = (function(){
                     this.redrawGetNodes(this.root.children[i], leafIds);
                 }
             }
+
             this.root.setTotalLength();
             this.prerenderers[this.treeType](this);
             this.draw();
@@ -2212,21 +2215,11 @@ var PhyloCanvas = (function(){
         },
         redrawOriginalTree : function()
         {
-            if(!this.origBranches) return;
+            this.resetTree();
 
-            this.branches = this.origBranches;
-            for(var n in this.origBL)
-            {
-                this.branches[n].branchLength = this.origBL[n];
-                this.branches[n].parent = this.origP[n];
-            }
-
-            this.leaves = this.origLeaves;
-            this.root = this.origRoot;
             this.root.setTotalLength();
             this.prerenderers[this.treeType](this);
             this.draw();
-            if(this.originalTreeRedrawn)this.originalTreeRedrawn();
         },
         saveNode : function(node)
         {
@@ -2343,14 +2336,20 @@ var PhyloCanvas = (function(){
         },
         setTreeType : function(type)
         {
-            this.drawn = false;
+            var oldType = this.treeType;
             this.treeType = type;
-            this.draw();
+            if(this.drawn)
+            {
+                this.drawn = false;
+                this.draw();
+            }
+
+            this.treeTypeChanged(oldType, type);
         },
         setSize: function(width, height)
         {
-            this.canvas.canvas.style.width = width + 'px';
-            this.canvas.canvas.style.height = height + 'px';
+            this.canvas.canvas.width = width;
+            this.canvas.canvas.height = height;
             if(this.drawn){
             //    this.drawn = false;
                 this.draw();
@@ -2438,6 +2437,26 @@ var PhyloCanvas = (function(){
         }
     }
 
+    Tree.prototype.treeTypeChanged = function(oldType, newType)
+    {
+        fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType : newType });
+    }
+
+    Tree.prototype.resetTree = function()
+    {
+        if(!this.origBranches) return;
+
+        this.branches = this.origBranches;
+        for(var n in this.origBL)
+        {
+            this.branches[n].branchLength = this.origBL[n];
+            this.branches[n].parent = this.origP[n];
+        }
+
+        this.leaves = this.origLeaves;
+        this.root = this.origRoot;
+    }
+
     function History(tree)
     {
         this.tree = tree;
@@ -2452,6 +2471,15 @@ var PhyloCanvas = (function(){
             this.addSnapshot(evt.node);
         }.bind(this));
 
+
+        this.tree.addListener('loaded', this.reset.bind(this));
+        this.tree.addListener('typechanged', this.reset.bind(this));
+    }
+
+    History.prototype.reset = function()
+    {
+        this.clear();
+        this.addSnapshot('root');
     }
 
     History.prototype.createDiv = function(parentDiv)
@@ -2464,6 +2492,7 @@ var PhyloCanvas = (function(){
         div.style.boxSizing = 'border-box';
         div.style.border= '1px solid #CCCCCC';
         div.style.width = this.width + 'px'
+        div.style.overflowY = 'auto';
 
         parentDiv.appendChild(div);
         return div
@@ -2471,7 +2500,7 @@ var PhyloCanvas = (function(){
 
     History.prototype.resizeTree = function(tree)
     {
-        console.debug(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
+
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
         tree.canvasEl.style.paddingLeft = this.width + 'px';
     }
@@ -2489,7 +2518,16 @@ var PhyloCanvas = (function(){
             this.tree.redrawFromBranch(this.tree.origBranches[id]);
         }.bind(this));
 
+    }
 
+    History.prototype.clear = function()
+    {
+        var thumbs = document.getElementsByTagName('img')
+
+        for ( var i = thumbs.length; i-- ; )
+        {
+            thumbs[0].remove();
+        };
     }
 
     return { /*lends PhyloCanvas*/
