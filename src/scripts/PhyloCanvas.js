@@ -2505,19 +2505,35 @@ var PhyloCanvas = (function(){
         tree.canvasEl.style.paddingLeft = this.width + 'px';
     }
 
+    /**
+     * Add a snapshot of the tree to the history
+     * 1.0.6-1 (08/04/2014) - put the new snapshot at the top of the list github issue #17
+     */
     History.prototype.addSnapshot = function(id)
     {
         var url = this.tree.getPngUrl(), thumbnail = document.createElement('img');
 
         thumbnail.width = this.width;
         thumbnail.src = url;
-        this.div.appendChild(thumbnail);
+
+        // altered 1.0.6-1 : issue #17
+        //this.div.appendChild(thumbnail);
+
+        var firstThumb = this.div.querySelector('img')
+
+        if(firstThumb)
+        {
+            this.div.insertBefore(thumbnail, firstThumb);
+        }
+        else
+        {
+            this.div.appendChild(thumbnail);
+        }
 
         addEvent(thumbnail, 'click', function(evt){
             console.debug(id);
             this.tree.redrawFromBranch(this.tree.origBranches[id]);
         }.bind(this));
-
     }
 
     History.prototype.clear = function()
