@@ -487,6 +487,8 @@ var PhyloCanvas = (function(){
              this.branchColour = "rgba(0,0,0,1)";
              this.branchScalar = 1.0;
 
+            this.hoverLabel = false;
+
              this.internalNodesSelectable = true;
 
              this.showLabels = true;
@@ -843,7 +845,7 @@ var PhyloCanvas = (function(){
                 this.canvas.translate(this.centerx, this.centery);
                 this.canvas.rotate(this.angle);
                 this.tree.nodeRenderers[this.nodeShape](this);
-                if(this.tree.showLabels) this.drawLabel();
+                if(this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
                 this.canvas.restore();
 
             }
