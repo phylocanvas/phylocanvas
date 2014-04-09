@@ -1,6 +1,6 @@
 {
-  "name": "Phylocanvas",
-  "version": "1.2.1-0",
+  "name": "PhyloCanvas",
+  "version": "1.2.1",
   "repository": "https://github.com/CIPowell/PhyloCanvas",
   "dependencies": {},
   "devDependencies": {

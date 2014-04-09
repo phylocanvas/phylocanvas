@@ -2319,7 +2319,6 @@ var PhyloCanvas = (function(){
                    if(this.drawn)
                    {
                         ctx.setNodeColourAndShape(nids, colour, shape, size, true);
-                        console.debug('clear');
                         clearInterval(to);
                    }
                 });
