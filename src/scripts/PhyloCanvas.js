@@ -2534,7 +2534,7 @@ var PhyloCanvas = (function(){
 
     History.prototype.clear = function()
     {
-        var thumbs = document.getElementsByTagName('img')
+        var thumbs = this.div.getElementsByTagName('img');
 
         for ( var i = thumbs.length; i-- ; )
         {

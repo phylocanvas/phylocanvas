@@ -32,7 +32,7 @@ canvas
     background: #EEE;
 }
 
-.pc-history:before
+/*.pc-history:before
 {
     content: 'History';
     transform: rotate(-90deg);
@@ -46,7 +46,7 @@ canvas
 
     bottom: 1em;
     left: -1em;
-}
+}*/
 
 .pc-history img
 {
