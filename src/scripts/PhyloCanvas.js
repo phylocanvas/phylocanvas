@@ -1549,7 +1549,7 @@ var PhyloCanvas = (function(){
 
             if(this.maxBranchLength == 0)
             {
-                this.LoadError("All branches in the tree are identical.");
+                this.loadError("All branches in the tree are identical.");
                 return;
             }
 
