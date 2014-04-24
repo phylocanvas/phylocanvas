@@ -2355,7 +2355,7 @@ var PhyloCanvas = (function(){
         },
         setSize: function(width, height)
         {
-            this.canvas.canvas.width = width;
+            this.canvas.canvas.width = width - 200;
             this.canvas.canvas.height = height;
             if(this.drawn){
             //    this.drawn = false;
