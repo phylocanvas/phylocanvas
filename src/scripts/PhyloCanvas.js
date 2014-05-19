@@ -1713,7 +1713,7 @@ var PhyloCanvas = (function(){
             },
             square : function (node)
             {
-                var r = this.getNodeSize();
+                var r = node.getNodeSize();
                 var x1 = 0;
                 var x2 = r * 2;
                 var y1 = -r;
@@ -1728,7 +1728,7 @@ var PhyloCanvas = (function(){
             },
             star: function (node)
             {
-                var r = this.getNodeSize();
+                var r = node.getNodeSize();
                 var cx =  r ;
                 var cy = 0;
 
