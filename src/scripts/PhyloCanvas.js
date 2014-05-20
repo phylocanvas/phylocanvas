@@ -879,7 +879,7 @@ var PhyloCanvas = (function(){
                 {
                     children.push(this.children[x].getChildIds());
                 }
-                return children.join(",");
+                return children;
             }
         },
         getChildCount : function()
@@ -1438,6 +1438,7 @@ var PhyloCanvas = (function(){
 
           if(e.button == 0)
           {
+              var nids = [];
 
                 //if this is triggered by the release after a drag then the click shouldn't be triggered.
                 if(this.dragging)
@@ -1455,19 +1456,24 @@ var PhyloCanvas = (function(){
                    if(this.internalNodesSelectable || nd.leaf)
                    {
                       nd.setSelected(true, true);
+                       nids = nd.getChildIds();
                    }
                    this.draw();
+
+
                 }
                 else if(this.unselectOnClickAway && !this.dragging)
                 {
                    this.root.setSelected(false, true);
                    this.draw();
+
                 }
 
                 if(!this.pickedup){
                    this.dragging = false;
                 }
 
+              this.nodesSelected(nids);
           }
           else if(e.button == 2)
           {
@@ -2421,6 +2427,11 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.subtreeDrawn = function(node){
         fireEvent(this.canvasEl, 'subtree', { node: node });
+    }
+
+    Tree.prototype.nodesSelected = function(nids)
+    {
+         fireEvent(this.canvasEl, 'subtree', { nodeIds: nids });
     }
 
     Tree.prototype.addListener = function(event, listener)
