@@ -877,7 +877,7 @@ var PhyloCanvas = (function(){
                 var children = [];
                 for(var x = 0; x < this.children.length; x++)
                 {
-                    children.push(this.children[x].getChildIds());
+                    children = children.concat(this.children[x].getChildIds());
                 }
                 return children;
             }
