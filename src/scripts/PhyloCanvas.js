@@ -1473,7 +1473,7 @@ var PhyloCanvas = (function(){
                    this.dragging = false;
                 }
 
-              this.nodesSelected(nids);
+                this.nodesSelected(nids);
           }
           else if(e.button == 2)
           {
@@ -2431,7 +2431,7 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.nodesSelected = function(nids)
     {
-         fireEvent(this.canvasEl, 'subtree', { nodeIds: nids });
+         fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
     }
 
     Tree.prototype.addListener = function(event, listener)
