@@ -759,6 +759,8 @@ var PhyloCanvas = (function(){
                 this.cel.height = this.tree.canvas.canvas.height / 3;
                 this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
                 this.drawFrame();
+
+
             }
     };
 
@@ -2375,6 +2377,7 @@ var PhyloCanvas = (function(){
             }
             if(this.navigator)this.navigator.resize();
             this.adjustForPixelRatio();
+            this.history.resizeTree();
         },
         setZoom : function(z)
         {
@@ -2556,12 +2559,15 @@ var PhyloCanvas = (function(){
     {
         var tree = this.tree;
         this.width = this.div.offsetWidth;
-
-        console.debug(this.width);
-
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
-        tree.canvasEl.style.paddingLeft = this.width + 'px';
-        console.debug(this.width);
+        if(this.isCollapsed())
+        {
+            tree.canvasEl.style.paddingLeft = this.width + 'px';
+        }
+        else
+        {
+            tree.canvasEl.style.paddingLeft = '20%';
+        }
     }
 
     /**
