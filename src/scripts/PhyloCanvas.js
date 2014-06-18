@@ -2367,7 +2367,7 @@ var PhyloCanvas = (function(){
         },
         setSize: function(width, height)
         {
-            this.canvas.canvas.width = width - 200;
+            this.canvas.canvas.width = width;
             this.canvas.canvas.height = height;
             if(this.drawn){
             //    this.drawn = false;
@@ -2556,8 +2556,12 @@ var PhyloCanvas = (function(){
     {
         var tree = this.tree;
         this.width = this.div.offsetWidth;
-        tree.setSize(tree.div.offsetWidth - this.width, tree.div.offsetHeight);
+
+        console.debug(this.width);
+
+        tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
         tree.canvasEl.style.paddingLeft = this.width + 'px';
+        console.debug(this.width);
     }
 
     /**
