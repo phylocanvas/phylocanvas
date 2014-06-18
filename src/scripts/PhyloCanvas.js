@@ -2377,7 +2377,7 @@ var PhyloCanvas = (function(){
             }
             if(this.navigator)this.navigator.resize();
             this.adjustForPixelRatio();
-            this.history.resizeTree();
+            if(this.history) this.history.resizeTree();
         },
         setZoom : function(z)
         {
