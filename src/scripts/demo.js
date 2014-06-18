@@ -2,7 +2,7 @@ window.onload = function(){
    "use strict";
 
     // Construct tree object
-    var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
+    var phylocanvas = new PhyloCanvas.Tree('phylocanvas',{ history_collapsed : true });
     phylocanvas.showLabels = false;
     phylocanvas.hoverLabel = true;
 

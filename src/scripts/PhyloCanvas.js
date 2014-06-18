@@ -66,7 +66,7 @@ var PhyloCanvas = (function(){
               }
 
               event.eventName = type;
-
+              event.bubbles = false;
                 if(params)
                 {
                     for( var param in params )
@@ -396,8 +396,9 @@ var PhyloCanvas = (function(){
          * @example
          *  new PhyloCanvas.Tree(div);
          */
-        var Tree = function(div)
+        var Tree = function(div, conf)
         {
+            if(!conf) conf = {}
             // if the ID is provided get the element, if not assume div
             if(typeof div == 'string') div = document.getElementById(div);
 
@@ -487,7 +488,7 @@ var PhyloCanvas = (function(){
              this.branchColour = "rgba(0,0,0,1)";
              this.branchScalar = 1.0;
 
-            this.hoverLabel = false;
+             this.hoverLabel = false;
 
              this.internalNodesSelectable = true;
 
@@ -508,7 +509,12 @@ var PhyloCanvas = (function(){
                  this.navigator = new Navigator(this);
              }
 
-            new History(this);
+            this.history_collapsed = conf.history_collapsed;
+            this.history = new History(this);
+            if(this.history_collapsed) this.history.collapse();
+
+            addEvent(document.querySelector('.pc-history .toggle'), 'click', this.history.toggle.bind(this.history));
+
             this.adjustForPixelRatio();
 
             //if(this.showControls) this.drawControls();
@@ -2479,9 +2485,8 @@ var PhyloCanvas = (function(){
     {
         this.tree = tree;
 
-        this.width = 200;
-
         this.div = this.createDiv(tree.canvasEl);
+
         this.resizeTree(tree);
 
         this.tree.addListener('subtree', function(evt)
@@ -2499,18 +2504,58 @@ var PhyloCanvas = (function(){
         this.addSnapshot('root');
     }
 
+    History.prototype.collapse = function()
+    {
+        this.div.classList.add('collapsed');
+        this.toggle_div.firstChild.data = '>';
+        this.resizeTree();
+    }
+
+    History.prototype.expand = function()
+    {
+        this.div.classList.remove('collapsed');
+        this.toggle_div.firstChild.data = '<';
+        this.resizeTree();
+    }
+
+    History.prototype.isCollapsed = function()
+    {
+        return this.div.classList.contains('collapsed');
+    }
+
+    History.prototype.toggle = function()
+    {
+        if(this.isCollapsed())
+        {
+            this.expand();
+        }
+        else
+        {
+            this.collapse();
+        }
+    }
+
     History.prototype.createDiv = function(parentDiv)
     {
         var div = document.createElement('div');
         div.classList.add('pc-history');
 
         parentDiv.appendChild(div);
+
+        var tabDiv = document.createElement('div');
+        tabDiv.appendChild(document.createTextNode('<'));
+        tabDiv.classList.add('toggle');
+        div.appendChild(tabDiv);
+
+        this.toggle_div = tabDiv;
+
         return div
     }
 
-    History.prototype.resizeTree = function(tree)
+    History.prototype.resizeTree = function()
     {
-
+        var tree = this.tree;
+        this.width = this.div.offsetWidth;
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
         tree.canvasEl.style.paddingLeft = this.width + 'px';
     }
