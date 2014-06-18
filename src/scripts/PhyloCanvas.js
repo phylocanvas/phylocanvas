@@ -2556,7 +2556,7 @@ var PhyloCanvas = (function(){
     {
         var tree = this.tree;
         this.width = this.div.offsetWidth;
-        tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
+        tree.setSize(tree.div.offsetWidth - this.width, tree.div.offsetHeight);
         tree.canvasEl.style.paddingLeft = this.width + 'px';
     }
 
