@@ -1082,6 +1082,7 @@ var PhyloCanvas = (function(){
         node.childNo = this.children.length;
         node.canvas = this.canvas;
         node.tree = this.tree;
+        this.leaf = false;
         this.children.push(node);
     };
 
@@ -1851,17 +1852,14 @@ var PhyloCanvas = (function(){
                 {
                     case '(': //new Child
                         var nd = new Branch();
-                        curNode.leaf = false;
                         curNode.addChild(nd);
                         curNode = nd;
                         break;
                     case ')': //return to parent
-                        if(curNode.leaf) this.leaves.push(curNode);
                         curNode = curNode.parent;
                         break;
                     case ',': //new sibiling
                         var nd = new Branch();
-                        if(curNode.leaf) this.leaves.push(curNode);
                         curNode.parent.addChild(nd);
                         curNode = nd;
                         break;
@@ -1889,6 +1887,8 @@ var PhyloCanvas = (function(){
                     }
             }
 
+
+
             this.saveNode(this.root);
             this.root.saveChildren();
 
@@ -1901,6 +1901,8 @@ var PhyloCanvas = (function(){
                 this.loadError("All branches in the tree are identical.");
                 return;
             }
+
+            this.buildLeaves();
 
             this.loadCompleted();
         },
@@ -2483,6 +2485,38 @@ var PhyloCanvas = (function(){
         this.root = this.origRoot;
     }
 
+    Tree.prototype.rotateBranch = function(branch)
+    {
+        console.debug(this.branches[branch.id].children);
+        this.branches[branch.id].children = branch.children.reverse();
+
+
+        for( var i = 0; i < this.branches[branch.id].children.length; i++ )
+        {
+            this.branches[branch.id].children[i].childNo = i;
+        }
+
+        console.debug(this.branches[branch.id].children);
+
+        this.buildLeaves();
+        this.drawn = false;
+        this.resetTree();
+        this.draw();
+    }
+
+    Tree.prototype.buildLeaves = function()
+    {
+        this.leaves = [];
+
+        for( var branch in this.branches )
+        {
+            if(this.branches[branch].leaf)
+            {
+                this.leaves.push(this.branches[branch]);
+            }
+        }
+    }
+
     function History(tree)
     {
         this.tree = tree;
@@ -2603,7 +2637,7 @@ var PhyloCanvas = (function(){
 
         for ( var i = thumbs.length; i-- ; )
         {
-            thumbs[0].remove();
+            this.div.removeChild(thumbs[0]);
         };
     }
 
