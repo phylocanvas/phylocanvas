@@ -2647,10 +2647,10 @@ var PhyloCanvas = (function(){
 
         while(ele.previousSibling)
         {
-            ele.previousSibling.remove();
+            this.div.removeChild(ele.previousSibling);
         }
 
-        ele.remove();
+        this.div.removeChild(ele);
 
         this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
     }
