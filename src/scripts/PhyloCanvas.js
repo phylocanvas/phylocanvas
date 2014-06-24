@@ -2244,6 +2244,8 @@ var PhyloCanvas = (function(){
             this.root.setTotalLength();
             this.prerenderers[this.treeType](this);
             this.draw();
+
+            this.subtreeDrawn(this.root.id);
         },
         saveNode : function(node)
         {
@@ -2643,11 +2645,18 @@ var PhyloCanvas = (function(){
 
     History.prototype.goBackTo = function(evt)
     {
-        var ele = evt.target
+        var ele = evt.target;
 
         while(ele.previousSibling)
         {
-            this.div.removeChild(ele.previousSibling);
+            if(ele.previousSibling.tagName == 'IMG')
+            {
+                this.div.removeChild(ele.previousSibling);
+            }
+            else
+            {
+                break;
+            }
         }
 
         this.div.removeChild(ele);
