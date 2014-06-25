@@ -571,8 +571,9 @@ var PhyloCanvas = (function(){
                     d.style.cursor = 'pointer';
                     d.style.padding = '0.3em 0.5em 0.3em 0.5em';
                     d.style.fontFamily = this.tree.font;
-                    d.style.fontSize = this.tree.textSize + 'pt';
+                    d.style.fontSize = '12pt';
                     d.addEventListener('click', createHandler(this, 'close'));
+                    document.body.addEventListener('click', createHandler(this, 'close'));
                     d.addEventListener('contextmenu', function(e){e.preventDefault();});
                     d.addEventListener('mouseover', createHandler(d, this.mouseover));
                     d.addEventListener('mouseout', createHandler(d, this.mouseout));
@@ -1183,7 +1184,7 @@ var PhyloCanvas = (function(){
 
     Branch.prototype.getNodeSize = function()
     {
-        return this.tree.baseNodeSize + this.radius;
+        return Math.min(0, this.tree.baseNodeSize + this.radius);
     }
 
     Tree.prototype = {
@@ -1951,7 +1952,7 @@ var PhyloCanvas = (function(){
                         }
                         if(nd.childNo == nd.parent.children.length - 1)
                         {
-                            nd.parent.centery = (nd.parent.centery + nd.centery )/2; // (nd.parent.children.length - 1);
+                            nd.parent.centery = (nd.parent.centery + nd.centery )/2; // set parent's position to the average of the first and last branch
                         }
                         else
                         {
@@ -2489,20 +2490,15 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.rotateBranch = function(branch)
     {
-        console.debug(this.branches[branch.id].children);
         this.branches[branch.id].children = branch.children.reverse();
-
 
         for( var i = 0; i < this.branches[branch.id].children.length; i++ )
         {
-            this.branches[branch.id].children[i].childNo = i;
+            if(this.branches[branch.id].children[i].leaf) this.this.rotateBranch(this.branches[branch.id].children[i]);
+            this.branches[branch.id].children[i].childNo = branch.children.length - this.branches[branch.id].children[i].childNo;
         }
 
-        console.debug(this.branches[branch.id].children);
-
         this.buildLeaves();
-        this.drawn = false;
-        this.resetTree();
         this.draw();
     }
 
