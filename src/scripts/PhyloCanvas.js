@@ -66,7 +66,7 @@ var PhyloCanvas = (function(){
               }
 
               event.eventName = type;
-
+              event.bubbles = false;
                 if(params)
                 {
                     for( var param in params )
@@ -396,8 +396,9 @@ var PhyloCanvas = (function(){
          * @example
          *  new PhyloCanvas.Tree(div);
          */
-        var Tree = function(div)
+        var Tree = function(div, conf)
         {
+            if(!conf) conf = {}
             // if the ID is provided get the element, if not assume div
             if(typeof div == 'string') div = document.getElementById(div);
 
@@ -487,7 +488,7 @@ var PhyloCanvas = (function(){
              this.branchColour = "rgba(0,0,0,1)";
              this.branchScalar = 1.0;
 
-            this.hoverLabel = false;
+             this.hoverLabel = false;
 
              this.internalNodesSelectable = true;
 
@@ -508,7 +509,12 @@ var PhyloCanvas = (function(){
                  this.navigator = new Navigator(this);
              }
 
-            new History(this);
+            this.history_collapsed = conf.history_collapsed;
+            this.history = new History(this);
+            if(this.history_collapsed) this.history.collapse();
+
+            addEvent(document.querySelector('.pc-history .toggle'), 'click', this.history.toggle.bind(this.history));
+
             this.adjustForPixelRatio();
 
             //if(this.showControls) this.drawControls();
@@ -565,8 +571,9 @@ var PhyloCanvas = (function(){
                     d.style.cursor = 'pointer';
                     d.style.padding = '0.3em 0.5em 0.3em 0.5em';
                     d.style.fontFamily = this.tree.font;
-                    d.style.fontSize = this.tree.textSize + 'pt';
+                    d.style.fontSize = '12pt';
                     d.addEventListener('click', createHandler(this, 'close'));
+                    document.body.addEventListener('click', createHandler(this, 'close'));
                     d.addEventListener('contextmenu', function(e){e.preventDefault();});
                     d.addEventListener('mouseover', createHandler(d, this.mouseover));
                     d.addEventListener('mouseout', createHandler(d, this.mouseout));
@@ -753,6 +760,8 @@ var PhyloCanvas = (function(){
                 this.cel.height = this.tree.canvas.canvas.height / 3;
                 this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
                 this.drawFrame();
+
+
             }
     };
 
@@ -877,9 +886,9 @@ var PhyloCanvas = (function(){
                 var children = [];
                 for(var x = 0; x < this.children.length; x++)
                 {
-                    children.push(this.children[x].getChildIds());
+                    children = children.concat(this.children[x].getChildIds());
                 }
-                return children.join(",");
+                return children;
             }
         },
         getChildCount : function()
@@ -1074,6 +1083,7 @@ var PhyloCanvas = (function(){
         node.childNo = this.children.length;
         node.canvas = this.canvas;
         node.tree = this.tree;
+        this.leaf = false;
         this.children.push(node);
     };
 
@@ -1174,7 +1184,7 @@ var PhyloCanvas = (function(){
 
     Branch.prototype.getNodeSize = function()
     {
-        return this.tree.baseNodeSize + this.radius;
+        return Math.max(0, this.tree.baseNodeSize * this.radius);
     }
 
     Tree.prototype = {
@@ -1438,6 +1448,7 @@ var PhyloCanvas = (function(){
 
           if(e.button == 0)
           {
+              var nids = [];
 
                 //if this is triggered by the release after a drag then the click shouldn't be triggered.
                 if(this.dragging)
@@ -1455,19 +1466,24 @@ var PhyloCanvas = (function(){
                    if(this.internalNodesSelectable || nd.leaf)
                    {
                       nd.setSelected(true, true);
+                       nids = nd.getChildIds();
                    }
                    this.draw();
+
+
                 }
                 else if(this.unselectOnClickAway && !this.dragging)
                 {
                    this.root.setSelected(false, true);
                    this.draw();
+
                 }
 
                 if(!this.pickedup){
                    this.dragging = false;
                 }
 
+                this.nodesSelected(nids);
           }
           else if(e.button == 2)
           {
@@ -1713,7 +1729,7 @@ var PhyloCanvas = (function(){
             },
             square : function (node)
             {
-                var r = this.getNodeSize();
+                var r = node.getNodeSize();
                 var x1 = 0;
                 var x2 = r * 2;
                 var y1 = -r;
@@ -1728,7 +1744,7 @@ var PhyloCanvas = (function(){
             },
             star: function (node)
             {
-                var r = this.getNodeSize();
+                var r = node.getNodeSize();
                 var cx =  r ;
                 var cy = 0;
 
@@ -1837,17 +1853,14 @@ var PhyloCanvas = (function(){
                 {
                     case '(': //new Child
                         var nd = new Branch();
-                        curNode.leaf = false;
                         curNode.addChild(nd);
                         curNode = nd;
                         break;
                     case ')': //return to parent
-                        if(curNode.leaf) this.leaves.push(curNode);
                         curNode = curNode.parent;
                         break;
                     case ',': //new sibiling
                         var nd = new Branch();
-                        if(curNode.leaf) this.leaves.push(curNode);
                         curNode.parent.addChild(nd);
                         curNode = nd;
                         break;
@@ -1875,6 +1888,8 @@ var PhyloCanvas = (function(){
                     }
             }
 
+
+
             this.saveNode(this.root);
             this.root.saveChildren();
 
@@ -1887,6 +1902,8 @@ var PhyloCanvas = (function(){
                 this.loadError("All branches in the tree are identical.");
                 return;
             }
+
+            this.buildLeaves();
 
             this.loadCompleted();
         },
@@ -1935,7 +1952,7 @@ var PhyloCanvas = (function(){
                         }
                         if(nd.childNo == nd.parent.children.length - 1)
                         {
-                            nd.parent.centery = (nd.parent.centery + nd.centery )/2; // (nd.parent.children.length - 1);
+                            nd.parent.centery = (nd.parent.centery + nd.centery )/2; // set parent's position to the average of the first and last branch
                         }
                         else
                         {
@@ -2228,6 +2245,8 @@ var PhyloCanvas = (function(){
             this.root.setTotalLength();
             this.prerenderers[this.treeType](this);
             this.draw();
+
+            this.subtreeDrawn(this.root.id);
         },
         saveNode : function(node)
         {
@@ -2355,7 +2374,7 @@ var PhyloCanvas = (function(){
         },
         setSize: function(width, height)
         {
-            this.canvas.canvas.width = width - 200;
+            this.canvas.canvas.width = width;
             this.canvas.canvas.height = height;
             if(this.drawn){
             //    this.drawn = false;
@@ -2423,6 +2442,11 @@ var PhyloCanvas = (function(){
         fireEvent(this.canvasEl, 'subtree', { node: node });
     }
 
+    Tree.prototype.nodesSelected = function(nids)
+    {
+         fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+    }
+
     Tree.prototype.addListener = function(event, listener)
     {
         addEvent(this.canvasEl, event, listener);
@@ -2464,13 +2488,39 @@ var PhyloCanvas = (function(){
         this.root = this.origRoot;
     }
 
+    Tree.prototype.rotateBranch = function(branch)
+    {
+        this.branches[branch.id].children = branch.children.reverse();
+
+        for( var i = 0; i < this.branches[branch.id].children.length; i++ )
+        {
+            if(this.branches[branch.id].children[i].leaf) this.this.rotateBranch(this.branches[branch.id].children[i]);
+            this.branches[branch.id].children[i].childNo = branch.children.length - this.branches[branch.id].children[i].childNo;
+        }
+
+        this.buildLeaves();
+        this.draw();
+    }
+
+    Tree.prototype.buildLeaves = function()
+    {
+        this.leaves = [];
+
+        for( var branch in this.branches )
+        {
+            if(this.branches[branch].leaf)
+            {
+                this.leaves.push(this.branches[branch]);
+            }
+        }
+    }
+
     function History(tree)
     {
         this.tree = tree;
 
-        this.width = 200;
-
         this.div = this.createDiv(tree.canvasEl);
+
         this.resizeTree(tree);
 
         this.tree.addListener('subtree', function(evt)
@@ -2488,20 +2538,67 @@ var PhyloCanvas = (function(){
         this.addSnapshot('root');
     }
 
+    History.prototype.collapse = function()
+    {
+        this.div.classList.add('collapsed');
+        this.toggle_div.firstChild.data = '>';
+        this.resizeTree();
+    }
+
+    History.prototype.expand = function()
+    {
+        this.div.classList.remove('collapsed');
+        this.toggle_div.firstChild.data = '<';
+        this.resizeTree();
+    }
+
+    History.prototype.isCollapsed = function()
+    {
+        return this.div.classList.contains('collapsed');
+    }
+
+    History.prototype.toggle = function()
+    {
+        if(this.isCollapsed())
+        {
+            this.expand();
+        }
+        else
+        {
+            this.collapse();
+        }
+    }
+
     History.prototype.createDiv = function(parentDiv)
     {
         var div = document.createElement('div');
         div.classList.add('pc-history');
 
         parentDiv.appendChild(div);
+
+        var tabDiv = document.createElement('div');
+        tabDiv.appendChild(document.createTextNode('<'));
+        tabDiv.classList.add('toggle');
+        div.appendChild(tabDiv);
+
+        this.toggle_div = tabDiv;
+
         return div
     }
 
-    History.prototype.resizeTree = function(tree)
+    History.prototype.resizeTree = function()
     {
-
+        var tree = this.tree;
+        this.width = this.div.offsetWidth;
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
-        tree.canvasEl.style.paddingLeft = this.width + 'px';
+        if(this.isCollapsed())
+        {
+            tree.canvasEl.style.paddingLeft = this.width + 'px';
+        }
+        else
+        {
+            tree.canvasEl.style.paddingLeft = '20%';
+        }
     }
 
     /**
@@ -2538,20 +2635,27 @@ var PhyloCanvas = (function(){
 
         for ( var i = thumbs.length; i-- ; )
         {
-            thumbs[0].remove();
+            this.div.removeChild(thumbs[0]);
         };
     }
 
     History.prototype.goBackTo = function(evt)
     {
-        var ele = evt.target
+        var ele = evt.target;
 
         while(ele.previousSibling)
         {
-            ele.previousSibling.remove();
+            if(ele.previousSibling.tagName == 'IMG')
+            {
+                this.div.removeChild(ele.previousSibling);
+            }
+            else
+            {
+                break;
+            }
         }
 
-        ele.remove();
+        this.div.removeChild(ele);
 
         this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
     }

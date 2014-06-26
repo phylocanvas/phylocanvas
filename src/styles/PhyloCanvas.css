@@ -1,9 +1,10 @@
 canvas
 {
     border : 1px solid #333;
+    box-sizing: border-box;
 }
 
-.pc-container:after
+/*.pc-container:after
 {
     content: 'PhyloCanvas';
     position: absolute;
@@ -15,7 +16,7 @@ canvas
 
     bottom: 0.25em;
     right: 0.25em;
-}
+}*/
 
 .pc-history
 {
@@ -26,10 +27,53 @@ canvas
     left : 0;
     box-sizing : border-box;
     /*border : 1px solid #CCCCCC;*/
-    width : 200px;
+    width : 20%;
     overflow-x: hidden;
     overflow-y : auto;
     background: #EEE;
+
+}
+
+.pc-history .toggle
+{
+
+    position : absolute;
+    top: 10px;
+    right: 0px;
+
+    padding : 5px 10px;
+
+    cursor: pointer;
+
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+
+    background-color : #CCCCCC;
+    color:#FFFFFF;
+}
+
+.pc-history.collapsed .toggle
+{
+    border-top-left-radius: 0%;
+    border-bottom-left-radius: 0%;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+}
+
+.pc-history .toggle:hover
+{
+    background-color : #FFF;
+    color:#CCC;
+}
+
+.pc-history.collapsed
+{
+    width:30px;
+}
+
+.pc-history.collapsed img
+{
+    display : none;
 }
 
 /*.pc-history:before
@@ -52,6 +96,10 @@ canvas
 {
     border: 1px solid #CCC;
     cursor: pointer;
+
+    width: 100%;
+
+    box-sizing : border-box;
 
     transition: background-color 0.25s ease;
 }
