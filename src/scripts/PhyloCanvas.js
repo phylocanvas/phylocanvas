@@ -1184,7 +1184,7 @@ var PhyloCanvas = (function(){
 
     Branch.prototype.getNodeSize = function()
     {
-        return Math.min(0, this.tree.baseNodeSize + this.radius);
+        return Math.max(0, this.tree.baseNodeSize * this.radius);
     }
 
     Tree.prototype = {
