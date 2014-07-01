@@ -51,4 +51,6 @@
     // load tree via AJAX and render using default params
     phylocanvas.load('./tree.nwk');
 
+    window.phylocanvas = phylocanvas;
+
 })();

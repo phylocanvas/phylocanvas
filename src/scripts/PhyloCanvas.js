@@ -324,6 +324,9 @@ var PhyloCanvas = (function(){
           },
           {
               text:'Collapse/Expand branch',handler: 'toggleCollapsed', internal: true, leaf:false
+          },
+          {
+              text:'Rotate Branch',handler: 'rotate', internal: true, leaf:false
           }];
 
           this.tree.canvasEl.appendChild(this.div);
@@ -1187,6 +1190,24 @@ var PhyloCanvas = (function(){
         return Math.max(0, this.tree.baseNodeSize * this.radius);
     }
 
+    Branch.prototype.rotate = function(evt)
+    {
+        console.debug(this.children)
+        this.children = this.children.reverse();
+        console.debug(this.children.reverse())
+        for( var i = 0; i < this.children.length; i++ )
+        {
+            if(this.children[i].leaf) this.children[i].rotate({ preventredraw: true });
+            this.childNo = this.children.length - this.childNo;
+        }
+
+        if ( ! evt.preventredraw )
+        {
+            this.tree.buildLeaves();
+            this.tree.draw(true);
+        }
+    }
+
     Tree.prototype = {
         // Included
         AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
@@ -1559,7 +1580,7 @@ var PhyloCanvas = (function(){
         /**
          * Draw the frame
          */
-        draw : function()
+        draw : function(forceRedraw)
         {
             this.selectedNodes = [];
 
@@ -1580,9 +1601,9 @@ var PhyloCanvas = (function(){
 
             this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
 
-            if(!this.drawn)
+            if(!this.drawn || forceRedraw)
             {
-                this.prerenderers[this.treeType](this);
+                this.prerenderers[this.treeType](this, forceRedraw);
             }
             this.canvas.translate(this.offsetx, this.offsety);
             this.canvas.scale(this.zoom, this.zoom);
@@ -2034,7 +2055,7 @@ var PhyloCanvas = (function(){
 
                 tree.zoom = (Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) - 50  - tree.leaves[0].getNodeSize()) / (r * 2);
             },
-            radial : function(tree)
+            radial : function(tree, forcedDraw)
             {
                 tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
                 //tree.root.setTotalLength();
@@ -2078,10 +2099,12 @@ var PhyloCanvas = (function(){
 
                 var sx = (tree.maxx - tree.minx);
                 var sy = (tree.maxy - tree.miny);
-
-                tree.zoom = Math.min((tree.canvas.canvas.width - 50) / sx, (tree.canvas.canvas.height - 50) / sy);
-                tree.offsetx =  - ((tree.minx + tree.maxx)/2) * tree.zoom;
-                tree.offsety =  - ((tree.miny + tree.maxy)/2) * tree.zoom;
+                if(!forcedDraw)
+                {
+                    tree.zoom = Math.min((tree.canvas.canvas.width - 50) / sx, (tree.canvas.canvas.height - 50) / sy);
+                    tree.offsetx =  - ((tree.minx + tree.maxx)/2) * tree.zoom;
+                    tree.offsety =  - ((tree.miny + tree.maxy)/2) * tree.zoom;
+                }
 
             },
             diagonal : function(tree)
@@ -2490,16 +2513,7 @@ var PhyloCanvas = (function(){
 
     Tree.prototype.rotateBranch = function(branch)
     {
-        this.branches[branch.id].children = branch.children.reverse();
-
-        for( var i = 0; i < this.branches[branch.id].children.length; i++ )
-        {
-            if(this.branches[branch.id].children[i].leaf) this.this.rotateBranch(this.branches[branch.id].children[i]);
-            this.branches[branch.id].children[i].childNo = branch.children.length - this.branches[branch.id].children[i].childNo;
-        }
-
-        this.buildLeaves();
-        this.draw();
+        this.branches[branch.id].rotate();
     }
 
     Tree.prototype.buildLeaves = function()
@@ -2593,11 +2607,11 @@ var PhyloCanvas = (function(){
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
         if(this.isCollapsed())
         {
-            tree.canvasEl.style.paddingLeft = this.width + 'px';
+            tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = this.width + 'px';
         }
         else
         {
-            tree.canvasEl.style.paddingLeft = '20%';
+            tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = '20%';
         }
     }
 
@@ -2659,6 +2673,8 @@ var PhyloCanvas = (function(){
 
         this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
     }
+
+
 
     return { /*lends PhyloCanvas*/
         Tree: Tree,
