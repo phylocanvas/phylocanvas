@@ -2593,11 +2593,11 @@ var PhyloCanvas = (function(){
         tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
         if(this.isCollapsed())
         {
-            tree.canvasEl.style.paddingLeft = this.width + 'px';
+            tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = this.width + 'px';
         }
         else
         {
-            tree.canvasEl.style.paddingLeft = '20%';
+            tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = '20%';
         }
     }
 
