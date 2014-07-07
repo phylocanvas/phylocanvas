@@ -1205,16 +1205,13 @@ var PhyloCanvas = (function(){
         var newChildren = [];
         for( var i = this.children.length; i-- ; )
         {
-        //    if(!this.children[i].leaf) this.children[i].rotate({ preventredraw: true });
             newChildren.push(this.children[i]);
-            //this.children[i].childNo = this.children.length - this.childNo;
         }
 
         this.children = newChildren;
 
         if( ! evt.preventredraw )
         {
-            console.debug('redraw');
             this.tree.buildLeaves();
             this.tree.draw(true);
         }
@@ -1617,7 +1614,7 @@ var PhyloCanvas = (function(){
 
             this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
 
-            if(!this.drawn)
+            if(!this.drawn || forceRedraw)
             {
                 this.prerenderers[this.treeType](this);
                 if(! forceRedraw) { this.fitInPanel(); }
@@ -2462,7 +2459,7 @@ var PhyloCanvas = (function(){
 
         this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
         this.offsety = (maxy + miny) * this.zoom / -2;
-        this.offsetx = (maxx + minx) * this.zoom / -2;
+        this.offsetx = (maxx + minx)* this.zoom / -2;
 
         console.log(JSON.stringify(bounds), this.offsetx, this.offsety);
 
@@ -2535,7 +2532,10 @@ var PhyloCanvas = (function(){
         }.bind(this));
 
         this.tree.addListener('loaded', this.reset.bind(this));
-        this.tree.addListener('typechanged', this.reset.bind(this));
+        this.tree.addListener('typechanged', function(evt)
+        {
+            this.addSnapshot(this.tree.root);
+        }.bind(this));
     }
 
     History.prototype.reset = function()
