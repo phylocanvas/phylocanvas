@@ -233,7 +233,7 @@ var PhyloCanvas = (function(){
             /**
              * The text lable for this node
              */
-            this.label = "";
+            this.label = null;
             /**
              * If true, this node have no children
              */
@@ -796,7 +796,7 @@ var PhyloCanvas = (function(){
             this.canvas.font = f_size + "pt " + this.tree.font;
             var dim = this.canvas.measureText(lbl);
 
-            var lbl = this.label ? this.label : this.id;
+            var lbl = (this.label !== undefined && this.label !== null) ? this.label : this.id;
 
             var tx = this.getNodeSize() + 15
             var ty = f_size / 3;
