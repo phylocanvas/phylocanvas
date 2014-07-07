@@ -1192,17 +1192,21 @@ var PhyloCanvas = (function(){
 
     Branch.prototype.rotate = function(evt)
     {
-        console.debug(this.children)
-        this.children = this.children.reverse();
-        console.debug(this.children.reverse())
-        for( var i = 0; i < this.children.length; i++ )
+        console.debug(this.children);
+        var newChildren = [];
+        for( var i = this.children.length; i-- ; )
         {
-            if(this.children[i].leaf) this.children[i].rotate({ preventredraw: true });
-            this.childNo = this.children.length - this.childNo;
+        //    if(!this.children[i].leaf) this.children[i].rotate({ preventredraw: true });
+            newChildren.push(this.children[i]);
+            this.children[i].childNo = this.children.length - this.childNo;
         }
 
-        if ( ! evt.preventredraw )
+        this.children = newChildren
+        console.debug(this.children);
+
+        if( ! evt.preventredraw )
         {
+            console.debug('redraw');
             this.tree.buildLeaves();
             this.tree.draw(true);
         }
@@ -1951,7 +1955,7 @@ var PhyloCanvas = (function(){
         },
         prerenderers :
         {
-            rectangular : function(tree)
+            rectangular : function(tree, forcedDraw)
             {
                 tree.root.startx = 0;
                 tree.root.starty = 0;
@@ -1959,6 +1963,8 @@ var PhyloCanvas = (function(){
                 tree.root.centery = 0;
                 tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
                 var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+
+                //set initial positons of the branches
                 for(var i = 0; i < tree.leaves.length; i++)
                 {
                     tree.leaves[i].angle = 0;
@@ -1967,36 +1973,30 @@ var PhyloCanvas = (function(){
 
                     for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
                     {
-                        if(nd.childNo == 0)
-                        {
-                            nd.parent.centery = nd.centery;
-                        }
-                        if(nd.childNo == nd.parent.children.length - 1)
-                        {
-                            nd.parent.centery = (nd.parent.centery + nd.centery )/2; // set parent's position to the average of the first and last branch
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        var cn = nd.parent.children
+                        nd.parent.centery = (cn[0].centery + cn[cn.length-1].centery) / 2;
                     }
                 }
 
-                var miny = tree.leaves[0].centery - tree.leaves[0].getNodeSize();
-                var maxy = tree.leaves[tree.leaves.length - 1].centery + tree.leaves[tree.leaves.length - 1].getNodeSize();
-
-                var minx = 0;
-                var maxx = (tree.maxBranchLength * tree.branchScalar) + (tree.leaves[0].getNodeSize() * 2) + 20;
-
                 tree.root.startx = tree.root.centerx;
                 tree.root.starty = tree.root.centery;
-                tree.zoom = Math.min((tree.canvas.canvas.width -100) / (maxx), (tree.canvas.canvas.height - 100) / (maxy - miny));
-                //tree.offsetx = tree.canvas.canvas.width/2 - (maxx - minx) /2;
-                //tree.offsety = miny + 20;
-                tree.offsetx =  - ((maxx - minx)*tree.zoom /2) ;
-                tree.offsety = - ((maxy - miny)*tree.zoom /2) ;
 
-                //tree.zoom = Math.min((tree.canvas.canvas.width - 20) / (maxx - minx), (tree.canvas.canvas.height - 20) / (maxy - miny));
+                //TODO : Move to new method ... (getTreeBounds)
+                if( ! forcedDraw )
+                {
+                    var miny = tree.leaves[0].centery - tree.leaves[0].getNodeSize();
+                    var maxy = tree.leaves[tree.leaves.length - 1].centery + tree.leaves[tree.leaves.length - 1].getNodeSize();
+
+                    var minx = 0;
+                    var maxx = (tree.maxBranchLength * tree.branchScalar) + (tree.leaves[0].getNodeSize() * 2) + 20;
+
+
+                    tree.zoom = Math.min((tree.canvas.canvas.width -100) / (maxx), (tree.canvas.canvas.height - 100) / (maxy - miny));
+
+                    tree.offsetx =  - ((maxx - minx)*tree.zoom /2) ;
+                    tree.offsety = - ((maxy - miny)*tree.zoom /2) ;
+                }
+
             },
             circular : function(tree)
             {
@@ -2520,12 +2520,11 @@ var PhyloCanvas = (function(){
     {
         this.leaves = [];
 
-        for( var branch in this.branches )
+        var leafIds = this.root.getChildIds();
+
+        for( var i = 0; i < leafIds.length; i++ )
         {
-            if(this.branches[branch].leaf)
-            {
-                this.leaves.push(this.branches[branch]);
-            }
+            this.leaves.push(this.branches[leafIds[i]]);
         }
     }
 
