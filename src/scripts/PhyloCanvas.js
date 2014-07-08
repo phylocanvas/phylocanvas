@@ -532,6 +532,9 @@ var PhyloCanvas = (function(){
             addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this)); //=  createHandler(this, "drag");
             addEvent(this.canvas.canvas,'mousewheel', this.scroll.bind(this));// = createHandler(this, "scroll");
             addEvent(this.canvas.canvas,'DOMMouseScroll', this.scroll.bind(this));//createHandler(this, "scroll"));
+            addEvent(window,'resize', function(evt) {
+                this.resizeToContainer();
+            }.bind(this));
 
             this.addListener('loaded', function(evt){
                     this.origBranches = this.branches;
@@ -1149,6 +1152,24 @@ var PhyloCanvas = (function(){
         }
     };
 
+    Branch.prototype.getNwk = function(){
+        if(this.leaf)
+        {
+            return this.id + ':' + this.branchLength;
+        }
+        else
+        {
+            var children= [];
+            for( var i = 0; i < this.children.length; i++ )
+            {
+                children.push(this.children[i].getNwk())
+            }
+            nwk = '(' + children.join(',') + '):' + this.branchLength;
+            return nwk;
+        }
+
+    }
+
     Branch.prototype.getTextColour = function()
     {
         if(this.selected)
@@ -1700,10 +1721,14 @@ var PhyloCanvas = (function(){
                 else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i))
                 {
                     this.parseNexus(tree, name);
+                    this.draw();
+                    this.loadCompleted();
                 }
                 else if(tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi))
                 {
                     this.parseNwk(tree, name);
+                    this.draw();
+                    this.loadCompleted();
                 }
                 else
                 {
@@ -2461,8 +2486,6 @@ var PhyloCanvas = (function(){
         this.offsety = (maxy + miny) * this.zoom / -2;
         this.offsetx = (maxx + minx)* this.zoom / -2;
 
-        console.log(JSON.stringify(bounds), this.offsetx, this.offsety);
-
     }
 
     Tree.prototype.on = Tree.prototype.addListener;
@@ -2516,6 +2539,17 @@ var PhyloCanvas = (function(){
         {
             this.leaves.push(this.branches[leafIds[i]]);
         }
+    }
+
+    Tree.prototype.exportNwk = function()
+    {
+        var nwk = this.root.getNwk();
+        return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
+    }
+
+    Tree.prototype.resizeToContainer = function()
+    {
+        this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight)
     }
 
     function History(tree)
