@@ -93,6 +93,34 @@ var PhyloCanvas = (function(){
             }
         }
 
+        function addClass(element, className)
+        {
+            var classes = element.className.split(' ');
+            if( classes.indexOf(className) === -1 )
+            {
+                classes.push(className);
+                element.className = classes.join(' ');
+            }
+        }
+
+        function removeClass(element, className)
+        {
+            var classes = element.className.split(' '),
+                idx = classes.indexOf(className);
+            if( idx !== -1 )
+            {
+                classes.splice(idx, 1);
+                element.className = classes.join(' ');
+            }
+        }
+
+        function hasClass(element, className)
+        {
+            var classes = element.className.split(' '),
+                idx = classes.indexOf(className);
+            return idx !== -1;
+        }
+
         /**
          * @namespace PhyloCanvas
          */
@@ -441,7 +469,7 @@ var PhyloCanvas = (function(){
 
             this.canvasEl = div;
 
-            this.canvasEl.classList.add('pc-container');
+            addClass(this.canvasEl, 'pc-container');
 
             //Set up the div and canvas element
             if(window.getComputedStyle(this.canvasEl).position === 'static' )this.canvasEl.style.position = 'relative';
@@ -2582,21 +2610,21 @@ var PhyloCanvas = (function(){
 
     History.prototype.collapse = function()
     {
-        this.div.classList.add('collapsed');
+        addClass(this.div, 'collapsed');
         this.toggle_div.firstChild.data = '>';
         this.resizeTree();
     }
 
     History.prototype.expand = function()
     {
-        this.div.classList.remove('collapsed');
+        removeClass(this.div, 'collapsed');
         this.toggle_div.firstChild.data = '<';
         this.resizeTree();
     }
 
     History.prototype.isCollapsed = function()
     {
-        return this.div.classList.contains('collapsed');
+        return hasClass(this.div, 'collapsed');
     }
 
     History.prototype.toggle = function()
@@ -2614,13 +2642,13 @@ var PhyloCanvas = (function(){
     History.prototype.createDiv = function(parentDiv)
     {
         var div = document.createElement('div');
-        div.classList.add('pc-history');
+        addClass(div, 'pc-history');
 
         parentDiv.appendChild(div);
 
         var tabDiv = document.createElement('div');
         tabDiv.appendChild(document.createTextNode('<'));
-        tabDiv.classList.add('toggle');
+        addClass(tabDiv,'toggle');
         div.appendChild(tabDiv);
 
         this.toggle_div = tabDiv;
@@ -2701,8 +2729,6 @@ var PhyloCanvas = (function(){
 
         this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
     }
-
-
 
     return { /*lends PhyloCanvas*/
         Tree: Tree,
