@@ -4,1106 +4,1083 @@
  * @author Chris Powell (c.powell@imperial.ac.uk)
  * @modified 14/01/14
  */
-var PhyloCanvas = (function(){
-        /**
-         * Get the y coordinate of oElement
-         *
-         * @param oElement - The element to get the Y position of.
-         *
-         */
-        function getY( oElement )
-        {
-         var iReturnValue = 0;
-         while( oElement != null ) {
-            iReturnValue += oElement.offsetTop;
-            oElement = oElement.offsetParent;
-         }
-         return iReturnValue;
-        }
-
-        /**
-         * Get the x coordinate of oElement
-         *
-         * @param oElement - The element to get the X position of.
-         *
-         */
-        function getX( oElement )
-        {
-         var iReturnValue = 0;
-         while( oElement != null ) {
-            iReturnValue += oElement.offsetLeft;
-            oElement = oElement.offsetParent;
-         }
-         return iReturnValue;
-        }
-
-        /**
-         * Return backing store pixel ratio of context.
-         *
-         * @param context - The rendering context of HTMl5 canvas.
-         *
-         */
-        function getBackingStorePixelRatio(context) {
-            return (context.backingStorePixelRatio ||
-                context.webkitBackingStorePixelRatio ||
-                context.mozBackingStorePixelRatio ||
-                context.msBackingStorePixelRatio ||
-                context.oBackingStorePixelRatio ||
-                context.backingStorePixelRatio || 1);
-        }
-
-
-        function fireEvent(element, type, params)
-        {
-            var event; // The custom event that will be created
-
-              if (document.createEvent) {
-                event = document.createEvent("HTMLEvents");
-                event.initEvent(type, true, true);
-              } else {
-                event = document.createEventObject();
-                event.eventType = type;
-              }
-
-              event.eventName = type;
-              event.bubbles = false;
-                if(params)
-                {
-                    for( var param in params )
-                    {
-                        event[param] = params[param];
-                    }
-                }
-
-              if (document.createEvent) {
-                element.dispatchEvent(event);
-              } else {
-                element.fireEvent("on" + event.eventType, event);
-              }
-        }
-
-        function addEvent(elem, event, fn) {
-            if (elem.addEventListener) {
-                elem.addEventListener(event, fn, false);
-            } else {
-                elem.attachEvent("on" + event, function() {
-                    // set the this pointer same as addEventListener when fn is called
-                    return(fn.call(elem, window.event));
-                });
-            }
-        }
-
-        function addClass(element, className)
-        {
-            var classes = element.className.split(' ');
-            if( classes.indexOf(className) === -1 )
-            {
-                classes.push(className);
-                element.className = classes.join(' ');
-            }
-        }
-
-        function removeClass(element, className)
-        {
-            var classes = element.className.split(' '),
-                idx = classes.indexOf(className);
-            if( idx !== -1 )
-            {
-                classes.splice(idx, 1);
-                element.className = classes.join(' ');
-            }
-        }
-
-        function hasClass(element, className)
-        {
-            var classes = element.className.split(' '),
-                idx = classes.indexOf(className);
-            return idx !== -1;
-        }
-
-        /**
-         * @namespace PhyloCanvas
-         */
-
-
-
-        /**
-         * An enumeration of certain pre-defined angles to enable faster drawing of trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-         * @enum
-         * @memberof PhyloCanvas
-         * @constant
-         */
-        var Angles={
-            /**
-             * @constant
-             * @type double
-             * @description PI / 4
-             */
-            FORTYFIVE : Math.PI / 4,
-            /**
-             * @constant
-             * @type double
-             * @description PI / 2
-             */
-            QUARTER : Math.PI / 2,
-            /**
-             * @constant
-             * @type double
-             * @description PI
-             */
-            HALF : Math.PI,
-            /**
-             * @constant
-             * @type double
-             * @description PI * 2
-             */
-            FULL : 2 * Math.PI
-        };
-
-        /**
-         * Creates a function which can be called from an event handler independent of scope
-         *
-         * @param {Object} obj the object the function will be called on
-         * @param {String} func the name of the function to be called
-         * @retuns {function}
-         */
-        function createHandler(obj, func)
-        {
-
-            if(typeof func == typeof "aaa")
-            {
-                return (function(e){return obj[func](e);});
-            }
-            else
-            {
-                return function(e){return func(obj);};
-            }
-        };
-
-        /**
-         * dictionary to translate annotations in NWK to branch renderer ids
-         * @enum
-         * @memberof PhyloCanvas
-         */
-        var Shapes = {
-            "x" : "star",
-            "s" : "square",
-            "o" : "circle",
-            "t" : "triangle"
-        };
-
-        /**
-         * Creates a branch
-         *
-         * @constructor
-         * @memberof PhyloCanvas
-         * @public
-         *
-         */
-        var Branch = function()
-        {
-
-            /**
-             * The angle clockwise from horizontal the branch is (Used paricularly for Circular and Radial Trees)
-             * @public
-             *
-             */
-            this.angle = 0;
-
-            /**
-             * The Length of the branch
-             */
-            this.branchLength = false;
-
-            /**
-             * The Canvas DOM object the parent tree is drawn on
-             */
-            this.canvas;
-
-            /**
-             * The center of the end of the node on the x axis
-             */
-            this.centerx = 0;
-            /**
-             * The center of the end of the node on the y axis
-             */
-            this.centery = 0;
-            /**
-             * the branches that stem from this branch
-             */
-            this.children = [];
-            //this.childNo = 0;
-            /**
-             * true if the node has been collapsed
-             * @type Boolean
-             */
-            this.collapsed = false;
-            /**
-             * The colour of the terminal of this node
-             */
-            this.colour =  "rgba(0,0,0,1)";
-            /**
-             * an object to hold custom data for this node
-             */
-            this.data = {};
-            /**
-             * This node's unique ID
-             */
-            this.id = "";
-            /**
-             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the colour of the branch.
-             */
-            this.interx = 0;
-            /**
-             * when the branch drawing algorithm needs to switch. For example: where the Circular algorithm needs to change the colour of the branch.
-             */
-            this.intery = 0;
-            /**
-             * The text lable for this node
-             */
-            this.label = null;
-            /**
-             * If true, this node have no children
-             */
-            this.leaf = true;
-            /**
-             * the angle that the last child of this brach 'splays' at, used for circular and radial trees
-             */
-            this.maxChildAngle = 0;
-            /**
-             * the angle that the last child of this brach 'splays' at, used for circular and radial trees
-             */
-            this.minChildAngle = Angles.FULL;
-
-            /**
-             * What kind of teminal should be drawn on this node
-             */
-            this.nodeShape = "circle";
-
-            /**
-             * The parent branch of this branch
-             */
-            this.parent = null;
-            /**
-             * The relative size of the terminal of this node
-             */
-            this.radius =  1.0;
-            /**
-             * true if this branch is currently selected
-             */
-            this.selected = false;
-
-            /**
-             * the x position of the start of the branch
-             * @type double
-             */
-            this.startx = 0;
-            /**
-             * the y position of the start of the branch
-             * @type double
-             */
-            this.starty = 0;
-            /**
-             * The length from the root of the tree to the tip of this branch
-             */
-            this.totalBranchLength = 0;
-            /**
-             * The tree object that this branch is part of
-             * @type Tree
-             */
-            this.tree = {};
-        };
-
-
-        /**
-         * The menu that is shown when the PhyloCanvas widget is right-clicked
-         *
-         * @constructor
-         * @memberOf PhyloCanvas
-         *
-         */
-        var ContextMenu = function(tree)
-        {
-         /**
-          * The Tree object that this context menu influences
-          */
-          this.tree = tree;
-          /**
-           * The div of the menu
-           */
-          this.div = document.createElement('div');
-          this.div.style.display = 'none';
-          this.div.style.position = 'fixed';
-          this.div.style.border = '1px solid #CCCCCC';
-          this.div.style.background = '#FFFFFF';
-          this.div.className = 'contextMenu';
-          /**
-           * The options in this menu
-           */
-          this.elements = [
-          {
-              text:'Redraw Subtree',handler: 'redrawTreeFromBranch', internal: true, leaf:false
-          },
-          {
-              text:'Show Labels',handler: 'displayLabels', internal: false, leaf:false
-          },
-          {
-              text:'Hide Labels',handler: 'hideLabels', internal: false, leaf:false
-          },
-          {
-              text:'Collapse/Expand branch',handler: 'toggleCollapsed', internal: true, leaf:false
-          },
-          {
-              text:'Rotate Branch',handler: 'rotate', internal: true, leaf:false
-          }];
-
-          this.tree.canvasEl.appendChild(this.div);
-        };
-
-        /**
-         * @constructor
-         * @memberof PhyloCanvas
-         */
-        var Loader = function(div)
-        {
-            this.div = div;
-            this.cl = document.createElement('canvas');
-            this.cl.id = div.id + 'Loader';
-            this.cl.style.position = 'absolute';
-            this.cl.style.backgroundColour = '#FFFFFF';
-            this.cl.style.top = (div.offsetHeight/4) + "px";
-            this.cl.style.left = (div.offsetWidth/4) + "px";
-            this.cl.height = div.offsetHeight/2;
-            this.cl.width = div.offsetWidth/2;
-            this.cl.style.zIndex = '1000';
-            div.appendChild(this.cl);
-
-    //        this.ctx = this.cl.getContext('2d');
-            this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-            this.drawer = null;
-            this.loader_radius;
-            this.loader_step = (2 * Math.PI) / 360;
-
-            this.message = "Loading ...";
-        };
-
-        /**
-         * @constructor
-         * @memberof PhyloCanvas
-         */
-        var Navigator = function(tree)
-        {
-            this.tree = tree;
-            this.cel = document.createElement('canvas');
-            this.cel.id = this.tree.canvasEl.id + 'Navi';
-            this.cel.style.zIndex = '100';
-            this.cel.style.backgroundColour = '#FFFFFF';
-            this.cel.width = this.tree.canvas.canvas.width / 3;
-            this.cel.height = this.tree.canvas.canvas.height / 3;
-            this.cel.style.position = 'absolute';
-            this.cel.style.bottom = '0px';
-            this.cel.style.right = '0px';
-            this.cel.style.border = '1px solid #CCCCCC';
-            this.tree.canvasEl.appendChild(this.cel);
-
-            this.ctx = this.cel.getContext('2d');
-            this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-            this.ctx.save();
-
-        };
-
-        /**
-         * The instance of a PhyloCanvas Widget
-         *
-         * @constructor
-         * @memberof PhyloCanvas
-         * @param div {string|HTMLDivElement} the div or id of a div that phylocanvas will be drawn in
-         *
-         * {@link PhyoCanvas.Tree}
-         *
-         * @example
-         *  new PhyloCanvas.Tree('div_id');
-         *
-         * @example
-         *  new PhyloCanvas.Tree(div);
-         */
-        var Tree = function(div, conf)
-        {
-            if(!conf) conf = {}
-            // if the ID is provided get the element, if not assume div
-            if(typeof div == 'string') div = document.getElementById(div);
-
-            /**
-             *
-             * Dictionary of all branches indexed by Id
-             */
-            this.branches = {};
-            /**
-             *
-             * List of leaves
-             */
-            this.leaves = [];
-            /**
-             * Loading dialog displayed while waiting for the tree
-             */
-            //this.loader = new Loader(div);
-            /**
-             * The root node of the tree (not neccesarily a root in the Phylogenetic sense)
-             */
-            this.root = false;
-
-            /**
-             *
-             * used for auto ids for internal nodes
-             * @private
-             */
-            this.lastId = 0;
-
-            /**
-             * backColour colour the branches of the tree based on the colour of the tips
-             */
-            this.backColour = false
-
-            this.origBL = {};
-            this.origP = {};
-
-            this.canvasEl = div;
-
-            addClass(this.canvasEl, 'pc-container');
-
-            //Set up the div and canvas element
-            if(window.getComputedStyle(this.canvasEl).position === 'static' )this.canvasEl.style.position = 'relative';
-            this.canvasEl.style.boxSizing = 'border-box';
-            var cl = document.createElement('canvas');
-            cl.id = div.id + 'pCanvas';
-            cl.className = 'phylocanvas';
-            cl.style.position = 'relative';
-            cl.style.backgroundColour = '#FFFFFF';
-            cl.height = div.clientHeight || 400;
-            cl.width = div.clientWidth || 400;
-            cl.style.zIndex = '1';
-            this.canvasEl.appendChild(cl);
-
-            /***
-             * Right click menu
-             */
-            this.contextMenu = new ContextMenu(this);
-            this.drawn = false;
-
-             this.selectedNodes = [];
-
-             this.zoom = 1;
-             this.pickedup = false;
-             this.dragging = false;
-             this.startx; this.starty;
-             this.pickedup = false;
-             this.baseNodeSize = 1;
-             this.curx;
-             this.cury;
-             this.origx;
-             this.origy;
-
-             this.canvas = cl.getContext('2d');
-
-             this.canvas.canvas.onselectstart = function () { return false; };
-             this.canvas.fillStyle = "#000000";
-             this.canvas.strokeStyle = "#000000";
-             this.canvas.save();
-
-             this.offsetx = this.canvas.canvas.width/2;
-             this.offsety = this.canvas.canvas.height/2;
-             this.selectedColour = "rgba(49,151,245,1)";
-             this.highlightColour = "rgba(49,151,245,1)";
-             this.highlightWidth = 5.0;
-             this.selectedNodeSizeIncrease = 0;
-             this.branchColour = "rgba(0,0,0,1)";
-             this.branchScalar = 1.0;
-
-             this.hoverLabel = false;
-
-             this.internalNodesSelectable = true;
-
-             this.showLabels = true;
-             this.showBootstraps = false;
-
-             this.treeType = 'radial';
-             this.maxBranchLength = 0;
-             this.lineWidth = 1.0;
-             this.textSize = 10;
-             this.font = "sans-serif";
-
-
-             this.unselectOnClickAway = true;
-             this.rightClickZoom = true;
-
-             if(this.use_navigator){
-                 this.navigator = new Navigator(this);
-             }
-
-            this.history_collapsed = conf.history_collapsed;
-            this.history = new History(this);
-            if(this.history_collapsed) this.history.collapse();
-
-            addEvent(document.querySelector('.pc-history .toggle'), 'click', this.history.toggle.bind(this.history));
-
-            this.adjustForPixelRatio();
-
-            //if(this.showControls) this.drawControls();
-            //window.onresize = createHandler(this, "autoSize");
-            this.addListener('contextmenu', this.clicked.bind(this));
-            this.addListener('click', this.clicked.bind(this));
-            //this.canvas.canvas.ondblclick =  createHandler(this, "dblclicked");
-            this.addListener('mousedown', this.pickup.bind(this));
-            this.addListener('mouseup', this.drop.bind(this));// =  createHandler(this, "drop");
-            this.addListener('mouseout', this.drop.bind(this));// =  createHandler(this, "drop");
-
-            addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this)); //=  createHandler(this, "drag");
-            addEvent(this.canvas.canvas,'mousewheel', this.scroll.bind(this));// = createHandler(this, "scroll");
-            addEvent(this.canvas.canvas,'DOMMouseScroll', this.scroll.bind(this));//createHandler(this, "scroll"));
-            addEvent(window,'resize', function(evt) {
-                this.resizeToContainer();
-            }.bind(this));
-
-            this.addListener('loaded', function(evt){
-                    this.origBranches = this.branches;
-                    this.origLeaves = this.leaves;
-                    this.origRoot = this.root;
-            }.bind(this))
-
-
-        };
-
+var PhyloCanvas = (function () {
+  /**
+   * Get the y coordinate of oElement
+   *
+   * @param oElement - The element to get the Y position of.
+   *
+   */
+  function getY(domElement) {
+    var yValue = 0;
+    while (domElement) {
+      yValue += domElement.offsetTop;
+      domElement = domElement.offsetParent;
+    }
+    return yValue;
+  }
+
+  /**
+   * Get the x coordinate of oElement
+   *
+   * @param oElement - The element to get the X position of.
+   *
+   */
+  function getX(domElement) {
+    var xValue = 0;
+    while (domElement != null) {
+      xValue += domElement.offsetLeft;
+      domElement = domElement.offsetParent;
+    }
+    return xValue;
+  }
+
+  /**
+   * Return backing store pixel ratio of context.
+   *
+   * @param context - The rendering context of HTMl5 canvas.
+   *
+   */
+  function getBackingStorePixelRatio(context) {
+    return (
+      context.backingStorePixelRatio ||
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio ||
+      context.msBackingStorePixelRatio ||
+      context.oBackingStorePixelRatio ||
+      1
+    );
+  }
+
+  function fireEvent(element, type, params) {
+    var event; // The custom event that will be created
+
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(type, true, true);
+    } else {
+      event = document.createEventObject();
+      event.eventType = type;
+    }
+
+    event.eventName = type;
+    event.bubbles = false;
+    if (params) {
+      for (var param in params) {
+        event[param] = params[param];
+      }
+    }
+
+    if (document.createEvent) {
+      element.dispatchEvent(event);
+    } else {
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  function addEvent(elem, event, fn) {
+    if (elem.addEventListener) {
+      elem.addEventListener(event, fn, false);
+    } else {
+      elem.attachEvent('on' + event, function () {
+        // set the this pointer same as addEventListener when fn is called
+        return (fn.call(elem, window.event));
+      });
+    }
+  }
+
+  function addClass(element, className) {
+    var classes = element.className.split(' ');
+    if (classes.indexOf(className) === -1) {
+      classes.push(className);
+      element.className = classes.join(' ');
+    }
+  }
+
+  function removeClass(element, className) {
+    var classes = element.className.split(' ');
+    var index = classes.indexOf(className);
+
+    if (index !== -1) {
+      classes.splice(index, 1);
+      element.className = classes.join(' ');
+    }
+  }
+
+  function hasClass(element, className) {
+    var classes = element.className.split(' ');
+    var index = classes.indexOf(className);
+
+    return index !== -1;
+  }
+
+  /**
+   * @namespace PhyloCanvas
+   */
+
+  /**
+   * An enumeration of certain pre-defined angles to enable faster drawing of
+   * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
+   *
+   * @enum
+   * @memberof PhyloCanvas
+   * @constant
+   */
+  var Angles = {
+    /**
+     * @constant
+     * @type double
+     * @description PI / 4
+     */
+    FORTYFIVE: Math.PI / 4,
+    /**
+     * @constant
+     * @type double
+     * @description PI / 2
+     */
+    QUARTER: Math.PI / 2,
+    /**
+     * @constant
+     * @type double
+     * @description PI
+     */
+    HALF: Math.PI,
+    /**
+     * @constant
+     * @type double
+     * @description PI * 2
+     */
+    FULL: 2 * Math.PI
+  };
+
+  /**
+   * Creates a function which can be called from an event handler independent of
+   * scope.
+   *
+   * @param {Object} obj the object the function will be called on
+   * @param {String} func the name of the function to be called
+   * @retuns {function}
+   */
+  function createHandler(obj, func) {
+    if (typeof func === typeof 'aaa') {
+      return (function (e) {return obj[func](e);});
+    }
+    else {
+      return function (e) {return func(obj);};
+    }
+  }
+
+  /**
+   * dictionary to translate annotations in NWK to branch renderer ids
+   *
+   * @enum
+   * @memberof PhyloCanvas
+   */
+  var Shapes = {
+    x: 'star',
+    s: 'square',
+    o: 'circle',
+    t: 'triangle'
+  };
+
+  /**
+   * Creates a branch
+   *
+   * @constructor
+   * @memberof PhyloCanvas
+   * @public
+   *
+   */
+  function Branch() {
+
+    /**
+     * The angle clockwise from horizontal the branch is (Used paricularly for
+     * Circular and Radial Trees)
+     * @public
+     *
+     */
+    this.angle = 0;
+
+    /**
+     * The Length of the branch
+     */
+    this.branchLength = false;
+
+    /**
+     * The Canvas DOM object the parent tree is drawn on
+     */
+    this.canvas;
+
+    /**
+     * The center of the end of the node on the x axis
+     */
+    this.centerx = 0;
+    /**
+     * The center of the end of the node on the y axis
+     */
+    this.centery = 0;
+    /**
+     * the branches that stem from this branch
+     */
+    this.children = [];
+    //this.childNo = 0;
+    /**
+     * true if the node has been collapsed
+     * @type Boolean
+     */
+    this.collapsed = false;
+    /**
+     * The colour of the terminal of this node
+     */
+    this.colour =  'rgba(0,0,0,1)';
+    /**
+     * an object to hold custom data for this node
+     */
+    this.data = {};
+    /**
+     * This node's unique ID
+     */
+    this.id = '';
+    /**
+     * when the branch drawing algorithm needs to switch. For example: where the
+     * Circular algorithm needs to change the colour of the branch.
+     */
+    this.interx = 0;
+    /**
+     * when the branch drawing algorithm needs to switch. For example: where the
+     * Circular algorithm needs to change the colour of the branch.
+     */
+    this.intery = 0;
+    /**
+     * The text lable for this node
+     */
+    this.label = null;
+    /**
+     * If true, this node have no children
+     */
+    this.leaf = true;
+    /**
+     * the angle that the last child of this brach 'splays' at, used for
+     * circular and radial trees
+     */
+    this.maxChildAngle = 0;
+    /**
+     * the angle that the last child of this brach 'splays' at, used for
+     * circular and radial trees
+     */
+    this.minChildAngle = Angles.FULL;
+
+    /**
+     * What kind of teminal should be drawn on this node
+     */
+    this.nodeShape = 'circle';
+
+    /**
+     * The parent branch of this branch
+     */
+    this.parent = null;
+    /**
+     * The relative size of the terminal of this node
+     */
+    this.radius =  1.0;
+    /**
+     * true if this branch is currently selected
+     */
+    this.selected = false;
+
+    /**
+     * the x position of the start of the branch
+     * @type double
+     */
+    this.startx = 0;
+    /**
+     * the y position of the start of the branch
+     * @type double
+     */
+    this.starty = 0;
+    /**
+     * The length from the root of the tree to the tip of this branch
+     */
+    this.totalBranchLength = 0;
+    /**
+     * The tree object that this branch is part of
+     * @type Tree
+     */
+    this.tree = {};
+  }
+
+  /**
+   * The menu that is shown when the PhyloCanvas widget is right-clicked
+   *
+   * @constructor
+   * @memberOf PhyloCanvas
+   *
+   */
+  function ContextMenu(tree) {
+    /**
+     * The Tree object that this context menu influences
+     */
+    this.tree = tree;
+    /**
+     * The div of the menu
+     */
+    this.div = document.createElement('div');
+    this.div.style.display = 'none';
+    this.div.style.position = 'fixed';
+    this.div.style.border = '1px solid #CCCCCC';
+    this.div.style.background = '#FFFFFF';
+    this.div.className = 'contextMenu';
+    /**
+     * The options in this menu
+     */
+    this.elements = [{
+      text: 'Redraw Subtree',
+      handler: 'redrawTreeFromBranch',
+      internal: true,
+      leaf: false
+    }, {
+      text: 'Show Labels',
+      handler: 'displayLabels',
+      internal: false,
+      leaf:false
+    }, {
+      text: 'Hide Labels',
+      handler: 'hideLabels',
+      internal: false,
+      leaf: false
+    }, {
+      text: 'Collapse/Expand branch',
+      handler: 'toggleCollapsed',
+      internal: true,
+      leaf: false
+    }, {
+      text: 'Rotate Branch',
+      handler: 'rotate',
+      internal: true,
+      leaf: false
+    }];
+
+    this.tree.canvasEl.appendChild(this.div);
+  }
+
+  /**
+   * @constructor
+   * @memberof PhyloCanvas
+   */
+  function Loader(div) {
+    this.div = div;
+    this.cl = document.createElement('canvas');
+    this.cl.id = div.id + 'Loader';
+    this.cl.style.position = 'absolute';
+    this.cl.style.backgroundColour = '#FFFFFF';
+    this.cl.style.top = (div.offsetHeight / 4) + 'px';
+    this.cl.style.left = (div.offsetWidth / 4) + 'px';
+    this.cl.height = div.offsetHeight / 2;
+    this.cl.width = div.offsetWidth / 2;
+    this.cl.style.zIndex = '1000';
+    div.appendChild(this.cl);
+
+    this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
+    this.drawer = null;
+    this.loaderRadius;
+    this.loaderStep = (2 * Math.PI) / 360;
+
+    this.message = 'Loading ...';
+  }
+
+  /**
+   * @constructor
+   * @memberof PhyloCanvas
+   */
+  function Navigator(tree) {
+    this.tree = tree;
+    this.cel = document.createElement('canvas');
+    this.cel.id = this.tree.canvasEl.id + 'Navi';
+    this.cel.style.zIndex = '100';
+    this.cel.style.backgroundColour = '#FFFFFF';
+    this.cel.width = this.tree.canvas.canvas.width / 3;
+    this.cel.height = this.tree.canvas.canvas.height / 3;
+    this.cel.style.position = 'absolute';
+    this.cel.style.bottom = '0px';
+    this.cel.style.right = '0px';
+    this.cel.style.border = '1px solid #CCCCCC';
+    this.tree.canvasEl.appendChild(this.cel);
+
+    this.ctx = this.cel.getContext('2d');
+    this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
+    this.ctx.save();
+  }
+
+  /**
+   * The instance of a PhyloCanvas Widget
+   *
+   * @constructor
+   * @memberof PhyloCanvas
+   * @param div {string|HTMLDivElement} the div or id of a div that phylocanvas
+   * will be drawn in
+   *
+   * {@link PhyoCanvas.Tree}
+   *
+   * @example
+   *  new PhyloCanvas.Tree('div_id');
+   *
+   * @example
+   *  new PhyloCanvas.Tree(div);
+   */
+  var Tree = function (div, conf) {
+    if (!conf) conf = {};
+    // if the ID is provided get the element, if not assume div
+    if (typeof div === 'string') div = document.getElementById(div);
+
+    /**
+     *
+     * Dictionary of all branches indexed by Id
+     */
+    this.branches = {};
+    /**
+     *
+     * List of leaves
+     */
+    this.leaves = [];
+    /**
+     * Loading dialog displayed while waiting for the tree
+     */
+    //this.loader = new Loader(div);
+    /**
+     * The root node of the tree
+     * (not neccesarily a root in the Phylogenetic sense)
+     */
+    this.root = false;
+
+    /**
+     *
+     * used for auto ids for internal nodes
+     * @private
+     */
+    this.lastId = 0;
+
+    /**
+     * backColour colour the branches of the tree based on the colour of the
+     * tips
+     */
+    this.backColour = false;
+
+    this.origBL = {};
+    this.origP = {};
+
+    this.canvasEl = div;
+
+    addClass(this.canvasEl, 'pc-container');
+
+    //Set up the div and canvas element
+    if (window.getComputedStyle(this.canvasEl).position === 'static') {
+      this.canvasEl.style.position = 'relative';
+    }
+    this.canvasEl.style.boxSizing = 'border-box';
+    var cl = document.createElement('canvas');
+    cl.id = div.id + 'pCanvas';
+    cl.className = 'phylocanvas';
+    cl.style.position = 'relative';
+    cl.style.backgroundColour = '#FFFFFF';
+    cl.height = div.clientHeight || 400;
+    cl.width = div.clientWidth || 400;
+    cl.style.zIndex = '1';
+    this.canvasEl.appendChild(cl);
+
+    /***
+     * Right click menu
+     */
+    this.contextMenu = new ContextMenu(this);
+    this.drawn = false;
+
+    this.selectedNodes = [];
+
+    this.zoom = 1;
+    this.pickedup = false;
+    this.dragging = false;
+    this.startx; this.starty;
+    this.pickedup = false;
+    this.baseNodeSize = 1;
+    this.curx;
+    this.cury;
+    this.origx;
+    this.origy;
+
+    this.canvas = cl.getContext('2d');
+
+    this.canvas.canvas.onselectstart = function () { return false; };
+    this.canvas.fillStyle = '#000000';
+    this.canvas.strokeStyle = '#000000';
+    this.canvas.save();
+
+    this.offsetx = this.canvas.canvas.width / 2;
+    this.offsety = this.canvas.canvas.height / 2;
+    this.selectedColour = 'rgba(49,151,245,1)';
+    this.highlightColour = 'rgba(49,151,245,1)';
+    this.highlightWidth = 5.0;
+    this.selectedNodeSizeIncrease = 0;
+    this.branchColour = 'rgba(0,0,0,1)';
+    this.branchScalar = 1.0;
+
+    this.hoverLabel = false;
+
+    this.internalNodesSelectable = true;
+
+    this.showLabels = true;
+    this.showBootstraps = false;
+
+    this.treeType = 'radial';
+    this.maxBranchLength = 0;
+    this.lineWidth = 1.0;
+    this.textSize = 10;
+    this.font = 'sans-serif';
+
+    this.unselectOnClickAway = true;
+    this.rightClickZoom = true;
+
+    if (this.useNavigator) {
+      this.navigator = new Navigator(this);
+    }
+
+    this.historyCollapsed = conf.historyCollapsed;
+    this.history = new History(this);
+    if (this.historyCollapsed) this.history.collapse();
+
+    addEvent(
+      document.querySelector('.pc-history .toggle'),
+      'click',
+      this.history.toggle.bind(this.history)
+    );
+
+    this.adjustForPixelRatio();
+
+    this.addListener('contextmenu', this.clicked.bind(this));
+    this.addListener('click', this.clicked.bind(this));
+
+    this.addListener('mousedown', this.pickup.bind(this));
+    this.addListener('mouseup', this.drop.bind(this));
+    this.addListener('mouseout', this.drop.bind(this));
+
+    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    addEvent(window, 'resize', function (evt) {
+      this.resizeToContainer();
+    }.bind(this));
+
+    this.addListener('loaded', function (evt) {
+      this.origBranches = this.branches;
+      this.origLeaves = this.leaves;
+      this.origRoot = this.root;
+    }.bind(this));
+  };
 
     //static members
-    ContextMenu.prototype = {
-            close : function()
-            {
-                this.div.style.display = 'none';
-            },
-            mouseover : function(d){d.style.backgroundColour = "#E2E3DF";},
-            mouseout : function(d){d.style.backgroundColour = "transparent";},
-            open: function(x,y)
-            {
-                while(this.div.hasChildNodes()){this.div.removeChild(this.div.firstChild);}
-                for(var i = 0; i < this.elements.length; i++)
-                {
-                    var nd = this.tree.root.clicked(this.tree.translateClickX(x), this.tree.translateClickY(y));
-                    if((nd && ((nd.leaf && !this.elements[i].leaf && this.elements[i].internal) ||(!nd.leaf && !this.elements[i].internal && this.elements[i].leaf))) || (!nd && (this.elements[i].leaf || this.elements[i].internal)))
-                    {
-                        continue;
-                    }
-                    d = document.createElement('div');
-                    d.appendChild(document.createTextNode(this.elements[i].text));
-                    if(this.elements[i].leaf || this.elements[i].internal)
-                    {
-                        d.addEventListener('click', createHandler(nd, this.elements[i].handler));
-                    }
-                    else
-                    {
-                        d.addEventListener('click', createHandler(this.tree, this.elements[i].handler));
-                    }
-                    d.style.cursor = 'pointer';
-                    d.style.padding = '0.3em 0.5em 0.3em 0.5em';
-                    d.style.fontFamily = this.tree.font;
-                    d.style.fontSize = '12pt';
-                    d.addEventListener('click', createHandler(this, 'close'));
-                    document.body.addEventListener('click', createHandler(this, 'close'));
-                    d.addEventListener('contextmenu', function(e){e.preventDefault();});
-                    d.addEventListener('mouseover', createHandler(d, this.mouseover));
-                    d.addEventListener('mouseout', createHandler(d, this.mouseout));
-                    this.div.appendChild(d);
-                }
-                if(x && y)
-                {
-
-                    this.div.style.top = y + 'px';
-                    this.div.style.left = x + 'px';
-                }
-                else
-                {
-                    this.div.style.top = '100px';
-                    this.div.style.left = '100px';
-                }
-
-                this.div.style.zIndex = 2000;
-                this.div.style.display = 'block';
-
-                this.div.style.backgroundColour = '#FFFFFF';
-            }
-    };
-    /**
-     * Prototype for the loading spinner.
-     */
-    Loader.prototype = {
-             run : function()
-             {
-                 var i = 0;
-                 this.cl.style.diangle = "block";
-                 this.initLoader();
-                 var loader = this;
-                 this.drawer = setInterval(function(){
-                     loader.drawLoader(i);
-                     i++;
-                 }, 10);
-
-             },
-             resize : function()
-             {
-                this.cl.style.top = "2px";
-                this.cl.style.left = "2px";
-                this.cl.height = this.div.offsetHeight * .75;
-                this.cl.width = this.div.offsetWidth  * .75;
-
-                this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-                this.ctx.fillStyle = 'rgba(180,180,255,1)';
-                this.ctx.lineWidth = 10.0;
-
-                this.ctx.font = "24px sans-serif";
-
-                this.ctx.shadowOffsetX = 2.0;
-                this.ctx.shadowOffsetY = 2.0;
-
-             },
-             initLoader : function()
-             {
-                 this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-                 this.ctx.fillStyle = 'rgba(180,180,255,1)';
-                 this.ctx.lineWidth = 10.0;
-
-                 this.ctx.font = "24px sans-serif";
-
-                 this.ctx.shadowOffsetX = 2.0;
-                 this.ctx.shadowOffsetY = 2.0;
-             },
-             drawLoader : function (t)
-             {
-                 this.ctx.restore();
-
-                 this.ctx.translate(0,0);
-                 this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4);
-
-                 this.ctx.save();
-                 this.ctx.clearRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
-                 this.ctx.translate(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
-
-                 this.ctx.beginPath();
-                 this.ctx.arc(0,0, this.loader_radius, this.loader_step * t, this.loader_step * t + 2);
-                 this.ctx.stroke();
-
-                 this.ctx.beginPath();
-                 this.ctx.arc(0,0, this.loader_radius, this.loader_step * t + 3, this.loader_step * t + 5);
-                 this.ctx.stroke();
-                 var txt = this.message;
-                 this.ctx.fillText(txt, -(this.ctx.measureText(txt).width / 2), this.loader_radius + 50, this.cl.width);
-
-             },
-             stop : function(){
-                clearInterval(this.drawer);
-                this.cl.style.display = "none";
-             },
-             fail : function(message)
-             {
-
-                clearInterval(this.drawer);
-                this.loader_radius = Math.min(this.ctx.canvas.width/4, this.ctx.canvas.height/4);
-                 this.ctx.restore();
-
-                 this.ctx.translate(0,0);
-                 this.ctx.clearRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
-                //    this.ctx.translate(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
-
-                 this.ctx.beginPath();
-
-                this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-                this.ctx.fillStyle = 'rgba(255,180,180,1)';
-
-                this.ctx.translate(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
-
-                this.ctx.beginPath();
-
-                this.ctx.moveTo(0,0);
-                this.ctx.lineTo(this.loader_radius, this.loader_radius);
-                this.ctx.moveTo(0,0);
-                this.ctx.lineTo(-this.loader_radius, this.loader_radius);
-                this.ctx.moveTo(0,0);
-                this.ctx.lineTo(-this.loader_radius, -this.loader_radius);
-                this.ctx.moveTo(0,0);
-                this.ctx.lineTo(this.loader_radius, -this.loader_radius);
-                this.ctx.stroke();
-
-
-                this.ctx.fillText(message, -(this.ctx.measureText(message).width / 2), this.loader_radius + 50, this.loader_radius * 2);
-             }
-    };
-
-    /**
-     *  Overview window
-     */
-    Navigator.prototype = {
-            //
-            drawFrame : function()
-            {
-                this.ctx.restore();
-                this.ctx.save();
-
-                var w = this.cel.width;
-                var h = this.cel.height;
-                var hw = w/2;
-                var hh = h/2;
-
-                this.ctx.clearRect(-hw, -hh, w, h);
-
-                this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-
-                if(!this.tree.drawn)
-                {
-                    var url = this.tree.canvas.canvas.toDataURL();
-
-                    this.img = document.createElement('img');
-                    this.img.src = url;
-
-                    var evtctx = this;
-
-                    this.img.onload = function(){
-                        evtctx.ctx.drawImage(evtctx.img, -hw, -hh, evtctx.cel.width, evtctx.cel.height);
-                    };
-
-                    this.baseOffsetx = this.tree.offsetx;
-                    this.baseOffsety = this.tree.offsety;
-                    this.baseZoom = this.tree.zoom;
-                }
-                else
-                {
-                    this.ctx.drawImage(this.img,-hw, -hh, this.cel.width, this.cel.height);
-                }
-
-                var z = 1 / (this.tree.zoom / this.baseZoom);
-
-                this.ctx.lineWidth = this.ctx.lineWidth / z;
-
-                this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z, (this.baseOffsety - (this.tree.offsety * z)) * z);
-                this.ctx.scale(z, z);
-                this.ctx.strokeRect(-hw, -hh, w, h);
-            },
-
-            /**
-             *
-             */
-            resize : function(){
-                this.cel.width = this.tree.canvas.canvas.width / 3;
-                this.cel.height = this.tree.canvas.canvas.height / 3;
-                this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-                this.drawFrame();
-
-
-            }
-    };
-
-
-    Branch.prototype = {
-        clicked : function(x,y)
-        {
-            if(this.dragging) return;
-            if(x < (this.maxx ) && x > (this.minx ))
-            {
-                if(y < (this.maxy ) && y > (this.miny ))
-                {
-                    return this;
-                }
-            }
-
-            for(var i = this.children.length - 1; i >= 0; i--)
-            {
-                cld = this.children[i].clicked(x,y);
-                if(cld) return cld;
-            }
-
-        },
-        drawLabel : function()
-        {
-           // var  h = (/this.tree.zoom) ;
-
-            var f_size = this.tree.textSize;
-            this.canvas.font = f_size + "pt " + this.tree.font;
-            var dim = this.canvas.measureText(lbl);
-
-            var lbl = this.getLabel();
-
-            var tx = this.getNodeSize() + 15
-            var ty = f_size / 3;
-
-            if(this.angle > Angles.QUARTER && this.angle < (Angles.HALF + Angles.QUARTER))
-            {
-               this.canvas.rotate(Angles.HALF);
-               tx = -tx - (dim.width * 1.1);
-            }
-
-            this.canvas.beginPath();
-            this.canvas.fillStyle = this.getTextColour();
-            this.canvas.fillText(lbl, tx ,ty);
-            this.canvas.closePath();
-        },
-        drawNode : function()
-        {
-            var  r = this.getNodeSize(); //r = node radius
-            var theta = r; //theta = translation to center of node... ensures that the node edge is at the end of the branch so the branches don't look shorter than  they should
-
-             var cx = this.leaf ? (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
-             var cy = this.leaf ? (theta * Math.sin(this.angle)) + this.centery : this.centery;
-
-            this.canvas.beginPath();
-            this.canvas.fillStyle = this.selected ? this.tree.selectedColour:this.colour ;
-            if((r * this.tree.zoom) < 5)
-            {
-               var e =  (5 / this.tree.zoom);
-               this.minx = cx - e;
-               this.maxx = cx + e;
-               this.miny = cy - e;
-               this.maxy = cy + e;
-            }
-            else
-            {
-               this.minx =  cx - r;
-               this.maxx = cx + r;
-               this.miny= cy - r;
-               this.maxy = cy + r;
-            }
-            if(this.collapsed)
-            {
-                var x1 = ((this.getNodeSize() * 10) /this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
-                var y1 = ((this.getNodeSize() * 10) /this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
-                var x2 = ((this.getNodeSize() * 10) /this.tree.zoom) * Math.cos(this.angle);
-                var y2 = ((this.getNodeSize() * 10) /this.tree.zoom) * Math.sin(this.angle);
-                this.canvas.beginPath();
-                this.canvas.moveTo((this.centerx - x1), (this.centery - y1));
-                this.canvas.lineTo((this.centerx + x1), (this.centery + y1));
-                this.canvas.lineTo((this.centerx + x2), (this.centery + y2));
-                this.canvas.lineTo((this.centerx - x1), (this.centery - y1));
-                this.canvas.closePath();
-                this.canvas.fill();
-            }
-            else if(this.leaf)
-            {
-                this.canvas.save();
-                this.canvas.translate(this.centerx, this.centery);
-                this.canvas.rotate(this.angle);
-                this.tree.nodeRenderers[this.nodeShape](this);
-                if(this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
-                this.canvas.restore();
-
-            }
-
-            this.canvas.closePath();
-
-
-             if(this.highlighted)
-             {
-                 this.canvas.beginPath();
-                 var l = this.canvas.lineWidth;
-                 this.canvas.strokeStyle = this.tree.highlightColour;
-                 this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-                 this.canvas.arc(cx, cy, (this.leaf? this.getNodeSize() : 0)+ ((5 + ( this.tree.highlightWidth/ 2)) / this.tree.zoom), 0, Angles.FULL, false);
-                 this.canvas.stroke();
-                 this.canvas.lineWidth = l;
-                 this.canvas.strokeStyle = this.tree.branchColour;
-                 this.canvas.beginPath();
-             }
-        },
-        getChildIds : function()
-        {
-            if(this.leaf)
-            {
-                return this.id;
-            }
-            else
-            {
-                var children = [];
-                for(var x = 0; x < this.children.length; x++)
-                {
-                    children = children.concat(this.children[x].getChildIds());
-                }
-                return children;
-            }
-        },
-        getChildCount : function()
-        {
-            if(this.leaf) return 1;
-            var children = 0;
-            for(var x = 0; x < this.children.length; x++)
-            {
-                children += this.children[x].getChildCount();
-            }
-            return children;
-        },
-        getChildYTotal : function()
-        {
-         if(this.leaf) return this.centery;
-
-         var y = 0;
-         for(var i = 0; i < this.children.length; i++)
-         {
-            y += this.children[i].getChildYTotal();
-         }
-         return y;
-        },
-        setSelected : function(selected, applyToChildren)
-        {
-            var ids = this.id;
-            this.selected = selected;
-            if(applyToChildren){
-                for(var i = 0; i < this.children.length; i++)
-                {
-                  ids = ids + "," + this.children[i].setSelected(selected, applyToChildren);
-                }
-            }
-            return ids;
-        },
-        setHighlighted : function(highlighted)
-        {
-            //var ids = this.id;
-            this.highlighted = highlighted;
-            if(!highlighted){
-                for(var i = 0; i < this.children.length; i++)
-                {
-                  this.children[i].setHighlighted(highlighted);
-                }
-            }
-            //return ids;
-        },
-        reset : function()
-        {
-            this.startx = 0;
-            this.starty = 0;
-            this.centerx = 0;
-            this.centery = 0;
-            this.angle = null;
-            //this.totalBranchLength = 0;
-            this.minChildAngle = Angles.FULL;
-            this.maxChildAngle = 0;
-            for(cld in this.children)
-            {
-                try{
-                    this.children[cld].pcReset();
-                }catch(e){}
-            }
-        },
-        parseNwk :function(nwk, idx)
-        {
-            idx = this.parseLabel(nwk,idx);
-            if(nwk[idx] == ":")
-            {
-                idx = this.parseNodeLength(nwk, idx + 1);
-            }
-            else
-            {
-                this.branchLength = 0;
-            }
-            if(!this.id || this.id == "") this.id = this.tree.genId();
-            return idx;
-        },
-        parseLabel : function(nwk, idx)
-        {
-            var lbl = "";
-            for(idx; nwk[idx] != ":" && nwk[idx] != "," && nwk[idx] != ")" && idx < nwk.length; idx++)
-            {
-               lbl += nwk[idx];
-            }
-            //idx--;
-            if(!lbl) return idx;
-            if(lbl.match(/\*/))
-            {
-                var bits = lbl.split("**");
-                this.id = bits[0];
-                if(bits.length == 1 ) return idx;
-                // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />label is : ' + bits[0]);
-                bits = bits[1].split("*");
-
-                for(var b = 0; b < bits.length; b += 2)
-                {
-                   switch (bits[b])
-                   {
-                      case "nsz" :
-                          // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node Size is : ' + bits[b+1]);
-                         this.radius = parseInt(bits[b+1]);
-                         break;
-                      case "nsh" :
-
-                        if(Shapes[bits[b+1]]) this.nodeShape = Shapes[bits[b+1]];
-                        else if(this.nodeRenderers[bits[b+1]]) this.nodeShape = bits[b+1];
-                        else this.nodeShape = "circle";
-                         // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node shape is : ' + bits[b+1]);
-                         break;
-                      case "ncol" : this.colour = bits[b+1];
-                         var hexRed = '0x' + this.colour.substring(0,2);
-                         var hexGreen = '0x' + this.colour.substring(2,4);
-                         var hexBlue = '0x' + this.colour.substring(4,6);
-                         this.colour = 'rgba('+parseInt(hexRed, 16).toString()+','+parseInt(hexGreen, 16).toString()+','+parseInt(hexBlue, 16).toString()+',1)';
-                         // if(pcdebug && Ext) Ext.get(pcdebug).update(pcdebug.innerText + '\nNode Colour is : ' + bits[b+1]); && Ext) Ext.get(pcdebug).update(pcdebug.innerHtml + '<br />Node Colour is : ' + bits[b+1]);
-                         break;
-                   }
-                }
-            }
-            else
-            {
-                this.id = lbl;
-            }
-            return idx;
-        },
-        parseNodeLength : function(nwk, idx)
-        {
-            var str = "";
-            for(idx; nwk[idx] != ")" && nwk[idx] != ","; idx++)
-            {
-               str += nwk[idx];
-            }
-
-            this.branchLength = parseFloat(str);
-            if(this.branchLength < 0) this.branchLength = 0;
-            return idx;
-        },
-        redrawTreeFromBranch : function()
-        {
-            this.tree.redrawFromBranch(this);
-        },
-        saveChildren : function()
-        {
-            for(var i = 0; i < this.children.length; i ++)
-            {
-                this.tree.saveNode(this.children[i]);
-                this.children[i].saveChildren();
-            }
-        },
-        collapse : function()
-       {
-           this.collapsed = this.leaf === false; // don't collapse the node if it is a leaf... that would be silly!
-       },
-       expand : function()
-       {
-           this.collapsed = false;
-       },
-       toggleCollapsed : function()
-       {
-           this.collapsed ? this.expand() : this.collapse();
-       },
-        setTotalLength : function()
-        {
-
-            if(this.parent)
-            {
-                this.totalBranchLength = this.parent.totalBranchLength +  this.branchLength;
-                if(this.totalBranchLength > this.tree.maxBranchLength) this.tree.maxBranchLength = this.totalBranchLength;
-            }
-            else
-            {
-                 this.totalBranchLength = this.branchLength;
-                 this.tree.maxBranchLength = this.totalBranchLength;
-            }
-            for(var c = 0; c < this.children.length ; c++)
-            {
-                this.children[c].setTotalLength();
-            }
+  ContextMenu.prototype = {
+    close: function () {
+      this.div.style.display = 'none';
+    },
+    mouseover: function (d) { d.style.backgroundColour = '#E2E3DF'; },
+    mouseout: function (d) { d.style.backgroundColour = 'transparent'; },
+    open: function (x, y) {
+      while (this.div.hasChildNodes()) {
+        this.div.removeChild(this.div.firstChild);
+      }
+      for (var i = 0; i < this.elements.length; i++) {
+        var nd = this.tree.root.clicked(
+          this.tree.translateClickX(x),
+          this.tree.translateClickY(y)
+        );
+        if (
+          (nd && ((nd.leaf && !this.elements[i].leaf && this.elements[i].internal) ||
+          (!nd.leaf && !this.elements[i].internal && this.elements[i].leaf))) ||
+          (!nd && (this.elements[i].leaf || this.elements[i].internal))
+        ) {
+          continue;
         }
-    };
+        d = document.createElement('div');
+        d.appendChild(document.createTextNode(this.elements[i].text));
+        if (this.elements[i].leaf || this.elements[i].internal) {
+          d.addEventListener(
+            'click', createHandler(nd, this.elements[i].handler)
+          );
+        }
+        else {
+          d.addEventListener(
+            'click', createHandler(this.tree, this.elements[i].handler)
+          );
+        }
+        d.style.cursor = 'pointer';
+        d.style.padding = '0.3em 0.5em 0.3em 0.5em';
+        d.style.fontFamily = this.tree.font;
+        d.style.fontSize = '12pt';
+        d.addEventListener('click', createHandler(this, 'close'));
+        document.body.addEventListener('click', createHandler(this, 'close'));
+        d.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        d.addEventListener('mouseover', createHandler(d, this.mouseover));
+        d.addEventListener('mouseout', createHandler(d, this.mouseout));
+        this.div.appendChild(d);
+      }
+
+      if (x && y) {
+        this.div.style.top = y + 'px';
+        this.div.style.left = x + 'px';
+      } else {
+        this.div.style.top = '100px';
+        this.div.style.left = '100px';
+      }
+
+      this.div.style.zIndex = 2000;
+      this.div.style.display = 'block';
+
+      this.div.style.backgroundColour = '#FFFFFF';
+    }
+  };
+  /**
+   * Prototype for the loading spinner.
+   */
+  Loader.prototype = {
+    run: function () {
+      var i = 0;
+      var _this = this;
+      this.cl.style.diangle = 'block';
+      this.initLoader();
+      this.drawer = setInterval(function () {
+        _this.drawLoader(i);
+        i++;
+      }, 10);
+    },
+    resize: function () {
+      this.cl.style.top = '2px';
+      this.cl.style.left = '2px';
+      this.cl.height = this.div.offsetHeight * 0.75;
+      this.cl.width = this.div.offsetWidth  * 0.75;
+
+      this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+      this.ctx.fillStyle = 'rgba(180,180,255,1)';
+      this.ctx.lineWidth = 10.0;
+
+      this.ctx.font = '24px sans-serif';
+
+      this.ctx.shadowOffsetX = 2.0;
+      this.ctx.shadowOffsetY = 2.0;
+
+    },
+    initLoader: function () {
+      this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+      this.ctx.fillStyle = 'rgba(180,180,255,1)';
+      this.ctx.lineWidth = 10.0;
+
+      this.ctx.font = '24px sans-serif';
+
+      this.ctx.shadowOffsetX = 2.0;
+      this.ctx.shadowOffsetY = 2.0;
+    },
+    drawLoader: function (t) {
+      this.ctx.restore();
+
+      this.ctx.translate(0, 0);
+      this.loaderRadius = Math.min(
+        this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
+      );
+
+      this.ctx.save();
+      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+      this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+      this.ctx.beginPath();
+      this.ctx.arc(
+        0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
+      );
+      this.ctx.stroke();
+
+      this.ctx.beginPath();
+      this.ctx.arc(
+        0, 0,
+        this.loaderRadius,
+        this.loaderStep * t + 3,
+        this.loaderStep * t + 5
+      );
+      this.ctx.stroke();
+      var txt = this.message;
+      this.ctx.fillText(
+        txt,
+        -(this.ctx.measureText(txt).width / 2),
+        this.loaderRadius + 50, this.cl.width
+      );
+    },
+    stop: function () {
+      clearInterval(this.drawer);
+      this.cl.style.display = 'none';
+    },
+    fail: function (message) {
+      clearInterval(this.drawer);
+      this.loaderRadius = Math.min(
+        this.ctx.canvas.width / 4,
+        this.ctx.canvas.height / 4
+      );
+      this.ctx.restore();
+
+      this.ctx.translate(0, 0);
+      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+      this.ctx.beginPath();
+
+      this.ctx.strokeStyle = 'rgba(255,180,180,1)';
+      this.ctx.fillStyle = 'rgba(255,180,180,1)';
+
+      this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+      this.ctx.beginPath();
+
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
+      this.ctx.stroke();
+
+      this.ctx.fillText(
+        message,
+        -(this.ctx.measureText(message).width / 2),
+        this.loaderRadius + 50,
+        this.loaderRadius * 2
+      );
+    }
+  };
+
+  /**
+   *  Overview window
+   */
+  Navigator.prototype = {
+    //
+    drawFrame: function () {
+      this.ctx.restore();
+      this.ctx.save();
+
+      var w = this.cel.width;
+      var h = this.cel.height;
+      var hw = w / 2;
+      var hh = h / 2;
+
+      this.ctx.clearRect(-hw, -hh, w, h);
+
+      this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+
+      if (!this.tree.drawn) {
+        var url = this.tree.canvas.canvas.toDataURL();
+
+        this.img = document.createElement('img');
+        this.img.src = url;
+
+        var _this = this;
+
+        this.img.onload = function () {
+          _this.ctx.drawImage(
+            _this.img, -hw, -hh, _this.cel.width, _this.cel.height
+          );
+        };
+
+        this.baseOffsetx = this.tree.offsetx;
+        this.baseOffsety = this.tree.offsety;
+        this.baseZoom = this.tree.zoom;
+      } else {
+        this.ctx.drawImage(this.img, -hw, -hh, this.cel.width, this.cel.height);
+      }
+
+      var z = 1 / (this.tree.zoom / this.baseZoom);
+
+      this.ctx.lineWidth = this.ctx.lineWidth / z;
+
+      this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z, (this.baseOffsety - (this.tree.offsety * z)) * z);
+      this.ctx.scale(z, z);
+      this.ctx.strokeRect(-hw, -hh, w, h);
+    },
+
+    /**
+     *
+     */
+    resize: function () {
+      this.cel.width = this.tree.canvas.canvas.width / 3;
+      this.cel.height = this.tree.canvas.canvas.height / 3;
+      this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
+      this.drawFrame();
+    }
+  };
+
+  Branch.prototype = {
+    clicked: function (x, y) {
+      if (this.dragging) return;
+      if (x < (this.maxx) && x > (this.minx)) {
+        if (y < (this.maxy) && y > (this.miny)) {
+          return this;
+        }
+      }
+
+      for (var i = this.children.length - 1; i >= 0; i--) {
+        cld = this.children[i].clicked(x, y);
+        if (cld) return cld;
+      }
+    },
+    drawLabel: function () {
+      var fSize = this.tree.textSize;
+      var lbl = this.getLabel();
+      this.canvas.font = fSize + 'pt ' + this.tree.font;
+      var dim = this.canvas.measureText(lbl);
+
+      var tx = this.getNodeSize() + 15;
+      var ty = fSize / 3;
+
+      if (this.angle > Angles.QUARTER &&
+          this.angle < (Angles.HALF + Angles.QUARTER)) {
+        this.canvas.rotate(Angles.HALF);
+        tx = -tx - (dim.width * 1.1);
+      }
+
+      this.canvas.beginPath();
+      this.canvas.fillStyle = this.getTextColour();
+      this.canvas.fillText(lbl, tx, ty);
+      this.canvas.closePath();
+    },
+    drawNode: function () {
+      var  r = this.getNodeSize(); //r = node radius
+      /**
+       * theta = translation to center of node... ensures that the node edge is
+       * at the end of the branch so the branches don't look shorter than  they
+       * should
+       */
+      var theta = r;
+
+      var cx = this.leaf ?
+        (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
+      var cy = this.leaf ?
+        (theta * Math.sin(this.angle)) + this.centery : this.centery;
+
+      this.canvas.beginPath();
+      this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
+      if ((r * this.tree.zoom) < 5) {
+        var e =  (5 / this.tree.zoom);
+        this.minx = cx - e;
+        this.maxx = cx + e;
+        this.miny = cy - e;
+        this.maxy = cy + e;
+      } else {
+        this.minx =  cx - r;
+        this.maxx = cx + r;
+        this.miny = cy - r;
+        this.maxy = cy + r;
+      }
+      if (this.collapsed) {
+        var x1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
+        var y1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
+        var x2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle);
+        var y2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle);
+        this.canvas.beginPath();
+        this.canvas.moveTo((this.centerx - x1), (this.centery - y1));
+        this.canvas.lineTo((this.centerx + x1), (this.centery + y1));
+        this.canvas.lineTo((this.centerx + x2), (this.centery + y2));
+        this.canvas.lineTo((this.centerx - x1), (this.centery - y1));
+        this.canvas.closePath();
+        this.canvas.fill();
+      }
+      else if (this.leaf) {
+        this.canvas.save();
+        this.canvas.translate(this.centerx, this.centery);
+        this.canvas.rotate(this.angle);
+        this.tree.nodeRenderers[this.nodeShape](this);
+        if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
+        this.canvas.restore();
+      }
+
+      this.canvas.closePath();
+
+      if (this.highlighted) {
+        this.canvas.beginPath();
+        var l = this.canvas.lineWidth;
+        this.canvas.strokeStyle = this.tree.highlightColour;
+        this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
+        this.canvas.arc(cx, cy, (this.leaf ? this.getNodeSize() : 0) + ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+        this.canvas.stroke();
+        this.canvas.lineWidth = l;
+        this.canvas.strokeStyle = this.tree.branchColour;
+        this.canvas.beginPath();
+      }
+    },
+    getChildIds: function () {
+      if (this.leaf) {
+        return this.id;
+      } else {
+        var children = [];
+        for (var x = 0; x < this.children.length; x++) {
+          children = children.concat(this.children[x].getChildIds());
+        }
+        return children;
+      }
+    },
+    getChildCount: function () {
+      if (this.leaf) return 1;
+      var children = 0;
+      for (var x = 0; x < this.children.length; x++) {
+        children += this.children[x].getChildCount();
+      }
+      return children;
+    },
+    getChildYTotal: function () {
+      if (this.leaf) return this.centery;
+
+      var y = 0;
+      for (var i = 0; i < this.children.length; i++) {
+        y += this.children[i].getChildYTotal();
+      }
+      return y;
+    },
+    setSelected: function (selected, applyToChildren) {
+      var ids = this.id;
+      this.selected = selected;
+      if (applyToChildren) {
+        for (var i = 0; i < this.children.length; i++) {
+          ids = ids + ',' + this.children[i].setSelected(selected, applyToChildren);
+        }
+      }
+      return ids;
+    },
+    setHighlighted: function (highlighted) {
+      this.highlighted = highlighted;
+      if (!highlighted) {
+        for (var i = 0; i < this.children.length; i++) {
+          this.children[i].setHighlighted(highlighted);
+        }
+      }
+    },
+    reset: function () {
+      this.startx = 0;
+      this.starty = 0;
+      this.centerx = 0;
+      this.centery = 0;
+      this.angle = null;
+      //this.totalBranchLength = 0;
+      this.minChildAngle = Angles.FULL;
+      this.maxChildAngle = 0;
+      for (var child in this.children) {
+        try {
+          this.children[child].pcReset();
+        } catch (e) { }
+      }
+    },
+    parseNwk:function (nwk, idx) {
+      idx = this.parseLabel(nwk, idx);
+      if (nwk[idx] === ':') {
+        idx = this.parseNodeLength(nwk, idx + 1);
+      } else {
+        this.branchLength = 0;
+      }
+      if (!this.id || this.id === '') {
+        this.id = this.tree.genId();
+      }
+      return idx;
+    },
+    parseLabel: function (nwk, idx) {
+      var lbl = '';
+      for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && idx < nwk.length; idx++) {
+        lbl += nwk[idx];
+      }
+      if (!lbl) return idx;
+      if (lbl.match(/\*/)) {
+        var bits = lbl.split('**');
+        this.id = bits[0];
+        if (bits.length === 1) return idx;
+        bits = bits[1].split('*');
+
+        for (var b = 0; b < bits.length; b += 2) {
+          switch (bits[b]) {
+            case 'nsz' :
+              this.radius = parseInt(bits[b + 1]);
+              break;
+            case 'nsh' :
+              if (Shapes[bits[b + 1]]) {
+                this.nodeShape = Shapes[bits[b + 1]];
+              } else if (this.nodeRenderers[bits[b + 1]]) {
+                this.nodeShape = bits[b + 1];
+              } else {
+                this.nodeShape = 'circle';
+              }
+              break;
+            case 'ncol' : this.colour = bits[b + 1];
+              var hexRed = '0x' + this.colour.substring(0, 2);
+              var hexGreen = '0x' + this.colour.substring(2, 4);
+              var hexBlue = '0x' + this.colour.substring(4, 6);
+              this.colour =
+                'rgba(' +
+                  parseInt(hexRed, 16).toString() + ',' +
+                  parseInt(hexGreen, 16).toString() + ',' +
+                  parseInt(hexBlue, 16).toString() +
+                ',1)';
+              break;
+          }
+        }
+      } else {
+        this.id = lbl;
+      }
+      return idx;
+    },
+      parseNodeLength : function(nwk, idx)
+      {
+          var str = '';
+          for(idx; nwk[idx] != ')' && nwk[idx] != ','; idx++)
+          {
+             str += nwk[idx];
+          }
+
+          this.branchLength = parseFloat(str);
+          if(this.branchLength < 0) this.branchLength = 0;
+          return idx;
+      },
+      redrawTreeFromBranch : function()
+      {
+          this.tree.redrawFromBranch(this);
+      },
+      saveChildren : function()
+      {
+          for(var i = 0; i < this.children.length; i ++)
+          {
+              this.tree.saveNode(this.children[i]);
+              this.children[i].saveChildren();
+          }
+      },
+      collapse : function()
+     {
+         this.collapsed = this.leaf === false; // don't collapse the node if it is a leaf... that would be silly!
+     },
+     expand : function()
+     {
+         this.collapsed = false;
+     },
+     toggleCollapsed : function()
+     {
+         this.collapsed ? this.expand() : this.collapse();
+     },
+      setTotalLength : function()
+      {
+
+          if(this.parent)
+          {
+              this.totalBranchLength = this.parent.totalBranchLength +  this.branchLength;
+              if(this.totalBranchLength > this.tree.maxBranchLength) this.tree.maxBranchLength = this.totalBranchLength;
+          }
+          else
+          {
+               this.totalBranchLength = this.branchLength;
+               this.tree.maxBranchLength = this.totalBranchLength;
+          }
+          for(var c = 0; c < this.children.length ; c++)
+          {
+              this.children[c].setTotalLength();
+          }
+      }
+  };
 
     /**
      *
@@ -1281,7 +1258,7 @@ var PhyloCanvas = (function(){
           }
           else
           {// code for IE6, IE5
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            xmlhttp=new ActiveXObject('Microsoft.XMLHTTP');
           }
 
           xmlhttp.onreadystatechange=function()
@@ -1299,7 +1276,7 @@ var PhyloCanvas = (function(){
             }
           };
           xmlhttp.open(method,url,true);
-          if(method == "GET")
+          if(method == 'GET')
           {
             xmlhttp.send();
           }
@@ -1378,7 +1355,7 @@ var PhyloCanvas = (function(){
                         node.canvas.lineTo(node.interx, node.intery);
                         node.canvas.stroke();
                         var ss = node.getColour();
-                        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  "rgba(0,0,0,0.5)";
+                        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
                         node.canvas.lineTo(node.centerx, node.centery);
                         node.canvas.stroke();
                         node.canvas.strokeStyle = ss;
@@ -1648,15 +1625,15 @@ var PhyloCanvas = (function(){
 
             if(this.maxBranchLength == 0)
             {
-                this.loadError("All branches in the tree are identical.");
+                this.loadError('All branches in the tree are identical.');
                 return;
             }
 
             this.canvas.restore();
 
             this.canvas.clearRect(0,0,this.canvas.canvas.width,this.canvas.canvas.height);
-            this.canvas.lineCap = "round";
-            this.canvas.lineJoin = "round";
+            this.canvas.lineCap = 'round';
+            this.canvas.lineJoin = 'round';
 
             this.canvas.strokeStyle = this.branchColour;
             this.canvas.save();
@@ -1707,7 +1684,7 @@ var PhyloCanvas = (function(){
         },
         genId : function()
         {
-            return "pcn" + this.lastId++;
+            return 'pcn' + this.lastId++;
         },
         getPngUrl : function()
         {
@@ -1776,7 +1753,7 @@ var PhyloCanvas = (function(){
             }
             else
             {
-                throw "file type not recognised by PhyloCanvas";
+                throw 'file type not recognised by PhyloCanvas';
             }
             scope.draw();
             scope.loadCompleted();
@@ -1865,11 +1842,11 @@ var PhyloCanvas = (function(){
         {
             if(!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i))
             {
-                 throw "the string provided was not a nexus string";
+                 throw 'the string provided was not a nexus string';
             }
             else if(!str.match(/BEGIN TREES/gi))
             {
-                throw "The nexus file does not contain a tree block";
+                throw 'The nexus file does not contain a tree block';
             }
 
             //Get everything between BEGIN TREES and next END;
@@ -1887,7 +1864,7 @@ var PhyloCanvas = (function(){
             var ia;
             for(var i = 0; i < tIntArr.length; i++)
             {
-                ia = tIntArr[i].replace('\n', '').split(" ");
+                ia = tIntArr[i].replace('\n', '').split(' ');
                 rObj[ia[0].trim()] = ia[1].trim();
             }
 
@@ -1897,11 +1874,11 @@ var PhyloCanvas = (function(){
             //id name is '' or does not exist, ask user to choose which tree.
             for(var i = 0; i < tArr.length; i++)
             {
-                if(tArr[i].trim() == "") continue;
+                if(tArr[i].trim() == '') continue;
                 var str = tArr[i].replace(/tree\s/i,'');
                 trees[str.match(/^\w+/)[0]] = str.match(/ [\S]*$/)[0];
             }
-            if(!trees[name]) throw "tree " + name + " does not exist in this NEXUS file";
+            if(!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
 
             this.parseNwk(trees[name].trim());
             //translate in accordance with translate block
@@ -1927,7 +1904,7 @@ var PhyloCanvas = (function(){
             this.branches = {};
             this.drawn = false;
             var curNode = new Branch();
-            curNode.id = "root";
+            curNode.id = 'root';
             this.branches.root = curNode;
             this.setRoot(curNode);
 
@@ -1965,7 +1942,7 @@ var PhyloCanvas = (function(){
                         }
                         catch(e)
                         {
-                            this.loadError( "Error parsing nwk file" + e );
+                            this.loadError( 'Error parsing nwk file' + e );
                             return;
                         }
                         break;
@@ -1983,7 +1960,7 @@ var PhyloCanvas = (function(){
 
             if(this.maxBranchLength == 0)
             {
-                this.loadError("All branches in the tree are identical.");
+                this.loadError('All branches in the tree are identical.');
                 return;
             }
 
@@ -2272,7 +2249,7 @@ var PhyloCanvas = (function(){
         },
         saveNode : function(node)
         {
-          if(!node.id || node.id == "") node.id=node.tree.genId();
+          if(!node.id || node.id == '') node.id=node.tree.genId();
           if(this.branches[node.id])
           {
               if(node != this.branches[node.id])
@@ -2284,7 +2261,7 @@ var PhyloCanvas = (function(){
                 }
                 else
                 {
-                    throw "Two nodes on this tree share the id " + node.id;
+                    throw 'Two nodes on this tree share the id ' + node.id;
                 }
             }
           }
@@ -2306,7 +2283,7 @@ var PhyloCanvas = (function(){
             this.root.setSelected(false, true);
             var ns = nIds;
 
-            if( typeof nIds == 'string') ns = ns.split(",");
+            if( typeof nIds == 'string') ns = ns.split(',');
 
             for(var i = 0; i < this.leaves.length; i++ )
             {
@@ -2334,12 +2311,12 @@ var PhyloCanvas = (function(){
                 var arr = [];
                 if(typeof nids == 'string')
                 {
-                    arr = nids.split(",");
+                    arr = nids.split(',');
                 }else{
                     arr = nids;
                 }
 
-                if(nids != "")
+                if(nids != '')
                 {
                     for(var i = 0; i <  arr.length; i++)
                     {
@@ -2681,7 +2658,7 @@ var PhyloCanvas = (function(){
 
         thumbnail.width = this.width;
         thumbnail.src = url;
-        thumbnail.id = "phylocanvas-history-" + id;
+        thumbnail.id = 'phylocanvas-history-' + id;
 
         // altered 1.0.6-1 : issue #17
         //this.div.appendChild(thumbnail);
@@ -2727,7 +2704,7 @@ var PhyloCanvas = (function(){
 
         this.div.removeChild(ele);
 
-        this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace("phylocanvas-history-", '')]);
+        this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
     }
 
     return { /*lends PhyloCanvas*/
