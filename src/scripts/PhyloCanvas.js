@@ -1026,60 +1026,52 @@ var PhyloCanvas = (function () {
       }
       return idx;
     },
-      parseNodeLength : function(nwk, idx)
-      {
-          var str = '';
-          for(idx; nwk[idx] != ')' && nwk[idx] != ','; idx++)
-          {
-             str += nwk[idx];
-          }
-
-          this.branchLength = parseFloat(str);
-          if(this.branchLength < 0) this.branchLength = 0;
-          return idx;
-      },
-      redrawTreeFromBranch : function()
-      {
-          this.tree.redrawFromBranch(this);
-      },
-      saveChildren : function()
-      {
-          for(var i = 0; i < this.children.length; i ++)
-          {
-              this.tree.saveNode(this.children[i]);
-              this.children[i].saveChildren();
-          }
-      },
-      collapse : function()
-     {
-         this.collapsed = this.leaf === false; // don't collapse the node if it is a leaf... that would be silly!
-     },
-     expand : function()
-     {
-         this.collapsed = false;
-     },
-     toggleCollapsed : function()
-     {
-         this.collapsed ? this.expand() : this.collapse();
-     },
-      setTotalLength : function()
-      {
-
-          if(this.parent)
-          {
-              this.totalBranchLength = this.parent.totalBranchLength +  this.branchLength;
-              if(this.totalBranchLength > this.tree.maxBranchLength) this.tree.maxBranchLength = this.totalBranchLength;
-          }
-          else
-          {
-               this.totalBranchLength = this.branchLength;
-               this.tree.maxBranchLength = this.totalBranchLength;
-          }
-          for(var c = 0; c < this.children.length ; c++)
-          {
-              this.children[c].setTotalLength();
-          }
+    parseNodeLength: function (nwk, idx) {
+      var str = '';
+      for (idx; nwk[idx] !== ')' && nwk[idx] !== ','; idx++) {
+        str += nwk[idx];
       }
+      this.branchLength = parseFloat(str);
+      if (this.branchLength < 0) this.branchLength = 0;
+      return idx;
+    },
+    redrawTreeFromBranch: function () {
+      this.tree.redrawFromBranch(this);
+    },
+    saveChildren: function () {
+      for (var i = 0; i < this.children.length; i++) {
+        this.tree.saveNode(this.children[i]);
+        this.children[i].saveChildren();
+      }
+    },
+    collapse: function () {
+      // don't collapse the node if it is a leaf... that would be silly!
+      this.collapsed = this.leaf === false;
+    },
+    expand: function () {
+      this.collapsed = false;
+    },
+    toggleCollapsed: function () {
+      if (this.collapsed) {
+        this.expand();
+      } else {
+        this.collapse();
+      }
+    },
+    setTotalLength: function () {
+      if (this.parent) {
+        this.totalBranchLength = this.parent.totalBranchLength + this.branchLength;
+        if (this.totalBranchLength > this.tree.maxBranchLength) {
+          this.tree.maxBranchLength = this.totalBranchLength;
+        }
+      } else {
+        this.totalBranchLength = this.branchLength;
+        this.tree.maxBranchLength = this.totalBranchLength;
+      }
+      for (var c = 0; c < this.children.length ; c++) {
+        this.children[c].setTotalLength();
+      }
+    }
   };
 
     /**
@@ -1088,1101 +1080,881 @@ var PhyloCanvas = (function () {
      * @param node {Branch} the node to add as a child
      * @memberof Branch
      */
-    Branch.prototype.addChild = function(node)
-    {
-        node.parent = this;
-        //node.childNo = this.children.length;
-        node.canvas = this.canvas;
-        node.tree = this.tree;
-        this.leaf = false;
-        this.children.push(node);
-    };
+  Branch.prototype.addChild = function (node) {
+    node.parent = this;
+    //node.childNo = this.children.length;
+    node.canvas = this.canvas;
+    node.tree = this.tree;
+    this.leaf = false;
+    this.children.push(node);
+  };
+
+  /**
+   * Return the node colour of all the nodes that are children of this one.
+   */
+  Branch.prototype.getChildColours = function () {
+    var colours = [];
+
+    this.children.forEach(function (branch, n) {
+      var colour = branch.children.length === 0 ? branch.colour : branch.getColour();
+      //only add each colour once.
+      if (colours.indexOf(colour) === -1) {
+        colours.push(colour);
+      }
+    });
+
+    return colours;
+  };
+
+  /**
+   * Get the colour(s) of the branch itself.
+   */
+  Branch.prototype.getColour = function () {
+    if (this.selected) {
+      return this.tree.selectedColour;
+    } else if (this.tree.backColour === true) {
+      if (this.children.length) {
+        var childColours = this.getChildColours();
+        if (childColours.length === 1) {
+          return childColours[0];
+        } else {
+          return this.tree.branchColour;
+        }
+      } else {
+        return this.colour;
+      }
+    }
+    else if (typeof this.tree.backColour === 'function') {
+      return this.tree.backColour(this);
+    } else {
+      return this.tree.branchColour;
+    }
+  };
+
+  Branch.prototype.getNwk = function () {
+    if (this.leaf) {
+      return this.id + ':' + this.branchLength;
+    } else {
+      var children = [];
+      for (var i = 0; i < this.children.length; i++) {
+        children.push(this.children[i].getNwk());
+      }
+      nwk = '(' + children.join(',') + '):' + this.branchLength;
+      return nwk;
+    }
+  };
+
+  Branch.prototype.getTextColour = function () {
+    if (this.selected) {
+      return this.tree.selectedColour;
+    }
+    if (this.highlighted) {
+      return this.tree.highlightColour;
+    }
+    else if (this.tree.backColour) {
+      if (this.children.length) {
+        var chiledColours = this.getChildColours();
+
+        if (chiledColours.length === 1) {
+          return chiledColours[0];
+        } else {
+          return this.tree.branchColour;
+        }
+      } else {
+        return this.colour;
+      }
+    }
+    else {
+      return this.tree.branchColour;
+    }
+  };
+
+  Branch.prototype.getLabel = function () {
+    return (this.label !== undefined && this.label !== null) ? this.label : this.id;
+  };
+
+  Branch.prototype.getLabelSize = function () {
+    return this.tree.canvas.measureText(this.getLabel()).width;
+  };
+
+  Branch.prototype.getNodeSize = function () {
+    return Math.max(0, this.tree.baseNodeSize * this.radius);
+  };
+
+  Branch.prototype.rotate = function (evt) {
+    var newChildren = [];
+    for (var i = this.children.length; i-- ;) {
+      newChildren.push(this.children[i]);
+    }
+
+    this.children = newChildren;
+
+    if (!evt.preventredraw) {
+      this.tree.buildLeaves();
+      this.tree.draw(true);
+    }
+  };
+
+  Branch.prototype.getChildNo = function () {
+    return this.parent.children.indexOf(this);
+  };
+
+  Tree.prototype = {
+    // Included
+    AJAX: function (url, method, params, callback, callbackPars, scope, errorCallback) {
+      var xmlhttp;
+      if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+      } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+      }
+
+      xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState === 4) {
+          if (xmlhttp.status === 200) {
+            callback(xmlhttp, callbackPars, scope);
+          } else {
+            if (errorCallback) errorCallback(xmlhttp, callbackPars, scope);
+          }
+        }
+      };
+      xmlhttp.open(method, url, true);
+      if (method === 'GET') {
+        xmlhttp.send();
+      }
+      else {
+        xmlhttp.send(params);
+      }
+    },
 
     /**
-     * Return the node colour of all the nodes that are children of this one.
+     * A dictionary of functions. Each function draws a different tree structure
      */
-    Branch.prototype.getChildColours = function()
-    {
-        var colours = [];
+    branchRenderers: {
+      rectangular: function (tree, node, collapse) {
+        var  bl = node.branchLength * tree.branchScalar ;
+        node.angle = 0;
+        if (node.parent) {
+          node.centerx = node.startx +  bl;
+        }
+        if (node.selected) {
+          //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
+          node.canvas.fillStyle = tree.selectedColour;
+        } else {
+          node.canvas.fillStyle = node.colour;
+        }
 
-        this.children.forEach(function(branch, n)
-        {
-            var colour = branch.children.length === 0 ? branch.colour : branch.getColour();
+        node.canvas.strokeStyle = node.getColour();
+        node.canvas.beginPath();
 
-            if (colours.indexOf(colour) === -1 ) //only add each colour once.
-            {
-                colours.push(colour);
-            }
-        });
+        if (!collapse) {
+          node.canvas.moveTo(node.startx, node.starty);
+          node.canvas.lineTo(node.startx, node.centery);
+          node.canvas.lineTo(node.centerx, node.centery);
+          node.canvas.stroke();
+          node.canvas.closePath();
+          node.drawNode();
+        }
 
-        return colours;
-    }
+        node.canvas.closePath();
 
+        for (var i = 0 ; i < node.children.length && !collapse; i++) {
+          node.children[i].startx = node.centerx;
+          node.children[i].starty = node.centery;
+          if (node.children[i].selected && !node.collapsed) {
+            tree.selectedNodes.push(node.children[i]);
+          } else {
+            tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
+          }
+        }
+      },
+      circular: function (tree, node, collapse) {
+        var  bl = node.totalBranchLength * tree.branchScalar;
+        node.canvas.strokeStyle = node.getColour();
+
+        if (node.selected) {
+          //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
+          node.canvas.fillStyle = node.tree.selectedColour;
+        } else {
+          node.canvas.fillStyle = node.colour;
+        }
+
+        if (!collapse) {
+          node.canvas.beginPath();
+          node.canvas.moveTo(node.startx, node.starty);
+          if (node.leaf) {
+            node.canvas.lineTo(node.interx, node.intery);
+            node.canvas.stroke();
+            var ss = node.getColour();
+            node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
+            node.canvas.lineTo(node.centerx, node.centery);
+            node.canvas.stroke();
+            node.canvas.strokeStyle = ss;
+          } else {
+            node.canvas.lineTo(node.centerx, node.centery);
+            node.canvas.stroke();
+          }
+
+          node.canvas.strokeStyle = node.getColour();
+
+          if (node.children.length > 1 && !node.collapsed) {
+            node.canvas.beginPath();
+            node.canvas.arc(0, 0, (bl), node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
+            node.canvas.stroke();
+            node.canvas.closePath();
+          }
+          node.drawNode();
+        }
+
+        for (var i = 0 ; i < node.children.length && !collapse; i++) {
+          tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
+        }
+      },
+      radial: function (tree, node, collapse) {
+        node.canvas.strokeStyle = node.getColour();
+
+        if (node.selected) {
+          node.canvas.fillStyle = node.tree.selectedColour;
+        }
+        else {
+          node.canvas.fillStyle = node.colour;
+        }
+
+        if (node.parent && !collapse) {
+          node.canvas.beginPath();
+          node.canvas.moveTo(node.startx, node.starty);
+          node.canvas.lineTo(node.centerx, node.centery);
+          node.canvas.stroke();
+          node.canvas.closePath();
+          node.drawNode();
+        }
+
+        for (var i = 0 ; i < node.children.length && !collapse; i++) {
+          if (node.children[i].selected && !node.collapsed) {
+            node.tree.selectedNodes.push(node.children[i]);
+          } else {
+            tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
+          }
+        }
+      },
+      diagonal: function (tree, node, collapse) {
+        node.angle = 0;
+        node.canvas.strokeStyle = node.getColour();
+
+        if (node.selected) {
+          node.canvas.fillStyle = node.tree.selectedColour;
+        } else {
+          node.canvas.fillStyle = node.colour;
+        }
+
+        node.canvas.beginPath();
+        //alert(node.starty);
+
+        if (!collapse) {
+          node.canvas.moveTo(node.startx, node.starty);
+          node.canvas.lineTo(node.centerx, node.centery);
+          node.canvas.stroke();
+          node.canvas.closePath();
+          node.drawNode();
+        }
+
+        node.canvas.closePath();
+
+        for (var i = 0 ; i < node.children.length && !collapse; i++) {
+          node.children[i].startx = node.centerx;
+          node.children[i].starty = node.centery;
+          if (node.children[i].selected && !node.collapsed) {
+            node.tree.selectedNodes.push(node.children[i]);
+          } else {
+            tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
+          }
+        }
+      },
+      hierarchy: function (tree, node, collapse) {
+        node.canvas.strokeStyle = node.getColour();
+
+        if (node.selected) {
+          node.canvas.fillStyle = node.tree.selectedColour;
+        } else {
+          node.canvas.fillStyle = node.colour;
+        }
+
+        if (!collapse) {
+          node.canvas.beginPath();
+          if (node !== node.tree.root) {
+            node.canvas.moveTo(node.startx, node.starty);
+            node.canvas.lineTo(node.centerx, node.starty);
+          }
+
+          node.canvas.lineTo(node.centerx, node.centery);
+          node.canvas.stroke();
+
+          node.drawNode();
+        }
+        node.canvas.closePath();
+
+        for (var i = 0 ; i < node.children.length  && !collapse; i++) {
+          if (node.children[i].selected && !(collapse || node.collapsed)) {
+            node.tree.selectedNodes.push(node.children[i]);
+          } else {
+            tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
+          }
+        }
+      }
+    },
+    clicked: function (e) {
+      if (e.button === 0) {
+        var nids = [];
+
+        //if this is triggered by the release after a drag then the click shouldn't be triggered.
+        if (this.dragging) {
+          this.dragging = false;
+          return;
+        }
+
+        if (!this.root) return false;
+        var nd = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+
+        if (nd) {
+          this.root.setSelected(false, true);
+          if (this.internalNodesSelectable || nd.leaf) {
+            nd.setSelected(true, true);
+            nids = nd.getChildIds();
+          }
+          this.draw();
+        } else if (this.unselectOnClickAway && !this.dragging) {
+          this.root.setSelected(false, true);
+          this.draw();
+        }
+
+        if (!this.pickedup) {
+          this.dragging = false;
+        }
+
+        this.nodesSelected(nids);
+      }
+      else if (e.button === 2) {
+        e.preventDefault();
+        this.contextMenu.open(e.clientX, e.clientY);
+      }
+    },
+    dblclicked: function (e) {
+      if (!this.root) return false;
+      var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+      if (nd) {
+        nd.setSelected(false, true);
+        nd.toggleCollapsed();
+      }
+
+      if (!this.pickedup) {
+        this.dragging = false;
+      }
+      this.draw();
+    },
+    displayLabels: function () {
+      this.showLabels = true;
+      this.draw();
+    },
+    drag: function (event) {
+      //get window ratio
+      var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+
+      if (!this.drawn) return false;
+
+      if (this.pickedup) {
+        var xmove = (event.clientX - this.startx) * ratio;
+        var ymove = (event.clientY - this.starty) * ratio;
+        if (Math.abs(xmove) + Math.abs(ymove) > 5) {
+          this.dragging = true;
+
+          this.offsetx = this.origx + xmove;
+          this.offsety = this.origy + ymove;
+          this.draw();
+        }
+      }
+      else if (this.zoomPickedUp) {
+        //right click and drag
+        this.d = ((this.starty - event.clientY) / 100);
+        x = this.translateClickX(this.startx);
+        this.setZoom(this.origZoom + this.d);
+        this.draw();
+      } else {
+        //hover
+        var e = event;
+
+        var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+        if (nd && (this.internalNodesSelectable || nd.leaf)) {
+          this.root.setHighlighted(false);
+          nd.setHighlighted(true);
+        } else {
+          this.root.setHighlighted(false);
+        }
+        this.draw();
+      }
+    },
     /**
-     * Get the colour(s) of the branch itself.
+     * Draw the frame
      */
-    Branch.prototype.getColour = function()
-    {
-        if(this.selected)
-        {
-            return this.tree.selectedColour;
+    draw: function (forceRedraw) {
+      this.selectedNodes = [];
+
+      if (this.maxBranchLength === 0) {
+        this.loadError('All branches in the tree are identical.');
+        return;
+      }
+
+      this.canvas.restore();
+
+      this.canvas.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
+      this.canvas.lineCap = 'round';
+      this.canvas.lineJoin = 'round';
+
+      this.canvas.strokeStyle = this.branchColour;
+      this.canvas.save();
+
+      this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
+
+      if (!this.drawn || forceRedraw) {
+        this.prerenderers[this.treeType](this);
+        if (!forceRedraw) { this.fitInPanel(); }
+      }
+
+      this.canvas.lineWidth = this.lineWidth / this.zoom;
+
+      this.canvas.translate(this.offsetx, this.offsety);
+      this.canvas.scale(this.zoom, this.zoom);
+
+      this.branchRenderers[this.treeType](this, this.root);
+
+      for (var i = 0; i < this.selectedNodes.length; i++) {
+        this.branchRenderers[this.treeType](this, this.selectedNodes[i]);
+      }
+
+      this.drawn = true;
+    },
+    drop: function () {
+      if (!this.drawn) return false;
+      this.pickedup = false;
+      this.zoomPickedUp = false;
+    },
+    findBranch: function (patt) {
+      this.root.setSelected(false, true);
+      for (var i = 0; i < this.leaves.length; i++) {
+        if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
+          this.leaves[i].setSelected(true, true);
         }
-        else if(this.tree.backColour === true)
-        {
-            if(this.children.length)
-            {
-                var c_cols = this.getChildColours();
-
-                if(c_cols.length === 1)
-                {
-                    return c_cols[0]
-                }
-                else
-                {
-                    return this.tree.branchColour;
-                }
-            }
-            else
-            {
-                return this.colour;
-            }
-        }
-        else if(typeof this.tree.backColour === 'function')
-        {
-            return this.tree.backColour(this);
-        }
-        else
-        {
-            return this.tree.branchColour;
-        }
-    };
-
-    Branch.prototype.getNwk = function(){
-        if(this.leaf)
-        {
-            return this.id + ':' + this.branchLength;
-        }
-        else
-        {
-            var children= [];
-            for( var i = 0; i < this.children.length; i++ )
-            {
-                children.push(this.children[i].getNwk())
-            }
-            nwk = '(' + children.join(',') + '):' + this.branchLength;
-            return nwk;
-        }
-
-    }
-
-    Branch.prototype.getTextColour = function()
-    {
-        if(this.selected)
-        {
-            return this.tree.selectedColour;
-        }
-        if(this.highlighted)
-        {
-                return this.tree.highlightColour;
-        }
-        else if(this.tree.backColour)
-        {
-            if(this.children.length)
-            {
-                var c_cols = this.getChildColours();
-
-                if(c_cols.length === 1)
-                {
-                    return c_cols[0]
-                }
-                else
-                {
-                    return this.tree.branchColour;
-                }
-            }
-            else
-            {
-                return this.colour;
-            }
-        }
-        else
-        {
-            return this.tree.branchColour;
-        }
-    };
-
-    Branch.prototype.getLabel = function()
-    {
-        return (this.label !== undefined && this.label !== null) ? this.label : this.id;
-    };
-
-    Branch.prototype.getLabelSize = function()
-    {
-        return this.tree.canvas.measureText(this.getLabel()).width;
-    }
-
-    Branch.prototype.getNodeSize = function()
-    {
-        return Math.max(0, this.tree.baseNodeSize * this.radius);
-    };
-
-    Branch.prototype.rotate = function(evt)
-    {
-        var newChildren = [];
-        for( var i = this.children.length; i-- ; )
-        {
-            newChildren.push(this.children[i]);
-        }
-
-        this.children = newChildren;
-
-        if( ! evt.preventredraw )
-        {
-            this.tree.buildLeaves();
-            this.tree.draw(true);
-        }
-    }
-
-    Branch.prototype.getChildNo = function(){
-        return this.parent.children.indexOf(this);
-    }
-
-    Tree.prototype = {
-        // Included
-        AJAX : function(url, method, params, callback, callbackPars, scope, errorCallback)
-        {
-          var xmlhttp;
-          if (window.XMLHttpRequest)
-          {// code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp=new XMLHttpRequest();
+      }
+      this.draw();
+    },
+    genId: function () {
+      return 'pcn' + this.lastId++;
+    },
+    getPngUrl: function () {
+      return this.canvas.canvas.toDataURL();
+    },
+    hideLabels: function () {
+      this.showLabels = false;
+      this.draw();
+    },
+    load: function (tree, name, format) {
+      if (format) {
+        if (format.match(/nexus/i)) {
+          if (tree.match(/\.\w+$/)) {
+            this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);
+          } else {
+            this.parseNexus(tree, name);
           }
-          else
-          {// code for IE6, IE5
-            xmlhttp=new ActiveXObject('Microsoft.XMLHTTP');
+        } else if (format.match(/newick/i)) {
+          if (tree.match(/\.\w+$/)) {
+            this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);
+          } else {
+            this.parseNwk(tree, name);
           }
-
-          xmlhttp.onreadystatechange=function()
-          {
-            if (xmlhttp.readyState==4)
-            {
-                if(xmlhttp.status==200)
-                {
-                    callback(xmlhttp, callbackPars, scope);
-                }
-                else
-                {
-                    if(errorCallback) errorCallback(xmlhttp, callbackPars, scope);
-                }
-            }
-          };
-          xmlhttp.open(method,url,true);
-          if(method == 'GET')
-          {
-            xmlhttp.send();
-          }
-          else
-          {
-            xmlhttp.send(params);
-          }
-        },
-        /**
-         * A dictionary of functions. Each function  draws a different tree structure
-         */
-        branchRenderers :
-        {
-            rectangular : function (tree, node, collapse){
-                var  bl = node.branchLength * tree.branchScalar ;
-                node.angle = 0;
-                if(node.parent){
-                    node.centerx = node.startx +  bl;
-                }
-                if(node.selected)
-                {
-                    //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-                    node.canvas.fillStyle = tree.selectedColour;
-                }
-                else
-                {
-                    node.canvas.fillStyle = node.colour;
-                }
-
-                node.canvas.strokeStyle = node.getColour();
-                node.canvas.beginPath();
-
-                if(!collapse){
-                    node.canvas.moveTo(node.startx , node.starty);
-                    node.canvas.lineTo(node.startx, node.centery);
-                    node.canvas.lineTo(node.centerx, node.centery);
-                    node.canvas.stroke();
-                    node.canvas.closePath();
-                    node.drawNode();
-                }
-
-                node.canvas.closePath();
-
-                for(var i = 0 ; i < node.children.length && !collapse ;i++)
-                {
-                    node.children[i].startx = node.centerx;
-                    node.children[i].starty = node.centery;
-                    if(node.children[i].selected && !node.collapsed)
-                    {
-                     tree.selectedNodes.push(node.children[i]);
-                    }
-                    else
-                    {
-                      tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-                    }
-                }
-            },
-            circular : function(tree, node, collapse){
-                var  bl = node.totalBranchLength * tree.branchScalar;
-                node.canvas.strokeStyle = node.getColour();
-
-                if(node.selected){
-                    //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-                    node.canvas.fillStyle = node.tree.selectedColour;
-                }
-                else
-                {
-                    node.canvas.fillStyle = node.colour;
-                }
-
-                if(!collapse){
-                    node.canvas.beginPath();
-                    node.canvas.moveTo(node.startx, node.starty);
-                    if(node.leaf)
-                    {
-                        node.canvas.lineTo(node.interx, node.intery);
-                        node.canvas.stroke();
-                        var ss = node.getColour();
-                        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
-                        node.canvas.lineTo(node.centerx, node.centery);
-                        node.canvas.stroke();
-                        node.canvas.strokeStyle = ss;
-                    }
-                    else
-                    {
-                        node.canvas.lineTo(node.centerx, node.centery);
-                        node.canvas.stroke();
-                    }
-
-
-                    node.canvas.strokeStyle = node.getColour();
-
-
-                    if(node.children.length > 1 && !node.collapsed )
-                    {
-                        node.canvas.beginPath();
-                        node.canvas.arc(0, 0, (bl) , node.minChildAngle, node.maxChildAngle,node.maxChildAngle < node.minChildAngle);
-                        node.canvas.stroke();
-                        node.canvas.closePath();
-                    }
-                    node.drawNode();
-                }
-
-                for(var i = 0 ; i < node.children.length && !collapse; i++)
-                {
-                    tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
-                }
-            },
-            radial : function(tree, node, collapse){
-                node.canvas.strokeStyle = node.getColour();
-
-                if(node.selected){
-                    node.canvas.fillStyle = node.tree.selectedColour;
-                }
-                else
-                {
-                    node.canvas.fillStyle = node.colour;
-                }
-
-
-                if(node.parent && !collapse){
-
-                    node.canvas.beginPath();
-                    node.canvas.moveTo(node.startx , node.starty );
-                    node.canvas.lineTo(node.centerx ,  node.centery);
-                    node.canvas.stroke();
-                    node.canvas.closePath();
-                    node.drawNode();
-                }
-                for(var i = 0 ; i < node.children.length && !collapse; i++)
-                {
-                    if(node.children[i].selected && !node.collapsed)
-                    {
-                      node.tree.selectedNodes.push(node.children[i]);
-                    }
-                    else
-                    {
-                      tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-                    }
-                }
-            },
-            diagonal: function(tree, node, collapse){
-                node.angle = 0;
-                node.canvas.strokeStyle = node.getColour();
-
-                if(node.selected)
-                {
-                    node.canvas.fillStyle = node.tree.selectedColour;
-                }
-                else
-                {
-                    node.canvas.fillStyle = node.colour;
-                }
-
-                node.canvas.beginPath();
-                //alert(node.starty);
-
-                if(!collapse){
-                    node.canvas.moveTo(node.startx , node.starty);
-                    node.canvas.lineTo(node.centerx, node.centery);
-                    node.canvas.stroke();
-                    node.canvas.closePath();
-                    node.drawNode();
-                }
-
-                node.canvas.closePath();
-
-                for(var i = 0 ; i < node.children.length && !collapse ;i++)
-                {
-                    node.children[i].startx = node.centerx;
-                    node.children[i].starty = node.centery;
-                    if(node.children[i].selected && !node.collapsed)
-                    {
-                      node.tree.selectedNodes.push(node.children[i]);
-                    }
-                    else
-                    {
-                      tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-                    }
-                }
-            },
-            hierarchy : function(tree,node,collapse) {
-                node.canvas.strokeStyle = node.getColour();
-
-                if(node.selected)
-                {
-                    node.canvas.fillStyle = node.tree.selectedColour;
-                }
-                else
-                {
-                    node.canvas.fillStyle = node.colour;
-                }
-
-
-                //alert(node.starty);
-
-                if(!collapse){
-                    node.canvas.beginPath();
-                    if(node != node.tree.root)
-                    {
-                        node.canvas.moveTo(node.startx , node.starty);
-                        node.canvas.lineTo(node.centerx, node.starty);
-                    }
-
-                    node.canvas.lineTo(node.centerx, node.centery);
-                    node.canvas.stroke();
-
-                    node.drawNode();
-                }
-                node.canvas.closePath();
-
-                for(var i = 0 ; i < node.children.length  && !collapse; i++)
-                {
-                    if(node.children[i].selected && !(collapse ||node.collapsed ))
-                    {
-                      node.tree.selectedNodes.push(node.children[i]);
-                    }
-                    else
-                    {
-                      tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-                    }
-                }
-            }
-        },
-        clicked : function(e)
-        {
-          //this.contextMenu.close();
-          //this.canvas.fill();
-
-          if(e.button == 0)
-          {
-              var nids = [];
-
-                //if this is triggered by the release after a drag then the click shouldn't be triggered.
-                if(this.dragging)
-                {
-                    this.dragging = false;
-                    return;
-                }
-
-                if(!this.root) return false;
-                var nd = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
-
-                if(nd)
-                {
-                   this.root.setSelected(false, true);
-                   if(this.internalNodesSelectable || nd.leaf)
-                   {
-                      nd.setSelected(true, true);
-                       nids = nd.getChildIds();
-                   }
-                   this.draw();
-
-
-                }
-                else if(this.unselectOnClickAway && !this.dragging)
-                {
-                   this.root.setSelected(false, true);
-                   this.draw();
-
-                }
-
-                if(!this.pickedup){
-                   this.dragging = false;
-                }
-
-                this.nodesSelected(nids);
-          }
-          else if(e.button == 2)
-          {
-              e.preventDefault();
-              this.contextMenu.open(e.clientX, e.clientY);
-          }
-        },
-        dblclicked : function(e)
-        {
-            if(!this.root) return false;
-            var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
-            if(nd) {
-               nd.setSelected(false, true);
-               nd.toggleCollapsed();
-            }
-
-            if(!this.pickedup){
-                this.dragging = false;
-            }
-            this.draw();
-        },
-        displayLabels : function()
-        {
-          this.showLabels = true;
+        }
+      } else {
+        if (tree.match(/\.n(ex|xs)$/)) {
+          this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);
+        } else if (tree.match(/\.nwk$/)) {
+          this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);
+        } else if (tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i)) {
+          this.parseNexus(tree, name);
           this.draw();
-        },
-        drag : function(event)
-        {
-            //get window ratio
-            var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-
-            if(!this.drawn) return false;
-
-            if(this.pickedup)
-            {
-                var xmove = (event.clientX - this.startx) * ratio;
-                var ymove = (event.clientY - this.starty) * ratio;
-                if(Math.abs(xmove) + Math.abs(ymove) > 5)
-                {
-                    this.dragging = true;
-
-                    this.offsetx = this.origx + xmove;
-                    this.offsety = this.origy + ymove;
-                    this.draw();
-                }
-            }
-            else if(this.zoomPickedUp)
-            {
-                //right click and drag
-               this.d = ((this.starty - event.clientY) / 100);
-               x = this.translateClickX(this.startx);
-               this.setZoom(this.origZoom + this.d);
-               this.draw();
-            }
-            else
-            {
-                //hover
-               var e = event;
-
-               var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
-               if(nd && (this.internalNodesSelectable || nd.leaf))
-               {
-                  this.root.setHighlighted(false);
-                  nd.setHighlighted(true);
-               }
-               else
-               {
-                   this.root.setHighlighted(false);
-               }
-               this.draw();
-            }
-        },
-        /**
-         * Draw the frame
-         */
-        draw : function(forceRedraw)
-        {
-            this.selectedNodes = [];
-
-            if(this.maxBranchLength == 0)
-            {
-                this.loadError('All branches in the tree are identical.');
-                return;
-            }
-
-            this.canvas.restore();
-
-            this.canvas.clearRect(0,0,this.canvas.canvas.width,this.canvas.canvas.height);
-            this.canvas.lineCap = 'round';
-            this.canvas.lineJoin = 'round';
-
-            this.canvas.strokeStyle = this.branchColour;
-            this.canvas.save();
-
-            this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
-
-            if(!this.drawn || forceRedraw)
-            {
-                this.prerenderers[this.treeType](this);
-                if(! forceRedraw) { this.fitInPanel(); }
-            }
-
-            this.canvas.lineWidth = this.lineWidth / this.zoom;
-
-            this.canvas.translate(this.offsetx, this.offsety);
-            this.canvas.scale(this.zoom, this.zoom);
-
-            this.branchRenderers[this.treeType](this, this.root);
-
-            for(var i = 0; i < this.selectedNodes.length; i++)
-            {
-                this.branchRenderers[this.treeType](this, this.selectedNodes[i]);
-            }
-
-
-            //if( this.navigator ) this.navigator.drawFrame();
-            this.drawn = true;
-        },
-        drop : function()
-        {
-
-          if(!this.drawn) return false;
-          this.pickedup = false;
-          this.zoomPickedUp = false;
-          //this.dragging = false;
-        },
-        findBranch : function(patt)
-        {
-            this.root.setSelected(false, true);
-            for(var i = 0; i < this.leaves.length; i++)
-            {
-                if(this.leaves[i].id.match(new RegExp(patt, 'i')))
-                {
-                    this.leaves[i].setSelected(true, true);
-                }
-            }
-            this.draw();
-        },
-        genId : function()
-        {
-            return 'pcn' + this.lastId++;
-        },
-        getPngUrl : function()
-        {
-            return this.canvas.canvas.toDataURL();
-        },
-        hideLabels : function()
-        {
-          this.showLabels = false;
+          this.loadCompleted();
+        } else if (tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) {
+          this.parseNwk(tree, name);
           this.draw();
-        },
-        load : function(tree, name, format)
-        {
-            if(format)
-            {
-                if(format.match(/nexus/i))
-                {
-                    if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);}
-                    else{this.parseNexus(tree, name);}
-                }
-                else if(format.match(/newick/i))
-                {
-                    if(tree.match(/\.\w+$/)){this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);}
-                    else{this.parseNwk(tree, name);}
-                }
+          this.loadCompleted();
+        } else {
+          this.loadError('PhyloCanvas did not recognise the string as a file or a newick or Nexus format string');
+        }
+      }
+    },
+    loadFileCallback: function (response, opts, scope) {
+      if (opts.format.match(/nexus/i)) {
+        scope.parseNexus(reponse.responseText, opts.name);
+      } else if (opts.format.match(/newick/i)) {
+        scope.parseNwk(response.responseText);
+      } else {
+        throw 'file type not recognised by PhyloCanvas';
+      }
+      scope.draw();
+      scope.loadCompleted();
+    },
+    nodePrerenderers: {
+      radial: function (tree, node) {
+        if (node.parent) {
+          node.startx = node.parent.centerx;
+          node.starty = node.parent.centery;
+        } else {
+          node.startx = 0;
+          node.starty = 0;
+        }
+        node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
+        node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
+
+        for (var i = 0; i < node.children.length; i++) {
+          this.radial(tree, node.children[i]);
+        }
+      }
+    },
+    nodeRenderers: {
+      circle: function (node) {
+        var r = node.getNodeSize();
+        node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
+        node.canvas.stroke();
+        node.canvas.fill();
+      },
+      square: function (node) {
+        var r = node.getNodeSize();
+        var x1 = 0;
+        var x2 = r * 2;
+        var y1 = -r;
+        var y2 = r ;
+        node.canvas.moveTo(x1, y1);
+        node.canvas.lineTo(x1, y2);
+        node.canvas.lineTo(x2, y2);
+        node.canvas.lineTo(x2, y1);
+        node.canvas.lineTo(x1, y1);
+        node.canvas.stroke();
+        node.canvas.fill();
+      },
+      star: function (node) {
+        var r = node.getNodeSize();
+        var cx =  r ;
+        var cy = 0;
+
+        node.canvas.moveTo(cx, cy);
+        var alpha = (2 * Math.PI) / 10;
+        var rb = r * 1.75;
+        for (var i = 11; i !== 0; i--) {
+          var ra = i % 2 === 1 ? rb : r;
+          var omega = alpha * i;
+          node.canvas.lineTo(cx + (ra * Math.sin(omega)), cy + (ra * Math.cos(omega)));
+        }
+        node.canvas.stroke();
+        node.canvas.fill();
+      },
+      triangle: function (node) {
+        var r = node.getNodeSize();
+        var cx = r;
+        var cy = 0;
+        var x1 = cx - r;
+        var x2 = cx + r;
+        var y1 = cy - r;
+        var y2 = cy + r;
+        node.canvas.moveTo(cx, y1);
+        node.canvas.lineTo(x2, y2);
+        node.canvas.lineTo(x1, y2);
+        node.canvas.lineTo(cx, y1);
+        node.canvas.stroke();
+        node.canvas.fill();
+      }
+    },
+    parseNexus: function (str, name) {
+      if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
+        throw 'the string provided was not a nexus string';
+      }
+      else if (!str.match(/BEGIN TREES/gi)) {
+        throw 'The nexus file does not contain a tree block';
+      }
+
+      //Get everything between BEGIN TREES and next END;
+      var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i,'').replace(/END;/i,'');
+      //get translate section
+      var translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
+
+      //remove translate section from tree section
+      treeSection = treeSection.replace(translateSection, '');
+      //parse translate section into kv pairs
+      translateSection = translateSection.replace(/translate|;/gi, '');
+
+      var tIntArr = translateSection.split(',');
+      var rObj = {};
+      var ia;
+      for (var i = 0; i < tIntArr.length; i++) {
+        ia = tIntArr[i].replace('\n', '').split(' ');
+        rObj[ia[0].trim()] = ia[1].trim();
+      }
+
+      //find each line starting with tree.
+      var tArr = treeSection.split('\n');
+      var trees = {};
+      //id name is '' or does not exist, ask user to choose which tree.
+      for (i = 0; i < tArr.length; i++) {
+        if (tArr[i].trim() === '') continue;
+        var s = tArr[i].replace(/tree\s/i, '');
+        trees[s.match(/^\w+/)[0]] = s.match(/ [\S]*$/)[0];
+      }
+      if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
+
+      this.parseNwk(trees[name].trim());
+      //translate in accordance with translate block
+      for (var n in rObj) {
+        var b = this.branches[n];
+        delete this.branches[n];
+        b.id = rObj[n];
+        this.branches[b.id] = b;
+      }
+    },
+    parseNwk: function (nwk) {
+      this.origBranches = false;
+      this.origLeaves = false;
+      this.origRoot = false;
+      this.origBL = {};
+      this.origP = {};
+
+      this.root = false;
+      this.leaves = [];
+      this.branches = {};
+      this.drawn = false;
+      var curNode = new Branch();
+      curNode.id = 'root';
+      this.branches.root = curNode;
+      this.setRoot(curNode);
+
+      for (var i = 0; i < nwk.length; i++) {
+        switch (nwk[i]) {
+          case '(': //new Child
+            var nd = new Branch();
+            curNode.addChild(nd);
+            curNode = nd;
+            break;
+          case ')': //return to parent
+            curNode = curNode.parent;
+            break;
+          case ',': //new sibiling
+            var nd = new Branch();
+            curNode.parent.addChild(nd);
+            curNode = nd;
+            break;
+          case ';':
+            for (var l = 0; l < this.leaves.length; l++) {
+              if (this.leaves[l].totalBranchLength > this.maxBranchLength) {
+                this.maxBranchLength = this.leaves[l].totalBranchLength;
+              }
             }
-            else
-            {
-
-                if(tree.match(/\.n(ex|xs)$/))
-                {
-
-                    this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);
-                }
-                else if(tree.match(/\.nwk$/))
-                {
-
-                    this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);
-                }
-                else if(tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i))
-                {
-                    this.parseNexus(tree, name);
-                    this.draw();
-                    this.loadCompleted();
-                }
-                else if(tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi))
-                {
-                    this.parseNwk(tree, name);
-                    this.draw();
-                    this.loadCompleted();
-                }
-                else
-                {
-                    this.loadError('PhyloCanvas did not recognise the string as a file or a newick or Nexus format string');
-                }
+            break;
+          default:
+            try {
+              i = curNode.parseNwk(nwk, i);
+              i--;
+            } catch (e) {
+              this.loadError('Error parsing nwk file' + e);
+              return;
             }
-        },
-        loadFileCallback : function(response, opts, scope)
-        {
-            if(opts.format.match(/nexus/i))
-            {
-                scope.parseNexus(reponse.responseText, opts.name);
-            }
-            else if(opts.format.match(/newick/i))
-            {
-                scope.parseNwk(response.responseText);
-            }
-            else
-            {
-                throw 'file type not recognised by PhyloCanvas';
-            }
-            scope.draw();
-            scope.loadCompleted();
-        },
-        nodePrerenderers :
-        {
-            radial : function(tree, node)
-            {
-                if(node.parent)
-                {
-                    node.startx = node.parent.centerx;
-                    node.starty = node.parent.centery;
-                }
-                else
-                {
-                    node.startx = 0;
-                    node.starty = 0;
-                }
-                node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
-                node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
+            break;
+        }
+      }
 
-                for(var i = 0; i < node.children.length; i++)
-                {
-                    this.radial(tree, node.children[i]);
-                }
+      this.saveNode(this.root);
+      this.root.saveChildren();
+
+      this.root.branchLength = 0;
+      this.maxBranchLength = 0;
+      this.root.setTotalLength();
+
+      if (this.maxBranchLength == 0) {
+        this.loadError('All branches in the tree are identical.');
+        return;
+      }
+
+      this.buildLeaves();
+
+      this.loadCompleted();
+    },
+    pickup: function (event) {
+
+      if (!this.drawn) return false;
+      this.origx = this.offsetx;
+      this.origy = this.offsety;
+
+      if (event.button == 0) {
+        this.pickedup = true;
+      }
+
+      if (event.button == 2 && this.rightClickZoom) {
+        this.zoomPickedUp = true;
+        this.origZoom = Math.log(this.zoom) / Math.log(10);
+        this.oz = this.zoom;
+        // position in the diagram on which you clicked
+      }
+      this.startx = event.clientX ;
+      this.starty = event.clientY;
+    },
+    prerenderers: {
+      rectangular: function (tree, forcedDraw) {
+        tree.root.startx = 0;
+        tree.root.starty = 0;
+        tree.root.centerx = 0;
+        tree.root.centery = 0;
+        tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+        var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+
+        //set initial positons of the branches
+        for (var i = 0; i < tree.leaves.length; i++) {
+          tree.leaves[i].angle = 0;
+          tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery  + ystep : 0);
+          tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+            var cn = nd.parent.children
+            nd.parent.centery = (cn[0].centery + cn[cn.length - 1].centery) / 2;
+          }
+        }
+
+        tree.root.startx = tree.root.centerx;
+        tree.root.starty = tree.root.centery;
+      },
+      circular: function (tree) {
+        tree.root.startx = 0;
+        tree.root.starty = 0;
+        tree.root.centerx = 0;
+        tree.root.centery = 0;
+        tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height)/tree.maxBranchLength;
+        // work out radius of tree and the make branch scalar proportinal to the
+        var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
+        if (tree.branchScalar * tree.maxBranchLength > r) {
+          r = tree.branchScalar * tree.maxBranchLength;
+        } else {
+          tree.branchScalar = r / tree.maxBranchLength;
+        }
+
+        var step = Angles.FULL / tree.leaves.length;
+
+        for (var i = 0; i < tree.leaves.length; i++) {
+          tree.leaves[i].angle = step * i;
+          tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
+          tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
+          tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
+          tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
+          tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
+          tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
+          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+            if (nd.getChildNo() == 0) {
+              nd.parent.angle = nd.angle;
+              nd.parent.minChildAngle = nd.angle;
             }
-        },
-        nodeRenderers : {
-            circle : function (node) {
-                var r = node.getNodeSize();
-                node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-                node.canvas.stroke();
-                node.canvas.fill();
-            },
-            square : function (node)
-            {
-                var r = node.getNodeSize();
-                var x1 = 0;
-                var x2 = r * 2;
-                var y1 = -r;
-                var y2 = r ;
-                node.canvas.moveTo(x1, y1);
-                node.canvas.lineTo(x1, y2);
-                node.canvas.lineTo(x2, y2);
-                node.canvas.lineTo(x2, y1);
-                node.canvas.lineTo(x1, y1);
-                node.canvas.stroke();
-                node.canvas.fill();
-            },
-            star: function (node)
-            {
-                var r = node.getNodeSize();
-                var cx =  r ;
-                var cy = 0;
-
-                node.canvas.moveTo(cx, cy);
-                var alpha = (2 * Math.PI) / 10;
-                var rb = r * 1.75;
-                for(var i = 11; i != 0; i--)
-                {
-                    var ra = i % 2 == 1 ? rb: r;
-                    var omega = alpha * i;
-                    node.canvas.lineTo(cx + (ra * Math.sin(omega)), cy + (ra * Math.cos(omega)));
-                }
-                node.canvas.stroke();
-                node.canvas.fill();
-            },
-            triangle : function (node)
-            {
-                var r = node.getNodeSize();
-                var cx = r;
-                var cy = 0;
-                var x1 = cx - r;
-                var x2 = cx + r;
-                var y1 = cy - r;
-                var y2 = cy + r;
-                node.canvas.moveTo(cx, y1);
-                node.canvas.lineTo(x2, y2);
-                node.canvas.lineTo(x1, y2);
-                node.canvas.lineTo(cx, y1);
-                node.canvas.stroke();
-                node.canvas.fill();
+            if (nd.getChildNo() == nd.parent.children.length - 1) {
+              nd.parent.maxChildAngle = nd.angle;
+              nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
+              nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
+              nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
+              nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
+              nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
+            } else {
+              break;
             }
-        },
-        parseNexus : function(str, name)
-        {
-            if(!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i))
-            {
-                 throw 'the string provided was not a nexus string';
+          }
+        }
+      },
+      radial: function (tree, forcedDraw) {
+        tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+
+        var step = Angles.FULL / tree.leaves.length;
+        tree.root.startx = 0;
+        tree.root.starty = 0;
+        tree.root.centerx = 0;
+        tree.root.centery = 0;
+
+        for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
+          tree.leaves[i].angle = step * i;
+          tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+          tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+
+          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+            if (nd.getChildNo() == 0) {
+              nd.parent.angle = 0;
             }
-            else if(!str.match(/BEGIN TREES/gi))
-            {
-                throw 'The nexus file does not contain a tree block';
+            nd.parent.angle += (nd.angle * nd.getChildCount());
+            if (nd.getChildNo() == nd.parent.children.length - 1) {
+              nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
+            } else {
+              break;
             }
+          }
+        }
 
-            //Get everything between BEGIN TREES and next END;
-            var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i,'').replace(/END;/i,'');
-            //get translate section
-            var translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
+        tree.nodePrerenderers.radial(tree, tree.root);
+      },
+      diagonal: function (tree, forceRender) {
 
-            //remove translate section from tree section
-            treeSection = treeSection.replace(translateSection, '');
-            //parse translate section into kv pairs
-            translateSection = translateSection.replace(/translate|;/gi, '');
+        var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 
-            var tIntArr = translateSection.split(',');
-            var rObj = {};
-            var ia;
-            for(var i = 0; i < tIntArr.length; i++)
-            {
-                ia = tIntArr[i].replace('\n', '').split(' ');
-                rObj[ia[0].trim()] = ia[1].trim();
+        for (var i = 0; i < tree.leaves.length; i++) {
+          tree.leaves[i].centerx = 0;
+          tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
+          tree.leaves[i].angle = 0;
+
+          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+            if (nd.getChildNo() == nd.parent.children.length - 1) {
+              nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
+              nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
+              for (var j = 0; j < nd.parent.children.length; j++) {
+                nd.parent.children[j].startx = nd.parent.centerx;
+                nd.parent.children[j].starty = nd.parent.centery;
+              }
+            } else {
+              break;
             }
+          }
+        }
 
-            //find each line starting with tree.
-            var tArr = treeSection.split('\n');
-            var trees = {};
-            //id name is '' or does not exist, ask user to choose which tree.
-            for(var i = 0; i < tArr.length; i++)
-            {
-                if(tArr[i].trim() == '') continue;
-                var str = tArr[i].replace(/tree\s/i,'');
-                trees[str.match(/^\w+/)[0]] = str.match(/ [\S]*$/)[0];
-            }
-            if(!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
+      },
+      hierarchy: function (tree) {
+        tree.root.startx = 0;
+        tree.root.starty = 0;
+        tree.root.centerx = 0;
+        tree.root.centery = 0;
+        tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
+        var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 
-            this.parseNwk(trees[name].trim());
-            //translate in accordance with translate block
-            for(var n in rObj)
-            {
-                var b = this.branches[n];
-                delete this.branches[n];
-                b.id = rObj[n];
-                this.branches[b.id] = b;
-            }
-        },
-        parseNwk : function(nwk)
-        {
+        for (var i = 0; i < tree.leaves.length; i++) {
+          tree.leaves[i].angle = Angles.QUARTER;
+          tree.leaves[i].centerx = (i > 0 ? tree.leaves[i - 1].centerx + xstep : 0);
+          tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
 
-            this.origBranches = false;
-            this.origLeaves = false;
-            this.origRoot = false;
-            this.origBL = {};
-            this.origP = {};
-
-            this.root = false;
-            this.leaves = [];
-            this.branches = {};
-            this.drawn = false;
-            var curNode = new Branch();
-            curNode.id = 'root';
-            this.branches.root = curNode;
-            this.setRoot(curNode);
-
-            for(var i = 0; i < nwk.length; i++)
-            {
-                switch(nwk[i])
-                {
-                    case '(': //new Child
-                        var nd = new Branch();
-                        curNode.addChild(nd);
-                        curNode = nd;
-                        break;
-                    case ')': //return to parent
-                        curNode = curNode.parent;
-                        break;
-                    case ',': //new sibiling
-                        var nd = new Branch();
-                        curNode.parent.addChild(nd);
-                        curNode = nd;
-                        break;
-                    case ';':
-                        for (var l = 0; l < this.leaves.length; l++)
-                        {
-                            if(this.leaves[l].totalBranchLength > this.maxBranchLength)
-                            {
-                                this.maxBranchLength = this.leaves[l].totalBranchLength;
-                            }
-                        }
-                        break;
-                    default:
-                        try
-                        {
-                            i = curNode.parseNwk(nwk, i);
-                            i--;
-                        }
-                        catch(e)
-                        {
-                            this.loadError( 'Error parsing nwk file' + e );
-                            return;
-                        }
-                        break;
-                    }
+          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+            if (nd.getChildNo() == 0) {
+              nd.parent.centerx = nd.centerx;
             }
 
-
-
-            this.saveNode(this.root);
-            this.root.saveChildren();
-
-            this.root.branchLength = 0;
-            this.maxBranchLength = 0;
-            this.root.setTotalLength();
-
-            if(this.maxBranchLength == 0)
-            {
-                this.loadError('All branches in the tree are identical.');
-                return;
+            if (nd.getChildNo() == nd.parent.children.length - 1) {
+              nd.parent.angle = Angles.QUARTER;
+              nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
+              nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
+              for (var j = 0; j < nd.parent.children.length; j++) {
+                nd.parent.children[j].startx = nd.parent.centerx;
+                nd.parent.children[j].starty = nd.parent.centery;
+              }
+            } else {
+              break;
             }
-
-            this.buildLeaves();
-
-            this.loadCompleted();
-        },
-        pickup : function(event)
-        {
-
-             if(!this.drawn) return false;
-             this.origx = this.offsetx;
-             this.origy = this.offsety;
-
-             if(event.button == 0){
-                this.pickedup = true;
-             }
-
-             if(event.button ==2 && this.rightClickZoom){
-                this.zoomPickedUp = true;
-                this.origZoom = Math.log(this.zoom)/Math.log(10);
-                this.oz = this.zoom;
-                // position in the diagram on which you clicked
-             }
-             this.startx = event.clientX ;
-             this.starty = event.clientY;
-
-        },
-        prerenderers :
-        {
-            rectangular : function(tree, forcedDraw)
-            {
-                tree.root.startx = 0;
-                tree.root.starty = 0;
-                tree.root.centerx = 0;
-                tree.root.centery = 0;
-                tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
-                var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-
-                //set initial positons of the branches
-                for(var i = 0; i < tree.leaves.length; i++)
-                {
-                    tree.leaves[i].angle = 0;
-                    tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery  + ystep : 0);
-                    tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-                    for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
-                    {
-                        var cn = nd.parent.children
-                        nd.parent.centery = (cn[0].centery + cn[cn.length-1].centery) / 2;
-                    }
-                }
-
-                tree.root.startx = tree.root.centerx;
-                tree.root.starty = tree.root.centery;
-
-            },
-            circular : function(tree)
-            {
-                tree.root.startx = 0;
-                tree.root.starty = 0;
-                tree.root.centerx = 0;
-                tree.root.centery = 0;
-                tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height)/tree.maxBranchLength;
-                // work out radius of tree and the make branch scalar proportinal to the
-                var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2)/Angles.FULL;
-                if(tree.branchScalar * tree.maxBranchLength > r)
-                {
-                    r = tree.branchScalar * tree.maxBranchLength;
-                }
-                else
-                {
-                    tree.branchScalar = r / tree.maxBranchLength;
-                }
-
-                var step = Angles.FULL / tree.leaves.length;
-
-                for(var i = 0; i < tree.leaves.length; i++)
-                {
-                    tree.leaves[i].angle = step * i;
-                    tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
-                    tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
-                    tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-                    tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-                    tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-                    tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-                    for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
-                    {
-                        if(nd.getChildNo() == 0)
-                        {
-                            nd.parent.angle = nd.angle;
-                            nd.parent.minChildAngle = nd.angle;
-                        }
-                        if(nd.getChildNo() == nd.parent.children.length - 1)
-                        {
-                            nd.parent.maxChildAngle = nd.angle;
-                            nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
-                            nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
-                            nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
-                            nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
-                            nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
-                        }
-                        else
-                        {
-                            break;
-                        }
-
-                    }
-                }
-            },
-            radial : function(tree, forcedDraw)
-            {
-                tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-                //tree.root.setTotalLength();
-
-                var step = Angles.FULL / tree.leaves.length;
-                tree.root.startx = 0;
-                tree.root.starty = 0;
-                tree.root.centerx = 0;
-                tree.root.centery = 0;
-
-                for(var i = 0.0; i < tree.leaves.length; i += 1.0)
-                {
-                    tree.leaves[i].angle = step * i;
-                    tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-                    tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-                    for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
-                    {
-                        if(nd.getChildNo() == 0)
-                        {
-                            nd.parent.angle = 0;
-                        }
-                        nd.parent.angle += (nd.angle * nd.getChildCount());
-                        if(nd.getChildNo() == nd.parent.children.length - 1)
-                        {
-                            nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                tree.nodePrerenderers.radial(tree, tree.root);
-
-
-            },
-            diagonal : function(tree, forceRender)
-            {
-
-                var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-
-                for(var i = 0; i < tree.leaves.length; i++)
-                {
-                    tree.leaves[i].centerx = 0;
-                    tree.leaves[i].centery = (i > 0 ? tree.leaves[i-1].centery + ystep : 0);
-                    tree.leaves[i].angle = 0;
-
-                    for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
-                    {
-                        if(nd.getChildNo() == nd.parent.children.length - 1)
-                        {
-                            nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-                            nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
-                            for(var j = 0; j < nd.parent.children.length; j++)
-                            {
-                                nd.parent.children[j].startx = nd.parent.centerx;
-                                nd.parent.children[j].starty = nd.parent.centery;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-            },
-            hierarchy : function(tree)
-            {
-                tree.root.startx = 0;
-                tree.root.starty = 0;
-                tree.root.centerx = 0;
-                tree.root.centery = 0;
-                tree.branchScalar = tree.canvas.canvas.height/tree.maxBranchLength;
-                var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() +2) * 2);
-
-                for(var i = 0; i < tree.leaves.length; i++)
-                {
-                    tree.leaves[i].angle = Angles.QUARTER;
-                    tree.leaves[i].centerx = (i > 0 ?tree.leaves[i-1].centerx + xstep : 0);
-                    tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-                    for(var nd = tree.leaves[i]; nd.parent; nd = nd.parent)
-                    {
-                        if(nd.getChildNo() == 0)
-                        {
-                            nd.parent.centerx = nd.centerx;
-                        }
-
-                        if(nd.getChildNo() == nd.parent.children.length - 1)
-                        {
-                            nd.parent.angle = Angles.QUARTER;
-                            nd.parent.centerx = (nd.parent.centerx + nd.centerx )/2;
-                            nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
-                            for(var j = 0; j < nd.parent.children.length; j++)
-                            {
-                                nd.parent.children[j].startx = nd.parent.centerx;
-                                nd.parent.children[j].starty = nd.parent.centery;
-                            }
-
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        },
+          }
+        }
+      }
+    },
         redrawGetNodes: function(node, leafIds)
         {
             for(var i = 0; i < node.children.length; i++)
