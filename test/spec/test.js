@@ -69,7 +69,6 @@
 
       it('should get the right parent branch colour', function () {
         var colour1 = 'rgba(255,0,0,1)',
-            colour2 = 'rgba(0,255,0,1)',
             div = document.createElement('div');
 
         document.body.appendChild(div);
@@ -83,7 +82,7 @@
         branch2 = new PhyloCanvas.Branch();
 
         branch1.colour = colour1;
-        branch2.colour = colour2;
+        branch2.colour = colour1;
 
         branch.addChild(branch1);
         branch.addChild(branch2);
@@ -97,10 +96,10 @@
       });
 
       it('should get the right colours', function () {
-        var colour1 = 'rgba(255,0,0,1)',
-        colour2 = 'rgba(0,255,0,1)',
-        colour3 = 'rgba(0,0,0,1)',
-        div = document.createElement('div');
+        var colour1 = 'rgba(255,0,0,1)';
+        var colour2 = 'rgba(0,255,0,1)';
+        var colour3 = 'rgba(0,0,0,1)';
+        var div = document.createElement('div');
         document.body.appendChild(div);
         var tree = new PhyloCanvas.Tree(div);
 
