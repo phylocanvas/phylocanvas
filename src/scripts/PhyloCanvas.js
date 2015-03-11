@@ -209,7 +209,7 @@ var PhyloCanvas = (function () {
     /**
      * The Canvas DOM object the parent tree is drawn on
      */
-    this.canvas;
+    this.canvas = null;
 
     /**
      * The center of the end of the node on the x axis
@@ -543,6 +543,8 @@ var PhyloCanvas = (function () {
     }
 
     this.historyCollapsed = conf.historyCollapsed;
+    this.historySnapshots = [];
+
     this.history = new History(this);
     if (this.historyCollapsed) this.history.collapse();
 
@@ -2280,7 +2282,7 @@ var PhyloCanvas = (function () {
 
     this.tree.addListener('loaded', this.reset.bind(this));
     this.tree.addListener('typechanged', function (evt) {
-      this.addSnapshot(this.tree.root);
+      this.addSnapshot(this.tree.root.id);
     }.bind(this));
   }
 
@@ -2345,11 +2347,36 @@ var PhyloCanvas = (function () {
    * 1.0.6-1 (08/04/2014) - put the new snapshot at the top of the list github issue #17
    */
   History.prototype.addSnapshot = function (id) {
-    var url = this.tree.getPngUrl(), thumbnail = document.createElement('img');
+    var historyIdPrefix = 'phylocanvas-history-';
+    // console.log(this.tree.historySnapshots)
+    // So that addSnapshot will not be invoked on drawing the subtree
+    // You dont need to create a snapshot of an already created one.
+    var treetype = this.tree.treeType;
+    var match = false;
+    var init = true;
+    this.tree.historySnapshots.forEach(function (ele) {
+      var dataTreeType = ele.getAttribute('data-tree-type');
+      // console.log(ele.id, ' ** ', historyIdPrefix + id, data_tree_type, treetype)
+      ele.style.background = 'transparent';
+      if (ele.id == historyIdPrefix + id && ele.getAttribute('data-tree-type') == treetype) {
+        // History already present
+        match = true;
+        ele.style.background = 'lightblue';
+      }
+    })
+
+    if (match)
+        return;
+    var url = this.tree.getPngUrl(),
+        thumbnail = document.createElement('img');
 
     thumbnail.width = this.width;
     thumbnail.src = url;
-    thumbnail.id = 'phylocanvas-history-' + id;
+    thumbnail.id = historyIdPrefix + id;
+    thumbnail.setAttribute('data-tree-type', this.tree.treeType)
+    thumbnail.style.background = 'lightblue';
+    // Creating the snapshot array which is used to check if the element exists in history in further clicks
+    this.tree.historySnapshots.push(thumbnail);
 
     // altered 1.0.6-1 : issue #17
     //this.div.appendChild(thumbnail);
@@ -2375,17 +2402,19 @@ var PhyloCanvas = (function () {
   History.prototype.goBackTo = function (evt) {
     var ele = evt.target;
 
-    while (ele.previousSibling) {
-      if (ele.previousSibling.tagName == 'IMG') {
-        this.div.removeChild(ele.previousSibling);
-      } else {
-        break;
-      }
-    }
+    // while (ele.previousSibling) {
+    //   if (ele.previousSibling.tagName == 'IMG') {
+    //     this.div.removeChild(ele.previousSibling);
+    //   } else {
+    //     break;
+    //   }
+    // }
 
-    this.div.removeChild(ele);
+    // this.div.removeChild(ele);
 
+    this.tree.treeType = ele.getAttribute('data-tree-type');
     this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
+
   }
 
   /* lends PhyloCanvas */
