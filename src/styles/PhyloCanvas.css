@@ -36,7 +36,7 @@ canvas
 .pc-history .pc-history-title
 {
     text-align: center;
-    font-size: 1.1em;
+    font-size: 13px;
     color: #666;
     padding : 2px 0px;
     border-bottom: 1px solid #bbb;
@@ -89,7 +89,7 @@ canvas
     margin-top: 70px;
     background: transparent;
     color: #666;
-    letter-spacing: 0.09em;
+    letter-spacing: 1.2px;
     border-bottom: none;
 }
 
