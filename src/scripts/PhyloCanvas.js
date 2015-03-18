@@ -542,7 +542,8 @@ var PhyloCanvas = (function () {
       this.navigator = new Navigator(this);
     }
 
-    this.historyCollapsed = conf.historyCollapsed;
+    this.historyCollapsed = (conf.historyCollapsed != undefined)?conf.historyCollapsed:true;
+
     this.historySnapshots = [];
 
     this.history = new History(this);
@@ -1550,6 +1551,10 @@ var PhyloCanvas = (function () {
       }
       this.draw();
     },
+    clearSelect: function() {
+      this.root.setSelected(false, true);
+      this.draw();
+    },
     genId: function () {
       return 'pcn' + this.lastId++;
     },
@@ -1904,6 +1909,10 @@ var PhyloCanvas = (function () {
       diagonal: function (tree, forceRender) {
 
         var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+        tree.root.startx = 0;
+        tree.root.starty = 0;
+        tree.root.centerx = 0;
+        tree.root.centery = 0;
 
         for (var i = 0; i < tree.leaves.length; i++) {
           tree.leaves[i].centerx = 0;
@@ -2317,6 +2326,10 @@ var PhyloCanvas = (function () {
 
   History.prototype.createDiv = function (parentDiv) {
     var div = document.createElement('div');
+    var title = document.createElement('div');
+    title.innerHTML = 'History';
+    title.className = 'pc-history-title';
+    div.appendChild(title);
     addClass(div, 'pc-history');
 
     parentDiv.appendChild(div);
@@ -2354,6 +2367,8 @@ var PhyloCanvas = (function () {
     var treetype = this.tree.treeType;
     var match = false;
     var init = true;
+
+    // Check if there is a snapshot already available. If not, then add a snapshot
     this.tree.historySnapshots.forEach(function (ele) {
       var dataTreeType = ele.getAttribute('data-tree-type');
       // console.log(ele.id, ' ** ', historyIdPrefix + id, data_tree_type, treetype)
@@ -2365,6 +2380,7 @@ var PhyloCanvas = (function () {
       }
     })
 
+    // Check if there is a snapshot already available. If not, then add a snapshot
     if (match)
         return;
     var url = this.tree.getPngUrl(),

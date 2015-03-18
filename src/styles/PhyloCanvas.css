@@ -33,22 +33,24 @@ canvas
     background: #EEE;
 
 }
-
+.pc-history .pc-history-title
+{
+    text-align: center;
+    font-size: 1.1em;
+    color: #666;
+    padding : 2px 0px;
+    border-bottom: 1px solid #bbb;
+}
 .pc-history .toggle
 {
-
     position : absolute;
-    top: 10px;
+    top: 0px;
     right: 0px;
-
-    padding : 5px 10px;
-
+    padding : 2px 8px;
     cursor: pointer;
-
     border-top-left-radius: 50%;
     border-bottom-left-radius: 50%;
-
-    background-color : #CCCCCC;
+    background-color : #666;
     color:#FFFFFF;
 }
 
@@ -68,12 +70,27 @@ canvas
 
 .pc-history.collapsed
 {
-    width:30px;
+    width: 25px;
 }
 
 .pc-history.collapsed img
 {
     display : none;
+}
+
+.pc-history.collapsed .pc-history-title
+{
+    writing-mode:tb-rl;
+    -webkit-transform:rotate(270deg);
+    -moz-transform:rotate(270deg);
+    -o-transform: rotate(270deg);
+    -ms-transform:rotate(270deg);
+    transform: rotate(270deg);
+    margin-top: 70px;
+    background: transparent;
+    color: #666;
+    letter-spacing: 0.09em;
+    border-bottom: none;
 }
 
 /*.pc-history:before
@@ -132,4 +149,11 @@ canvas
 .pc-toolbar .btn-group
 {
     margin-left:0px;
+}
+
+.rot{
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    writing-mode: tb-rl;
 }
