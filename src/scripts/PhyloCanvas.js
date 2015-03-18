@@ -2297,7 +2297,10 @@ var PhyloCanvas = (function () {
 
   History.prototype.reset = function () {
     this.clear();
-    this.addSnapshot('root');
+    // Draw a snapshot after tree is drawn.
+    // Fixing initial drawing
+    if(this.tree.drawn)
+      this.addSnapshot('root');
   }
 
   History.prototype.collapse = function () {
