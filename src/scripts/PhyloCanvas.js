@@ -2,7 +2,7 @@
  * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
  *
  * @author Chris Powell (c.powell@imperial.ac.uk)
- * @modified 14/01/14
+ * @modified Jyothish NT 01/03/15
  */
 var PhyloCanvas = (function () {
   /**
@@ -532,7 +532,7 @@ var PhyloCanvas = (function () {
     this.treeType = 'radial';
     this.maxBranchLength = 0;
     this.lineWidth = 1.0;
-    this.textSize = 10;
+    this.textSize = 7;
     this.font = 'sans-serif';
 
     this.unselectOnClickAway = true;
@@ -576,6 +576,18 @@ var PhyloCanvas = (function () {
       this.origLeaves = this.leaves;
       this.origRoot = this.root;
     }.bind(this));
+
+    /**
+     * Align nodes vertically
+     */
+    this.nodeAlign = false;
+    /**
+     * X and Y axes of the node that is farther from the root
+     * Used to align node vertically
+     */
+    this.farthestNodeFromRootX = 0;
+    this.farthestNodeFromRootY = 0;
+
   };
 
     //static members
@@ -833,10 +845,20 @@ var PhyloCanvas = (function () {
       var lbl = this.getLabel();
       this.canvas.font = fSize + 'pt ' + this.tree.font;
       var dim = this.canvas.measureText(lbl);
-
-      var tx = this.getNodeSize() + 15;
+// Nodealign
+      // var tx = this.getNodeSize() + 15;
+      var tx = this.getLabelStartX();
       var ty = fSize / 3;
 
+// Nodealign
+      if (this.tree.nodeAlign) {
+        if (this.tree.treeType === 'rectangular') {
+          tx = (this.tree.farthestNodeFromRootX - this.centerx) + 5;
+        }
+        else if (this.tree.treeType === 'hierarchy') {
+          tx = (this.tree.farthestNodeFromRootY - this.centery) + 5;
+        }
+      }
       if (this.angle > Angles.QUARTER &&
           this.angle < (Angles.HALF + Angles.QUARTER)) {
         this.canvas.rotate(Angles.HALF);
@@ -890,14 +912,71 @@ var PhyloCanvas = (function () {
         this.canvas.fill();
       }
       else if (this.leaf) {
-        this.canvas.save();
-        this.canvas.translate(this.centerx, this.centery);
-        this.canvas.rotate(this.angle);
-        this.tree.nodeRenderers[this.nodeShape](this);
-        if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
-        this.canvas.restore();
-      }
+// Nodealign
+        // Drawing line connectors to nodes and align all the nodes vertically
+        // This is currently for rectangular tree but can be adjsuted for hierarchical tree too.
+        if (this.tree.nodeAlign) {
+          // Store line width for swapping back after drawing lines for aligning
+          var t = this.canvas.lineWidth;
+          this.canvas.lineWidth = this.canvas.lineWidth / 10;
+/*
+          // For drawing dashed lines
+          // setLineDash does not work in firefox  and safari. So check if it is available
+          if (this.canvas.setLineDash) {
+            this.canvas.lineDashOffset = 1;
+            this.canvas.setLineDash([0.5, 2]);
+          }
+*/
+          this.canvas.beginPath();
+          // Draw line till the x position of the right-end node
+          if (this.tree.treeType === 'rectangular') this.canvas.moveTo(this.tree.farthestNodeFromRootX, (this.centery));
+          if (this.tree.treeType === 'hierarchy') this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
 
+          this.canvas.closePath();
+          this.canvas.fill();
+
+        }
+        // Save canvas
+        this.canvas.save();
+
+        // Move to node center position (setting canvas (0,0) position as (this.centerx, this.centery))
+        this.canvas.translate(this.centerx, this.centery);
+        // rotate canvas (mainly for circular, radial trees etc)
+        this.canvas.rotate(this.angle);
+        // Draw node shape as chosen - default is circle
+        this.tree.nodeRenderers[this.nodeShape](this);
+
+        // If nodeAlign is true then restore x,y of the canvas and then draw labels
+        // Else draw label near to the node and then restore x,y
+        // if(this.tree.nodeAlign) {
+        //   if(this.tree.treeType === 'rectangular') {
+        //     // Restore the canvas position to original
+        //     // this.canvas.restore();
+        //     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
+        //   }
+        //   else if(this.tree.treeType === 'hierarchy') {
+        //     // Restore the canvas position to original
+        //     // this.canvas.restore();
+        //     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
+        //   }
+        //   else {
+        //     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
+        //     // Restore the canvas position to original
+        //     this.canvas.restore();
+        //   }
+        // }
+        // else {
+          if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) this.drawLabel();
+          // Restore the canvas position to original
+          this.canvas.restore();
+        // }
+        // Swapping back the line width
+        this.canvas.lineWidth = t;
+        // setLineDash does not work in firefox  and safari
+        if (this.canvas.setLineDash) {
+          this.canvas.setLineDash([0]);
+        }
+      }
       this.canvas.closePath();
 
       if (this.highlighted) {
@@ -1183,7 +1262,16 @@ var PhyloCanvas = (function () {
   Branch.prototype.getNodeSize = function () {
     return Math.max(0, this.tree.baseNodeSize * this.radius);
   };
-
+  /**
+   * Calculates label start position
+   * Diameter of the node + actual node size + extra width(baseNodeSize)
+   * @method getNodeSize
+   * @return CallExpression
+   */
+  Branch.prototype.getLabelStartX = function()
+  {
+      return this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2);
+  }
   Branch.prototype.rotate = function (evt) {
     var newChildren = [];
     for (var i = this.children.length; i-- ;) {
@@ -1817,23 +1905,38 @@ var PhyloCanvas = (function () {
         tree.root.starty = 0;
         tree.root.centerx = 0;
         tree.root.centery = 0;
+        tree.farthestNodeFromRootX = 0;
+        tree.farthestNodeFromRootY = 0;
+        // Calculate branchScalar based on canvas width and total branch length
+        // This is used to transform the X coordinate based on the canvas width and no. of branches
         tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+        // ystep is the vertical distance between 2 nodes
         var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 
         //set initial positons of the branches
         for (var i = 0; i < tree.leaves.length; i++) {
-          tree.leaves[i].angle = 0;
-          tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery  + ystep : 0);
+          tree.leaves[i].angle = 0; // for rectangle
+          // Calculate and assign y coordinate for all the leaves
+          tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
           tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
 
-          for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-            var cn = nd.parent.children
-            nd.parent.centery = (cn[0].centery + cn[cn.length - 1].centery) / 2;
+          // Assign x,y position of the farthest node from the root
+          if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+          if (tree.leaves[i].centery > tree.farthestNodeFromRootY) tree.farthestNodeFromRootY = tree.leaves[i].centery;
+
+          // Calculate and assign y coordinate for all the parent branches
+          for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
+            // Get all the children of a parent
+            var childrenArray = branch.parent.children;
+            // Assign parent's y coordinate
+            // Idea: Total ystep of all the children of this parent / 2
+            branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
           }
         }
-
+        // Assign root startx and starty
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
+
       },
       circular: function (tree) {
         tree.root.startx = 0;
@@ -1939,6 +2042,8 @@ var PhyloCanvas = (function () {
         tree.root.starty = 0;
         tree.root.centerx = 0;
         tree.root.centery = 0;
+        tree.farthestNodeFromRootX = 0;
+        tree.farthestNodeFromRootY = 0;
         tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
         var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 
@@ -1964,6 +2069,9 @@ var PhyloCanvas = (function () {
               break;
             }
           }
+          // Assign x,y position of the farthest node from the root
+          if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+          if (tree.leaves[i].centery > tree.farthestNodeFromRootY) tree.farthestNodeFromRootY = tree.leaves[i].centery;
         }
       }
     },

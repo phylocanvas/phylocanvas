@@ -150,10 +150,3 @@ canvas
 {
     margin-left:0px;
 }
-
-.rot{
-    -webkit-transform: rotate(270deg);
-    -moz-transform: rotate(270deg);
-    -o-transform: rotate(270deg);
-    writing-mode: tb-rl;
-}
