@@ -845,12 +845,10 @@ var PhyloCanvas = (function () {
       var lbl = this.getLabel();
       this.canvas.font = fSize + 'pt ' + this.tree.font;
       var dim = this.canvas.measureText(lbl);
-// Nodealign
-      // var tx = this.getNodeSize() + 15;
+
       var tx = this.getLabelStartX();
       var ty = fSize / 3;
-
-// Nodealign
+      // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
       if (this.tree.nodeAlign) {
         if (this.tree.treeType === 'rectangular') {
           tx = (this.tree.farthestNodeFromRootX - this.centerx) + 5;
@@ -912,7 +910,7 @@ var PhyloCanvas = (function () {
         this.canvas.fill();
       }
       else if (this.leaf) {
-// Nodealign
+
         // Drawing line connectors to nodes and align all the nodes vertically
         // This is currently for rectangular tree but can be adjsuted for hierarchical tree too.
         if (this.tree.nodeAlign) {
@@ -1614,10 +1612,14 @@ var PhyloCanvas = (function () {
 
       this.canvas.lineWidth = this.lineWidth / this.zoom;
 
+
       this.canvas.translate(this.offsetx, this.offsety);
       this.canvas.scale(this.zoom, this.zoom);
 
       this.branchRenderers[this.treeType](this, this.root);
+
+      // this.setTextSize(this.getTextSize());
+      // console.log(this.textSize)
 
       for (var i = 0; i < this.selectedNodes.length; i++) {
         this.branchRenderers[this.treeType](this, this.selectedNodes[i]);
@@ -1936,7 +1938,8 @@ var PhyloCanvas = (function () {
         // Assign root startx and starty
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
-
+        // Set font size for tree and its branches
+        tree.setFontSize();
       },
       circular: function (tree) {
         tree.root.startx = 0;
@@ -1979,6 +1982,10 @@ var PhyloCanvas = (function () {
             }
           }
         }
+        // Assign root startx and starty
+        tree.root.startx = tree.root.centerx;
+        tree.root.starty = tree.root.centery;
+        tree.setFontSize();
       },
       radial: function (tree, forcedDraw) {
         tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
@@ -2006,8 +2013,11 @@ var PhyloCanvas = (function () {
             }
           }
         }
-
+        // Assign root startx and starty
+        tree.root.startx = tree.root.centerx;
+        tree.root.starty = tree.root.centery;
         tree.nodePrerenderers.radial(tree, tree.root);
+        tree.setFontSize();
       },
       diagonal: function (tree, forceRender) {
 
@@ -2035,7 +2045,10 @@ var PhyloCanvas = (function () {
             }
           }
         }
-
+        // Assign root startx and starty
+        tree.root.startx = tree.root.centerx;
+        tree.root.starty = tree.root.centery;
+        tree.setFontSize();
       },
       hierarchy: function (tree) {
         tree.root.startx = 0;
@@ -2073,6 +2086,7 @@ var PhyloCanvas = (function () {
           if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) tree.farthestNodeFromRootX = tree.leaves[i].centerx;
           if (tree.leaves[i].centery > tree.farthestNodeFromRootY) tree.farthestNodeFromRootY = tree.leaves[i].centery;
         }
+        tree.setFontSize();
       }
     },
     redrawGetNodes: function (node, leafIds) {
@@ -2116,7 +2130,6 @@ var PhyloCanvas = (function () {
       this.root.setTotalLength();
       this.prerenderers[this.treeType](this);
       this.draw();
-
       this.subtreeDrawn(node.id);
     },
     redrawOriginalTree: function () {
@@ -2162,7 +2175,10 @@ var PhyloCanvas = (function () {
       this.draw();
     },
     setFont: function (font) {
-      this.font = font;
+      if(isNaN(font))
+        this.font = font;
+      else
+        this.font
       this.draw();
     },
     setNodeColourAndShape: function (nids, colour, shape, size, waiting) {
@@ -2209,6 +2225,36 @@ var PhyloCanvas = (function () {
     setTextSize: function (size) {
       this.textSize = Number(size);
       this.draw();
+    },
+    setFontSize: function () {
+      // Setting tree text size
+      this.textSize = this.getTextSize();
+      // Setting for size for all branches
+      for(var id in this.branches) {
+        this.branches[id].canvas.font = this.textSize + 'pt ' + this.font;
+      }
+    },
+    getTextSize: function () {
+      // Calculating the font size based on the number of nodes.
+      // Bit tricky for radial tree.
+      var x = (this.leaves.length/this.origLeaves.length);
+      var y = (1 / x) / 100;
+      if (this.treeType == 'rectangular') {
+        size = (15 * y) + 5;
+      }
+      else if (this.treeType == 'diagonal') {
+        size = (10 * y) + 5;
+      }
+      else if (this.treeType == 'hierarchy') {
+        size = (30 * y) + 5;
+      }
+      else if (this.treeType == 'circular') {
+        size = 3 * (100 * y) + 3;
+      }
+      else if (this.treeType == 'radial') {
+        size = 2 * (20 * y) + 3;
+      }
+      return size;
     },
     setTreeType: function (type) {
       var oldType = this.treeType;
