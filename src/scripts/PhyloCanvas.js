@@ -1985,6 +1985,7 @@ var PhyloCanvas = (function () {
         // Assign root startx and starty
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
+        // Set font size for tree and its branches
         tree.setFontSize();
       },
       radial: function (tree, forcedDraw) {
@@ -2017,6 +2018,7 @@ var PhyloCanvas = (function () {
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
         tree.nodePrerenderers.radial(tree, tree.root);
+        // Set font size for tree and its branches
         tree.setFontSize();
       },
       diagonal: function (tree, forceRender) {
@@ -2048,6 +2050,7 @@ var PhyloCanvas = (function () {
         // Assign root startx and starty
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
+        // Set font size for tree and its branches
         tree.setFontSize();
       },
       hierarchy: function (tree) {
@@ -2086,6 +2089,10 @@ var PhyloCanvas = (function () {
           if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) tree.farthestNodeFromRootX = tree.leaves[i].centerx;
           if (tree.leaves[i].centery > tree.farthestNodeFromRootY) tree.farthestNodeFromRootY = tree.leaves[i].centery;
         }
+        // Assign root startx and starty
+        tree.root.startx = tree.root.centerx;
+        tree.root.starty = tree.root.centery;
+        // Set font size for tree and its branches
         tree.setFontSize();
       }
     },
