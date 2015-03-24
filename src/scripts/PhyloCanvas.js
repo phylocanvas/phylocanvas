@@ -2224,19 +2224,19 @@ var PhyloCanvas = (function () {
     },
     setFontSize: function (ystep) {
       // Setting tree text size
-      if(this.treeType == 'circular') {
-        this.textSize = Math.min(ystep * 100 + 5, 40);
+      if (this.treeType == 'circular') {
+        this.textSize = Math.min((ystep * 100) + 5, 40);
       }
-      else if(this.treeType == 'radial') {
-        this.textSize = Math.min(ystep * 50 + 5, 20);
+      else if (this.treeType == 'radial') {
+        this.textSize = Math.min((ystep * 50) + 5, 20);
       }
-      else if(this.treeType == 'diagonal') {
-        this.textSize = Math.min(ystep/2, 10);
+      else if (this.treeType == 'diagonal') {
+        this.textSize = Math.min((ystep / 2), 10);
       }
       else {
-        this.textSize = Math.min(ystep / 2, 15);
+        this.textSize = Math.min((ystep / 2), 15);
       }
-      this.canvas.font = this.textSize + 10 + 'pt ' + this.font;
+      this.canvas.font = this.textSize + 'pt ' + this.font;
     },
     setTreeType: function (type) {
       var oldType = this.treeType;
