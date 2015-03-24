@@ -859,12 +859,11 @@ var PhyloCanvas = (function () {
           this.angle < (Angles.HALF + Angles.QUARTER)) {
         this.canvas.rotate(Angles.HALF);
         // Angles.Half text position changes
-        tx = -tx - (dim.width * 1); // Minus 10 to adjust the +5 added below to indent the label
+        tx = -tx - (dim.width * 1);
       }
 
       this.canvas.beginPath();
       this.canvas.fillStyle = this.getTextColour();
-      // +5 to indent the label a bit
       this.canvas.fillText(lbl, tx, ty);
       this.canvas.closePath();
     },
