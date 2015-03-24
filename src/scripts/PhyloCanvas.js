@@ -849,10 +849,10 @@ var PhyloCanvas = (function () {
       // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
       if (this.tree.nodeAlign) {
         if (this.tree.treeType === 'rectangular') {
-          tx = (this.tree.farthestNodeFromRootX - this.centerx) + 5;
+          tx += (this.tree.farthestNodeFromRootX - this.centerx) + fSize;
         }
         else if (this.tree.treeType === 'hierarchy') {
-          tx = (this.tree.farthestNodeFromRootY - this.centery) + 5;
+          tx += (this.tree.farthestNodeFromRootY - this.centery) + fSize;
         }
       }
       if (this.angle > Angles.QUARTER &&
