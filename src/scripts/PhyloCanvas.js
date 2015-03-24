@@ -849,16 +849,17 @@ var PhyloCanvas = (function () {
       // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
       if (this.tree.nodeAlign) {
         if (this.tree.treeType === 'rectangular') {
-          tx = (this.tree.farthestNodeFromRootX - this.centerx) + 5;
+          tx += (this.tree.farthestNodeFromRootX - this.centerx);
         }
         else if (this.tree.treeType === 'hierarchy') {
-          tx = (this.tree.farthestNodeFromRootY - this.centery) + 5;
+          tx += (this.tree.farthestNodeFromRootY - this.centery);
         }
       }
       if (this.angle > Angles.QUARTER &&
           this.angle < (Angles.HALF + Angles.QUARTER)) {
         this.canvas.rotate(Angles.HALF);
-        tx = -tx - (dim.width * 1.1);
+        // Angles.Half text position changes
+        tx = -tx - (dim.width * 1);
       }
 
       this.canvas.beginPath();
@@ -1914,7 +1915,7 @@ var PhyloCanvas = (function () {
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
-        tree.setFontSize();
+        tree.setFontSize(ystep);
       },
       circular: function (tree) {
         tree.root.startx = 0;
@@ -1961,7 +1962,7 @@ var PhyloCanvas = (function () {
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
-        tree.setFontSize();
+        tree.setFontSize(step);
       },
       radial: function (tree, forcedDraw) {
         tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
@@ -1994,7 +1995,7 @@ var PhyloCanvas = (function () {
         tree.root.starty = tree.root.centery;
         tree.nodePrerenderers.radial(tree, tree.root);
         // Set font size for tree and its branches
-        tree.setFontSize();
+        tree.setFontSize(step);
       },
       diagonal: function (tree, forceRender) {
 
@@ -2026,7 +2027,7 @@ var PhyloCanvas = (function () {
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
-        tree.setFontSize();
+        tree.setFontSize(ystep);
       },
       hierarchy: function (tree) {
         tree.root.startx = 0;
@@ -2072,7 +2073,7 @@ var PhyloCanvas = (function () {
         tree.root.startx = tree.root.centerx;
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
-        tree.setFontSize();
+        tree.setFontSize(xstep);
       }
     },
     redrawGetNodes: function (node, leafIds) {
@@ -2221,35 +2222,21 @@ var PhyloCanvas = (function () {
       this.textSize = Number(size);
       this.draw();
     },
-    setFontSize: function () {
+    setFontSize: function (ystep) {
       // Setting tree text size
-      this.textSize = this.getTextSize();
-      // Setting for size for all branches
-      for (var id in this.branches) {
-        this.branches[id].canvas.font = this.textSize + 'pt ' + this.font;
-      }
-    },
-    getTextSize: function () {
-      // Calculating the font size based on the number of nodes.
-      // Bit tricky for radial tree.
-      var x = (this.leaves.length / this.origLeaves.length);
-      var y = (1 / x) / 100;
-      if (this.treeType == 'rectangular') {
-        size = (15 * y) + 5;
-      }
-      else if (this.treeType == 'diagonal') {
-        size = (10 * y) + 5;
-      }
-      else if (this.treeType == 'hierarchy') {
-        size = (30 * y) + 5;
-      }
-      else if (this.treeType == 'circular') {
-        size = 3 * (100 * y) + 3;
+      if (this.treeType == 'circular') {
+        this.textSize = Math.min((ystep * 100) + 5, 40);
       }
       else if (this.treeType == 'radial') {
-        size = 2 * (20 * y) + 3;
+        this.textSize = Math.min((ystep * 50) + 5, 20);
       }
-      return size;
+      else if (this.treeType == 'diagonal') {
+        this.textSize = Math.min((ystep / 2), 10);
+      }
+      else {
+        this.textSize = Math.min((ystep / 2), 15);
+      }
+      this.canvas.font = this.textSize + 'pt ' + this.font;
     },
     setTreeType: function (type) {
       var oldType = this.treeType;
