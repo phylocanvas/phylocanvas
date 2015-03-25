@@ -2159,7 +2159,9 @@ var PhyloCanvas = (function () {
       }
       for (var i = 0; i < this.leaves.length; i++) {
         for (var j = 0; j < ns.length; j++) {
-          this.leaves[i].setSelected(ns[j] == this.leaves[i].id, false);
+          if (ns[j] == this.leaves[i].id) {
+            this.leaves[i].setSelected(true, false);
+          }
         }
       }
       this.draw();
