@@ -542,7 +542,8 @@ var PhyloCanvas = (function () {
       this.navigator = new Navigator(this);
     }
 
-    this.historyCollapsed = (conf.historyCollapsed !== undefined) ? conf.historyCollapsed : true;
+    this.historyCollapsed = (conf.historyCollapsed !== undefined) ?
+    conf.historyCollapsed : true;
 
     this.historySnapshots = [];
 
@@ -587,6 +588,21 @@ var PhyloCanvas = (function () {
      */
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
+    this.showMetadata = false;
+    // Takes an array of metadata column headings to overlay on the tree
+    this.selectedMetadataColumns = [];
+    // Colour for 1 and 0s. Currently 0s are not drawn
+    this.colour1 = 'rgba(206,16,16,1)';
+    this.colour0 = '#ccc';
+    /**
+       Maximum length of label for each tree type.
+       Because label length pixel differes for different tree types for some reason
+     */
+    this.maxLabelLength = {};
+    // x step for metadata
+    this.metadataXStep = 15;
+    // Boolean to detect if metadata heading is drawn or not
+    this.metadataHeadingDrawn = false;
 
   };
 
@@ -838,14 +854,112 @@ var PhyloCanvas = (function () {
         if (cld) return cld;
       }
     },
+    drawMetadata: function () {
+
+      var fSize = this.tree.textSize;
+      var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
+      var ty = 0;
+
+      if (this.tree.nodeAlign) {
+        if (this.tree.treeType === 'rectangular') {
+          tx += (this.tree.farthestNodeFromRootX - this.centerx);
+        }
+        else if (this.tree.treeType === 'hierarchy') {
+          tx += (this.tree.farthestNodeFromRootY - this.centery);
+        }
+      }
+
+      if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
+        this.drawMetadataHeading(tx, ty);
+        this.tree.metadataHeadingDrawn = true;
+      }
+
+      if (Object.keys(this.data).length > 0) {
+        this.canvas.beginPath();
+        if (this.angle > Angles.QUARTER && this.angle < (Angles.HALF + Angles.QUARTER)) {
+          this.canvas.rotate(Angles.HALF);
+        }
+
+        var metadata = [];
+        // If no columns specified, then draw all columns
+
+        if (this.tree.selectedMetadataColumns.length > 0) {
+          metadata = this.tree.selectedMetadataColumns;
+        }
+        else {
+
+          metadata = Object.keys(this.data);
+        }
+        var height = this.tree.textSize;
+        var width = this.tree.metadataXStep / 2;
+
+        ty = ty - (height / 2);
+
+        for (var i = 0; i < metadata.length; i++) {
+          columnName = metadata[i];
+          tx += this.tree.metadataXStep;
+
+          if (parseInt(this.data[columnName])) {
+            this.canvas.fillStyle = this.tree.colour1;
+            this.canvas.fillRect(tx, ty, width, height);
+          }
+        }
+        this.canvas.stroke();
+        this.canvas.closePath();
+      }
+    },
+    drawMetadataHeading: function (tx, ty) {
+
+      if (this.tree.selectedMetadataColumns.length > 0) {
+        metadata = this.tree.selectedMetadataColumns;
+      }
+      else {
+
+        metadata = Object.keys(this.data);
+      }
+
+      // Drawing Column headings
+      this.canvas.font = '12px Sans-serif';
+      this.canvas.fillStyle = 'black';
+
+      for (var i = 0; i < metadata.length; i++) {
+        columnName = metadata[i];
+        tx += this.tree.metadataXStep;
+        // Rotate canvas to write column headings
+        this.canvas.rotate(-Math.PI / 2);
+        if (this.tree.treeType === 'rectangular') {
+          this.canvas.textAlign = 'left';
+          // x and y axes changed because of rotate
+          // Adding + 6 to adjust the position
+          this.canvas.fillText(columnName, 20, tx + 6);
+        }
+        else if (this.tree.treeType === 'hierarchy') {
+          this.canvas.textAlign = 'right';
+          this.canvas.fillText(columnName, -20, tx + 8);
+        }
+        else if (this.tree.treeType === 'diagonal') {
+          this.canvas.textAlign = 'left';
+          this.canvas.fillText(columnName, 20, tx + 6);
+        }
+        // Rotate canvas back to normal position
+        this.canvas.rotate(Math.PI / 2);
+      }
+    },
     drawLabel: function () {
       var fSize = this.tree.textSize;
       var lbl = this.getLabel();
       this.canvas.font = fSize + 'pt ' + this.tree.font;
-      var dim = this.canvas.measureText(lbl);
+      var dimensions = this.canvas.measureText(lbl);
+      // finding the maximum label length
+      if (this.tree.maxLabelLength[this.tree.treeType] === undefined) {
+        this.tree.maxLabelLength[this.tree.treeType] = 0;
+      }
+      if (dimensions.width > this.tree.maxLabelLength[this.tree.treeType]) {
+        this.tree.maxLabelLength[this.tree.treeType] = dimensions.width;
+      }
 
       var tx = this.getLabelStartX();
-      var ty = fSize / 3;
+      var ty = fSize / 2;
       // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
       if (this.tree.nodeAlign) {
         if (this.tree.treeType === 'rectangular') {
@@ -859,7 +973,7 @@ var PhyloCanvas = (function () {
           this.angle < (Angles.HALF + Angles.QUARTER)) {
         this.canvas.rotate(Angles.HALF);
         // Angles.Half text position changes
-        tx = -tx - (dim.width * 1);
+        tx = -tx - (dimensions.width * 1);
       }
 
       this.canvas.beginPath();
@@ -938,6 +1052,10 @@ var PhyloCanvas = (function () {
 
         if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
           this.drawLabel();
+        }
+
+        if (this.tree.showMetadata) {
+          this.drawMetadata();
         }
         // Restore the canvas position to original
         this.canvas.restore();
@@ -1329,11 +1447,7 @@ var PhyloCanvas = (function () {
         for (var i = 0 ; i < node.children.length && !collapse; i++) {
           node.children[i].startx = node.centerx;
           node.children[i].starty = node.centery;
-          if (node.children[i].selected && !node.collapsed) {
-            tree.selectedNodes.push(node.children[i]);
-          } else {
-            tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-          }
+          tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
         }
       },
       circular: function (tree, node, collapse) {
@@ -1398,11 +1512,7 @@ var PhyloCanvas = (function () {
         }
 
         for (var i = 0 ; i < node.children.length && !collapse; i++) {
-          if (node.children[i].selected && !node.collapsed) {
-            node.tree.selectedNodes.push(node.children[i]);
-          } else {
-            tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-          }
+          tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
         }
       },
       diagonal: function (tree, node, collapse) {
@@ -1431,11 +1541,7 @@ var PhyloCanvas = (function () {
         for (var i = 0 ; i < node.children.length && !collapse; i++) {
           node.children[i].startx = node.centerx;
           node.children[i].starty = node.centery;
-          if (node.children[i].selected && !node.collapsed) {
-            node.tree.selectedNodes.push(node.children[i]);
-          } else {
-            tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-          }
+          tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
         }
       },
       hierarchy: function (tree, node, collapse) {
@@ -1462,11 +1568,7 @@ var PhyloCanvas = (function () {
         node.canvas.closePath();
 
         for (var i = 0 ; i < node.children.length  && !collapse; i++) {
-          if (node.children[i].selected && !(collapse || node.collapsed)) {
-            node.tree.selectedNodes.push(node.children[i]);
-          } else {
-            tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-          }
+          tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
         }
       }
     },
@@ -1580,7 +1682,7 @@ var PhyloCanvas = (function () {
       this.canvas.strokeStyle = this.branchColour;
       this.canvas.save();
 
-      this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
+      this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas), (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
       if (!this.drawn || forceRedraw) {
         this.prerenderers[this.treeType](this);
@@ -1593,10 +1695,7 @@ var PhyloCanvas = (function () {
 
       this.branchRenderers[this.treeType](this, this.root);
 
-      for (var i = 0; i < this.selectedNodes.length; i++) {
-        this.branchRenderers[this.treeType](this, this.selectedNodes[i]);
-      }
-
+      this.metadataHeadingDrawn = false;
       this.drawn = true;
     },
     drop: function () {
@@ -1881,6 +1980,7 @@ var PhyloCanvas = (function () {
         tree.root.centery = 0;
         tree.farthestNodeFromRootX = 0;
         tree.farthestNodeFromRootY = 0;
+
         // Calculate branchScalar based on canvas width and total branch length
         // This is used to transform the X coordinate based on the canvas width and no. of branches
         tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
@@ -1916,12 +2016,14 @@ var PhyloCanvas = (function () {
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
         tree.setFontSize(ystep);
+        tree.setMaxLabelLength();
       },
       circular: function (tree) {
         tree.root.startx = 0;
         tree.root.starty = 0;
         tree.root.centerx = 0;
         tree.root.centery = 0;
+
         tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
         // work out radius of tree and the make branch scalar proportinal to the
         var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
@@ -1963,6 +2065,7 @@ var PhyloCanvas = (function () {
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
         tree.setFontSize(step);
+        tree.setMaxLabelLength();
       },
       radial: function (tree, forcedDraw) {
         tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
@@ -1996,6 +2099,7 @@ var PhyloCanvas = (function () {
         tree.nodePrerenderers.radial(tree, tree.root);
         // Set font size for tree and its branches
         tree.setFontSize(step);
+        tree.setMaxLabelLength();
       },
       diagonal: function (tree, forceRender) {
 
@@ -2028,6 +2132,7 @@ var PhyloCanvas = (function () {
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
         tree.setFontSize(ystep);
+        tree.setMaxLabelLength();
       },
       hierarchy: function (tree) {
         tree.root.startx = 0;
@@ -2036,6 +2141,7 @@ var PhyloCanvas = (function () {
         tree.root.centery = 0;
         tree.farthestNodeFromRootX = 0;
         tree.farthestNodeFromRootY = 0;
+
         tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
         var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 
@@ -2074,6 +2180,7 @@ var PhyloCanvas = (function () {
         tree.root.starty = tree.root.centery;
         // Set font size for tree and its branches
         tree.setFontSize(xstep);
+        tree.setMaxLabelLength();
       }
     },
     redrawGetNodes: function (node, leafIds) {
@@ -2159,7 +2266,9 @@ var PhyloCanvas = (function () {
       }
       for (var i = 0; i < this.leaves.length; i++) {
         for (var j = 0; j < ns.length; j++) {
-          this.leaves[i].setSelected(ns[j] == this.leaves[i].id, false);
+          if (ns[j] == this.leaves[i].id) {
+            this.leaves[i].setSelected(true, false);
+          }
         }
       }
       this.draw();
@@ -2292,6 +2401,51 @@ var PhyloCanvas = (function () {
       y = y / this.zoom;
 
       return y;
+    },
+    viewMetadataColumns: function (metadataColumnArray) {
+      this.showMetadata = true;
+      if (metadataColumnArray == undefined) {
+        // Select all column headings so that it will draw all columns
+        metadataColumnArray = this.getMetadataColumnHeadings();
+      }
+      // If argument missing or no key id matching, then this array would be undefined
+      if (metadataColumnArray !== undefined) {
+        this.selectedMetadataColumns = metadataColumnArray;
+      }
+      // Fit to canvas window
+      this.fitInPanel();
+      this.draw();
+    },
+    getMetadataColumnHeadings: function () {
+      var metadataColumnArray = [];
+      for (var i = 0; i < this.leaves.length; i++) {
+        if (Object.keys(this.leaves[i].data).length > 0) {
+          metadataColumnArray = Object.keys(this.leaves[i].data);
+          break;
+        }
+      }
+      return metadataColumnArray;
+    },
+    clearMetadata: function () {
+      for (var i = 0; i < this.leaves.length; i++) {
+        if (Object.keys(this.leaves[i].data).length > 0) {
+          this.leaves[i].data = {};
+        }
+      }
+    },
+    setMaxLabelLength: function () {
+      var dimensions;
+      if (this.maxLabelLength[this.treeType] === undefined) {
+        this.maxLabelLength[this.treeType] = 0;
+      }
+
+      for (var i = 0; i < this.leaves.length; i++) {
+        dimensions = this.canvas.measureText(this.leaves[i].id);
+        // finding the maximum label length
+        if (dimensions.width > this.maxLabelLength[this.treeType]) {
+          this.maxLabelLength[this.treeType] = dimensions.width;
+        }
+      }
     }
   }
 
@@ -2318,7 +2472,6 @@ var PhyloCanvas = (function () {
   Tree.prototype.addListener = function (event, listener) {
     addEvent(this.canvasEl, event, listener);
   }
-
   Tree.prototype.getBounds = function () {
     var minx = this.root.startx,
           maxx = this.root.startx,
@@ -2329,7 +2482,9 @@ var PhyloCanvas = (function () {
       var x = this.leaves[i].centerx;
       var y = this.leaves[i].centery ;
       var theta = this.leaves[i].angle;
-      var pad = this.leaves[i].getNodeSize() + (this.showLabels ? this.leaves[i].getLabelSize() : 0);
+      var pad = this.leaves[i].getNodeSize()
+                + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0)
+                + (this.showMetadata ?  this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
 
       x = x + (pad * Math.cos(theta));
       y = y + (pad * Math.sin(theta));
@@ -2339,7 +2494,6 @@ var PhyloCanvas = (function () {
       miny = Math.min(miny, y);
       maxy = Math.max(maxy, y);
     }
-
     return [[minx, miny], [maxx, maxy]];
   }
 
@@ -2435,7 +2589,7 @@ var PhyloCanvas = (function () {
     this.clear();
     // Fixing initial snapshot - draw only after the tree is drawn
     if (this.tree.drawn) {
-      this.addSnapshot('root');
+      this.addSnapshot(this.tree.root.id);
     }
   }
 
