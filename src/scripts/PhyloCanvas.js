@@ -153,6 +153,20 @@ var PhyloCanvas = (function () {
     FULL: 2 * Math.PI
   };
 
+  /*** Applying css for the history snapshot ***/
+  var css = '.pc-history{position:absolute;top:0;bottom:0;left:0;box-sizing:border-box;width:20%;overflow-x:hidden;overflow-y:auto;background:#EEE}.pc-history .pc-history-title{text-align:center;font-size:13px;color:#666;padding:2px 0;border-bottom:1px solid #bbb}.pc-history .toggle{position:absolute;top:0;right:0;padding:2px 8px;cursor:pointer;border-top-left-radius:50%;border-bottom-left-radius:50%;background-color:#666;color:#FFF}.pc-history.collapsed .toggle{border-radius:0 50% 50% 0}.pc-history .toggle:hover{background-color:#FFF;color:#CCC}.pc-history.collapsed{width:25px}.pc-history.collapsed img{display:none}.pc-history.collapsed .pc-history-title{writing-mode:tb-rl;-webkit-transform:rotate(270deg);-moz-transform:rotate(270deg);-o-transform:rotate(270deg);-ms-transform:rotate(270deg);transform:rotate(270deg);margin-top:70px;background:0 0;color:#666;letter-spacing:1.2px;border-bottom:none}.pc-history img{border:1px solid #CCC;cursor:pointer;width:100%;box-sizing:border-box;transition:background-color .25s ease}.pc-history img:hover{background-color:#fff}',
+      head = document.head || document.getElementsByTagName('head')[0],
+      style = document.createElement('style');
+
+  style.type = 'text/css';
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+  head.appendChild(style);
+  /********************************************/
+
   /**
    * Creates a function which can be called from an event handler independent of
    * scope.
@@ -2480,7 +2494,7 @@ var PhyloCanvas = (function () {
 
     for (var i = this.leaves.length; i--;) {
       var x = this.leaves[i].centerx;
-      var y = this.leaves[i].centery ;
+      var y = this.leaves[i].centery;
       var theta = this.leaves[i].angle;
       var pad = this.leaves[i].getNodeSize()
                 + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0)
