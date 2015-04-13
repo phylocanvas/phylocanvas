@@ -177,7 +177,11 @@ var PhyloCanvas = (function () {
    */
   function createHandler(obj, func) {
     if (typeof func === typeof 'aaa') {
-      return (function (e) {return obj[func](e);});
+      return (function (e) {
+        if (obj[func]) {
+          return obj[func](e);
+        }
+      });
     }
     else {
       return function (e) {return func(obj);};
@@ -330,7 +334,7 @@ var PhyloCanvas = (function () {
    * @memberOf PhyloCanvas
    *
    */
-  function ContextMenu(tree) {
+  function ContextMenu(tree, options) {
     /**
      * The Tree object that this context menu influences
      */
@@ -343,37 +347,55 @@ var PhyloCanvas = (function () {
     this.div.style.position = 'fixed';
     this.div.style.border = '1px solid #CCCCCC';
     this.div.style.background = '#FFFFFF';
+    // this.div.style.fontSize = 'px';
+    this.div.style.letterSpacing = '0.5px';
     this.div.className = 'contextMenu';
+
     /**
      * The options in this menu
      */
-    this.elements = [{
-      text: 'Redraw Subtree',
-      handler: 'redrawTreeFromBranch',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Show Labels',
-      handler: 'displayLabels',
-      internal: false,
-      leaf:false
-    }, {
-      text: 'Hide Labels',
-      handler: 'hideLabels',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Collapse/Expand branch',
-      handler: 'toggleCollapsed',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Rotate Branch',
-      handler: 'rotate',
-      internal: true,
-      leaf: false
-    }];
+    this.elements = [];
+    if (options.length > 0) {
+      for (var i = 0; i < options.length; i++) {
+        var menuItem = {};
 
+        if (options[i].handler) {
+          menuItem.handler = options[i].handler;
+          menuItem.text = options[i].text || 'New Menu Item';
+          menuItem.internal = options[i].internal || false;
+          menuItem.leaf = options[i].leaf || false;
+          this.elements.push(menuItem);
+        }
+      }
+    }
+    else {
+      this.elements = [{
+        text: 'Redraw Subtree',
+        handler: 'redrawTreeFromBranch',
+        internal: true,
+        leaf: false
+      }, {
+        text: 'Show Labels',
+        handler: 'displayLabels',
+        internal: false,
+        leaf:false
+      }, {
+        text: 'Hide Labels',
+        handler: 'hideLabels',
+        internal: false,
+        leaf: false
+      }, {
+        text: 'Collapse/Expand branch',
+        handler: 'toggleCollapsed',
+        internal: true,
+        leaf: false
+      }, {
+        text: 'Rotate Branch',
+        handler: 'rotate',
+        internal: true,
+        leaf: false
+      }];
+    }
     this.tree.canvasEl.appendChild(this.div);
   }
 
@@ -386,7 +408,7 @@ var PhyloCanvas = (function () {
     this.cl = document.createElement('canvas');
     this.cl.id = div.id + 'Loader';
     this.cl.style.position = 'absolute';
-    this.cl.style.backgroundColour = '#FFFFFF';
+    this.cl.style.backgroundColor = '#FFFFFF';
     this.cl.style.top = (div.offsetHeight / 4) + 'px';
     this.cl.style.left = (div.offsetWidth / 4) + 'px';
     this.cl.height = div.offsetHeight / 2;
@@ -411,7 +433,7 @@ var PhyloCanvas = (function () {
     this.cel = document.createElement('canvas');
     this.cel.id = this.tree.canvasEl.id + 'Navi';
     this.cel.style.zIndex = '100';
-    this.cel.style.backgroundColour = '#FFFFFF';
+    this.cel.style.backgroundColor = '#FFFFFF';
     this.cel.width = this.tree.canvas.canvas.width / 3;
     this.cel.height = this.tree.canvas.canvas.height / 3;
     this.cel.style.position = 'absolute';
@@ -495,7 +517,7 @@ var PhyloCanvas = (function () {
     cl.id = div.id + 'pCanvas';
     cl.className = 'phylocanvas';
     cl.style.position = 'relative';
-    cl.style.backgroundColour = '#FFFFFF';
+    cl.style.backgroundColor = '#FFFFFF';
     cl.height = div.clientHeight || 400;
     cl.width = div.clientWidth || 400;
     cl.style.zIndex = '1';
@@ -503,8 +525,13 @@ var PhyloCanvas = (function () {
 
     /***
      * Right click menu
+     * Users could pass options while creating the Tree object
      */
-    this.contextMenu = new ContextMenu(this);
+    var menuOptions = [];
+    if (conf.contextMenu !== undefined) {
+      menuOptions = conf.contextMenu;
+    }
+    this.contextMenu = new ContextMenu(this, menuOptions);
     this.drawn = false;
 
     this.selectedNodes = [];
@@ -625,8 +652,8 @@ var PhyloCanvas = (function () {
     close: function () {
       this.div.style.display = 'none';
     },
-    mouseover: function (d) { d.style.backgroundColour = '#E2E3DF'; },
-    mouseout: function (d) { d.style.backgroundColour = 'transparent'; },
+    mouseover: function (d) { d.style.backgroundColor = '#E2E3DF'; },
+    mouseout: function (d) { d.style.backgroundColor = 'transparent'; },
     open: function (x, y) {
       while (this.div.hasChildNodes()) {
         this.div.removeChild(this.div.firstChild);
@@ -656,7 +683,7 @@ var PhyloCanvas = (function () {
         d.style.cursor = 'pointer';
         d.style.padding = '0.3em 0.5em 0.3em 0.5em';
         d.style.fontFamily = this.tree.font;
-        d.style.fontSize = '12pt';
+        d.style.fontSize = '8pt';
         d.addEventListener('click', createHandler(this, 'close'));
         document.body.addEventListener('click', createHandler(this, 'close'));
         d.addEventListener('contextmenu', function (e) { e.preventDefault(); });
@@ -676,7 +703,7 @@ var PhyloCanvas = (function () {
       this.div.style.zIndex = 2000;
       this.div.style.display = 'block';
 
-      this.div.style.backgroundColour = '#FFFFFF';
+      this.div.style.backgroundColor = '#FFFFFF';
     }
   };
   /**
@@ -2241,6 +2268,7 @@ var PhyloCanvas = (function () {
       this.subtreeDrawn(node.id);
     },
     redrawOriginalTree: function () {
+      this.drawn = false;
       this.resetTree();
 
       this.root.setTotalLength();
