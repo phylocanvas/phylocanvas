@@ -347,7 +347,6 @@ var PhyloCanvas = (function () {
     this.div.style.position = 'fixed';
     this.div.style.border = '1px solid #CCCCCC';
     this.div.style.background = '#FFFFFF';
-    // this.div.style.fontSize = 'px';
     this.div.style.letterSpacing = '0.5px';
     this.div.className = 'contextMenu';
 
@@ -355,7 +354,7 @@ var PhyloCanvas = (function () {
      * The options in this menu
      */
     this.elements = [];
-    if (options.length > 0) {
+    if (options && options.length > 0) {
       for (var i = 0; i < options.length; i++) {
         var menuItem = {};
 
