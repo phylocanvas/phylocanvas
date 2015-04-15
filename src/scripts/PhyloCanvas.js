@@ -4,7 +4,7 @@
  * @author Chris Powell (c.powell@imperial.ac.uk)
  * @modified Jyothish NT 01/03/15
  */
-var PhyloCanvas = (function () {
+(function () {
   /**
    * Get the y coordinate of oElement
    *
@@ -2747,12 +2747,18 @@ var PhyloCanvas = (function () {
     this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
   }
 
-  /* lends PhyloCanvas */
-  return {
+  var PhyloCanvas = {
     Tree: Tree,
-    Branch:Branch,
-    Loader:Loader,
+    Branch: Branch,
+    Loader: Loader,
     ContextMenu: ContextMenu,
     History: History
   };
+
+  // prefer CommonJS environment as could be both server and client-side
+  if (module && module.exports) {
+    module.exports = PhyloCanvas;
+  } else {
+    window.PhyloCanvas = PhyloCanvas;
+  }
 })();
