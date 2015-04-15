@@ -2756,7 +2756,7 @@
   };
 
   // prefer CommonJS environment as could be both server and client-side
-  if (module && module.exports) {
+  if (typeof exports === 'object') {
     module.exports = PhyloCanvas;
   } else {
     window.PhyloCanvas = PhyloCanvas;
