@@ -89,6 +89,11 @@
     }
   }
 
+  function killEvent(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
   function addClass(element, className) {
     var classes = element.className.split(' ');
     if (classes.indexOf(className) === -1) {
@@ -588,20 +593,13 @@
     this.historySnapshots = [];
 
     this.history = new History(this);
-    if (this.historyCollapsed) this.history.collapse();
-
-    addEvent(
-      document.querySelector('.pc-history .toggle'),
-      'click',
-      this.history.toggle.bind(this.history)
-    );
 
     this.adjustForPixelRatio();
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
 
-    this.addListener('mousedown', this.pickup.bind(this));
+    // this.addListener('mousedown', this.pickup.bind(this));
     this.addListener('mouseup', this.drop.bind(this));
     this.addListener('mouseout', this.drop.bind(this));
 
@@ -2624,6 +2622,10 @@
     this.tree.addListener('typechanged', function (evt) {
       this.addSnapshot(this.tree.root.id);
     }.bind(this));
+
+    if (tree.historyCollapsed) {
+      this.collapse();
+    }
   }
 
   History.prototype.reset = function () {
@@ -2660,6 +2662,9 @@
 
   History.prototype.createDiv = function (parentDiv) {
     var div = document.createElement('div');
+    addEvent(div, 'click', killEvent);
+    addEvent(div, 'contextmenu', killEvent);
+
     var title = document.createElement('div');
     title.innerHTML = 'History';
     title.className = 'pc-history-title';
@@ -2670,8 +2675,10 @@
     var tabDiv = document.createElement('div');
     tabDiv.appendChild(document.createTextNode('<'));
     addClass(tabDiv, 'toggle');
+    addEvent(tabDiv, 'click', this.toggle.bind(this));
     div.appendChild(tabDiv);
     this.toggleDiv = tabDiv;
+
     return div
   }
 
