@@ -599,7 +599,7 @@
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
 
-    // this.addListener('mousedown', this.pickup.bind(this));
+    this.addListener('mousedown', this.pickup.bind(this));
     this.addListener('mouseup', this.drop.bind(this));
     this.addListener('mouseout', this.drop.bind(this));
 
