@@ -2658,6 +2658,7 @@
     } else {
       this.collapse();
     }
+    fireEvent(this.tree.canvasEl, 'historyopen', { isOpen: !this.isCollapsed() });
   }
 
   History.prototype.createDiv = function (parentDiv) {
@@ -2679,7 +2680,7 @@
     div.appendChild(tabDiv);
     this.toggleDiv = tabDiv;
 
-    return div
+    return div;
   }
 
   History.prototype.resizeTree = function () {

@@ -10,6 +10,10 @@ window.onload = function(){
     // load tree via AJAX and render using default params
     phylocanvas.load('./tree.nwk');
 
+    phylocanvas.canvasEl.addEventListener('historyopen', function (e) {
+      alert(e.isOpen ? 'history is open' : 'history is closed');
+    });
+
     window.phylocanvas = phylocanvas;
 
 
