@@ -2658,7 +2658,7 @@
     } else {
       this.collapse();
     }
-    fireEvent(this.tree.canvasEl, 'historyopen', { isOpen: !this.isCollapsed() });
+    fireEvent(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
   }
 
   History.prototype.createDiv = function (parentDiv) {
