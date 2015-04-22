@@ -1,11 +1,10 @@
-#PhyloCanvas - HTML5 Phylogenetic Tree visualisation
+#PhyloCanvas - HTML5 Phylogenetic Tree Visualisation
 
-Written By Christopher I Powell under the supervision of Dr David Aanensen in the Labarotory of Professor Brian Spratt
-Department of Infectious Disease Epidemiology, Imperial College London
+Originally created By Christopher I Powell under the supervision of Dr David Aanensen in the Labarotory of Professor Brian Spratt Department of Infectious Disease Epidemiology, Imperial College London. Currently maintained by the Centre for Genomic Pathogen Surveillance at the Wellcome Trust Sanger Institute.
 
 PhyloCanvas is released under a GPL v3 Licence and documentation is realeased under a Creative Commons Share Alike Licence (CC BY-SA)
 
-## Getting started
+## Getting Started
 
 ```JavaScript
 // Construct tree object
