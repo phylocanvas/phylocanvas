@@ -7,21 +7,10 @@ PhyloCanvas is released under a GPL v3 Licence and documentation is realeased un
 
 ## Getting started
 
-PhyloCanvas is now built using [Grunt](http://gruntjs.com) and tested using [Mocha](http://visionmedia.github.io/mocha/), [chai](http://chaijs.com) and [expect.js](https://github.com/LearnBoost/expect.js/)
+```JavaScript
+// Construct tree object
+var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
 
-To build PhyloCanvas, after cloning
-    
-    npm install
-    bower install //currently there are no dependencies so this is redundant
-    grunt test
-    grunt build //or grunt serve to run the demo locally
-    
-
-## To start using PhyloCanvas : 
-
-    // Construct tree object
-    var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
-    
-    // load tree via AJAX and render using default params - NB: uses AJAX
-    phylocanvas.load('./tree.nwk');
-
+// load tree via AJAX and render using default params - NB: uses AJAX
+phylocanvas.load('./tree.nwk');
+```
