@@ -1628,7 +1628,7 @@
           }
           this.draw();
         } else if (this.unselectOnClickAway && !this.dragging) {
-          // this.root.setSelected(false, true);
+          this.root.setSelected(false, true);
           this.draw();
         }
 
