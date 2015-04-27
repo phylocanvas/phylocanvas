@@ -1,6 +1,6 @@
 {
   "name": "PhyloCanvas",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "repository": "https://github.com/ImperialCollegeLondon/PhyloCanvas",
   "main": "src/scripts/PhyloCanvas.js",
   "dependencies": {},
