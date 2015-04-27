@@ -587,14 +587,13 @@
       this.navigator = new Navigator(this);
     }
 
-    this.historyCollapsed = (conf.historyCollapsed !== undefined) ?
-    conf.historyCollapsed : true;
-
-    this.historySnapshots = [];
-
-    this.history = new History(this);
-
     this.adjustForPixelRatio();
+
+    if (conf.history) {
+      this.historyCollapsed = (conf.history.collapsed !== undefined) ? conf.history.collapsed : true;
+      this.historySnapshots = [];
+      this.history = new History(this);
+    }
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
