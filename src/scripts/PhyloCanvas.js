@@ -589,8 +589,9 @@
 
     this.adjustForPixelRatio();
 
-    if (conf.history) {
-      this.historyCollapsed = (conf.history.collapsed !== undefined) ? conf.history.collapsed : true;
+    if (conf.history || conf.history === undefined) {
+      var collapsed = (conf.history && conf.history.collapsed);
+      this.historyCollapsed = collapsed || true;
       this.historySnapshots = [];
       this.history = new History(this);
     }
