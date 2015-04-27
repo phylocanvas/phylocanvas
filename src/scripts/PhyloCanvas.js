@@ -587,14 +587,9 @@
       this.navigator = new Navigator(this);
     }
 
-    this.historyCollapsed = (conf.historyCollapsed !== undefined) ?
-    conf.historyCollapsed : true;
-
-    this.historySnapshots = [];
-
-    this.history = new History(this);
-
     this.adjustForPixelRatio();
+
+    this.initialiseHistory(conf);
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -1633,7 +1628,7 @@
           }
           this.draw();
         } else if (this.unselectOnClickAway && !this.dragging) {
-          this.root.setSelected(false, true);
+          // this.root.setSelected(false, true);
           this.draw();
         }
 
@@ -2400,18 +2395,20 @@
     setSize: function (width, height) {
       this.canvas.canvas.width = width;
       this.canvas.canvas.height = height;
+      if (this.navigator) {
+        this.navigator.resize();
+      }
+      this.adjustForPixelRatio();
       if (this.drawn) {
         this.draw();
       }
-      if (this.navigator)this.navigator.resize();
-      this.adjustForPixelRatio();
     },
     setZoom: function (z) {
       if (z > -2 && z < 2) {
         var oz = this.zoom;
         this.zoom = Math.pow(10, z);
 
-        this.offsetx = (this.offsetx / oz) * this.zoom ;
+        this.offsetx = (this.offsetx / oz) * this.zoom;
         this.offsety = (this.offsety / oz) * this.zoom;
 
         this.draw();
@@ -2607,6 +2604,17 @@
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight)
     this.draw();
     this.history.resizeTree();
+  }
+
+  Tree.prototype.initialiseHistory = function (config) {
+    var isCollapsedConfigured;
+
+    if (config.history || typeof config.history === 'undefined') {
+      isCollapsedConfigured = (config.history && typeof config.history.collapsed !== 'undefined')
+      this.historyCollapsed = isCollapsedConfigured ? config.history.collapsed : true;
+      this.historySnapshots = [];
+      this.history = new History(this);
+    }
   }
 
   function History(tree) {
