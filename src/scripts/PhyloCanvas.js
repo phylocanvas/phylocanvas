@@ -1122,7 +1122,9 @@
     },
     getChildIds: function () {
       if (this.leaf) {
-        return this.id;
+        // Fix for Issue #68
+        // Returning array, as expected
+        return [this.id];
       } else {
         var children = [];
         for (var x = 0; x < this.children.length; x++) {
