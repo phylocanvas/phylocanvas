@@ -1626,7 +1626,7 @@
           }
           this.draw();
         } else if (this.unselectOnClickAway && !this.dragging) {
-          this.root.setSelected(false, true);
+          // this.root.setSelected(false, true);
           this.draw();
         }
 
@@ -2393,18 +2393,20 @@
     setSize: function (width, height) {
       this.canvas.canvas.width = width;
       this.canvas.canvas.height = height;
+      if (this.navigator) {
+        this.navigator.resize();
+      }
+      this.adjustForPixelRatio();
       if (this.drawn) {
         this.draw();
       }
-      if (this.navigator)this.navigator.resize();
-      this.adjustForPixelRatio();
     },
     setZoom: function (z) {
       if (z > -2 && z < 2) {
         var oz = this.zoom;
         this.zoom = Math.pow(10, z);
 
-        this.offsetx = (this.offsetx / oz) * this.zoom ;
+        this.offsetx = (this.offsetx / oz) * this.zoom;
         this.offsety = (this.offsety / oz) * this.zoom;
 
         this.draw();
