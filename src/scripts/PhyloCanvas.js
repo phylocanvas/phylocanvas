@@ -589,12 +589,7 @@
 
     this.adjustForPixelRatio();
 
-    if (conf.history || conf.history === undefined) {
-      var collapsed = (conf.history && conf.history.collapsed);
-      this.historyCollapsed = collapsed || true;
-      this.historySnapshots = [];
-      this.history = new History(this);
-    }
+    this.initialiseHistory(conf);
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -2605,6 +2600,17 @@
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight)
     this.draw();
     this.history.resizeTree();
+  }
+
+  Tree.prototype.initialiseHistory = function (config) {
+    var isCollapsedConfigured;
+
+    if (config.history || typeof config.history === 'undefined') {
+      isCollapsedConfigured = (config.history && typeof config.history.collapsed !== 'undefined')
+      this.historyCollapsed = isCollapsedConfigured ? config.history.collapsed : true;
+      this.historySnapshots = [];
+      this.history = new History(this);
+    }
   }
 
   function History(tree) {
