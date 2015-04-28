@@ -2758,7 +2758,7 @@
   History.prototype.injectCss = function () {
     var css =
       '.pc-history { position: absolute; top: 0; bottom: 0; left: 0; box-sizing: border-box; width: 20%; overflow: hidden; background: #EEE }' +
-      '.pc-history .pc-history-title { text-align: center; font-size: 13px; color: #666; padding: 2px 0; border-bottom: 1px solid #bbb }' +
+      '.pc-history .pc-history-title { box-sizing: border-box; height: 20px; text-align: center; font-size: 13px; color: #666; padding: 2px; border-bottom: 1px solid #bbb }' +
       '.pc-history .toggle { position: absolute; top: 0; right: 0; padding: 1px 8px; cursor: pointer; border-top-left-radius: 50%; border-bottom-left-radius: 50%; background-color: #666; color: #FFF }' +
       '.pc-history.collapsed .toggle { border-radius: 0 50% 50% 0 }' +
       '.pc-history .toggle:hover { background-color: #FFF; color: #CCC }' +
