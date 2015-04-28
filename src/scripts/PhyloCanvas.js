@@ -1411,7 +1411,7 @@
 
   Branch.prototype.rotate = function (evt) {
     var newChildren = [];
-    for (var i = this.children.length; ; i--) {
+    for (var i = this.children.length; i--; ) {
       newChildren.push(this.children[i]);
     }
 
