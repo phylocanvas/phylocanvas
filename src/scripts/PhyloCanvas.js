@@ -1762,7 +1762,7 @@
       this.draw();
     },
 
-    setData: function (treeData) {
+    dangerouslySetData: function (treeData) {
       this.parseNwk(treeData, null);
       this.draw();
       this.loadCompleted();
