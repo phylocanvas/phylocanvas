@@ -305,7 +305,7 @@
     /**
      * The relative size of the terminal of this node
      */
-    this.radius =  1.0;
+    this.radius = 1.0;
     /**
      * true if this branch is currently selected
      */
@@ -875,20 +875,26 @@
 
   Branch.prototype = {
     clicked: function (x, y) {
-      if (this.dragging) return;
-      if (x < (this.maxx) && x > (this.minx)) {
-        if (y < (this.maxy) && y > (this.miny)) {
-          return this;
+      var i;
+      var child;
+
+      if (this.dragging) {
+        return;
+      }
+      if ((x < (this.maxx) && x > (this.minx)) &&
+          (y < (this.maxy) && y > (this.miny))) {
+        return this;
+      }
+
+      for (i = this.children.length - 1; i >= 0; i--) {
+        child = this.children[i].clicked(x, y);
+        if (child) {
+          return child;
         }
       }
-
-      for (var i = this.children.length - 1; i >= 0; i--) {
-        cld = this.children[i].clicked(x, y);
-        if (cld) return cld;
-      }
     },
-    drawMetadata: function () {
 
+    drawMetadata: function () {
       var fSize = this.tree.textSize;
       var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
       var ty = 0;
@@ -1015,7 +1021,7 @@
       this.canvas.closePath();
     },
     drawNode: function () {
-      var  r = this.getNodeSize(); //r = node radius
+      var r = this.getNodeSize(); // r = node radius
       /**
        * theta = translation to center of node... ensures that the node edge is
        * at the end of the branch so the branches don't look shorter than  they
@@ -1031,18 +1037,19 @@
       this.canvas.beginPath();
       this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
       if ((r * this.tree.zoom) < 5) {
-        var e =  (5 / this.tree.zoom);
+        var e = (5 / this.tree.zoom);
         this.minx = cx - e;
         this.maxx = cx + e;
         this.miny = cy - e;
         this.maxy = cy + e;
       } else {
-        this.minx =  cx - r;
+        this.minx = cx - r;
         this.maxx = cx + r;
         this.miny = cy - r;
         this.maxy = cy + r;
       }
       if (this.collapsed) {
+        // TODO: move this to own function
         var x1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
         var y1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
         var x2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle);
@@ -1388,7 +1395,9 @@
   };
 
   Branch.prototype.getNodeSize = function () {
-    return Math.max(0, this.tree.baseNodeSize * this.radius);
+    // scale by zoom to improve precision of hover detection for non-leaf nodes
+    var radius = this.leaf ? this.radius : (1 / this.tree.zoom);
+    return Math.max(0, this.tree.baseNodeSize * radius);
   };
   /**
    * Calculates label start position
@@ -1402,7 +1411,7 @@
 
   Branch.prototype.rotate = function (evt) {
     var newChildren = [];
-    for (var i = this.children.length; i-- ;) {
+    for (var i = this.children.length; ; i--) {
       newChildren.push(this.children[i]);
     }
 
