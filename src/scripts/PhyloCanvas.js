@@ -1761,6 +1761,13 @@
       this.showLabels = false;
       this.draw();
     },
+
+    dangerouslySetData: function (treeData) {
+      this.parseNwk(treeData, null);
+      this.draw();
+      this.loadCompleted();
+    },
+
     load: function (tree, name, format) {
       if (format) {
         if (format.match(/nexus/i)) {
