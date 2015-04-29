@@ -1021,13 +1021,13 @@
       this.canvas.closePath();
     },
     drawNode: function () {
-      var r = this.getNodeSize(); // r = node radius
+      var nodeRadius = this.getNodeSize();
       /**
        * theta = translation to center of node... ensures that the node edge is
        * at the end of the branch so the branches don't look shorter than  they
        * should
        */
-      var theta = r;
+      var theta = nodeRadius;
 
       var cx = this.leaf ?
         (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
@@ -1036,17 +1036,17 @@
 
       this.canvas.beginPath();
       this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
-      if ((r * this.tree.zoom) < 5) {
+      if ((nodeRadius * this.tree.zoom) < 5) {
         var e = (5 / this.tree.zoom);
         this.minx = cx - e;
         this.maxx = cx + e;
         this.miny = cy - e;
         this.maxy = cy + e;
       } else {
-        this.minx = cx - r;
-        this.maxx = cx + r;
-        this.miny = cy - r;
-        this.maxy = cy + r;
+        this.minx = cx - nodeRadius;
+        this.maxx = cx + nodeRadius;
+        this.miny = cy - nodeRadius;
+        this.maxy = cy + nodeRadius;
       }
       if (this.collapsed) {
         // TODO: move this to own function
@@ -2765,7 +2765,7 @@
     var thumbs = this.div.getElementsByTagName('img');
     for (var i = thumbs.length; i-- ;) {
       this.div.removeChild(thumbs[0]);
-    };
+    }
   }
 
   History.prototype.goBackTo = function (evt) {

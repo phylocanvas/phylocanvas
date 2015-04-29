@@ -5,7 +5,7 @@
   "main": "src/scripts/PhyloCanvas.js",
   "dependencies": {},
   "devDependencies": {
-    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.4",
+    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5",
     "grunt": "~0.4.1",
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0",
