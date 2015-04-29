@@ -1020,6 +1020,12 @@
       this.canvas.fillText(lbl, tx, ty);
       this.canvas.closePath();
     },
+    setNodeDimensions: function (centreX, centreY, radius) {
+      this.minx = centreX - radius;
+      this.maxx = centreX + radius;
+      this.miny = centreY - radius;
+      this.maxy = centreY + radius;
+    },
     drawNode: function () {
       var nodeRadius = this.getNodeSize();
       /**
@@ -1029,24 +1035,17 @@
        */
       var theta = nodeRadius;
 
-      var cx = this.leaf ?
+      var centreX = this.leaf ?
         (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
-      var cy = this.leaf ?
+      var centreY = this.leaf ?
         (theta * Math.sin(this.angle)) + this.centery : this.centery;
 
       this.canvas.beginPath();
       this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
-      if ((nodeRadius * this.tree.zoom) < 5) {
-        var e = (5 / this.tree.zoom);
-        this.minx = cx - e;
-        this.maxx = cx + e;
-        this.miny = cy - e;
-        this.maxy = cy + e;
+      if ((nodeRadius * this.tree.zoom) < 5 || !this.leaf) {
+        this.setNodeDimensions(centreX, centreY, 5 / this.tree.zoom);
       } else {
-        this.minx = cx - nodeRadius;
-        this.maxx = cx + nodeRadius;
-        this.miny = cy - nodeRadius;
-        this.maxy = cy + nodeRadius;
+        this.setNodeDimensions(centreX, centreY, nodeRadius);
       }
       if (this.collapsed) {
         // TODO: move this to own function
@@ -1115,7 +1114,7 @@
         var l = this.canvas.lineWidth;
         this.canvas.strokeStyle = this.tree.highlightColour;
         this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-        this.canvas.arc(cx, cy, (this.leaf ? this.getNodeSize() : 0) + ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+        this.canvas.arc(centreX, centreY, (this.leaf ? this.getNodeSize() : 0) + ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
         this.canvas.stroke();
         this.canvas.lineWidth = l;
         this.canvas.strokeStyle = this.tree.branchColour;
@@ -1395,9 +1394,7 @@
   };
 
   Branch.prototype.getNodeSize = function () {
-    // scale by zoom to improve precision of hover detection for non-leaf nodes
-    var radius = this.leaf ? this.radius : (1 / this.tree.zoom);
-    return Math.max(0, this.tree.baseNodeSize * radius);
+    return Math.max(0, this.tree.baseNodeSize * this.radius);
   };
   /**
    * Calculates label start position
