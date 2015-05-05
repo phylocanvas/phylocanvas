@@ -714,39 +714,41 @@
   };
 
   /*
-    Prototype for the loading spinner.
+    Prototype for the Tooltip.
   */
-  Tooltip.prototype = {
-    close: function () {
+  Tooltip.prototype.close = function(){
       this.div.style.display = 'none';
-    },
-    mouseover: function (d) { d.style.backgroundColor = '#E2E3DF'; },
-    mouseout: function (d) { d.style.backgroundColor = 'transparent'; },
-    open: function (message, x, y) {
-      while (this.div.hasChildNodes()) {
-        this.div.removeChild(this.div.firstChild);
-      }
-      var d = document.createElement('div');
-      d.appendChild(document.createTextNode(message));
-      d.style.cursor = 'pointer';
-      d.style.padding = '0.3em 0.5em 0.3em 0.5em';
-      d.style.fontFamily = this.tree.font;
-      d.style.fontSize = '12pt';
-      d.addEventListener('tooltip', function (e) { e.preventDefault(); });
-      this.div.appendChild(d);
-
-      if (x && y) {
-        this.div.style.top = y + 'px';
-        this.div.style.left = x + 'px';
-      } else {
-        this.div.style.top = '100px';
-        this.div.style.left = '100px';
-      }
-
-      this.div.style.zIndex = 2000;
-      this.div.style.display = 'block';
-      this.div.style.backgroundColor = '#FFFFFF';
+  };
+  Tooltip.prototype.mouseover = function (d) {
+    d.style.backgroundColor = '#E2E3DF';
+  };
+  Tooltip.prototype.mouseout = function (d) {
+    d.style.backgroundColor = 'transparent';
+  };
+  Tooltip.prototype.open = function (message, x, y) {
+    while (this.div.hasChildNodes()) {
+      this.div.removeChild(this.div.firstChild);
     }
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(message));
+    d.style.cursor = 'pointer';
+    d.style.padding = '0.3em 0.5em 0.3em 0.5em';
+    d.style.fontFamily = this.tree.font;
+    d.style.fontSize = '12pt';
+    d.addEventListener('tooltip', function (e) { e.preventDefault(); });
+    this.div.appendChild(d);
+
+    if (x && y) {
+      this.div.style.top = y + 'px';
+      this.div.style.left = x + 'px';
+    } else {
+      this.div.style.top = '100px';
+      this.div.style.left = '100px';
+    }
+
+    this.div.style.zIndex = 2000;
+    this.div.style.display = 'block';
+    this.div.style.backgroundColor = '#FFFFFF';
   };
 
   /**
@@ -1515,6 +1517,15 @@
       }
     },
 
+    checkInitialTreeCollapseRange: function(node) {
+      // Collapse nodes on default
+      var child_ids = node.getChildIds();
+      if (child_ids && child_ids.length > this.defaultCollapsedOptions.min &&
+          child_ids.length < this.defaultCollapsedOptions.max) {
+        node.collapsed = true;
+      }
+    },
+
     /**
      * A dictionary of functions. Each function draws a different tree structure
      */
@@ -1542,13 +1553,9 @@
           node.canvas.stroke();
           node.canvas.closePath();
 
-          // Collapse nodes on default
-          var child_ids = node.getChildIds();
-          if (tree.defaultCollapsed && tree.defaultCollapsedOptions &&
-              child_ids && child_ids.length > tree.defaultCollapsedOptions.min &&
-              child_ids.length < tree.defaultCollapsedOptions.max) {
-            collapse = true;
-            node.collapsed = true;
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
           }
           node.drawNode();
         }
@@ -1589,13 +1596,9 @@
           }
 
           node.canvas.strokeStyle = node.getColour();
-          // Collapse nodes on default
-          var child_ids = node.getChildIds();
-          if (tree.defaultCollapsed && tree.defaultCollapsedOptions &&
-              child_ids && child_ids.length > tree.defaultCollapsedOptions.min &&
-              child_ids.length < tree.defaultCollapsedOptions.max) {
-            collapse = true;
-            node.collapsed = true;
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
           }
 
           if (node.children.length > 1 && !node.collapsed) {
@@ -1628,13 +1631,9 @@
           node.canvas.stroke();
           node.canvas.closePath();
 
-          // Collapse nodes on default
-          var child_ids = node.getChildIds();
-          if (tree.defaultCollapsed && tree.defaultCollapsedOptions &&
-              child_ids && child_ids.length > tree.defaultCollapsedOptions.min &&
-              child_ids.length < tree.defaultCollapsedOptions.max) {
-            collapse = true;
-            node.collapsed = true;
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
           }
           node.drawNode();
         }
@@ -1662,13 +1661,9 @@
           node.canvas.stroke();
           node.canvas.closePath();
 
-          // Collapse nodes on default
-          var child_ids = node.getChildIds();
-          if (tree.defaultCollapsed && tree.defaultCollapsedOptions &&
-              child_ids && child_ids.length > tree.defaultCollapsedOptions.min &&
-              child_ids.length < tree.defaultCollapsedOptions.max) {
-            collapse = true;
-            node.collapsed = true;
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
           }
           node.drawNode();
         }
@@ -1700,13 +1695,9 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
 
-          // Collapse nodes on default
-          var child_ids = node.getChildIds();
-          if (tree.defaultCollapsed && tree.defaultCollapsedOptions &&
-              child_ids && child_ids.length > tree.defaultCollapsedOptions.min &&
-              child_ids.length < tree.defaultCollapsedOptions.max) {
-            collapse = true;
-            node.collapsed = true;
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
           }
           node.drawNode();
         }
