@@ -342,7 +342,6 @@
     this.div.style.background = '#FFFFFF';
     this.div.style.letterSpacing = '0.5px';
     this.div.className = 'contextMenu';
-
     /**
      * The options in this menu
      */
@@ -388,6 +387,21 @@
         leaf: false
       }];
     }
+    this.tree.canvasEl.appendChild(this.div);
+  }
+
+  /* Tooltip */
+  function Tooltip(tree) {
+    this.tree = tree;
+    this.div = document.createElement('div');
+    this.div.style.display = 'none';
+    this.div.style.position = 'fixed';
+    this.div.style.border = '1px solid #CCCCCC';
+    this.div.style.background = '#FFFFFF';
+    this.div.style.letterSpacing = '0.5px';
+    this.div.className = 'pc-tooltip';
+    this.div.innerHTML = 'Hi! This is me again'
+
     this.tree.canvasEl.appendChild(this.div);
   }
 
@@ -524,6 +538,18 @@
       menuOptions = conf.contextMenu;
     }
     this.contextMenu = new ContextMenu(this, menuOptions);
+
+    this.defaultCollapsedOptions = {};
+    this.defaultCollapsed = false;
+    if (conf.defaultCollapsed !== undefined) {
+      if (conf.defaultCollapsed.min && conf.defaultCollapsed.max) {
+        this.defaultCollapsedOptions = conf.defaultCollapsed;
+        this.defaultCollapsed = true;
+      }
+    }
+
+    this.tooltip = new Tooltip(this);
+
     this.drawn = false;
 
     this.selectedNodes = [];
@@ -686,6 +712,45 @@
       this.div.style.backgroundColor = '#FFFFFF';
     }
   };
+
+  /*
+    Prototype for the Tooltip.
+  */
+  Tooltip.prototype.close = function(){
+      this.div.style.display = 'none';
+  };
+  Tooltip.prototype.mouseover = function (d) {
+    d.style.backgroundColor = '#E2E3DF';
+  };
+  Tooltip.prototype.mouseout = function (d) {
+    d.style.backgroundColor = 'transparent';
+  };
+  Tooltip.prototype.open = function (message, x, y) {
+    while (this.div.hasChildNodes()) {
+      this.div.removeChild(this.div.firstChild);
+    }
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(message));
+    d.style.cursor = 'pointer';
+    d.style.padding = '0.3em 0.5em 0.3em 0.5em';
+    d.style.fontFamily = this.tree.font;
+    d.style.fontSize = '12pt';
+    d.addEventListener('tooltip', function (e) { e.preventDefault(); });
+    this.div.appendChild(d);
+
+    if (x && y) {
+      this.div.style.top = y + 'px';
+      this.div.style.left = x + 'px';
+    } else {
+      this.div.style.top = '100px';
+      this.div.style.left = '100px';
+    }
+
+    this.div.style.zIndex = 2000;
+    this.div.style.display = 'block';
+    this.div.style.backgroundColor = '#FFFFFF';
+  };
+
   /**
    * Prototype for the loading spinner.
    */
@@ -845,7 +910,8 @@
 
       this.ctx.lineWidth = this.ctx.lineWidth / z;
 
-      this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z, (this.baseOffsety - (this.tree.offsety * z)) * z);
+      this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z,
+        (this.baseOffsety - (this.tree.offsety * z)) * z);
       this.ctx.scale(z, z);
       this.ctx.strokeRect(-hw, -hh, w, h);
     },
@@ -896,7 +962,8 @@
         }
       }
 
-      if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
+      if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign &&
+        this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
         this.drawMetadataHeading(tx, ty);
         this.tree.metadataHeadingDrawn = true;
       }
@@ -1008,11 +1075,11 @@
       this.canvas.fillText(lbl, tx, ty);
       this.canvas.closePath();
     },
-    setNodeDimensions: function (centreX, centreY, radius) {
-      this.minx = centreX - radius;
-      this.maxx = centreX + radius;
-      this.miny = centreY - radius;
-      this.maxy = centreY + radius;
+    setNodeDimensions: function (centerX, centerY, radius) {
+      this.minx = centerX - radius;
+      this.maxx = centerX + radius;
+      this.miny = centerY - radius;
+      this.maxy = centerY + radius;
     },
     drawNode: function () {
       var nodeRadius = this.getNodeSize();
@@ -1023,31 +1090,37 @@
        */
       var theta = nodeRadius;
 
-      var centreX = this.leaf ?
+      var centerX = this.leaf ?
         (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
-      var centreY = this.leaf ?
+      var centerY = this.leaf ?
         (theta * Math.sin(this.angle)) + this.centery : this.centery;
 
       this.canvas.beginPath();
-      this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
+      this.canvas.fillStyle = this.selected ?
+                              this.tree.selectedColour : this.colour;
       if ((nodeRadius * this.tree.zoom) < 5 || !this.leaf) {
-        this.setNodeDimensions(centreX, centreY, 5 / this.tree.zoom);
+        this.setNodeDimensions(centerX, centerY, 5 / this.tree.zoom);
       } else {
-        this.setNodeDimensions(centreX, centreY, nodeRadius);
+        this.setNodeDimensions(centerX, centerY, nodeRadius);
       }
+
       if (this.collapsed) {
-        // TODO: move this to own function
-        var x1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
-        var y1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
-        var x2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle);
-        var y2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle);
+        var childIds = this.getChildIds();
+        var radius = childIds.length;
+        if (this.tree.treeType === 'radial') {
+          radius = radius / 7;
+        }
+        if (this.tree.treeType === 'circular') {
+          radius = radius / 3;
+        }
+
+        this.canvas.globalAlpha = 0.3;
         this.canvas.beginPath();
-        this.canvas.moveTo((this.centerx - x1), (this.centery - y1));
-        this.canvas.lineTo((this.centerx + x1), (this.centery + y1));
-        this.canvas.lineTo((this.centerx + x2), (this.centery + y2));
-        this.canvas.lineTo((this.centerx - x1), (this.centery - y1));
-        this.canvas.closePath();
+        this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color)?
+                          this.tree.defaultCollapsedOptions.color : 'purple';
         this.canvas.fill();
+        this.canvas.globalAlpha = 1;
       }
       else if (this.leaf) {
         // Store line width for swapping back after drawing lines for aligning
@@ -1070,7 +1143,8 @@
         }
         // Save canvas
         this.canvas.save();
-        // Move to node center position (setting canvas (0,0) position as (this.centerx, this.centery))
+        // Move to node center position
+        // (setting canvas (0,0) position as (this.centerx, this.centery))
         this.canvas.translate(this.centerx, this.centery);
         // rotate canvas (mainly for circular, radial trees etc)
         this.canvas.rotate(this.angle);
@@ -1102,7 +1176,8 @@
         var l = this.canvas.lineWidth;
         this.canvas.strokeStyle = this.tree.highlightColour;
         this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-        this.canvas.arc(centreX, centreY, (this.leaf ? this.getNodeSize() : 0) + ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+        this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) +
+          ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
         this.canvas.stroke();
         this.canvas.lineWidth = l;
         this.canvas.strokeStyle = this.tree.branchColour;
@@ -1442,6 +1517,15 @@
       }
     },
 
+    checkInitialTreeCollapseRange: function(node) {
+      // Collapse nodes on default
+      var child_ids = node.getChildIds();
+      if (child_ids && child_ids.length > this.defaultCollapsedOptions.min &&
+          child_ids.length < this.defaultCollapsedOptions.max) {
+        node.collapsed = true;
+      }
+    },
+
     /**
      * A dictionary of functions. Each function draws a different tree structure
      */
@@ -1468,6 +1552,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1507,6 +1596,10 @@
           }
 
           node.canvas.strokeStyle = node.getColour();
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
 
           if (node.children.length > 1 && !node.collapsed) {
             node.canvas.beginPath();
@@ -1537,6 +1630,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1562,6 +1660,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1592,6 +1695,10 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
 
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
         node.canvas.closePath();
@@ -1635,6 +1742,7 @@
       else if (e.button === 2) {
         e.preventDefault();
         this.contextMenu.open(e.clientX, e.clientY);
+        this.tooltip.close();
       }
     },
     dblclicked: function (e) {
@@ -1665,7 +1773,6 @@
         var ymove = (event.clientY - this.starty) * ratio;
         if (Math.abs(xmove) + Math.abs(ymove) > 5) {
           this.dragging = true;
-
           this.offsetx = this.origx + xmove;
           this.offsety = this.origy + ymove;
           this.draw();
@@ -1680,12 +1787,18 @@
       } else {
         //hover
         var e = event;
-
         var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+
         if (nd && (this.internalNodesSelectable || nd.leaf)) {
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
+          // For mouseover tooltip to show no. of children on the internal nodes
+          if (!nd.leaf) {
+            this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
+          }
         } else {
+          this.tooltip.close();
+          this.contextMenu.close();
           this.root.setHighlighted(false);
         }
         this.draw();
@@ -1711,7 +1824,8 @@
       this.canvas.strokeStyle = this.branchColour;
       this.canvas.save();
 
-      this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas), (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
+      this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas),
+        (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
       if (!this.drawn || forceRedraw) {
         this.prerenderers[this.treeType](this);
@@ -1723,7 +1837,8 @@
       this.canvas.scale(this.zoom, this.zoom);
 
       this.branchRenderers[this.treeType](this, this.root);
-
+      // Making default collapsed false so that it will collapse on initial load only
+      this.defaultCollapsed = false;
       this.metadataHeadingDrawn = false;
       this.drawn = true;
     },
@@ -2179,7 +2294,8 @@
         tree.farthestNodeFromRootY = 0;
 
         tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-        var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+        var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
+                        (tree.leaves[0].getNodeSize() + 2) * 2);
 
         for (var i = 0; i < tree.leaves.length; i++) {
           tree.leaves[i].angle = Angles.QUARTER;
@@ -2595,7 +2711,6 @@
       this.leaves.push(this.branches[leafIds[i]]);
     }
   }
-
   Tree.prototype.exportNwk = function () {
     var nwk = this.root.getNwk();
     return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
