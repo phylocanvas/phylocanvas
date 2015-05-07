@@ -342,6 +342,7 @@
     this.div.style.background = '#FFFFFF';
     this.div.style.letterSpacing = '0.5px';
     this.div.className = 'contextMenu';
+    this.closed = true;
     /**
      * The options in this menu
      */
@@ -657,6 +658,7 @@
   ContextMenu.prototype = {
     close: function () {
       this.div.style.display = 'none';
+      this.closed = true;
     },
     mouseover: function (d) { d.style.backgroundColor = '#E2E3DF'; },
     mouseout: function (d) { d.style.backgroundColor = 'transparent'; },
@@ -690,7 +692,10 @@
         d.style.padding = '0.3em 0.5em 0.3em 0.5em';
         d.style.fontFamily = this.tree.font;
         d.style.fontSize = '8pt';
-        d.addEventListener('click', createHandler(this, 'close'));
+        d.addEventListener('click', function(evt) {
+          createHandler(this, 'close');
+          this.closed = true;
+        });
         document.body.addEventListener('click', createHandler(this, 'close'));
         d.addEventListener('contextmenu', function (e) { e.preventDefault(); });
         d.addEventListener('mouseover', createHandler(d, this.mouseover));
@@ -1008,7 +1013,6 @@
         metadata = this.tree.selectedMetadataColumns;
       }
       else {
-
         metadata = Object.keys(this.data);
       }
 
@@ -1728,7 +1732,7 @@
             nids = nd.getChildIds();
           }
           this.draw();
-        } else if (this.unselectOnClickAway && !this.dragging) {
+        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
           this.root.setSelected(false, true);
           this.draw();
         }
@@ -1742,6 +1746,7 @@
       else if (e.button === 2) {
         e.preventDefault();
         this.contextMenu.open(e.clientX, e.clientY);
+        this.contextMenu.closed = false;
         this.tooltip.close();
       }
     },
