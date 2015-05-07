@@ -2416,19 +2416,21 @@
       e.preventDefault();
     },
     selectNodes: function (nIds) {
-      if(this.root) {
-        this.root.setSelected(false, true);
-        var ns = nIds;
+      var ns = nIds;
+      var node, nd;
 
-        if (typeof nIds == 'string') {
+      if (this.root) {
+        this.root.setSelected(false, true);
+        if (typeof nIds === 'string') {
           ns = ns.split(',');
         }
-        var node;
         for (var nd in this.branches) {
-          node = this.branches[nd];
-          for (var j = 0; j < ns.length; j++) {
-            if (ns[j] == node.id) {
-              node.setSelected(true, true);
+          if(this.branches.hasOwnProperty(nd)) {
+            node = this.branches[nd];
+            for (var j = 0; j < ns.length; j++) {
+              if (ns[j] == node.id) {
+                node.setSelected(true, true);
+              }
             }
           }
         }
