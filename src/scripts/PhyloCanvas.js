@@ -2425,7 +2425,7 @@
           ns = ns.split(',');
         }
         for (var nd in this.branches) {
-          if(this.branches.hasOwnProperty(nd)) {
+          if (this.branches.hasOwnProperty(nd)) {
             node = this.branches[nd];
             for (var j = 0; j < ns.length; j++) {
               if (ns[j] == node.id) {
