@@ -2416,20 +2416,24 @@
       e.preventDefault();
     },
     selectNodes: function (nIds) {
-      this.root.setSelected(false, true);
-      var ns = nIds;
+      if(this.root) {
+        this.root.setSelected(false, true);
+        var ns = nIds;
 
-      if (typeof nIds == 'string') {
-        ns = ns.split(',');
-      }
-      for (var i = 0; i < this.leaves.length; i++) {
-        for (var j = 0; j < ns.length; j++) {
-          if (ns[j] == this.leaves[i].id) {
-            this.leaves[i].setSelected(true, false);
+        if (typeof nIds == 'string') {
+          ns = ns.split(',');
+        }
+        var node;
+        for (var nd in this.branches) {
+          node = this.branches[nd];
+          for (var j = 0; j < ns.length; j++) {
+            if (ns[j] == node.id) {
+              node.setSelected(true, true);
+            }
           }
         }
+        this.draw();
       }
-      this.draw();
     },
     setFont: function (font) {
       if (isNaN(font))
