@@ -401,12 +401,12 @@
         internal: true,
         leaf: false
       }, {
-        text: 'Download All Leaves',
-        handler: 'downloadAllLeaves',
+        text: 'Download All Leaf IDs',
+        handler: 'downloadAllLeafIds',
         internal: false,
         leaf: false
       }, {
-        text: 'Download Branch Leaves',
+        text: 'Download Branch Leaf IDs',
         handler: 'downloadLeafIdsFromBranch',
         internal: true,
         leaf: false
@@ -2776,7 +2776,7 @@
     }
   };
 
-  Tree.prototype.downloadAllLeaves = function () {
+  Tree.prototype.downloadAllLeafIds = function () {
     this.root.downloadLeafIdsFromBranch();
   };
 
