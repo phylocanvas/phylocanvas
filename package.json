@@ -1,8 +1,24 @@
 {
   "name": "PhyloCanvas",
   "version": "1.5.0",
-  "repository": "https://github.com/ImperialCollegeLondon/PhyloCanvas",
   "main": "src/scripts/PhyloCanvas.js",
+  "repository": {
+    "type": "git",
+    "url": "git://git@github.com:ImperialCollegeLondon/PhyloCanvas.git"
+  },
+  "keywords": [
+    "phylocanvas",
+    "phylogenetic",
+    "tree",
+    "canvas",
+    "biojs"
+  ],
+  "author": "CGPS",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/ImperialCollegeLondon/PhyloCanvas/issues"
+  },
+  "homepage": "http://www.phylocanvas.net",
   "dependencies": {},
   "devDependencies": {
     "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5"
