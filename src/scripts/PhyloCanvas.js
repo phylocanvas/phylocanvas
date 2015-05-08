@@ -406,7 +406,7 @@
         leaf: false
       }, {
         text: 'Download Branch Leaves',
-        handler: 'downloadLeavesFromBranch',
+        handler: 'downloadLeafIdsFromBranch',
         internal: true,
         leaf: false
       } ];
@@ -1509,7 +1509,7 @@
     return this.parent.children.indexOf(this);
   };
 
-  Branch.prototype.downloadLeavesFromBranch = function () {
+  Branch.prototype.downloadLeafIdsFromBranch = function () {
     var downloadData;
     var childIds = this.getChildIds();
     downloadData = childIds.join('\n');
@@ -2766,7 +2766,7 @@
   };
 
   Tree.prototype.downloadAllLeaves = function () {
-    this.root.downloadLeavesFromBranch();
+    this.root.downloadLeafIdsFromBranch();
   };
 
   function History(tree) {
