@@ -1,15 +1,5 @@
-#PhyloCanvas - HTML5 Phylogenetic Tree Visualisation
+#PhyloCanvas - HTML5 Phylogenetic Tree viewer
 
-Originally created By Christopher I Powell under the supervision of Dr David Aanensen in the Labarotory of Professor Brian Spratt Department of Infectious Disease Epidemiology, Imperial College London. Currently maintained by the Centre for Genomic Pathogen Surveillance at the Wellcome Trust Sanger Institute.
+**www.phylocanvas.net**
 
-PhyloCanvas is released under a GPL v3 Licence and documentation is realeased under a Creative Commons Share Alike Licence (CC BY-SA)
-
-## Getting Started
-
-```JavaScript
-// Construct tree object
-var phylocanvas = new PhyloCanvas.Tree('phylocanvas');
-
-// load tree via AJAX and render using default params - NB: uses AJAX
-phylocanvas.load('./tree.nwk');
-```
+PhyloCanvas is released under a GPLv3 Licence and documentation is released under a Creative Commons Share Alike Licence (CC BY-SA)

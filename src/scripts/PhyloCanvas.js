@@ -158,18 +158,6 @@
     FULL: 2 * Math.PI
   };
 
-  /*** Applying css for the history snapshot ***/
-  var css = '.pc-history{position:absolute;top:0;bottom:0;left:0;box-sizing:border-box;width:20%;overflow-x:hidden;overflow-y:auto;background:#EEE}.pc-history .pc-history-title{text-align:center;font-size:13px;color:#666;padding:2px 0;border-bottom:1px solid #bbb}.pc-history .toggle{position:absolute;top:0;right:0;padding:2px 8px;cursor:pointer;border-top-left-radius:50%;border-bottom-left-radius:50%;background-color:#666;color:#FFF}.pc-history.collapsed .toggle{border-radius:0 50% 50% 0}.pc-history .toggle:hover{background-color:#FFF;color:#CCC}.pc-history.collapsed{width:25px}.pc-history.collapsed img{display:none}.pc-history.collapsed .pc-history-title{writing-mode:tb-rl;-webkit-transform:rotate(270deg);-moz-transform:rotate(270deg);-o-transform:rotate(270deg);-ms-transform:rotate(270deg);transform:rotate(270deg);margin-top:70px;background:0 0;color:#666;letter-spacing:1.2px;border-bottom:none}.pc-history img{border:1px solid #CCC;cursor:pointer;width:100%;box-sizing:border-box;transition:background-color .25s ease}.pc-history img:hover{background-color:#fff}',
-      head = document.head || document.getElementsByTagName('head')[0],
-      style = document.createElement('style');
-
-  style.type = 'text/css';
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
-  head.appendChild(style);
   /********************************************/
 
   /**
@@ -305,7 +293,7 @@
     /**
      * The relative size of the terminal of this node
      */
-    this.radius =  1.0;
+    this.radius = 1.0;
     /**
      * true if this branch is currently selected
      */
@@ -354,7 +342,7 @@
     this.div.style.background = '#FFFFFF';
     this.div.style.letterSpacing = '0.5px';
     this.div.className = 'contextMenu';
-
+    this.closed = true;
     /**
      * The options in this menu
      */
@@ -400,6 +388,21 @@
         leaf: false
       }];
     }
+    this.tree.canvasEl.appendChild(this.div);
+  }
+
+  /* Tooltip */
+  function Tooltip(tree) {
+    this.tree = tree;
+    this.div = document.createElement('div');
+    this.div.style.display = 'none';
+    this.div.style.position = 'fixed';
+    this.div.style.border = '1px solid #CCCCCC';
+    this.div.style.background = '#FFFFFF';
+    this.div.style.letterSpacing = '0.5px';
+    this.div.className = 'pc-tooltip';
+    this.div.innerHTML = 'Hi! This is me again'
+
     this.tree.canvasEl.appendChild(this.div);
   }
 
@@ -536,6 +539,18 @@
       menuOptions = conf.contextMenu;
     }
     this.contextMenu = new ContextMenu(this, menuOptions);
+
+    this.defaultCollapsedOptions = {};
+    this.defaultCollapsed = false;
+    if (conf.defaultCollapsed !== undefined) {
+      if (conf.defaultCollapsed.min && conf.defaultCollapsed.max) {
+        this.defaultCollapsedOptions = conf.defaultCollapsed;
+        this.defaultCollapsed = true;
+      }
+    }
+
+    this.tooltip = new Tooltip(this);
+
     this.drawn = false;
 
     this.selectedNodes = [];
@@ -587,14 +602,9 @@
       this.navigator = new Navigator(this);
     }
 
-    this.historyCollapsed = (conf.historyCollapsed !== undefined) ?
-    conf.historyCollapsed : true;
-
-    this.historySnapshots = [];
-
-    this.history = new History(this);
-
     this.adjustForPixelRatio();
+
+    this.initialiseHistory(conf);
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -648,6 +658,7 @@
   ContextMenu.prototype = {
     close: function () {
       this.div.style.display = 'none';
+      this.closed = true;
     },
     mouseover: function (d) { d.style.backgroundColor = '#E2E3DF'; },
     mouseout: function (d) { d.style.backgroundColor = 'transparent'; },
@@ -681,7 +692,10 @@
         d.style.padding = '0.3em 0.5em 0.3em 0.5em';
         d.style.fontFamily = this.tree.font;
         d.style.fontSize = '8pt';
-        d.addEventListener('click', createHandler(this, 'close'));
+        d.addEventListener('click', function(evt) {
+          createHandler(this, 'close');
+          this.closed = true;
+        });
         document.body.addEventListener('click', createHandler(this, 'close'));
         d.addEventListener('contextmenu', function (e) { e.preventDefault(); });
         d.addEventListener('mouseover', createHandler(d, this.mouseover));
@@ -703,6 +717,45 @@
       this.div.style.backgroundColor = '#FFFFFF';
     }
   };
+
+  /*
+    Prototype for the Tooltip.
+  */
+  Tooltip.prototype.close = function(){
+      this.div.style.display = 'none';
+  };
+  Tooltip.prototype.mouseover = function (d) {
+    d.style.backgroundColor = '#E2E3DF';
+  };
+  Tooltip.prototype.mouseout = function (d) {
+    d.style.backgroundColor = 'transparent';
+  };
+  Tooltip.prototype.open = function (message, x, y) {
+    while (this.div.hasChildNodes()) {
+      this.div.removeChild(this.div.firstChild);
+    }
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(message));
+    d.style.cursor = 'pointer';
+    d.style.padding = '0.3em 0.5em 0.3em 0.5em';
+    d.style.fontFamily = this.tree.font;
+    d.style.fontSize = '12pt';
+    d.addEventListener('tooltip', function (e) { e.preventDefault(); });
+    this.div.appendChild(d);
+
+    if (x && y) {
+      this.div.style.top = y + 'px';
+      this.div.style.left = x + 'px';
+    } else {
+      this.div.style.top = '100px';
+      this.div.style.left = '100px';
+    }
+
+    this.div.style.zIndex = 2000;
+    this.div.style.display = 'block';
+    this.div.style.backgroundColor = '#FFFFFF';
+  };
+
   /**
    * Prototype for the loading spinner.
    */
@@ -862,7 +915,8 @@
 
       this.ctx.lineWidth = this.ctx.lineWidth / z;
 
-      this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z, (this.baseOffsety - (this.tree.offsety * z)) * z);
+      this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z,
+        (this.baseOffsety - (this.tree.offsety * z)) * z);
       this.ctx.scale(z, z);
       this.ctx.strokeRect(-hw, -hh, w, h);
     },
@@ -880,20 +934,26 @@
 
   Branch.prototype = {
     clicked: function (x, y) {
-      if (this.dragging) return;
-      if (x < (this.maxx) && x > (this.minx)) {
-        if (y < (this.maxy) && y > (this.miny)) {
-          return this;
+      var i;
+      var child;
+
+      if (this.dragging) {
+        return;
+      }
+      if ((x < (this.maxx) && x > (this.minx)) &&
+          (y < (this.maxy) && y > (this.miny))) {
+        return this;
+      }
+
+      for (i = this.children.length - 1; i >= 0; i--) {
+        child = this.children[i].clicked(x, y);
+        if (child) {
+          return child;
         }
       }
-
-      for (var i = this.children.length - 1; i >= 0; i--) {
-        cld = this.children[i].clicked(x, y);
-        if (cld) return cld;
-      }
     },
-    drawMetadata: function () {
 
+    drawMetadata: function () {
       var fSize = this.tree.textSize;
       var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
       var ty = 0;
@@ -907,7 +967,8 @@
         }
       }
 
-      if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
+      if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign &&
+        this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
         this.drawMetadataHeading(tx, ty);
         this.tree.metadataHeadingDrawn = true;
       }
@@ -952,7 +1013,6 @@
         metadata = this.tree.selectedMetadataColumns;
       }
       else {
-
         metadata = Object.keys(this.data);
       }
 
@@ -1019,46 +1079,52 @@
       this.canvas.fillText(lbl, tx, ty);
       this.canvas.closePath();
     },
+    setNodeDimensions: function (centerX, centerY, radius) {
+      this.minx = centerX - radius;
+      this.maxx = centerX + radius;
+      this.miny = centerY - radius;
+      this.maxy = centerY + radius;
+    },
     drawNode: function () {
-      var  r = this.getNodeSize(); //r = node radius
+      var nodeRadius = this.getNodeSize();
       /**
        * theta = translation to center of node... ensures that the node edge is
        * at the end of the branch so the branches don't look shorter than  they
        * should
        */
-      var theta = r;
+      var theta = nodeRadius;
 
-      var cx = this.leaf ?
+      var centerX = this.leaf ?
         (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
-      var cy = this.leaf ?
+      var centerY = this.leaf ?
         (theta * Math.sin(this.angle)) + this.centery : this.centery;
 
       this.canvas.beginPath();
-      this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
-      if ((r * this.tree.zoom) < 5) {
-        var e =  (5 / this.tree.zoom);
-        this.minx = cx - e;
-        this.maxx = cx + e;
-        this.miny = cy - e;
-        this.maxy = cy + e;
+      this.canvas.fillStyle = this.selected ?
+                              this.tree.selectedColour : this.colour;
+      if ((nodeRadius * this.tree.zoom) < 5 || !this.leaf) {
+        this.setNodeDimensions(centerX, centerY, 5 / this.tree.zoom);
       } else {
-        this.minx =  cx - r;
-        this.maxx = cx + r;
-        this.miny = cy - r;
-        this.maxy = cy + r;
+        this.setNodeDimensions(centerX, centerY, nodeRadius);
       }
+
       if (this.collapsed) {
-        var x1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle - Angles.QUARTER);
-        var y1 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle - Angles.QUARTER);
-        var x2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.cos(this.angle);
-        var y2 = ((this.getNodeSize() * 10) / this.tree.zoom) * Math.sin(this.angle);
+        var childIds = this.getChildIds();
+        var radius = childIds.length;
+        if (this.tree.treeType === 'radial') {
+          radius = radius / 7;
+        }
+        if (this.tree.treeType === 'circular') {
+          radius = radius / 3;
+        }
+
+        this.canvas.globalAlpha = 0.3;
         this.canvas.beginPath();
-        this.canvas.moveTo((this.centerx - x1), (this.centery - y1));
-        this.canvas.lineTo((this.centerx + x1), (this.centery + y1));
-        this.canvas.lineTo((this.centerx + x2), (this.centery + y2));
-        this.canvas.lineTo((this.centerx - x1), (this.centery - y1));
-        this.canvas.closePath();
+        this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color)?
+                          this.tree.defaultCollapsedOptions.color : 'purple';
         this.canvas.fill();
+        this.canvas.globalAlpha = 1;
       }
       else if (this.leaf) {
         // Store line width for swapping back after drawing lines for aligning
@@ -1081,7 +1147,8 @@
         }
         // Save canvas
         this.canvas.save();
-        // Move to node center position (setting canvas (0,0) position as (this.centerx, this.centery))
+        // Move to node center position
+        // (setting canvas (0,0) position as (this.centerx, this.centery))
         this.canvas.translate(this.centerx, this.centery);
         // rotate canvas (mainly for circular, radial trees etc)
         this.canvas.rotate(this.angle);
@@ -1113,7 +1180,8 @@
         var l = this.canvas.lineWidth;
         this.canvas.strokeStyle = this.tree.highlightColour;
         this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-        this.canvas.arc(cx, cy, (this.leaf ? this.getNodeSize() : 0) + ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+        this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) +
+          ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
         this.canvas.stroke();
         this.canvas.lineWidth = l;
         this.canvas.strokeStyle = this.tree.branchColour;
@@ -1122,7 +1190,9 @@
     },
     getChildIds: function () {
       if (this.leaf) {
-        return this.id;
+        // Fix for Issue #68
+        // Returning array, as expected
+        return [this.id];
       } else {
         var children = [];
         for (var x = 0; x < this.children.length; x++) {
@@ -1405,7 +1475,7 @@
 
   Branch.prototype.rotate = function (evt) {
     var newChildren = [];
-    for (var i = this.children.length; i-- ;) {
+    for (var i = this.children.length; i--; ) {
       newChildren.push(this.children[i]);
     }
 
@@ -1451,6 +1521,15 @@
       }
     },
 
+    checkInitialTreeCollapseRange: function(node) {
+      // Collapse nodes on default
+      var child_ids = node.getChildIds();
+      if (child_ids && child_ids.length > this.defaultCollapsedOptions.min &&
+          child_ids.length < this.defaultCollapsedOptions.max) {
+        node.collapsed = true;
+      }
+    },
+
     /**
      * A dictionary of functions. Each function draws a different tree structure
      */
@@ -1477,6 +1556,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1516,6 +1600,10 @@
           }
 
           node.canvas.strokeStyle = node.getColour();
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
 
           if (node.children.length > 1 && !node.collapsed) {
             node.canvas.beginPath();
@@ -1546,6 +1634,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1571,6 +1664,11 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
           node.canvas.closePath();
+
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
 
@@ -1601,6 +1699,10 @@
           node.canvas.lineTo(node.centerx, node.centery);
           node.canvas.stroke();
 
+          // Check initial tree collapse range
+          if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
+            tree.checkInitialTreeCollapseRange(node);
+          }
           node.drawNode();
         }
         node.canvas.closePath();
@@ -1630,7 +1732,7 @@
             nids = nd.getChildIds();
           }
           this.draw();
-        } else if (this.unselectOnClickAway && !this.dragging) {
+        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
           this.root.setSelected(false, true);
           this.draw();
         }
@@ -1644,6 +1746,8 @@
       else if (e.button === 2) {
         e.preventDefault();
         this.contextMenu.open(e.clientX, e.clientY);
+        this.contextMenu.closed = false;
+        this.tooltip.close();
       }
     },
     dblclicked: function (e) {
@@ -1674,7 +1778,6 @@
         var ymove = (event.clientY - this.starty) * ratio;
         if (Math.abs(xmove) + Math.abs(ymove) > 5) {
           this.dragging = true;
-
           this.offsetx = this.origx + xmove;
           this.offsety = this.origy + ymove;
           this.draw();
@@ -1689,12 +1792,18 @@
       } else {
         //hover
         var e = event;
-
         var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+
         if (nd && (this.internalNodesSelectable || nd.leaf)) {
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
+          // For mouseover tooltip to show no. of children on the internal nodes
+          if (!nd.leaf) {
+            this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
+          }
         } else {
+          this.tooltip.close();
+          this.contextMenu.close();
           this.root.setHighlighted(false);
         }
         this.draw();
@@ -1720,7 +1829,8 @@
       this.canvas.strokeStyle = this.branchColour;
       this.canvas.save();
 
-      this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas), (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
+      this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas),
+        (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
       if (!this.drawn || forceRedraw) {
         this.prerenderers[this.treeType](this);
@@ -1732,7 +1842,8 @@
       this.canvas.scale(this.zoom, this.zoom);
 
       this.branchRenderers[this.treeType](this, this.root);
-
+      // Making default collapsed false so that it will collapse on initial load only
+      this.defaultCollapsed = false;
       this.metadataHeadingDrawn = false;
       this.drawn = true;
     },
@@ -1764,6 +1875,13 @@
       this.showLabels = false;
       this.draw();
     },
+
+    dangerouslySetData: function (treeData) {
+      this.parseNwk(treeData, null);
+      this.draw();
+      this.loadCompleted();
+    },
+
     load: function (tree, name, format) {
       if (format) {
         if (format.match(/nexus/i)) {
@@ -2181,7 +2299,8 @@
         tree.farthestNodeFromRootY = 0;
 
         tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-        var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+        var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
+                        (tree.leaves[0].getNodeSize() + 2) * 2);
 
         for (var i = 0; i < tree.leaves.length; i++) {
           tree.leaves[i].angle = Angles.QUARTER;
@@ -2297,20 +2416,26 @@
       e.preventDefault();
     },
     selectNodes: function (nIds) {
-      this.root.setSelected(false, true);
       var ns = nIds;
+      var node, nd;
 
-      if (typeof nIds == 'string') {
-        ns = ns.split(',');
-      }
-      for (var i = 0; i < this.leaves.length; i++) {
-        for (var j = 0; j < ns.length; j++) {
-          if (ns[j] == this.leaves[i].id) {
-            this.leaves[i].setSelected(true, false);
+      if (this.root) {
+        this.root.setSelected(false, true);
+        if (typeof nIds === 'string') {
+          ns = ns.split(',');
+        }
+        for (var nd in this.branches) {
+          if (this.branches.hasOwnProperty(nd)) {
+            node = this.branches[nd];
+            for (var j = 0; j < ns.length; j++) {
+              if (ns[j] == node.id) {
+                node.setSelected(true, true);
+              }
+            }
           }
         }
+        this.draw();
       }
-      this.draw();
     },
     setFont: function (font) {
       if (isNaN(font))
@@ -2398,18 +2523,20 @@
     setSize: function (width, height) {
       this.canvas.canvas.width = width;
       this.canvas.canvas.height = height;
+      if (this.navigator) {
+        this.navigator.resize();
+      }
+      this.adjustForPixelRatio();
       if (this.drawn) {
         this.draw();
       }
-      if (this.navigator)this.navigator.resize();
-      this.adjustForPixelRatio();
     },
     setZoom: function (z) {
       if (z > -2 && z < 2) {
         var oz = this.zoom;
         this.zoom = Math.pow(10, z);
 
-        this.offsetx = (this.offsetx / oz) * this.zoom ;
+        this.offsetx = (this.offsetx / oz) * this.zoom;
         this.offsety = (this.offsety / oz) * this.zoom;
 
         this.draw();
@@ -2595,7 +2722,6 @@
       this.leaves.push(this.branches[leafIds[i]]);
     }
   }
-
   Tree.prototype.exportNwk = function () {
     var nwk = this.root.getNwk();
     return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
@@ -2607,9 +2733,21 @@
     this.history.resizeTree();
   }
 
+  Tree.prototype.initialiseHistory = function (config) {
+    var isCollapsedConfigured;
+
+    if (config.history || typeof config.history === 'undefined') {
+      isCollapsedConfigured = (config.history && typeof config.history.collapsed !== 'undefined');
+      this.historyCollapsed = isCollapsedConfigured ? config.history.collapsed : true;
+      this.historySnapshots = [];
+      this.history = new History(this);
+    }
+  }
+
   function History(tree) {
     this.tree = tree;
 
+    this.injectCss();
     this.div = this.createDiv(tree.canvasEl);
 
     this.resizeTree(tree);
@@ -2617,9 +2755,8 @@
     this.tree.addListener('subtree', function (evt) {
       this.addSnapshot(evt.node);
     }.bind(this));
-
     this.tree.addListener('loaded', this.reset.bind(this));
-    this.tree.addListener('typechanged', function (evt) {
+    this.tree.addListener('typechanged', function () {
       this.addSnapshot(this.tree.root.id);
     }.bind(this));
 
@@ -2663,6 +2800,7 @@
 
   History.prototype.createDiv = function (parentDiv) {
     var div = document.createElement('div');
+    div.className = 'pc-history';
     addEvent(div, 'click', killEvent);
     addEvent(div, 'contextmenu', killEvent);
 
@@ -2670,16 +2808,20 @@
     title.innerHTML = 'History';
     title.className = 'pc-history-title';
     div.appendChild(title);
-    addClass(div, 'pc-history');
-    parentDiv.appendChild(div);
 
     var tabDiv = document.createElement('div');
     tabDiv.appendChild(document.createTextNode('<'));
-    addClass(tabDiv, 'toggle');
+    tabDiv.className = 'toggle';
     addEvent(tabDiv, 'click', this.toggle.bind(this));
     div.appendChild(tabDiv);
     this.toggleDiv = tabDiv;
 
+    var snapshotList = document.createElement('ul');
+    snapshotList.className = 'pc-history-snapshots';
+    div.appendChild(snapshotList);
+    this.snapshotList = snapshotList;
+
+    parentDiv.appendChild(div);
     return div;
   }
 
@@ -2721,31 +2863,28 @@
     if (match) {
       return;
     }
-    var url = this.tree.getPngUrl(),
-        thumbnail = document.createElement('img');
+    var url = this.tree.getPngUrl();
+    var listElement = document.createElement('li');
+    var thumbnail = document.createElement('img');
 
     thumbnail.width = this.width;
     thumbnail.src = url;
     thumbnail.id = historyIdPrefix + id;
-    thumbnail.setAttribute('data-tree-type', this.tree.treeType)
+    thumbnail.setAttribute('data-tree-type', this.tree.treeType);
     thumbnail.style.background = 'lightblue';
     // Creating the snapshot array which is used to check if the element exists in history in further clicks
     this.tree.historySnapshots.push(thumbnail);
 
-    // altered 1.0.6-1 : issue #17
-    var firstThumb = this.div.querySelector('img')
-    if (firstThumb) {
-      this.div.insertBefore(thumbnail, firstThumb);
-    } else {
-      this.div.appendChild(thumbnail);
-    }
+    listElement.appendChild(thumbnail);
+    this.snapshotList.appendChild(listElement);
+
     addEvent(thumbnail, 'click', this.goBackTo.bind(this));
   }
 
   History.prototype.clear = function () {
-    var thumbs = this.div.getElementsByTagName('img');
-    for (var i = thumbs.length; i-- ;) {
-      this.div.removeChild(thumbs[0]);
+    var listElements = this.snapshotList.getElementsByTagName('li');
+    for (var i = listElements.length; i-- ;) {
+      this.snapshotList.removeChild(listElements[0]);
     };
   }
 
@@ -2753,6 +2892,32 @@
     var ele = evt.target;
     this.tree.treeType = ele.getAttribute('data-tree-type');
     this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
+  }
+
+  History.prototype.injectCss = function () {
+    var css =
+      '.pc-history { position: absolute; top: 0; bottom: 0; left: 0; box-sizing: border-box; width: 20%; overflow: hidden; background: #EEE }' +
+      '.pc-history .pc-history-title { box-sizing: border-box; height: 20px; text-align: center; font-size: 13px; color: #666; padding: 2px; border-bottom: 1px solid #bbb }' +
+      '.pc-history .toggle { position: absolute; top: 0; right: 0; padding: 2px 8px; cursor: pointer; border-top-left-radius: 50%; border-bottom-left-radius: 50%; background-color: #666; color: #FFF; box-sizing: border-box; height: 20px; }' +
+      '.pc-history.collapsed .toggle { border-radius: 0 50% 50% 0 }' +
+      '.pc-history .toggle:hover { background-color: #FFF; color: #CCC }' +
+      '.pc-history.collapsed { width: 25px }' +
+      '.pc-history.collapsed .pc-history-snapshots { display: none }' +
+      '.pc-history.collapsed .pc-history-title { writing-mode: tb-rl; -webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); margin-top: 70px; background: 0 0; color: #666; letter-spacing: 1.2px; border-bottom: none }' +
+      '.pc-history-snapshots { position: absolute; top: 20px; bottom: 0; margin: 0; padding: 0; overflow-x: hidden; overflow-y: scroll; }' +
+      '.pc-history-snapshots li { list-style: outside none none }' +
+      '.pc-history img { border: 0px solid #CCC; border-top-width: 1px; cursor: pointer; width: 100%; box-sizing: border-box; transition: background-color .25s ease; display: block }' +
+      '.pc-history img:hover { background-color: #fff }';
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+
+    style.type = 'text/css';
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+    head.appendChild(style);
   }
 
   var PhyloCanvas = {

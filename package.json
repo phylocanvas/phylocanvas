@@ -1,11 +1,11 @@
 {
   "name": "PhyloCanvas",
-  "version": "1.3.2",
+  "version": "1.5.0",
   "repository": "https://github.com/ImperialCollegeLondon/PhyloCanvas",
   "main": "src/scripts/PhyloCanvas.js",
   "dependencies": {},
   "devDependencies": {
-    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.2"
+    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5"
   },
   "engines": {
     "node": ">=0.8.0"
