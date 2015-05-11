@@ -1828,7 +1828,7 @@
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
           // For mouseover tooltip to show no. of children on the internal nodes
-          if (!nd.leaf) {
+          if (!nd.leaf && this.contextMenu.closed) {
             this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
           }
         } else {
