@@ -119,6 +119,20 @@
     return index !== -1;
   }
 
+  function setupDownloadLink(data, filename) {
+    var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
+    var url = window.URL || window.webkitURL;
+    var anchor = document.createElement('a');
+    var isDownloadSupported = (typeof anchor.download !== 'undefined');
+
+    anchor.href = url.createObjectURL(blob);
+    anchor.target = '_blank';
+    if (isDownloadSupported) {
+      anchor.download = (filename)? filename : 'pc-download.txt'; // TODO: create filename from UI state
+    }
+    fireEvent(anchor, 'click');
+  }
+
   /**
    * @namespace PhyloCanvas
    */
@@ -361,7 +375,7 @@
       }
     }
     else {
-      this.elements = [{
+      this.elements = [ {
         text: 'Redraw Subtree',
         handler: 'redrawTreeFromBranch',
         internal: true,
@@ -370,7 +384,7 @@
         text: 'Show Labels',
         handler: 'displayLabels',
         internal: false,
-        leaf:false
+        leaf: false
       }, {
         text: 'Hide Labels',
         handler: 'hideLabels',
@@ -386,7 +400,17 @@
         handler: 'rotate',
         internal: true,
         leaf: false
-      }];
+      }, {
+        text: 'Download All Leaf IDs',
+        handler: 'downloadAllLeafIds',
+        internal: false,
+        leaf: false
+      }, {
+        text: 'Download Branch Leaf IDs',
+        handler: 'downloadLeafIdsFromBranch',
+        internal: true,
+        leaf: false
+      } ];
     }
     this.tree.canvasEl.appendChild(this.div);
   }
@@ -401,8 +425,6 @@
     this.div.style.background = '#FFFFFF';
     this.div.style.letterSpacing = '0.5px';
     this.div.className = 'pc-tooltip';
-    this.div.innerHTML = 'Hi! This is me again'
-
     this.tree.canvasEl.appendChild(this.div);
   }
 
@@ -1108,6 +1130,7 @@
         this.setNodeDimensions(centerX, centerY, nodeRadius);
       }
 
+      // If branch collapsed
       if (this.collapsed) {
         var childIds = this.getChildIds();
         var radius = childIds.length;
@@ -1491,6 +1514,14 @@
     return this.parent.children.indexOf(this);
   };
 
+  Branch.prototype.downloadLeafIdsFromBranch = function () {
+    var downloadData;
+    var childIds = this.getChildIds();
+    downloadData = childIds.join('\n');
+    setupDownloadLink(downloadData, 'pc_leaves.txt');
+  };
+
+
   Tree.prototype = {
     // Included
     AJAX: function (url, method, params, callback, callbackPars, scope, errorCallback) {
@@ -1798,7 +1829,7 @@
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
           // For mouseover tooltip to show no. of children on the internal nodes
-          if (!nd.leaf) {
+          if (!nd.leaf && this.contextMenu.closed) {
             this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
           }
         } else {
@@ -1966,19 +1997,36 @@
       },
       star: function (node) {
         var r = node.getNodeSize();
-        var cx =  r ;
+        var cx = r;
         var cy = 0;
+        var spikes = 6;
+        var outerRadius = 6;
+        var innerRadius = 2;
+        var rot = Math.PI / 2 * 3;
+        var x = cx;
+        var y = cy;
+        var step = Math.PI / spikes;
+        var i = 0;
+        node.canvas.beginPath();
+        node.canvas.moveTo(cx, cy - outerRadius);
+        for (i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          node.canvas.lineTo(x, y);
+          rot += step;
 
-        node.canvas.moveTo(cx, cy);
-        var alpha = (2 * Math.PI) / 10;
-        var rb = r * 1.75;
-        for (var i = 11; i !== 0; i--) {
-          var ra = i % 2 === 1 ? rb : r;
-          var omega = alpha * i;
-          node.canvas.lineTo(cx + (ra * Math.sin(omega)), cy + (ra * Math.cos(omega)));
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          node.canvas.lineTo(x, y);
+          rot += step;
         }
+        node.canvas.lineTo(cx, cy - outerRadius);
         node.canvas.stroke();
         node.canvas.fill();
+        node.canvas.moveTo(cx, cy);
+        node.canvas.lineTo(cx - (outerRadius - 1), cy);
+        node.canvas.stroke();
+        node.canvas.closePath();
       },
       triangle: function (node) {
         var r = node.getNodeSize();
@@ -1994,11 +2042,14 @@
         node.canvas.lineTo(cx, y1);
         node.canvas.stroke();
         node.canvas.fill();
+        node.canvas.moveTo(x1, (y1 + y2) / 2);
+        node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
+        node.canvas.stroke();
       }
     },
     parseNexus: function (str, name) {
       if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
-        throw 'the string provided was not a nexus string';
+        throw 'The string provided was not a nexus string';
       }
       else if (!str.match(/BEGIN TREES/gi)) {
         throw 'The nexus file does not contain a tree block';
@@ -2617,27 +2668,28 @@
 
   Tree.prototype.loadCompleted = function () {
     fireEvent(this.canvasEl, 'loaded');
-  }
+  };
 
   Tree.prototype.loadStarted = function () {
     fireEvent(this.canvasEl, 'loading');
-  }
+  };
 
   Tree.prototype.loadError = function (message) {
     fireEvent(this.canvasEl, 'error', { message: message });
-  }
+  };
 
   Tree.prototype.subtreeDrawn = function (node) {
     fireEvent(this.canvasEl, 'subtree', { node: node });
-  }
+  };
 
   Tree.prototype.nodesSelected = function (nids) {
     fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
-  }
+  };
 
   Tree.prototype.addListener = function (event, listener) {
     addEvent(this.canvasEl, event, listener);
-  }
+  };
+
   Tree.prototype.getBounds = function () {
     var minx = this.root.startx,
           maxx = this.root.startx,
@@ -2661,7 +2713,7 @@
       maxy = Math.max(maxy, y);
     }
     return [[minx, miny], [maxx, maxy]];
-  }
+  };
 
   Tree.prototype.fitInPanel = function () {
     var bounds = this.getBounds(),
@@ -2675,7 +2727,7 @@
     this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
     this.offsety = (maxy + miny) * this.zoom / -2;
     this.offsetx = (maxx + minx) * this.zoom / -2;
-  }
+  };
 
   Tree.prototype.on = Tree.prototype.addListener;
 
@@ -2690,11 +2742,11 @@
       this.canvas.canvas.width *= ratio;
       this.canvas.canvas.height *= ratio;
     }
-  }
+  };
 
   Tree.prototype.treeTypeChanged = function (oldType, newType) {
     fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
-  }
+  };
 
   Tree.prototype.resetTree = function () {
     if (!this.origBranches) return;
@@ -2707,11 +2759,11 @@
 
     this.leaves = this.origLeaves;
     this.root = this.origRoot;
-  }
+  };
 
   Tree.prototype.rotateBranch = function (branch) {
     this.branches[branch.id].rotate();
-  }
+  };
 
   Tree.prototype.buildLeaves = function () {
     this.leaves = [];
@@ -2721,17 +2773,18 @@
     for (var i = 0; i < leafIds.length; i++) {
       this.leaves.push(this.branches[leafIds[i]]);
     }
-  }
+  };
+
   Tree.prototype.exportNwk = function () {
     var nwk = this.root.getNwk();
     return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
-  }
+  };
 
   Tree.prototype.resizeToContainer = function () {
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight)
     this.draw();
     this.history.resizeTree();
-  }
+  };
 
   Tree.prototype.initialiseHistory = function (config) {
     var isCollapsedConfigured;
@@ -2742,7 +2795,11 @@
       this.historySnapshots = [];
       this.history = new History(this);
     }
-  }
+  };
+
+  Tree.prototype.downloadAllLeafIds = function () {
+    this.root.downloadLeafIdsFromBranch();
+  };
 
   function History(tree) {
     this.tree = tree;
@@ -2771,23 +2828,23 @@
     if (this.tree.drawn) {
       this.addSnapshot(this.tree.root.id);
     }
-  }
+  };
 
   History.prototype.collapse = function () {
     addClass(this.div, 'collapsed');
     this.toggleDiv.firstChild.data = '>';
     this.resizeTree();
-  }
+  };
 
   History.prototype.expand = function () {
     removeClass(this.div, 'collapsed');
     this.toggleDiv.firstChild.data = '<';
     this.resizeTree();
-  }
+  };
 
   History.prototype.isCollapsed = function () {
     return hasClass(this.div, 'collapsed');
-  }
+  };
 
   History.prototype.toggle = function () {
     if (this.isCollapsed()) {
@@ -2796,7 +2853,7 @@
       this.collapse();
     }
     fireEvent(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
-  }
+  };
 
   History.prototype.createDiv = function (parentDiv) {
     var div = document.createElement('div');
@@ -2823,7 +2880,7 @@
 
     parentDiv.appendChild(div);
     return div;
-  }
+  };
 
   History.prototype.resizeTree = function () {
     var tree = this.tree;
@@ -2834,7 +2891,7 @@
     } else {
       tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = '20%';
     }
-  }
+  };
 
   /**
    * Add a snapshot of the tree to the history
@@ -2857,7 +2914,7 @@
         match = true;
         ele.style.background = 'lightblue';
       }
-    })
+    });
 
     // Check if there is a snapshot already available. If not, then add a snapshot
     if (match) {
@@ -2879,14 +2936,14 @@
     this.snapshotList.appendChild(listElement);
 
     addEvent(thumbnail, 'click', this.goBackTo.bind(this));
-  }
+  };
 
   History.prototype.clear = function () {
     var listElements = this.snapshotList.getElementsByTagName('li');
     for (var i = listElements.length; i-- ;) {
       this.snapshotList.removeChild(listElements[0]);
-    };
-  }
+    }
+  };
 
   History.prototype.goBackTo = function (evt) {
     var ele = evt.target;
