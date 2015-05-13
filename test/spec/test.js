@@ -1,131 +1,118 @@
-/*global describe, it, PhyloCanvas, expect */
+describe('PhyloCanvas', function () {
 
-(function () {
-  'use strict';
-  describe('Phylocanvas', function () {
+  beforeEach(function () {
+    var div = document.createElement('div');
+    div.id = 'test';
+    document.body.appendChild(div);
+  });
 
-    describe('Branch Functions', function () {
+  afterEach(function () {
+    var div = document.getElementById('test');
+    document.body.removeChild(div);
+  });
 
-      it('should get the right colour', function () {
-        var colour1 = 'rgba(255,0,0,1)';
-        var colour2 = 'rgba(0,255,0,1)';
-        var div = document.createElement('div');
+  describe('Branch Functions', function () {
 
-        document.body.appendChild(div);
+    it('should get the right colour', function () {
+      var colour1 = 'rgba(255,0,0,1)';
+      var colour2 = 'rgba(0,255,0,1)';
+      var tree = new PhyloCanvas.Tree('test');
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+      var cols;
 
-        var tree = new PhyloCanvas.Tree(div);
+      tree.backColour = true;
 
-        tree.backColour = true;
+      branch1.colour = colour1;
+      branch2.colour = colour2;
 
-        var branch = new PhyloCanvas.Branch(),
-        branch1 = new PhyloCanvas.Branch(),
-        branch2 = new PhyloCanvas.Branch();
+      branch.addChild(branch1);
+      branch.addChild(branch2);
 
-        branch1.colour = colour1;
-        branch2.colour = colour2;
+      branch.tree = tree;
 
-        branch.addChild(branch1);
-        branch.addChild(branch2);
+      cols = branch.getChildColours();
 
-        branch.tree = tree;
+      expect(cols.length).to.equal(2);
+      expect(cols[0]).to.equal(colour1);
+    });
 
-        var cols = branch.getChildColours();
+    it('should get the right colours', function () {
+      var colour1 = 'rgba(255,0,0,1)';
+      var colour2 = 'rgba(0,255,0,1)';
+      var tree = new PhyloCanvas.Tree('test');
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+      var cols;
 
-        expect(cols.length).to.equal(2);
-        expect(cols[0]).to.equal(colour1);
+      tree.backColour = true;
 
-      });
+      branch1.colour = colour1;
+      branch2.colour = colour2;
 
-      it('should get the right colours', function () {
-        var colour1 = 'rgba(255,0,0,1)';
-        var colour2 = 'rgba(0,255,0,1)',
-        div = document.createElement('div');
+      branch.addChild(branch1);
+      branch.addChild(branch2);
 
-        document.body.appendChild(div);
+      branch.tree = tree;
 
-        var tree = new PhyloCanvas.Tree(div);
+      cols = branch.getChildColours();
 
-        tree.backColour = true;
+      expect(cols.length).to.equal(2);
+      expect(cols[0]).to.equal(colour1);
+      expect(cols[1]).to.equal(colour2);
+    });
 
-        var branch = new PhyloCanvas.Branch(),
-        branch1 = new PhyloCanvas.Branch(),
-        branch2 = new PhyloCanvas.Branch();
+    it('should get the right parent branch colour', function () {
+      var colour1 = 'rgba(255,0,0,1)';
+      var tree = new PhyloCanvas.Tree('test');
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+      var col;
 
-        branch1.colour = colour1;
-        branch2.colour = colour2;
+      tree.backColour = true;
 
-        branch.addChild(branch1);
-        branch.addChild(branch2);
+      branch1.colour = colour1;
+      branch2.colour = colour1;
 
-        branch.tree = tree;
+      branch.addChild(branch1);
+      branch.addChild(branch2);
 
-        var cols = branch.getChildColours();
+      branch.tree = tree;
 
-        expect(cols.length).to.equal(2);
-        expect(cols[0]).to.equal(colour1);
-        expect(cols[1]).to.equal(colour2);
+      col = branch.getColour();
 
-      });
+      expect(col).to.equal(colour1);
+    });
 
-      it('should get the right parent branch colour', function () {
-        var colour1 = 'rgba(255,0,0,1)',
-            div = document.createElement('div');
+    it('should get the right colours', function () {
+      var colour1 = 'rgba(255,0,0,1)';
+      var colour2 = 'rgba(0,255,0,1)';
+      var colour3 = 'rgba(0,0,0,1)';
+      var tree = new PhyloCanvas.Tree('test');
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+      var col;
 
-        document.body.appendChild(div);
+      tree.branchColour = colour3;
+      tree.backColour = true;
 
-        var tree = new PhyloCanvas.Tree(div);
+      branch1.colour = colour1;
+      branch2.colour = colour2;
 
-        tree.backColour = true;
+      branch.addChild(branch1);
+      branch.addChild(branch2);
 
-        var branch = new PhyloCanvas.Branch(),
-        branch1 = new PhyloCanvas.Branch(),
-        branch2 = new PhyloCanvas.Branch();
+      branch.tree = tree;
 
-        branch1.colour = colour1;
-        branch2.colour = colour1;
+      col = branch.getColour();
 
-        branch.addChild(branch1);
-        branch.addChild(branch2);
-
-        branch.tree = tree;
-
-        var col = branch.getColour();
-
-        expect(col).to.equal(colour1);
-
-      });
-
-      it('should get the right colours', function () {
-        var colour1 = 'rgba(255,0,0,1)';
-        var colour2 = 'rgba(0,255,0,1)';
-        var colour3 = 'rgba(0,0,0,1)';
-        var div = document.createElement('div');
-        document.body.appendChild(div);
-        var tree = new PhyloCanvas.Tree(div);
-
-        tree.branchColour = colour3;
-        tree.backColour = true;
-
-        var branch = new PhyloCanvas.Branch(),
-        branch1 = new PhyloCanvas.Branch(),
-        branch2 = new PhyloCanvas.Branch();
-
-        branch1.colour = colour1;
-        branch2.colour = colour2;
-
-        branch.addChild(branch1);
-        branch.addChild(branch2);
-
-        branch.tree = tree;
-
-        var col = branch.getColour();
-
-        expect(col).to.equal(colour3);
-
-      });
-
+      expect(col).to.equal(colour3);
     });
 
   });
 
-})();
+});

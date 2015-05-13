@@ -1,11 +1,11 @@
 {
   "name": "PhyloCanvas",
-  "description": "HTML5 Canvas-based Phylogenetic Tree Viewer",
+  "description": "Canvas-based Phylogenetic Tree Viewer",
   "version": "1.5.0",
-  "main": "src/scripts/PhyloCanvas.js",
+  "main": "PhyloCanvas.js",
   "repository": {
     "type": "git",
-    "url": "git://git@github.com:ImperialCollegeLondon/PhyloCanvas.git"
+    "url": "git://git@github.com:PhyloCanvas/PhyloCanvas.git"
   },
   "keywords": [
     "phylocanvas",
@@ -16,14 +16,28 @@
     "newick",
     "biojs"
   ],
-  "author": "CGPS",
-  "license": "GPLv3",
+  "author": "Centre for Genomic Pathogen Surveillance, Wellcome Trust Sanger Institute",
+  "licenses": [
+    {
+      "type": "LGPLv3",
+      "url": "https://www.gnu.org/licenses/lgpl.txt"
+    }
+  ],
   "bugs": {
-    "url": "https://github.com/ImperialCollegeLondon/PhyloCanvas/issues"
+    "url": "https://github.com/PhyloCanvas/PhyloCanvas/issues"
   },
   "homepage": "http://www.phylocanvas.net",
+  "scripts": {
+    "build": "webpack --progress --profile --colors",
+    "dev-server": "webpack-dev-server --hot --port 8000 --content-base ./examples"
+  },
   "dependencies": {},
   "devDependencies": {
-    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5"
+    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5",
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4",
+    "node-libs-browser": "^0.5.0",
+    "webpack": "^1.9.5",
+    "webpack-dev-server": "^1.8.2"
   }
 }

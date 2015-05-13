@@ -1,8 +1,8 @@
-window.onload = function(){
- "use strict";
+window.onload = function () {
+  'use strict';
 
   // Construct tree object
-  var phylocanvas = new PhyloCanvas.Tree('phylocanvas', {
+  var phylocanvas = new window.PhyloCanvas.Tree('phylocanvas', {
     history: {
       collapsed: true
     },
@@ -18,7 +18,7 @@ window.onload = function(){
   phylocanvas.setTreeType('radial');
 
   // load tree via AJAX and render using default params
-  phylocanvas.load('./tree.nwk');
+  phylocanvas.load('./data/tree.nwk');
 
   // phylocanvas.on('historytoggle', function (e) {
   //   alert(e.isOpen ? 'history is open' : 'history is closed');
