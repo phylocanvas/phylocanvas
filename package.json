@@ -2,7 +2,7 @@
   "name": "PhyloCanvas",
   "description": "Canvas-based Phylogenetic Tree Viewer",
   "version": "1.5.0",
-  "main": "PhyloCanvas.js",
+  "main": "dist/phylocanvas.js",
   "repository": {
     "type": "git",
     "url": "git://git@github.com:PhyloCanvas/PhyloCanvas.git"
@@ -29,7 +29,7 @@
   "homepage": "http://www.phylocanvas.net",
   "scripts": {
     "build": "webpack --progress --profile --colors",
-    "dev-server": "webpack-dev-server --hot --port 8000 --content-base ./examples"
+    "dev-server": "webpack-dev-server --hot --port 8000"
   },
   "dependencies": {},
   "devDependencies": {
