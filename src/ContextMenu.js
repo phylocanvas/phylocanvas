@@ -126,6 +126,7 @@ ContextMenu.prototype.createContent = function (node) {
 
     list.appendChild(listElement);
   }
+  document.body.addEventListener('click', createHandler(this, 'close'));
   this.element.appendChild(list);
 };
 
