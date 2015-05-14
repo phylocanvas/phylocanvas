@@ -10,7 +10,7 @@ module.exports = function (options) {
   if (options.dev) {
     entry = [
       'webpack-dev-server/client?http://localhost:8000',
-    //   'webpack/hot/only-dev-server',
+      'webpack/hot/dev-server',
       entry
     ];
   } else {
