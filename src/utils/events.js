@@ -32,6 +32,22 @@ function fireEvent(element, type, params) {
   }
 }
 
+function addEvent(elem, event, fn) {
+  if (elem.addEventListener) {
+    elem.addEventListener(event, fn, false);
+  } else {
+    elem.attachEvent('on' + event, function () {
+      // set the this pointer same as addEventListener when fn is called
+      return (fn.call(elem, window.event));
+    });
+  }
+}
+
+function killEvent(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
 /**
  * Creates a function which can be called from an event handler independent of
  * scope.
@@ -57,4 +73,6 @@ function createHandler(obj, func) {
 
 module.exports.preventDefault = preventDefault;
 module.exports.fireEvent = fireEvent;
+module.exports.addEvent = addEvent;
+module.exports.killEvent = killEvent;
 module.exports.createHandler = createHandler;
