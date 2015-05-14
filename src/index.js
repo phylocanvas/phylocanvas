@@ -110,54 +110,10 @@ var ContextMenu = require('./ContextMenu');
 
 var Tooltip = require('./Tooltip');
 
+var Loader = require('./Loader');
 
-/**
- * @constructor
- * @memberof PhyloCanvas
- */
-function Loader(div) {
-  this.div = div;
-  this.cl = document.createElement('canvas');
-  this.cl.id = div.id + 'Loader';
-  this.cl.style.position = 'absolute';
-  this.cl.style.backgroundColor = '#FFFFFF';
-  this.cl.style.top = (div.offsetHeight / 4) + 'px';
-  this.cl.style.left = (div.offsetWidth / 4) + 'px';
-  this.cl.height = div.offsetHeight / 2;
-  this.cl.width = div.offsetWidth / 2;
-  this.cl.style.zIndex = '1000';
-  div.appendChild(this.cl);
+var Navigator = require('./Navigator');
 
-  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-  this.drawer = null;
-  this.loaderRadius = null;
-  this.loaderStep = (2 * Math.PI) / 360;
-
-  this.message = 'Loading ...';
-}
-
-/**
- * @constructor
- * @memberof PhyloCanvas
- */
-function Navigator(tree) {
-  this.tree = tree;
-  this.cel = document.createElement('canvas');
-  this.cel.id = this.tree.canvasEl.id + 'Navi';
-  this.cel.style.zIndex = '100';
-  this.cel.style.backgroundColor = '#FFFFFF';
-  this.cel.width = this.tree.canvas.canvas.width / 3;
-  this.cel.height = this.tree.canvas.canvas.height / 3;
-  this.cel.style.position = 'absolute';
-  this.cel.style.bottom = '0px';
-  this.cel.style.right = '0px';
-  this.cel.style.border = '1px solid #CCCCCC';
-  this.tree.canvasEl.appendChild(this.cel);
-
-  this.ctx = this.cel.getContext('2d');
-  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-  this.ctx.save();
-}
 
 /**
  * The instance of a PhyloCanvas Widget
@@ -193,7 +149,7 @@ var Tree = function (div, conf) {
   /**
    * Loading dialog displayed while waiting for the tree
    */
-  //this.loader = new Loader(div);
+  // this.loader = new Loader(div);
   /**
    * The root node of the tree
    * (not neccesarily a root in the Phylogenetic sense)
@@ -356,183 +312,6 @@ var Tree = function (div, conf) {
   this.metadataXStep = 15;
   // Boolean to detect if metadata heading is drawn or not
   this.metadataHeadingDrawn = false;
-};
-
-
-/**
- * Prototype for the loading spinner.
- */
-Loader.prototype = {
-  run: function () {
-    var i = 0;
-    var _this = this;
-    this.cl.style.diangle = 'block';
-    this.initLoader();
-    this.drawer = setInterval(function () {
-      _this.drawLoader(i);
-      i++;
-    }, 10);
-  },
-  resize: function () {
-    this.cl.style.top = '2px';
-    this.cl.style.left = '2px';
-    this.cl.height = this.div.offsetHeight * 0.75;
-    this.cl.width = this.div.offsetWidth  * 0.75;
-
-    this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-    this.ctx.fillStyle = 'rgba(180,180,255,1)';
-    this.ctx.lineWidth = 10.0;
-
-    this.ctx.font = '24px sans-serif';
-
-    this.ctx.shadowOffsetX = 2.0;
-    this.ctx.shadowOffsetY = 2.0;
-
-  },
-  initLoader: function () {
-    this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-    this.ctx.fillStyle = 'rgba(180,180,255,1)';
-    this.ctx.lineWidth = 10.0;
-
-    this.ctx.font = '24px sans-serif';
-
-    this.ctx.shadowOffsetX = 2.0;
-    this.ctx.shadowOffsetY = 2.0;
-  },
-  drawLoader: function (t) {
-    this.ctx.restore();
-
-    this.ctx.translate(0, 0);
-    this.loaderRadius = Math.min(
-      this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
-    );
-
-    this.ctx.save();
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-    this.ctx.beginPath();
-    this.ctx.arc(
-      0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
-    );
-    this.ctx.stroke();
-
-    this.ctx.beginPath();
-    this.ctx.arc(
-      0, 0,
-      this.loaderRadius,
-      this.loaderStep * t + 3,
-      this.loaderStep * t + 5
-    );
-    this.ctx.stroke();
-    var txt = this.message;
-    this.ctx.fillText(
-      txt,
-      -(this.ctx.measureText(txt).width / 2),
-      this.loaderRadius + 50, this.cl.width
-    );
-  },
-  stop: function () {
-    clearInterval(this.drawer);
-    this.cl.style.display = 'none';
-  },
-  fail: function (message) {
-    clearInterval(this.drawer);
-    this.loaderRadius = Math.min(
-      this.ctx.canvas.width / 4,
-      this.ctx.canvas.height / 4
-    );
-    this.ctx.restore();
-
-    this.ctx.translate(0, 0);
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-    this.ctx.beginPath();
-
-    this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-    this.ctx.fillStyle = 'rgba(255,180,180,1)';
-
-    this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-    this.ctx.beginPath();
-
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
-    this.ctx.stroke();
-
-    this.ctx.fillText(
-      message,
-      -(this.ctx.measureText(message).width / 2),
-      this.loaderRadius + 50,
-      this.loaderRadius * 2
-    );
-  }
-};
-
-/**
- *  Overview window
- */
-Navigator.prototype = {
-  //
-  drawFrame: function () {
-    this.ctx.restore();
-    this.ctx.save();
-
-    var w = this.cel.width;
-    var h = this.cel.height;
-    var hw = w / 2;
-    var hh = h / 2;
-
-    this.ctx.clearRect(-hw, -hh, w, h);
-
-    this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-
-    if (!this.tree.drawn) {
-      var url = this.tree.canvas.canvas.toDataURL();
-
-      this.img = document.createElement('img');
-      this.img.src = url;
-
-      var _this = this;
-
-      this.img.onload = function () {
-        _this.ctx.drawImage(
-          _this.img, -hw, -hh, _this.cel.width, _this.cel.height
-        );
-      };
-
-      this.baseOffsetx = this.tree.offsetx;
-      this.baseOffsety = this.tree.offsety;
-      this.baseZoom = this.tree.zoom;
-    } else {
-      this.ctx.drawImage(this.img, -hw, -hh, this.cel.width, this.cel.height);
-    }
-
-    var z = 1 / (this.tree.zoom / this.baseZoom);
-
-    this.ctx.lineWidth = this.ctx.lineWidth / z;
-
-    this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z,
-      (this.baseOffsety - (this.tree.offsety * z)) * z);
-    this.ctx.scale(z, z);
-    this.ctx.strokeRect(-hw, -hh, w, h);
-  },
-
-  /**
-   *
-   */
-  resize: function () {
-    this.cel.width = this.tree.canvas.canvas.width / 3;
-    this.cel.height = this.tree.canvas.canvas.height / 3;
-    this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-    this.drawFrame();
-  }
 };
 
 
