@@ -1,6 +1,6 @@
-var Angles = require('./constants').Angles;
-var Shapes = require('./constants').Shapes;
-var setupDownloadLink = require('./utils').setupDownloadLink;
+var Angles = require('./utils/constants').Angles;
+var Shapes = require('./utils/constants').Shapes;
+var setupDownloadLink = require('./utils/dom').setupDownloadLink;
 
 /**
  * Creates a branch

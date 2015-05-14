@@ -1,3 +1,7 @@
+function preventDefault(event) {
+  event.preventDefault();
+  return false;
+}
 
 function fireEvent(element, type, params) {
   var event; // The custom event that will be created
@@ -28,19 +32,29 @@ function fireEvent(element, type, params) {
   }
 }
 
-function setupDownloadLink(data, filename) {
-  var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
-  var url = window.URL || window.webkitURL;
-  var anchor = document.createElement('a');
-  var isDownloadSupported = (typeof anchor.download !== 'undefined');
+/**
+ * Creates a function which can be called from an event handler independent of
+ * scope.
+ *
+ * @param {Object} obj the object the function will be called on
+ * @param {String} func the name of the function to be called
+ * @retuns {function}
+ */
+function createHandler(obj, func) {
+  var handler;
 
-  anchor.href = url.createObjectURL(blob);
-  anchor.target = '_blank';
-  if (isDownloadSupported) {
-    anchor.download = (filename) ? filename : 'pc-download.txt';
+  if (typeof func === typeof 'aaa') {
+    handler = function (e) {
+      if (obj[func]) {
+        return obj[func](e);
+      }
+    };
+  } else {
+    handler = function () { return func(obj); };
   }
-  fireEvent(anchor, 'click');
+  return handler;
 }
 
+module.exports.preventDefault = preventDefault;
 module.exports.fireEvent = fireEvent;
-module.exports.setupDownloadLink = setupDownloadLink;
+module.exports.createHandler = createHandler;

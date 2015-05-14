@@ -52,7 +52,7 @@ function getBackingStorePixelRatio(context) {
   );
 }
 
-var fireEvent = require('./utils').fireEvent;
+var fireEvent = require('./utils/events').fireEvent;
 
 function addEvent(elem, event, fn) {
   if (elem.addEventListener) {
@@ -100,115 +100,13 @@ function hasClass(element, className) {
  */
 
 
-var Angles = require('./constants').Angles;
+var Angles = require('./utils/constants').Angles;
 
-/********************************************/
-
-/**
- * Creates a function which can be called from an event handler independent of
- * scope.
- *
- * @param {Object} obj the object the function will be called on
- * @param {String} func the name of the function to be called
- * @retuns {function}
- */
-function createHandler(obj, func) {
-  if (typeof func === typeof 'aaa') {
-    return (function (e) {
-      if (obj[func]) {
-        return obj[func](e);
-      }
-    });
-  }
-  else {
-    return function (e) {return func(obj);};
-  }
-}
-
-var Shapes = require('./constants').Shapes;
+var Shapes = require('./utils/constants').Shapes;
 
 var Branch = require('./Branch');
 
-/**
- * The menu that is shown when the PhyloCanvas widget is right-clicked
- *
- * @constructor
- * @memberOf PhyloCanvas
- *
- */
-function ContextMenu(tree, options) {
-  /**
-   * The Tree object that this context menu influences
-   */
-  this.tree = tree;
-  /**
-   * The div of the menu
-   */
-  this.div = document.createElement('div');
-  this.div.style.display = 'none';
-  this.div.style.position = 'fixed';
-  this.div.style.border = '1px solid #CCCCCC';
-  this.div.style.background = '#FFFFFF';
-  this.div.style.letterSpacing = '0.5px';
-  this.div.className = 'contextMenu';
-  this.closed = true;
-  /**
-   * The options in this menu
-   */
-  this.elements = [];
-  if (options && options.length > 0) {
-    for (var i = 0; i < options.length; i++) {
-      var menuItem = {};
-
-      if (options[i].handler) {
-        menuItem.handler = options[i].handler;
-        menuItem.text = options[i].text || 'New Menu Item';
-        menuItem.internal = options[i].internal || false;
-        menuItem.leaf = options[i].leaf || false;
-        this.elements.push(menuItem);
-      }
-    }
-  }
-  else {
-    this.elements = [ {
-      text: 'Redraw Subtree',
-      handler: 'redrawTreeFromBranch',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Show Labels',
-      handler: 'displayLabels',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Hide Labels',
-      handler: 'hideLabels',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Collapse/Expand branch',
-      handler: 'toggleCollapsed',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Rotate Branch',
-      handler: 'rotate',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Download All Leaf IDs',
-      handler: 'downloadAllLeafIds',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Download Branch Leaf IDs',
-      handler: 'downloadLeafIdsFromBranch',
-      internal: true,
-      leaf: false
-    } ];
-  }
-  this.tree.canvasEl.appendChild(this.div);
-}
+var ContextMenu = require('./ContextMenu');
 
 /* Tooltip */
 function Tooltip(tree) {
@@ -468,78 +366,14 @@ var Tree = function (div, conf) {
   this.metadataXStep = 15;
   // Boolean to detect if metadata heading is drawn or not
   this.metadataHeadingDrawn = false;
-
 };
 
-  //static members
-ContextMenu.prototype = {
-  close: function () {
-    this.div.style.display = 'none';
-    this.closed = true;
-  },
-  mouseover: function (d) { d.style.backgroundColor = '#E2E3DF'; },
-  mouseout: function (d) { d.style.backgroundColor = 'transparent'; },
-  open: function (x, y) {
-    while (this.div.hasChildNodes()) {
-      this.div.removeChild(this.div.firstChild);
-    }
-    for (var i = 0; i < this.elements.length; i++) {
-      var nd = this.tree.root.clicked(
-        this.tree.translateClickX(x),
-        this.tree.translateClickY(y)
-      );
-      if ((nd && ((nd.leaf && !this.elements[i].leaf && this.elements[i].internal) ||
-        (!nd.leaf && !this.elements[i].internal && this.elements[i].leaf))) ||
-        (!nd && (this.elements[i].leaf || this.elements[i].internal))) {
-        continue;
-      }
-      d = document.createElement('div');
-      d.appendChild(document.createTextNode(this.elements[i].text));
-      if (this.elements[i].leaf || this.elements[i].internal) {
-        d.addEventListener(
-          'click', createHandler(nd, this.elements[i].handler)
-        );
-      }
-      else {
-        d.addEventListener(
-          'click', createHandler(this.tree, this.elements[i].handler)
-        );
-      }
-      d.style.cursor = 'pointer';
-      d.style.padding = '0.3em 0.5em 0.3em 0.5em';
-      d.style.fontFamily = this.tree.font;
-      d.style.fontSize = '8pt';
-      d.addEventListener('click', function(evt) {
-        createHandler(this, 'close');
-        this.closed = true;
-      });
-      document.body.addEventListener('click', createHandler(this, 'close'));
-      d.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-      d.addEventListener('mouseover', createHandler(d, this.mouseover));
-      d.addEventListener('mouseout', createHandler(d, this.mouseout));
-      this.div.appendChild(d);
-    }
-
-    if (x && y) {
-      this.div.style.top = y + 'px';
-      this.div.style.left = x + 'px';
-    } else {
-      this.div.style.top = '100px';
-      this.div.style.left = '100px';
-    }
-
-    this.div.style.zIndex = 2000;
-    this.div.style.display = 'block';
-
-    this.div.style.backgroundColor = '#FFFFFF';
-  }
-};
 
 /*
   Prototype for the Tooltip.
 */
-Tooltip.prototype.close = function(){
-    this.div.style.display = 'none';
+Tooltip.prototype.close = function () {
+  this.div.style.display = 'none';
 };
 Tooltip.prototype.mouseover = function (d) {
   d.style.backgroundColor = '#E2E3DF';
