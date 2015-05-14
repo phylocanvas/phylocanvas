@@ -108,18 +108,8 @@ var Branch = require('./Branch');
 
 var ContextMenu = require('./ContextMenu');
 
-/* Tooltip */
-function Tooltip(tree) {
-  this.tree = tree;
-  this.div = document.createElement('div');
-  this.div.style.display = 'none';
-  this.div.style.position = 'fixed';
-  this.div.style.border = '1px solid #CCCCCC';
-  this.div.style.background = '#FFFFFF';
-  this.div.style.letterSpacing = '0.5px';
-  this.div.className = 'pc-tooltip';
-  this.tree.canvasEl.appendChild(this.div);
-}
+var Tooltip = require('./Tooltip');
+
 
 /**
  * @constructor
@@ -368,44 +358,6 @@ var Tree = function (div, conf) {
   this.metadataHeadingDrawn = false;
 };
 
-
-/*
-  Prototype for the Tooltip.
-*/
-Tooltip.prototype.close = function () {
-  this.div.style.display = 'none';
-};
-Tooltip.prototype.mouseover = function (d) {
-  d.style.backgroundColor = '#E2E3DF';
-};
-Tooltip.prototype.mouseout = function (d) {
-  d.style.backgroundColor = 'transparent';
-};
-Tooltip.prototype.open = function (message, x, y) {
-  while (this.div.hasChildNodes()) {
-    this.div.removeChild(this.div.firstChild);
-  }
-  var d = document.createElement('div');
-  d.appendChild(document.createTextNode(message));
-  d.style.cursor = 'pointer';
-  d.style.padding = '0.3em 0.5em 0.3em 0.5em';
-  d.style.fontFamily = this.tree.font;
-  d.style.fontSize = '12pt';
-  d.addEventListener('tooltip', function (e) { e.preventDefault(); });
-  this.div.appendChild(d);
-
-  if (x && y) {
-    this.div.style.top = y + 'px';
-    this.div.style.left = x + 'px';
-  } else {
-    this.div.style.top = '100px';
-    this.div.style.left = '100px';
-  }
-
-  this.div.style.zIndex = 2000;
-  this.div.style.display = 'block';
-  this.div.style.backgroundColor = '#FFFFFF';
-};
 
 /**
  * Prototype for the loading spinner.
@@ -806,23 +758,25 @@ Tree.prototype = {
     }
   },
   clicked: function (e) {
+    var node;
+    var nids;
     if (e.button === 0) {
-      var nids = [];
-
-      //if this is triggered by the release after a drag then the click shouldn't be triggered.
+      nids = [];
+      // if this is triggered by the release after a drag then the click
+      // shouldn't be triggered.
       if (this.dragging) {
         this.dragging = false;
         return;
       }
 
       if (!this.root) return false;
-      var nd = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+      node = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
 
-      if (nd) {
+      if (node) {
         this.root.setSelected(false, true);
-        if (this.internalNodesSelectable || nd.leaf) {
-          nd.setSelected(true, true);
-          nids = nd.getChildIds();
+        if (this.internalNodesSelectable || node.leaf) {
+          node.setSelected(true, true);
+          nids = node.getChildIds();
         }
         this.draw();
       } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
@@ -835,10 +789,12 @@ Tree.prototype = {
       }
 
       this.nodesSelected(nids);
-    }
-    else if (e.button === 2) {
+    } else if (e.button === 2) {
       e.preventDefault();
-      this.contextMenu.open(e.clientX, e.clientY);
+      node = this.root.clicked(
+        this.translateClickX(e.clientX), this.translateClickY(e.clientY)
+      );
+      this.contextMenu.open(e.clientX, e.clientY, node);
       this.contextMenu.closed = false;
       this.tooltip.close();
     }
@@ -877,13 +833,12 @@ Tree.prototype = {
       }
     }
     else if (this.zoomPickedUp) {
-      //right click and drag
+      // right click and drag
       this.d = ((this.starty - event.clientY) / 100);
-      x = this.translateClickX(this.startx);
       this.setZoom(this.origZoom + this.d);
       this.draw();
     } else {
-      //hover
+      // hover
       var e = event;
       var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
 
@@ -892,7 +847,7 @@ Tree.prototype = {
         nd.setHighlighted(true);
         // For mouseover tooltip to show no. of children on the internal nodes
         if (!nd.leaf && this.contextMenu.closed) {
-          this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
+          this.tooltip.open(e.clientX, e.clientY, nd);
         }
       } else {
         this.tooltip.close();

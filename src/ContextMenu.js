@@ -1,93 +1,63 @@
+var Tooltip = require('./Tooltip');
+
 var createHandler = require('./utils/events').createHandler;
 var preventDefault = require('./utils/events').preventDefault;
+
+var DEFAULT_MENU_ITEMS = [ {
+    text: 'Redraw Subtree',
+    handler: 'redrawTreeFromBranch',
+    nodeType: 'internal'
+  }, {
+    text: 'Show Labels',
+    handler: 'displayLabels'
+  }, {
+    text: 'Hide Labels',
+    handler: 'hideLabels'
+  }, {
+    text: 'Collapse/Expand branch',
+    handler: 'toggleCollapsed',
+    nodeType: 'internal'
+  }, {
+    text: 'Rotate Branch',
+    handler: 'rotate',
+    nodeType: 'internal'
+  }, {
+    text: 'Download All Leaf IDs',
+    handler: 'downloadAllLeafIds'
+  }, {
+    text: 'Download Branch Leaf IDs',
+    handler: 'downloadLeafIdsFromBranch',
+    nodeType: 'internal'
+  }
+];
+
 
 /**
  * The menu that is shown when the PhyloCanvas widget is right-clicked
  *
  * @constructor
  * @memberOf PhyloCanvas
- *
+ * @extends Tooltip
  */
-function ContextMenu(tree, options) {
-  var i;
-  var menuItem;
+function ContextMenu(tree, menuItems) {
+  Tooltip.call(this, tree, 'pc-context-menu');
 
-  /**
-   * The Tree object that this context menu influences
-   */
-  this.tree = tree;
-  /**
-   * The div of the menu
-   */
-  this.div = document.createElement('div');
-  this.div.style.display = 'none';
-  this.div.style.position = 'fixed';
-  this.div.style.border = '1px solid #CCCCCC';
-  this.div.style.background = '#FFFFFF';
-  this.div.style.letterSpacing = '0.5px';
-  this.div.className = 'contextMenu';
-  this.closed = true;
-  /**
-   * The options in this menu
-   */
-  this.elements = [];
-  if (options && options.length > 0) {
-    for (i = 0; i < options.length; i++) {
-      menuItem = {};
-
-      if (options[i].handler) {
-        menuItem.handler = options[i].handler;
-        menuItem.text = options[i].text || 'New Menu Item';
-        menuItem.internal = options[i].internal || false;
-        menuItem.leaf = options[i].leaf || false;
-        this.elements.push(menuItem);
-      }
-    }
+  if (menuItems && menuItems.length) {
+    this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
+      return {
+        handler: menuItem.handler,
+        text: menuItem.text || 'New Menu Item',
+        nodeType: menuItem.nodeType || undefined
+      };
+    });
   } else {
-    this.elements = [ {
-      text: 'Redraw Subtree',
-      handler: 'redrawTreeFromBranch',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Show Labels',
-      handler: 'displayLabels',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Hide Labels',
-      handler: 'hideLabels',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Collapse/Expand branch',
-      handler: 'toggleCollapsed',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Rotate Branch',
-      handler: 'rotate',
-      internal: true,
-      leaf: false
-    }, {
-      text: 'Download All Leaf IDs',
-      handler: 'downloadAllLeafIds',
-      internal: false,
-      leaf: false
-    }, {
-      text: 'Download Branch Leaf IDs',
-      handler: 'downloadLeafIdsFromBranch',
-      internal: true,
-      leaf: false
-    } ];
+    this.menuItems = DEFAULT_MENU_ITEMS;
   }
-  this.tree.canvasEl.appendChild(this.div);
+
+  this.fontSize = '8pt';
 }
 
-ContextMenu.prototype.close = function () {
-  this.div.style.display = 'none';
-  this.closed = true;
-};
+ContextMenu.prototype = Object.create(Tooltip.prototype);
 
 ContextMenu.prototype.mouseover = function (element) {
   element.style.backgroundColor = '#E2E3DF';
@@ -99,63 +69,64 @@ ContextMenu.prototype.mouseout = function (element) {
 
 ContextMenu.prototype.click = function () {
   createHandler(this, 'close');
-  this.closed = true;
 };
 
-ContextMenu.prototype.open = function (x, y) {
-  var i;
-  var node;
-  var element;
-
-  while (this.div.hasChildNodes()) {
-    this.div.removeChild(this.div.firstChild);
+function menuItemApplicable(menuItem, node) {
+  if (!node) {
+    return !menuItem.nodeType;
   }
 
-  for (i = 0; i < this.elements.length; i++) {
-    node = this.tree.root.clicked(
-      this.tree.translateClickX(x),
-      this.tree.translateClickY(y)
-    );
-    if ((node && ((node.leaf && !this.elements[i].leaf && this.elements[i].internal) ||
-      (!node.leaf && !this.elements[i].internal && this.elements[i].leaf))) ||
-      (!node && (this.elements[i].leaf || this.elements[i].internal))) {
+  if (node.leaf && menuItem.nodeType !== 'internal') {
+    return true;
+  }
+
+  if (!node.leaf && menuItem.nodeType === 'internal') {
+    return true;
+  }
+
+  return false;
+}
+
+ContextMenu.prototype.createContent = function (node) {
+  var i;
+  var menuItem;
+  var listElement;
+  var list = document.createElement('ul');
+
+  list.style.margin = '0';
+  list.style.padding = '0';
+
+  for (i = 0; i < this.menuItems.length; i++) {
+    menuItem = this.menuItems[i];
+
+    if (!menuItemApplicable(menuItem, node)) {
       continue;
     }
-    element = document.createElement('div');
-    element.appendChild(document.createTextNode(this.elements[i].text));
-    if (this.elements[i].leaf || this.elements[i].internal) {
-      element.addEventListener(
-        'click', createHandler(node, this.elements[i].handler)
+
+    listElement = Tooltip.prototype.createElement.call(this, 'li', menuItem.text);
+    listElement.style.listStyle = 'none outside none';
+
+    if (menuItem.nodeType) {
+      listElement.addEventListener(
+        'click', createHandler(node, menuItem.handler)
       );
     } else {
-      element.addEventListener(
-        'click', createHandler(this.tree, this.elements[i].handler)
+      listElement.addEventListener(
+        'click', createHandler(this.tree, menuItem.handler)
       );
     }
-    element.style.cursor = 'pointer';
-    element.style.padding = '0.3em 0.5em 0.3em 0.5em';
-    element.style.fontFamily = this.tree.font;
-    element.style.fontSize = '8pt';
-    element.addEventListener('click', this.click);
-    document.body.addEventListener('click', createHandler(this, 'close'));
-    element.addEventListener('contextmenu', preventDefault);
-    element.addEventListener('mouseover', createHandler(element, this.mouseover));
-    element.addEventListener('mouseout', createHandler(element, this.mouseout));
-    this.div.appendChild(element);
+    listElement.addEventListener('click', this.click);
+    listElement.addEventListener('contextmenu', preventDefault);
+    listElement.addEventListener(
+      'mouseover', createHandler(listElement, this.mouseover)
+    );
+    listElement.addEventListener(
+      'mouseout', createHandler(listElement, this.mouseout)
+    );
+
+    list.appendChild(listElement);
   }
-
-  if (x && y) {
-    this.div.style.top = y + 'px';
-    this.div.style.left = x + 'px';
-  } else {
-    this.div.style.top = '100px';
-    this.div.style.left = '100px';
-  }
-
-  this.div.style.zIndex = 2000;
-  this.div.style.display = 'block';
-
-  this.div.style.backgroundColor = '#FFFFFF';
+  this.element.appendChild(list);
 };
 
 module.exports = ContextMenu;
