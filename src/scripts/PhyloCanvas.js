@@ -1133,6 +1133,7 @@
         this.setNodeDimensions(centerX, centerY, nodeRadius);
       }
 
+      // If branch collapsed
       if (this.collapsed) {
         var childIds = this.getChildIds();
         var radius = childIds.length;
@@ -1831,7 +1832,7 @@
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
           // For mouseover tooltip to show no. of children on the internal nodes
-          if (!nd.leaf) {
+          if (!nd.leaf && this.contextMenu.closed) {
             this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
           }
         } else {
@@ -1999,19 +2000,36 @@
       },
       star: function (node) {
         var r = node.getNodeSize();
-        var cx =  r ;
+        var cx = r;
         var cy = 0;
+        var spikes = 6;
+        var outerRadius = 6;
+        var innerRadius = 2;
+        var rot = Math.PI / 2 * 3;
+        var x = cx;
+        var y = cy;
+        var step = Math.PI / spikes;
+        var i = 0;
+        node.canvas.beginPath();
+        node.canvas.moveTo(cx, cy - outerRadius);
+        for (i = 0; i < spikes; i++) {
+          x = cx + Math.cos(rot) * outerRadius;
+          y = cy + Math.sin(rot) * outerRadius;
+          node.canvas.lineTo(x, y);
+          rot += step;
 
-        node.canvas.moveTo(cx, cy);
-        var alpha = (2 * Math.PI) / 10;
-        var rb = r * 1.75;
-        for (var i = 11; i !== 0; i--) {
-          var ra = i % 2 === 1 ? rb : r;
-          var omega = alpha * i;
-          node.canvas.lineTo(cx + (ra * Math.sin(omega)), cy + (ra * Math.cos(omega)));
+          x = cx + Math.cos(rot) * innerRadius;
+          y = cy + Math.sin(rot) * innerRadius;
+          node.canvas.lineTo(x, y);
+          rot += step;
         }
+        node.canvas.lineTo(cx, cy - outerRadius);
         node.canvas.stroke();
         node.canvas.fill();
+        node.canvas.moveTo(cx, cy);
+        node.canvas.lineTo(cx - (outerRadius - 1), cy);
+        node.canvas.stroke();
+        node.canvas.closePath();
       },
       triangle: function (node) {
         var r = node.getNodeSize();
@@ -2027,11 +2045,14 @@
         node.canvas.lineTo(cx, y1);
         node.canvas.stroke();
         node.canvas.fill();
+        node.canvas.moveTo(x1, (y1 + y2) / 2);
+        node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
+        node.canvas.stroke();
       }
     },
     parseNexus: function (str, name) {
       if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
-        throw 'the string provided was not a nexus string';
+        throw 'The string provided was not a nexus string';
       }
       else if (!str.match(/BEGIN TREES/gi)) {
         throw 'The nexus file does not contain a tree block';
