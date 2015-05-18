@@ -207,11 +207,11 @@ Branch.prototype.drawMetadata = function () {
 
       if (window.parseInt(this.data[columnName])) {
         this.canvas.fillStyle = this.tree.colour1;
+        this.canvas.fillRect(tx, ty, width, height);
       } else if (window.parseInt(this.data[columnName]) === 0) {
         this.canvas.fillStyle = this.tree.colour0;
+        this.canvas.fillRect(tx, ty, width, height);
       }
-
-      this.canvas.fillRect(tx, ty, width, height);
     }
     this.canvas.stroke();
     this.canvas.closePath();
