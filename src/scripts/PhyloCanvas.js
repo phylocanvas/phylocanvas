@@ -401,6 +401,11 @@
         internal: true,
         leaf: false
       }, {
+        text: 'Export PNG',
+        handler: 'exportCurrentTreeView',
+        internal: false,
+        leaf: false
+      }, {
         text: 'Download All Leaf IDs',
         handler: 'downloadAllLeafIds',
         internal: false,
@@ -2668,7 +2673,26 @@
       }
     }
   }
+  Tree.prototype.exportCurrentTreeView = function() {
+    var dataUrl = this.canvas.canvas.toDataURL("image/png");
+    var anchor = document.createElement('a');
+    var isDownloadSupported = (typeof anchor.download !== 'undefined');
 
+    anchor.href = dataUrl;
+    anchor.target = '_blank';
+
+    if (isDownloadSupported) {
+      anchor.download = 'phylocanvas.png'; // TODO: create filename from UI state
+    }
+
+    var event = document.createEvent('Event');
+    event.initEvent('click', true, true);
+    anchor.dispatchEvent(event);
+
+    if (isDownloadSupported) {
+      (window.URL || window.webkitURL).revokeObjectURL(anchor.href);
+    }
+  }
   Tree.prototype.loadCompleted = function () {
     fireEvent(this.canvasEl, 'loaded');
   };
