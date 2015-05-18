@@ -6,7 +6,6 @@ var Navigator = require('./Navigator');
 var Angles = require('./utils/constants').Angles;
 var Shapes = require('./utils/constants').Shapes;
 
-
 var addClass = require('./utils/dom').addClass;
 var getX = require('./utils/dom').getX;
 var getY = require('./utils/dom').getY;
@@ -16,6 +15,7 @@ var addEvent = require('./utils/events').addEvent;
 
 var getBackingStorePixelRatio =
   require('./utils/canvas').getBackingStorePixelRatio;
+
 /**
  * The instance of a PhyloCanvas Widget
  *
@@ -512,8 +512,7 @@ Tree.prototype.drag = function (event) {
       this.offsety = this.origy + ymove;
       this.draw();
     }
-  }
-  else if (this.zoomPickedUp) {
+  } else if (this.zoomPickedUp) {
     // right click and drag
     this.d = ((this.starty - event.clientY) / 100);
     this.setZoom(this.origZoom + this.d);
@@ -1327,7 +1326,7 @@ Tree.prototype.toggleLabels = function () {
 Tree.prototype.translateClickX = function (x) {
   var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
 
-  x = (x - getX(this.canvas.canvas)  + window.pageXOffset);
+  x = (x - getX(this.canvas.canvas) + window.pageXOffset);
   x *= ratio;
   x -= this.canvas.canvas.width / 2;
   x -= this.offsetx;
@@ -1339,7 +1338,7 @@ Tree.prototype.translateClickX = function (x) {
 Tree.prototype.translateClickY = function (y) {
   var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
 
-  y = (y - getY(this.canvas.canvas)  + window.pageYOffset) ; // account for positioning and scroll
+  y = (y - getY(this.canvas.canvas) + window.pageYOffset); // account for positioning and scroll
   y *= ratio;
   y -= this.canvas.canvas.height / 2;
   y -= this.offsety;
@@ -1350,7 +1349,7 @@ Tree.prototype.translateClickY = function (y) {
 
 Tree.prototype.viewMetadataColumns = function (metadataColumnArray) {
   this.showMetadata = true;
-  if (metadataColumnArray == undefined) {
+  if (metadataColumnArray === undefined) {
     // Select all column headings so that it will draw all columns
     metadataColumnArray = this.getMetadataColumnHeadings();
   }
@@ -1423,10 +1422,10 @@ Tree.prototype.addListener = function (event, listener) {
 };
 
 Tree.prototype.getBounds = function () {
-  var minx = this.root.startx,
-        maxx = this.root.startx,
-        miny = this.root.starty,
-        maxy = this.root.starty;
+  var minx = this.root.startx;
+  var maxx = this.root.startx;
+  var miny = this.root.starty;
+  var maxy = this.root.starty;
 
   for (var i = this.leaves.length; i--;) {
     var x = this.leaves[i].centerx;
@@ -1448,13 +1447,16 @@ Tree.prototype.getBounds = function () {
 };
 
 Tree.prototype.fitInPanel = function () {
-  var bounds = this.getBounds(),
-      minx = bounds[0][0],
-      maxx = bounds[1][0],
-      miny = bounds[0][1],
-      maxy = bounds[1][1],
-      padding = 50,
-      canvasSize = [this.canvas.canvas.width - padding, this.canvas.canvas.height - padding];
+  var bounds = this.getBounds();
+  var minx = bounds[0][0];
+  var maxx = bounds[1][0];
+  var miny = bounds[0][1];
+  var maxy = bounds[1][1];
+  var padding = 50;
+  var canvasSize = [
+    this.canvas.canvas.width - padding,
+    this.canvas.canvas.height - padding
+  ];
 
   this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
   this.offsety = (maxy + miny) * this.zoom / -2;
