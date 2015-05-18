@@ -1524,4 +1524,25 @@ Tree.prototype.downloadAllLeafIds = function () {
   this.root.downloadLeafIdsFromBranch();
 };
 
+Tree.prototype.exportCurrentTreeView = function () {
+  var dataUrl = this.getPngUrl();
+  var anchor = document.createElement('a');
+  var isDownloadSupported = (typeof anchor.download !== 'undefined');
+  var event = document.createEvent('Event');
+
+  anchor.href = dataUrl;
+  anchor.target = '_blank';
+
+  if (isDownloadSupported) {
+    anchor.download = 'phylocanvas.png';
+  }
+
+  event.initEvent('click', true, true);
+  anchor.dispatchEvent(event);
+
+  if (isDownloadSupported) {
+    (window.URL || window.webkitURL).revokeObjectURL(anchor.href);
+  }
+};
+
 module.exports = Tree;

@@ -22,6 +22,9 @@ var DEFAULT_MENU_ITEMS = [ {
     handler: 'rotate',
     nodeType: 'internal'
   }, {
+    text: 'Export As Image',
+    handler: 'exportCurrentTreeView'
+  }, {
     text: 'Download All Leaf IDs',
     handler: 'downloadAllLeafIds'
   }, {
