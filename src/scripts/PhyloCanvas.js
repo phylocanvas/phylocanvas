@@ -1106,8 +1106,17 @@
       }
 
       this.canvas.beginPath();
-      this.canvas.fillStyle = this.getTextColour();
-      this.canvas.fillText(lbl, tx, ty);
+      if(this.selected) {
+        // Draw background for selected nodes
+        this.canvas.fillStyle = this.tree.selectedColour;
+        this.canvas.fillRect(tx , ty - fSize - 1, dimensions.width, fSize + 2);
+        this.canvas.fillStyle = "black";
+        this.canvas.fillText(lbl, tx, ty);
+      }
+      else {
+        this.canvas.fillStyle = this.getTextColour();
+        this.canvas.fillText(lbl, tx, ty);
+      }
       this.canvas.closePath();
     },
     setNodeDimensions: function (centerX, centerY, radius) {
