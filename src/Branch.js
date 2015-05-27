@@ -337,9 +337,11 @@ Branch.prototype.drawNode = function () {
     }
 
     this.canvas.globalAlpha = 0.3;
+
     this.canvas.beginPath();
+
     this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color)?
+    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
                       this.tree.defaultCollapsedOptions.color : 'purple';
     this.canvas.fill();
     this.canvas.globalAlpha = 1;
@@ -358,7 +360,6 @@ Branch.prototype.drawNode = function () {
       if (this.tree.treeType === 'hierarchy') {
         this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
       }
-
       this.canvas.closePath();
       this.canvas.fill();
     }
@@ -384,11 +385,6 @@ Branch.prototype.drawNode = function () {
 
     // Swapping back the line width if it was changed due to nodeAlign
     this.canvas.lineWidth = origLineWidth;
-
-    // setLineDash does not work in firefox  and safari
-    if (this.canvas.setLineDash) {
-      this.canvas.setLineDash([ 0 ]);
-    }
   }
   this.canvas.closePath();
 
@@ -402,7 +398,7 @@ Branch.prototype.drawNode = function () {
     this.canvas.stroke();
     this.canvas.lineWidth = l;
     this.canvas.strokeStyle = this.tree.branchColour;
-    this.canvas.beginPath();
+    this.canvas.closePath();
   }
 };
 
