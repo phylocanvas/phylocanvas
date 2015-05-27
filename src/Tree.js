@@ -638,11 +638,11 @@ Tree.prototype.load = function (tree, name, format) {
       this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
     } else if (tree.match(/\.nwk$/)) {
       this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-    } else if (tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i)) {
+    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
       this.parseNexus(tree, name);
       this.draw();
       this.loadCompleted();
-    } else if (tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) {
+    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
       this.parseNwk(tree, name);
       this.draw();
       this.loadCompleted();
@@ -757,10 +757,7 @@ Tree.prototype.nodeRenderers = {
 };
 
 Tree.prototype.parseNexus = function (str, name) {
-  if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
-    throw 'The string provided was not a nexus string';
-  }
-  else if (!str.match(/BEGIN TREES/gi)) {
+  if (!str.match(/BEGIN TREES/gi)) {
     throw 'The nexus file does not contain a tree block';
   }
 
