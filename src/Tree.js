@@ -767,14 +767,17 @@ Tree.prototype.parseNexus = function (str, name) {
   //Get everything between BEGIN TREES and next END;
   var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
   //get translate section
-  var translateSection;
+
   var leafNameObject = {};
-  if (treeSection.match(/TRANSLATE[^;]+;/i)) {
-    translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
+  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
+  if (translateSection && translateSection.length) {
+    translateSection = translateSection[0];
     //remove translate section from tree section
     treeSection = treeSection.replace(translateSection, '');
+
     //parse translate section into kv pairs
     translateSection = translateSection.replace(/translate|;/gi, '');
+
     var tIntArr = translateSection.split(',');
     var ia;
     for (var i = 0; i < tIntArr.length; i++) {
