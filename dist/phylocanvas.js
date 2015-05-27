@@ -1665,7 +1665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.saveNode = function (node) {
-	  if (!node.id || node.id == '') {
+	  if (!node.id || node.id === '') {
 	    node.id = node.tree.genId();
 	  }
 	  if (this.branches[node.id]) {
@@ -1684,24 +1684,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.scroll = function (e) {
 	  var z = Math.log(this.zoom) / Math.log(10);
-	  this.setZoom(z + (e.wheelDelta ? e.wheelDelta / 1000 : e.detail / -100));
+	  this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
 	  e.preventDefault();
 	};
 
 	Tree.prototype.selectNodes = function (nIds) {
 	  var ns = nIds;
-	  var node, nd;
+	  var node;
+	  var nodeId;
+	  var index;
 
 	  if (this.root) {
 	    this.root.setSelected(false, true);
 	    if (typeof nIds === 'string') {
 	      ns = ns.split(',');
 	    }
-	    for (var nd in this.branches) {
-	      if (this.branches.hasOwnProperty(nd)) {
-	        node = this.branches[nd];
-	        for (var j = 0; j < ns.length; j++) {
-	          if (ns[j] == node.id) {
+	    for (nodeId in this.branches) {
+	      if (this.branches.hasOwnProperty(nodeId)) {
+	        node = this.branches[nodeId];
+	        for (index = 0; index < ns.length; index++) {
+	          if (ns[index] === node.id) {
 	            node.setSelected(true, true);
 	          }
 	        }
@@ -1712,11 +1714,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.setFont = function (font) {
-	  if (isNaN(font))
+	  if (isNaN(font)) {
 	    this.font = font;
-	  else
-	    this.font
-	  this.draw();
+	    this.draw();
+	  }
 	};
 
 	Tree.prototype.setNodeColourAndShape = function (nids, colour, shape, size, waiting) {
@@ -1724,13 +1725,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (this.drawn) {
 	    var arr = [];
-	    if (typeof nids == 'string') {
+	    if (typeof nids === 'string') {
 	      arr = nids.split(',');
 	    } else {
 	      arr = nids;
 	    }
 
-	    if (nids != '') {
+	    if (nids !== '') {
 	      for (var i = 0; i <  arr.length; i++) {
 	        if (this.branches[arr[i]]) {
 	          if (colour) {
@@ -1755,7 +1756,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    });
 	  }
-
 	};
 
 	Tree.prototype.setNodeSize = function (size) {
@@ -1776,16 +1776,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.setFontSize = function (ystep) {
 	  // Setting tree text size
-	  if (this.treeType == 'circular') {
+	  if (this.treeType === 'circular') {
 	    this.textSize = Math.min((ystep * 100) + 5, 40);
-	  }
-	  else if (this.treeType == 'radial') {
+	  } else if (this.treeType === 'radial') {
 	    this.textSize = Math.min((ystep * 50) + 5, 20);
-	  }
-	  else if (this.treeType == 'diagonal') {
+	  } else if (this.treeType === 'diagonal') {
 	    this.textSize = Math.min((ystep / 2), 10);
-	  }
-	  else {
+	  } else {
 	    this.textSize = Math.min((ystep / 2), 15);
 	  }
 	  this.canvas.font = this.textSize + 'pt ' + this.font;
@@ -2398,9 +2395,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    this.canvas.globalAlpha = 0.3;
+
 	    this.canvas.beginPath();
+
 	    this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-	    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color)?
+	    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
 	                      this.tree.defaultCollapsedOptions.color : 'purple';
 	    this.canvas.fill();
 	    this.canvas.globalAlpha = 1;
@@ -2419,7 +2418,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.tree.treeType === 'hierarchy') {
 	        this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
 	      }
-
 	      this.canvas.closePath();
 	      this.canvas.fill();
 	    }
@@ -2445,11 +2443,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // Swapping back the line width if it was changed due to nodeAlign
 	    this.canvas.lineWidth = origLineWidth;
-
-	    // setLineDash does not work in firefox  and safari
-	    if (this.canvas.setLineDash) {
-	      this.canvas.setLineDash([ 0 ]);
-	    }
 	  }
 	  this.canvas.closePath();
 
@@ -2463,7 +2456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.canvas.stroke();
 	    this.canvas.lineWidth = l;
 	    this.canvas.strokeStyle = this.tree.branchColour;
-	    this.canvas.beginPath();
+	    this.canvas.closePath();
 	  }
 	};
 
