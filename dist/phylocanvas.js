@@ -65,9 +65,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var hasClass = __webpack_require__(2).hasClass;
 	var removeClass = __webpack_require__(2).removeClass;
 
-	var fireEvent = __webpack_require__(5).fireEvent;
-	var addEvent = __webpack_require__(5).addEvent;
-	var killEvent = __webpack_require__(5).killEvent;
+	var fireEvent = __webpack_require__(1).fireEvent;
+	var addEvent = __webpack_require__(1).addEvent;
+	var killEvent = __webpack_require__(1).killEvent;
 
 	/**
 	 * @namespace PhyloCanvas
@@ -266,7 +266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	  Tree: Tree,
 	  Branch: __webpack_require__(4),
-	  Loader: __webpack_require__(1),
+	  Loader: __webpack_require__(10),
 	  ContextMenu: __webpack_require__(6),
 	  History: History
 	};
@@ -276,153 +276,91 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * @constructor
-	 * @memberof PhyloCanvas
-	 */
-	function Loader(div) {
-	  this.div = div;
-	  this.cl = document.createElement('canvas');
-	  this.cl.id = div.id + 'Loader';
-	  this.cl.style.position = 'absolute';
-	  this.cl.style.backgroundColor = '#FFFFFF';
-	  this.cl.style.top = (div.offsetHeight / 4) + 'px';
-	  this.cl.style.left = (div.offsetWidth / 4) + 'px';
-	  this.cl.height = div.offsetHeight / 2;
-	  this.cl.width = div.offsetWidth / 2;
-	  this.cl.style.zIndex = '1000';
-	  div.appendChild(this.cl);
-
-	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-	  this.drawer = null;
-	  this.loaderRadius = null;
-	  this.loaderStep = (2 * Math.PI) / 360;
-
-	  this.message = 'Loading ...';
+	function preventDefault(event) {
+	  event.preventDefault();
+	  return false;
 	}
 
-	Loader.prototype.run = function () {
-	  var i = 0;
-	  var _this = this;
-	  this.cl.style.diangle = 'block';
-	  this.initLoader();
-	  this.drawer = setInterval(function () {
-	    _this.drawLoader(i);
-	    i++;
-	  }, 10);
-	};
+	function fireEvent(element, type, params) {
+	  var event; // The custom event that will be created
+	  var param;
 
-	Loader.prototype.resize = function () {
-	  this.cl.style.top = '2px';
-	  this.cl.style.left = '2px';
-	  this.cl.height = this.div.offsetHeight * 0.75;
-	  this.cl.width = this.div.offsetWidth * 0.75;
+	  if (document.createEvent) {
+	    event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	  } else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	  }
 
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
+	  event.eventName = type;
+	  event.bubbles = false;
+	  if (params) {
+	    for (param in params) {
+	      if (params.hasOwnProperty(param)) {
+	        event[param] = params[param];
+	      }
+	    }
+	  }
 
-	  this.ctx.font = '24px sans-serif';
+	  if (document.createEvent) {
+	    element.dispatchEvent(event);
+	  } else {
+	    element.fireEvent('on' + event.eventType, event);
+	  }
+	}
 
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
-	};
+	function addEvent(elem, event, fn) {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(event, fn, false);
+	  } else {
+	    elem.attachEvent('on' + event, function () {
+	      // set the this pointer same as addEventListener when fn is called
+	      return (fn.call(elem, window.event));
+	    });
+	  }
+	}
 
-	Loader.prototype.initLoader = function () {
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
+	function killEvent(e) {
+	  e.stopPropagation();
+	  e.preventDefault();
+	}
 
-	  this.ctx.font = '24px sans-serif';
+	/**
+	 * Creates a function which can be called from an event handler independent of
+	 * scope.
+	 *
+	 * @param {Object} obj the object the function will be called on
+	 * @param {String} func the name of the function to be called
+	 * @retuns {function}
+	 */
+	function createHandler(obj, func) {
+	  var handler;
 
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
-	};
+	  if (typeof func === typeof 'aaa') {
+	    handler = function (e) {
+	      if (obj[func]) {
+	        return obj[func](e);
+	      }
+	    };
+	  } else {
+	    handler = function () { return func(obj); };
+	  }
+	  return handler;
+	}
 
-	Loader.prototype.drawLoader = function (t) {
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
-	  );
-
-	  this.ctx.save();
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
-	  );
-	  this.ctx.stroke();
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0,
-	    this.loaderRadius,
-	    this.loaderStep * t + 3,
-	    this.loaderStep * t + 5
-	  );
-	  this.ctx.stroke();
-	  this.ctx.fillText(
-	    this.message,
-	    -(this.ctx.measureText(this.message).width / 2),
-	    this.loaderRadius + 50, this.cl.width
-	  );
-	};
-
-	Loader.prototype.stop = function () {
-	  clearInterval(this.drawer);
-	  this.cl.style.display = 'none';
-	};
-
-	Loader.prototype.fail = function (message) {
-	  clearInterval(this.drawer);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4,
-	    this.ctx.canvas.height / 4
-	  );
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
-
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
-	  this.ctx.stroke();
-
-	  this.ctx.fillText(
-	    message,
-	    -(this.ctx.measureText(message).width / 2),
-	    this.loaderRadius + 50,
-	    this.loaderRadius * 2
-	  );
-	};
-
-	module.exports = Loader;
+	module.exports.preventDefault = preventDefault;
+	module.exports.fireEvent = fireEvent;
+	module.exports.addEvent = addEvent;
+	module.exports.killEvent = killEvent;
+	module.exports.createHandler = createHandler;
 
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var fireEvent = __webpack_require__(5).fireEvent;
+	var fireEvent = __webpack_require__(1).fireEvent;
 
 	function setupDownloadLink(data, filename) {
 	  var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
@@ -510,18 +448,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Tooltip = __webpack_require__(7);
 	var Navigator = __webpack_require__(8);
 
-	var Angles = __webpack_require__(9).Angles;
-	var Shapes = __webpack_require__(9).Shapes;
+	var Angles = __webpack_require__(5).Angles;
+	var Shapes = __webpack_require__(5).Shapes;
 
 	var addClass = __webpack_require__(2).addClass;
 	var getX = __webpack_require__(2).getX;
 	var getY = __webpack_require__(2).getY;
 
-	var fireEvent = __webpack_require__(5).fireEvent;
-	var addEvent = __webpack_require__(5).addEvent;
+	var fireEvent = __webpack_require__(1).fireEvent;
+	var addEvent = __webpack_require__(1).addEvent;
 
 	var getBackingStorePixelRatio =
-	  __webpack_require__(10).getBackingStorePixelRatio;
+	  __webpack_require__(9).getBackingStorePixelRatio;
 
 	/**
 	 * The instance of a PhyloCanvas Widget
@@ -1144,11 +1082,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
 	    } else if (tree.match(/\.nwk$/)) {
 	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-	    } else if (tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i)) {
+	    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
 	      this.parseNexus(tree, name);
 	      this.draw();
 	      this.loadCompleted();
-	    } else if (tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) {
+	    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
 	      this.parseNwk(tree, name);
 	      this.draw();
 	      this.loadCompleted();
@@ -1263,29 +1201,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.parseNexus = function (str, name) {
-	  if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
-	    throw 'The string provided was not a nexus string';
-	  }
-	  else if (!str.match(/BEGIN TREES/gi)) {
+	  if (!str.match(/BEGIN TREES/gi)) {
 	    throw 'The nexus file does not contain a tree block';
 	  }
 
 	  //Get everything between BEGIN TREES and next END;
 	  var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
 	  //get translate section
-	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
 
-	  //remove translate section from tree section
-	  treeSection = treeSection.replace(translateSection, '');
-	  //parse translate section into kv pairs
-	  translateSection = translateSection.replace(/translate|;/gi, '');
+	  var leafNameObject = {};
+	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
+	  if (translateSection && translateSection.length) {
+	    translateSection = translateSection[0];
+	    //remove translate section from tree section
+	    treeSection = treeSection.replace(translateSection, '');
 
-	  var tIntArr = translateSection.split(',');
-	  var rObj = {};
-	  var ia;
-	  for (var i = 0; i < tIntArr.length; i++) {
-	    ia = tIntArr[i].replace('\n', '').split(' ');
-	    rObj[ia[0].trim()] = ia[1].trim();
+	    //parse translate section into kv pairs
+	    translateSection = translateSection.replace(/translate|;/gi, '');
+
+	    var tIntArr = translateSection.split(',');
+	    var ia;
+	    for (var i = 0; i < tIntArr.length; i++) {
+	      ia = tIntArr[i].trim().replace('\n', '').split(' ');
+	      if (ia[0] && ia[1]) {
+	        leafNameObject[ia[0].trim()] = ia[1].trim();
+	      }
+	    }
 	  }
 
 	  // find each line starting with tree.
@@ -1295,17 +1236,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  for (var i = 0; i < tArr.length; i++) {
 	    if (tArr[i].trim() === '') continue;
 	    var s = tArr[i].replace(/tree\s/i, '');
-	    trees[s.match(/^\w+/)[0]] = s.match(/ [\S]*$/)[0];
+	    if (!name) {
+	      name = s.trim().match(/^\w+/)[0]
+	    }
+	    trees[name] = s.trim().match(/[\S]*$/)[0];
 	  }
 	  if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
 
 	  this.parseNwk(trees[name].trim());
 	  // translate in accordance with translate block
-	  for (var n in rObj) {
-	    var b = this.branches[n];
-	    delete this.branches[n];
-	    b.id = rObj[n];
-	    this.branches[b.id] = b;
+	  if (leafNameObject) {
+	    for (var n in leafNameObject) {
+	      var b = this.branches[n];
+	      delete this.branches[n];
+	      b.id = leafNameObject[n];
+	      this.branches[b.id] = b;
+	    }
 	  }
 	};
 
@@ -2056,8 +2002,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Angles = __webpack_require__(9).Angles;
-	var Shapes = __webpack_require__(9).Shapes;
+	var Angles = __webpack_require__(5).Angles;
+	var Shapes = __webpack_require__(5).Shapes;
 	var setupDownloadLink = __webpack_require__(2).setupDownloadLink;
 
 	/**
@@ -2828,84 +2774,55 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
+	/**
+	 * An enumeration of certain pre-defined angles to enable faster drawing of
+	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	module.exports.Angles = {
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 4
+	   */
+	  FORTYFIVE: Math.PI / 4,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 2
+	   */
+	  QUARTER: Math.PI / 2,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI
+	   */
+	  HALF: Math.PI,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI * 2
+	   */
+	  FULL: 2 * Math.PI
+	};
 
-	function fireEvent(element, type, params) {
-	  var event; // The custom event that will be created
-	  var param;
-
-	  if (document.createEvent) {
-	    event = document.createEvent('HTMLEvents');
-	    event.initEvent(type, true, true);
-	  } else {
-	    event = document.createEventObject();
-	    event.eventType = type;
-	  }
-
-	  event.eventName = type;
-	  event.bubbles = false;
-	  if (params) {
-	    for (param in params) {
-	      if (params.hasOwnProperty(param)) {
-	        event[param] = params[param];
-	      }
-	    }
-	  }
-
-	  if (document.createEvent) {
-	    element.dispatchEvent(event);
-	  } else {
-	    element.fireEvent('on' + event.eventType, event);
-	  }
-	}
-
-	function addEvent(elem, event, fn) {
-	  if (elem.addEventListener) {
-	    elem.addEventListener(event, fn, false);
-	  } else {
-	    elem.attachEvent('on' + event, function () {
-	      // set the this pointer same as addEventListener when fn is called
-	      return (fn.call(elem, window.event));
-	    });
-	  }
-	}
-
-	function killEvent(e) {
-	  e.stopPropagation();
-	  e.preventDefault();
-	}
 
 	/**
-	 * Creates a function which can be called from an event handler independent of
-	 * scope.
+	 * dictionary to translate annotations in NWK to branch renderer ids
 	 *
-	 * @param {Object} obj the object the function will be called on
-	 * @param {String} func the name of the function to be called
-	 * @retuns {function}
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
 	 */
-	function createHandler(obj, func) {
-	  var handler;
-
-	  if (typeof func === typeof 'aaa') {
-	    handler = function (e) {
-	      if (obj[func]) {
-	        return obj[func](e);
-	      }
-	    };
-	  } else {
-	    handler = function () { return func(obj); };
-	  }
-	  return handler;
-	}
-
-	module.exports.preventDefault = preventDefault;
-	module.exports.fireEvent = fireEvent;
-	module.exports.addEvent = addEvent;
-	module.exports.killEvent = killEvent;
-	module.exports.createHandler = createHandler;
+	module.exports.Shapes = {
+	  x: 'star',
+	  s: 'square',
+	  o: 'circle',
+	  t: 'triangle'
+	};
 
 
 /***/ },
@@ -2914,8 +2831,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Tooltip = __webpack_require__(7);
 
-	var createHandler = __webpack_require__(5).createHandler;
-	var preventDefault = __webpack_require__(5).preventDefault;
+	var createHandler = __webpack_require__(1).createHandler;
+	var preventDefault = __webpack_require__(1).preventDefault;
 
 	var DEFAULT_MENU_ITEMS = [ {
 	    text: 'Redraw Subtree',
@@ -3215,61 +3132,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * An enumeration of certain pre-defined angles to enable faster drawing of
-	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	module.exports.Angles = {
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 4
-	   */
-	  FORTYFIVE: Math.PI / 4,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 2
-	   */
-	  QUARTER: Math.PI / 2,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI
-	   */
-	  HALF: Math.PI,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI * 2
-	   */
-	  FULL: 2 * Math.PI
-	};
-
-
-	/**
-	 * dictionary to translate annotations in NWK to branch renderer ids
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	module.exports.Shapes = {
-	  x: 'star',
-	  s: 'square',
-	  o: 'circle',
-	  t: 'triangle'
-	};
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
 	 * Return backing store pixel ratio of context.
 	 *
 	 * @param context - The rendering context of HTMl5 canvas.
@@ -3287,6 +3149,152 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * @constructor
+	 * @memberof PhyloCanvas
+	 */
+	function Loader(div) {
+	  this.div = div;
+	  this.cl = document.createElement('canvas');
+	  this.cl.id = div.id + 'Loader';
+	  this.cl.style.position = 'absolute';
+	  this.cl.style.backgroundColor = '#FFFFFF';
+	  this.cl.style.top = (div.offsetHeight / 4) + 'px';
+	  this.cl.style.left = (div.offsetWidth / 4) + 'px';
+	  this.cl.height = div.offsetHeight / 2;
+	  this.cl.width = div.offsetWidth / 2;
+	  this.cl.style.zIndex = '1000';
+	  div.appendChild(this.cl);
+
+	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
+	  this.drawer = null;
+	  this.loaderRadius = null;
+	  this.loaderStep = (2 * Math.PI) / 360;
+
+	  this.message = 'Loading ...';
+	}
+
+	Loader.prototype.run = function () {
+	  var i = 0;
+	  var _this = this;
+	  this.cl.style.diangle = 'block';
+	  this.initLoader();
+	  this.drawer = setInterval(function () {
+	    _this.drawLoader(i);
+	    i++;
+	  }, 10);
+	};
+
+	Loader.prototype.resize = function () {
+	  this.cl.style.top = '2px';
+	  this.cl.style.left = '2px';
+	  this.cl.height = this.div.offsetHeight * 0.75;
+	  this.cl.width = this.div.offsetWidth * 0.75;
+
+	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
+	  this.ctx.lineWidth = 10.0;
+
+	  this.ctx.font = '24px sans-serif';
+
+	  this.ctx.shadowOffsetX = 2.0;
+	  this.ctx.shadowOffsetY = 2.0;
+	};
+
+	Loader.prototype.initLoader = function () {
+	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
+	  this.ctx.lineWidth = 10.0;
+
+	  this.ctx.font = '24px sans-serif';
+
+	  this.ctx.shadowOffsetX = 2.0;
+	  this.ctx.shadowOffsetY = 2.0;
+	};
+
+	Loader.prototype.drawLoader = function (t) {
+	  this.ctx.restore();
+
+	  this.ctx.translate(0, 0);
+	  this.loaderRadius = Math.min(
+	    this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
+	  );
+
+	  this.ctx.save();
+	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+	  this.ctx.beginPath();
+	  this.ctx.arc(
+	    0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
+	  );
+	  this.ctx.stroke();
+
+	  this.ctx.beginPath();
+	  this.ctx.arc(
+	    0, 0,
+	    this.loaderRadius,
+	    this.loaderStep * t + 3,
+	    this.loaderStep * t + 5
+	  );
+	  this.ctx.stroke();
+	  this.ctx.fillText(
+	    this.message,
+	    -(this.ctx.measureText(this.message).width / 2),
+	    this.loaderRadius + 50, this.cl.width
+	  );
+	};
+
+	Loader.prototype.stop = function () {
+	  clearInterval(this.drawer);
+	  this.cl.style.display = 'none';
+	};
+
+	Loader.prototype.fail = function (message) {
+	  clearInterval(this.drawer);
+	  this.loaderRadius = Math.min(
+	    this.ctx.canvas.width / 4,
+	    this.ctx.canvas.height / 4
+	  );
+	  this.ctx.restore();
+
+	  this.ctx.translate(0, 0);
+	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+	  this.ctx.beginPath();
+
+	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
+	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
+
+	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+	  this.ctx.beginPath();
+
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
+	  this.ctx.stroke();
+
+	  this.ctx.fillText(
+	    message,
+	    -(this.ctx.measureText(message).width / 2),
+	    this.loaderRadius + 50,
+	    this.loaderRadius * 2
+	  );
+	};
+
+	module.exports = Loader;
 
 
 /***/ }

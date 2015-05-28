@@ -637,11 +637,11 @@ Tree.prototype.load = function (tree, name, format) {
       this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
     } else if (tree.match(/\.nwk$/)) {
       this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-    } else if (tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i)) {
+    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
       this.parseNexus(tree, name);
       this.draw();
       this.loadCompleted();
-    } else if (tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) {
+    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
       this.parseNwk(tree, name);
       this.draw();
       this.loadCompleted();
@@ -756,29 +756,32 @@ Tree.prototype.nodeRenderers = {
 };
 
 Tree.prototype.parseNexus = function (str, name) {
-  if (!str.match(/^#NEXUS[\s\n;\w\.\*\/\:(\),-=\[\]&]+$/i)) {
-    throw 'The string provided was not a nexus string';
-  }
-  else if (!str.match(/BEGIN TREES/gi)) {
+  if (!str.match(/BEGIN TREES/gi)) {
     throw 'The nexus file does not contain a tree block';
   }
 
   //Get everything between BEGIN TREES and next END;
   var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
   //get translate section
-  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i)[0];
 
-  //remove translate section from tree section
-  treeSection = treeSection.replace(translateSection, '');
-  //parse translate section into kv pairs
-  translateSection = translateSection.replace(/translate|;/gi, '');
+  var leafNameObject = {};
+  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
+  if (translateSection && translateSection.length) {
+    translateSection = translateSection[0];
+    //remove translate section from tree section
+    treeSection = treeSection.replace(translateSection, '');
 
-  var tIntArr = translateSection.split(',');
-  var rObj = {};
-  var ia;
-  for (var i = 0; i < tIntArr.length; i++) {
-    ia = tIntArr[i].replace('\n', '').split(' ');
-    rObj[ia[0].trim()] = ia[1].trim();
+    //parse translate section into kv pairs
+    translateSection = translateSection.replace(/translate|;/gi, '');
+
+    var tIntArr = translateSection.split(',');
+    var ia;
+    for (var i = 0; i < tIntArr.length; i++) {
+      ia = tIntArr[i].trim().replace('\n', '').split(' ');
+      if (ia[0] && ia[1]) {
+        leafNameObject[ia[0].trim()] = ia[1].trim();
+      }
+    }
   }
 
   // find each line starting with tree.
@@ -788,17 +791,22 @@ Tree.prototype.parseNexus = function (str, name) {
   for (var i = 0; i < tArr.length; i++) {
     if (tArr[i].trim() === '') continue;
     var s = tArr[i].replace(/tree\s/i, '');
-    trees[s.match(/^\w+/)[0]] = s.match(/ [\S]*$/)[0];
+    if (!name) {
+      name = s.trim().match(/^\w+/)[0]
+    }
+    trees[name] = s.trim().match(/[\S]*$/)[0];
   }
   if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
 
   this.parseNwk(trees[name].trim());
   // translate in accordance with translate block
-  for (var n in rObj) {
-    var b = this.branches[n];
-    delete this.branches[n];
-    b.id = rObj[n];
-    this.branches[b.id] = b;
+  if (leafNameObject) {
+    for (var n in leafNameObject) {
+      var b = this.branches[n];
+      delete this.branches[n];
+      b.id = leafNameObject[n];
+      this.branches[b.id] = b;
+    }
   }
 };
 
