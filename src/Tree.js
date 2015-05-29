@@ -77,7 +77,7 @@ function Tree(div, conf) {
 
   addClass(this.canvasEl, 'pc-container');
 
-  //Set up the div and canvas element
+  // Set up the div and canvas element
   if (window.getComputedStyle(this.canvasEl).position === 'static') {
     this.canvasEl.style.position = 'relative';
   }
@@ -178,14 +178,16 @@ function Tree(div, conf) {
   addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
   addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
   addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-  addEvent(window, 'resize', function (evt) {
+  addEvent(window, 'resize', function () {
     this.resizeToContainer();
   }.bind(this));
 
-  this.addListener('loaded', function (evt) {
+  this.addListener('loaded', function () {
     this.origBranches = this.branches;
     this.origLeaves = this.leaves;
     this.origRoot = this.root;
+
+
   }.bind(this));
 
   /**
@@ -244,6 +246,24 @@ Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, sco
   }
 };
 
+Tree.prototype.setInitialCollapsedBranches = function (node) {
+  var childIds;
+  var i;
+
+  node = node || this.root; // default param
+
+  childIds = node.getChildIds();
+  if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
+      childIds.length < this.defaultCollapsedOptions.max) {
+    node.collapsed = true;
+    return;
+  }
+
+  for (i = 0; i < node.children.length; i++) {
+    this.setInitialCollapsedBranches(node.children[i]);
+  }
+};
+
 Tree.prototype.checkInitialTreeCollapseRange = function (node) {
   // Collapse nodes on default
   var childIds = node.getChildIds();
@@ -253,187 +273,7 @@ Tree.prototype.checkInitialTreeCollapseRange = function (node) {
   }
 };
 
-/**
- * A dictionary of functions. Each function draws a different tree structure
- */
-Tree.prototype.branchRenderers = {
-  rectangular: function (tree, node, collapse) {
-    var  bl = node.branchLength * tree.branchScalar;
-    node.angle = 0;
-    if (node.parent) {
-      node.centerx = node.startx + bl;
-    }
-    if (node.selected) {
-      //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-      node.canvas.fillStyle = tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    node.canvas.strokeStyle = node.getColour();
-    node.canvas.beginPath();
-
-    if (!collapse) {
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.startx, node.centery);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      node.children[i].startx = node.centerx;
-      node.children[i].starty = node.centery;
-      tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  circular: function (tree, node, collapse) {
-    var bl = node.totalBranchLength * tree.branchScalar;
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (!collapse) {
-      node.canvas.beginPath();
-      node.canvas.moveTo(node.startx, node.starty);
-      if (node.leaf) {
-        node.canvas.lineTo(node.interx, node.intery);
-        node.canvas.stroke();
-        var ss = node.getColour();
-        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
-        node.canvas.lineTo(node.centerx, node.centery);
-        node.canvas.stroke();
-        node.canvas.strokeStyle = ss;
-      } else {
-        node.canvas.lineTo(node.centerx, node.centery);
-        node.canvas.stroke();
-      }
-
-      node.canvas.strokeStyle = node.getColour();
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-
-      if (node.children.length > 1 && !node.collapsed) {
-        node.canvas.beginPath();
-        node.canvas.arc(0, 0, (bl), node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-        node.canvas.stroke();
-        node.canvas.closePath();
-      }
-      node.drawNode();
-    }
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  radial: function (tree, node, collapse) {
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    }
-    else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (node.parent && !collapse) {
-      node.canvas.beginPath();
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  diagonal: function (tree, node, collapse) {
-    node.angle = 0;
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    node.canvas.beginPath();
-    // alert(node.starty);
-
-    if (!collapse) {
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      node.children[i].startx = node.centerx;
-      node.children[i].starty = node.centery;
-      tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  hierarchy: function (tree, node, collapse) {
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (!collapse) {
-      node.canvas.beginPath();
-      if (node !== node.tree.root) {
-        node.canvas.moveTo(node.startx, node.starty);
-        node.canvas.lineTo(node.centerx, node.starty);
-      }
-
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-    }
-  }
-};
+Tree.prototype.branchRenderers = require('./renderers/branch');
 
 Tree.prototype.clicked = function (e) {
   var node;
@@ -874,6 +714,7 @@ Tree.prototype.parseNwk = function (nwk) {
   }
 
   this.buildLeaves();
+  this.setInitialCollapsedBranches();
 
   this.loadCompleted();
 };
@@ -1169,18 +1010,18 @@ Tree.prototype.saveNode = function (node) {
   if (!node.id || node.id === '') {
     node.id = node.tree.genId();
   }
+
   if (this.branches[node.id]) {
     if (node !== this.branches[node.id]) {
       if (!this.leaf) {
         node.id = this.genId();
-        this.branches[node.id] = node;
       } else {
-        throw 'Two nodes on this tree share the id ' + node.id;
+        throw new Error('Two nodes on this tree share the id ' + node.id);
       }
     }
-  } else {
-    this.branches[node.id] = node;
   }
+
+  this.branches[node.id] = node;
 };
 
 Tree.prototype.scroll = function (e) {
