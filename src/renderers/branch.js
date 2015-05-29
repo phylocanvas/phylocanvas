@@ -5,10 +5,9 @@ var diagonal = require('./branch/diagonal');
 var hierarchical = require('./branch/hierarchical');
 
 function createBranchRenderer(options) {
-  var i;
-
   return function renderBranch(tree, branch, collapse) {
-    if (collapse) return;
+    var i;
+    if (collapse || !branch) return;
 
     if (branch.selected) {
       branch.canvas.fillStyle = tree.selectedColour;

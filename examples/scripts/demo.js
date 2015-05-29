@@ -16,7 +16,7 @@ window.onload = function () {
   phylocanvas.hoverLabel = true;
 
   // load tree via AJAX and render using default params
-  phylocanvas.load('./data/tree.nwk');
+  phylocanvas.load('(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);');
 
   // phylocanvas.on('historytoggle', function (e) {
   //   alert(e.isOpen ? 'history is open' : 'history is closed');

@@ -899,7 +899,7 @@ Tree.prototype.prerenderers = {
     tree.setFontSize(ystep);
     tree.setMaxLabelLength();
   },
-  hierarchy: function (tree) {
+  hierarchical: function (tree) {
     tree.root.startx = 0;
     tree.root.starty = 0;
     tree.root.centerx = 0;
