@@ -1,5 +1,5 @@
 module.exports = {
-  render: function (tree, node) {
+  draw: function (tree, node) {
     var strokeStyle = node.getColour();
     var branchLength = node.totalBranchLength * tree.branchScalar;
 

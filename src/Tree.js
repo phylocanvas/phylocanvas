@@ -410,7 +410,7 @@ Tree.prototype.draw = function (forceRedraw) {
   this.canvas.translate(this.offsetx, this.offsety);
   this.canvas.scale(this.zoom, this.zoom);
 
-  this.branchRenderers[this.treeType](this, this.root);
+  this.branchRenderers[this.treeType].render(this, this.root);
   // Making default collapsed false so that it will collapse on initial load only
   this.defaultCollapsed = false;
   this.metadataHeadingDrawn = false;

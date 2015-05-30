@@ -1,5 +1,5 @@
 module.exports = {
-  render: function (tree, node) {
+  draw: function (tree, node) {
     node.angle = 0;
     node.canvas.beginPath();
 

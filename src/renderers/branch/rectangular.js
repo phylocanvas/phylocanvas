@@ -1,5 +1,5 @@
 module.exports = {
-  render: function (tree, node) {
+  draw: function (tree, node) {
     var branchLength = node.branchLength * tree.branchScalar;
 
     node.angle = 0;
@@ -13,12 +13,6 @@ module.exports = {
     node.canvas.lineTo(node.centerx, node.centery);
     node.canvas.stroke();
     node.canvas.closePath();
-
-    // Check initial tree collapse range
-    if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-      tree.checkInitialTreeCollapseRange(node);
-    }
-    node.drawNode();
   },
   prepareChild: function (node, child) {
     child.startx = node.centerx;
