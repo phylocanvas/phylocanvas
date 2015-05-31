@@ -185,8 +185,6 @@ function Tree(div, conf) {
     this.origBranches = this.branches;
     this.origLeaves = this.leaves;
     this.origRoot = this.root;
-
-
   }.bind(this));
 
   /**
@@ -216,6 +214,8 @@ function Tree(div, conf) {
   this.metadataHeadingDrawn = false;
 }
 
+Tree.prototype.branchRenderers = require('./renderers/branch');
+Tree.prototype.nodeRenderers = require('./renderers/node');
 
 Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
   var xmlhttp;
@@ -262,8 +262,6 @@ Tree.prototype.setInitialCollapsedBranches = function (node) {
     this.setInitialCollapsedBranches(node.children[i]);
   }
 };
-
-Tree.prototype.branchRenderers = require('./renderers/branch');
 
 Tree.prototype.clicked = function (e) {
   var node;
@@ -492,8 +490,6 @@ Tree.prototype.loadFileCallback = function (response, opts, scope) {
   scope.draw();
   scope.loadCompleted();
 };
-
-Tree.prototype.nodeRenderers = require('./renderers/node');
 
 Tree.prototype.parseNexus = function (str, name) {
   if (!str.match(/BEGIN TREES/gi)) {
