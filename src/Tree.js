@@ -3,7 +3,6 @@ var ContextMenu = require('./ContextMenu');
 var Tooltip = require('./Tooltip');
 var Navigator = require('./Navigator');
 
-var Angles = require('./utils/constants').Angles;
 var Shapes = require('./utils/constants').Shapes;
 
 var addClass = require('./utils/dom').addClass;
@@ -77,7 +76,7 @@ function Tree(div, conf) {
 
   addClass(this.canvasEl, 'pc-container');
 
-  //Set up the div and canvas element
+  // Set up the div and canvas element
   if (window.getComputedStyle(this.canvasEl).position === 'static') {
     this.canvasEl.style.position = 'relative';
   }
@@ -178,11 +177,11 @@ function Tree(div, conf) {
   addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
   addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
   addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-  addEvent(window, 'resize', function (evt) {
+  addEvent(window, 'resize', function () {
     this.resizeToContainer();
   }.bind(this));
 
-  this.addListener('loaded', function (evt) {
+  this.addListener('loaded', function () {
     this.origBranches = this.branches;
     this.origLeaves = this.leaves;
     this.origRoot = this.root;
@@ -215,6 +214,8 @@ function Tree(div, conf) {
   this.metadataHeadingDrawn = false;
 }
 
+Tree.prototype.branchRenderers = require('./renderers/branch');
+Tree.prototype.nodeRenderers = require('./renderers/node');
 
 Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
   var xmlhttp;
@@ -244,194 +245,21 @@ Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, sco
   }
 };
 
-Tree.prototype.checkInitialTreeCollapseRange = function (node) {
-  // Collapse nodes on default
-  var childIds = node.getChildIds();
+Tree.prototype.setInitialCollapsedBranches = function (node) {
+  var childIds;
+  var i;
+
+  node = node || this.root; // default param
+
+  childIds = node.getChildIds();
   if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
       childIds.length < this.defaultCollapsedOptions.max) {
     node.collapsed = true;
+    return;
   }
-};
 
-/**
- * A dictionary of functions. Each function draws a different tree structure
- */
-Tree.prototype.branchRenderers = {
-  rectangular: function (tree, node, collapse) {
-    var  bl = node.branchLength * tree.branchScalar;
-    node.angle = 0;
-    if (node.parent) {
-      node.centerx = node.startx + bl;
-    }
-    if (node.selected) {
-      //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-      node.canvas.fillStyle = tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    node.canvas.strokeStyle = node.getColour();
-    node.canvas.beginPath();
-
-    if (!collapse) {
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.startx, node.centery);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      node.children[i].startx = node.centerx;
-      node.children[i].starty = node.centery;
-      tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  circular: function (tree, node, collapse) {
-    var bl = node.totalBranchLength * tree.branchScalar;
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (!collapse) {
-      node.canvas.beginPath();
-      node.canvas.moveTo(node.startx, node.starty);
-      if (node.leaf) {
-        node.canvas.lineTo(node.interx, node.intery);
-        node.canvas.stroke();
-        var ss = node.getColour();
-        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
-        node.canvas.lineTo(node.centerx, node.centery);
-        node.canvas.stroke();
-        node.canvas.strokeStyle = ss;
-      } else {
-        node.canvas.lineTo(node.centerx, node.centery);
-        node.canvas.stroke();
-      }
-
-      node.canvas.strokeStyle = node.getColour();
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-
-      if (node.children.length > 1 && !node.collapsed) {
-        node.canvas.beginPath();
-        node.canvas.arc(0, 0, (bl), node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-        node.canvas.stroke();
-        node.canvas.closePath();
-      }
-      node.drawNode();
-    }
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  radial: function (tree, node, collapse) {
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    }
-    else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (node.parent && !collapse) {
-      node.canvas.beginPath();
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  diagonal: function (tree, node, collapse) {
-    node.angle = 0;
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    node.canvas.beginPath();
-    // alert(node.starty);
-
-    if (!collapse) {
-      node.canvas.moveTo(node.startx, node.starty);
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-      node.canvas.closePath();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      node.children[i].startx = node.centerx;
-      node.children[i].starty = node.centery;
-      tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-    }
-  },
-  hierarchy: function (tree, node, collapse) {
-    node.canvas.strokeStyle = node.getColour();
-
-    if (node.selected) {
-      node.canvas.fillStyle = node.tree.selectedColour;
-    } else {
-      node.canvas.fillStyle = node.colour;
-    }
-
-    if (!collapse) {
-      node.canvas.beginPath();
-      if (node !== node.tree.root) {
-        node.canvas.moveTo(node.startx, node.starty);
-        node.canvas.lineTo(node.centerx, node.starty);
-      }
-
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-
-      // Check initial tree collapse range
-      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-        tree.checkInitialTreeCollapseRange(node);
-      }
-      node.drawNode();
-    }
-    node.canvas.closePath();
-
-    for (var i = 0; i < node.children.length && !collapse; i++) {
-      tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-    }
+  for (i = 0; i < node.children.length; i++) {
+    this.setInitialCollapsedBranches(node.children[i]);
   }
 };
 
@@ -562,7 +390,7 @@ Tree.prototype.draw = function (forceRedraw) {
     (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
   if (!this.drawn || forceRedraw) {
-    this.prerenderers[this.treeType](this);
+    this.prerenderers[this.treeType].run(this);
     if (!forceRedraw) { this.fitInPanel(); }
   }
 
@@ -570,7 +398,7 @@ Tree.prototype.draw = function (forceRedraw) {
   this.canvas.translate(this.offsetx, this.offsety);
   this.canvas.scale(this.zoom, this.zoom);
 
-  this.branchRenderers[this.treeType](this, this.root);
+  this.branchRenderers[this.treeType].render(this, this.root);
   // Making default collapsed false so that it will collapse on initial load only
   this.defaultCollapsed = false;
   this.metadataHeadingDrawn = false;
@@ -661,98 +489,6 @@ Tree.prototype.loadFileCallback = function (response, opts, scope) {
   }
   scope.draw();
   scope.loadCompleted();
-};
-
-Tree.prototype.nodePrerenderers = {
-  radial: function (tree, node) {
-    if (node.parent) {
-      node.startx = node.parent.centerx;
-      node.starty = node.parent.centery;
-    } else {
-      node.startx = 0;
-      node.starty = 0;
-    }
-    node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
-    node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
-
-    for (var i = 0; i < node.children.length; i++) {
-      this.radial(tree, node.children[i]);
-    }
-  }
-};
-
-Tree.prototype.nodeRenderers = {
-  circle: function (node) {
-    var r = node.getNodeSize();
-    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-    node.canvas.stroke();
-    node.canvas.fill();
-  },
-  square: function (node) {
-    var r = node.getNodeSize();
-    var x1 = 0;
-    var x2 = r * 2;
-    var y1 = -r;
-    var y2 = r;
-    node.canvas.moveTo(x1, y1);
-    node.canvas.lineTo(x1, y2);
-    node.canvas.lineTo(x2, y2);
-    node.canvas.lineTo(x2, y1);
-    node.canvas.lineTo(x1, y1);
-    node.canvas.stroke();
-    node.canvas.fill();
-  },
-  star: function (node) {
-    var r = node.getNodeSize();
-    var cx = r;
-    var cy = 0;
-    var spikes = 6;
-    var outerRadius = 6;
-    var innerRadius = 2;
-    var rot = Math.PI / 2 * 3;
-    var x = cx;
-    var y = cy;
-    var step = Math.PI / spikes;
-    var i = 0;
-    node.canvas.beginPath();
-    node.canvas.moveTo(cx, cy - outerRadius);
-    for (i = 0; i < spikes; i++) {
-      x = cx + Math.cos(rot) * outerRadius;
-      y = cy + Math.sin(rot) * outerRadius;
-      node.canvas.lineTo(x, y);
-      rot += step;
-
-      x = cx + Math.cos(rot) * innerRadius;
-      y = cy + Math.sin(rot) * innerRadius;
-      node.canvas.lineTo(x, y);
-      rot += step;
-    }
-    node.canvas.lineTo(cx, cy - outerRadius);
-    node.canvas.stroke();
-    node.canvas.fill();
-    node.canvas.moveTo(cx, cy);
-    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-    node.canvas.stroke();
-    node.canvas.closePath();
-  },
-  triangle: function (node) {
-    var r = node.getNodeSize();
-    var cx = r;
-    var cy = 0;
-    var x1 = cx - r;
-    var x2 = cx + r;
-    var y1 = cy - r;
-    var y2 = cy + r;
-    node.canvas.moveTo(cx, y1);
-    node.canvas.lineTo(x2, y2);
-    node.canvas.lineTo(x1, y2);
-    node.canvas.lineTo(cx, y1);
-    node.canvas.stroke();
-    node.canvas.fill();
-    node.canvas.moveTo(x1, (y1 + y2) / 2);
-    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-    node.canvas.stroke();
-  }
 };
 
 Tree.prototype.parseNexus = function (str, name) {
@@ -874,6 +610,7 @@ Tree.prototype.parseNwk = function (nwk) {
   }
 
   this.buildLeaves();
+  this.setInitialCollapsedBranches();
 
   this.loadCompleted();
 };
@@ -897,217 +634,7 @@ Tree.prototype.pickup = function (event) {
   this.starty = event.clientY;
 };
 
-Tree.prototype.prerenderers = {
-  rectangular: function (tree, forcedDraw) {
-    tree.root.startx = 0;
-    tree.root.starty = 0;
-    tree.root.centerx = 0;
-    tree.root.centery = 0;
-    tree.farthestNodeFromRootX = 0;
-    tree.farthestNodeFromRootY = 0;
-
-    // Calculate branchScalar based on canvas width and total branch length
-    // This is used to transform the X coordinate based on the canvas width and no. of branches
-    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
-    // ystep is the vertical distance between 2 nodes
-    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-
-    //set initial positons of the branches
-    for (var i = 0; i < tree.leaves.length; i++) {
-      tree.leaves[i].angle = 0; // for rectangle
-      // Calculate and assign y coordinate for all the leaves
-      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-      // Assign x,y position of the farthest node from the root
-      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-      }
-      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-      }
-
-      // Calculate and assign y coordinate for all the parent branches
-      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
-        // Get all the children of a parent
-        var childrenArray = branch.parent.children;
-        // Assign parent's y coordinate
-        // Logic: Total ystep of all the children of this parent / 2
-        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
-      }
-    }
-    // Assign root startx and starty
-    tree.root.startx = tree.root.centerx;
-    tree.root.starty = tree.root.centery;
-    // Set font size for tree and its branches
-    tree.setFontSize(ystep);
-    tree.setMaxLabelLength();
-  },
-  circular: function (tree) {
-    tree.root.startx = 0;
-    tree.root.starty = 0;
-    tree.root.centerx = 0;
-    tree.root.centery = 0;
-
-    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-    // work out radius of tree and the make branch scalar proportinal to the
-    var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
-    if (tree.branchScalar * tree.maxBranchLength > r) {
-      r = tree.branchScalar * tree.maxBranchLength;
-    } else {
-      tree.branchScalar = r / tree.maxBranchLength;
-    }
-
-    var step = Angles.FULL / tree.leaves.length;
-
-    for (var i = 0; i < tree.leaves.length; i++) {
-      tree.leaves[i].angle = step * i;
-      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
-      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-      tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-      tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() == 0) {
-          nd.parent.angle = nd.angle;
-          nd.parent.minChildAngle = nd.angle;
-        }
-        if (nd.getChildNo() == nd.parent.children.length - 1) {
-          nd.parent.maxChildAngle = nd.angle;
-          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
-          nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
-          nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
-          nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
-          nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
-        } else {
-          break;
-        }
-      }
-    }
-    // Assign root startx and starty
-    tree.root.startx = tree.root.centerx;
-    tree.root.starty = tree.root.centery;
-    // Set font size for tree and its branches
-    tree.setFontSize(step);
-    tree.setMaxLabelLength();
-  },
-  radial: function (tree, forcedDraw) {
-    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-
-    var step = Angles.FULL / tree.leaves.length;
-    tree.root.startx = 0;
-    tree.root.starty = 0;
-    tree.root.centerx = 0;
-    tree.root.centery = 0;
-
-    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
-      tree.leaves[i].angle = step * i;
-      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() == 0) {
-          nd.parent.angle = 0;
-        }
-        nd.parent.angle += (nd.angle * nd.getChildCount());
-        if (nd.getChildNo() == nd.parent.children.length - 1) {
-          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
-        } else {
-          break;
-        }
-      }
-    }
-    // Assign root startx and starty
-    tree.root.startx = tree.root.centerx;
-    tree.root.starty = tree.root.centery;
-    tree.nodePrerenderers.radial(tree, tree.root);
-    // Set font size for tree and its branches
-    tree.setFontSize(step);
-    tree.setMaxLabelLength();
-  },
-  diagonal: function (tree, forceRender) {
-    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-    tree.root.startx = 0;
-    tree.root.starty = 0;
-    tree.root.centerx = 0;
-    tree.root.centery = 0;
-
-    for (var i = 0; i < tree.leaves.length; i++) {
-      tree.leaves[i].centerx = 0;
-      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-      tree.leaves[i].angle = 0;
-
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() == nd.parent.children.length - 1) {
-          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-          nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
-          for (var j = 0; j < nd.parent.children.length; j++) {
-            nd.parent.children[j].startx = nd.parent.centerx;
-            nd.parent.children[j].starty = nd.parent.centery;
-          }
-        } else {
-          break;
-        }
-      }
-    }
-    // Assign root startx and starty
-    tree.root.startx = tree.root.centerx;
-    tree.root.starty = tree.root.centery;
-    // Set font size for tree and its branches
-    tree.setFontSize(ystep);
-    tree.setMaxLabelLength();
-  },
-  hierarchy: function (tree) {
-    tree.root.startx = 0;
-    tree.root.starty = 0;
-    tree.root.centerx = 0;
-    tree.root.centery = 0;
-    tree.farthestNodeFromRootX = 0;
-    tree.farthestNodeFromRootY = 0;
-
-    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-    var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
-                    (tree.leaves[0].getNodeSize() + 2) * 2);
-
-    for (var i = 0; i < tree.leaves.length; i++) {
-      tree.leaves[i].angle = Angles.QUARTER;
-      tree.leaves[i].centerx = (i > 0 ? tree.leaves[i - 1].centerx + xstep : 0);
-      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() == 0) {
-          nd.parent.centerx = nd.centerx;
-        }
-
-        if (nd.getChildNo() == nd.parent.children.length - 1) {
-          nd.parent.angle = Angles.QUARTER;
-          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
-          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
-          for (var j = 0; j < nd.parent.children.length; j++) {
-            nd.parent.children[j].startx = nd.parent.centerx;
-            nd.parent.children[j].starty = nd.parent.centery;
-          }
-        } else {
-          break;
-        }
-      }
-      // Assign x,y position of the farthest node from the root
-      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-      }
-      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-      }
-    }
-    // Assign root startx and starty
-    tree.root.startx = tree.root.centerx;
-    tree.root.starty = tree.root.centery;
-    // Set font size for tree and its branches
-    tree.setFontSize(xstep);
-    tree.setMaxLabelLength();
-  }
-};
+Tree.prototype.prerenderers = require('./renderers/pre');
 
 Tree.prototype.redrawGetNodes = function (node, leafIds) {
   for (var i = 0; i < node.children.length; i++) {
@@ -1149,7 +676,7 @@ Tree.prototype.redrawFromBranch = function (node) {
   }
 
   this.root.setTotalLength();
-  this.prerenderers[this.treeType](this);
+  this.prerenderers[this.treeType].run(this);
   this.draw();
   this.subtreeDrawn(node.id);
 };
@@ -1159,7 +686,7 @@ Tree.prototype.redrawOriginalTree = function () {
   this.resetTree();
 
   this.root.setTotalLength();
-  this.prerenderers[this.treeType](this);
+  this.prerenderers[this.treeType].run(this);
   this.draw();
 
   this.subtreeDrawn(this.root.id);
@@ -1169,18 +696,18 @@ Tree.prototype.saveNode = function (node) {
   if (!node.id || node.id === '') {
     node.id = node.tree.genId();
   }
+
   if (this.branches[node.id]) {
     if (node !== this.branches[node.id]) {
       if (!this.leaf) {
         node.id = this.genId();
-        this.branches[node.id] = node;
       } else {
-        throw 'Two nodes on this tree share the id ' + node.id;
+        throw new Error('Two nodes on this tree share the id ' + node.id);
       }
     }
-  } else {
-    this.branches[node.id] = node;
   }
+
+  this.branches[node.id] = node;
 };
 
 Tree.prototype.scroll = function (e) {
