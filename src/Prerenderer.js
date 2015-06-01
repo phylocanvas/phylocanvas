@@ -1,9 +1,9 @@
-function Prerender(options) {
+function Prerenderer(options) {
   this.step = options.step;
   this.calculate = options.calculate;
 }
 
-Prerender.prototype.run = function (tree) {
+Prerenderer.prototype.run = function (tree) {
   var step = this.step(tree);
 
   tree.root.startx = 0;
@@ -23,4 +23,4 @@ Prerender.prototype.run = function (tree) {
   tree.setMaxLabelLength();
 };
 
-module.exports = Prerender;
+module.exports = Prerenderer;
