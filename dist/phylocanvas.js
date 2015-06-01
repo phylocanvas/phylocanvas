@@ -65,9 +65,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var hasClass = __webpack_require__(2).hasClass;
 	var removeClass = __webpack_require__(2).removeClass;
 
-	var fireEvent = __webpack_require__(1).fireEvent;
-	var addEvent = __webpack_require__(1).addEvent;
-	var killEvent = __webpack_require__(1).killEvent;
+	var fireEvent = __webpack_require__(13).fireEvent;
+	var addEvent = __webpack_require__(13).addEvent;
+	var killEvent = __webpack_require__(13).killEvent;
 
 	/**
 	 * @namespace PhyloCanvas
@@ -266,7 +266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	  Tree: Tree,
 	  Branch: __webpack_require__(4),
-	  Loader: __webpack_require__(10),
+	  Loader: __webpack_require__(5),
 	  ContextMenu: __webpack_require__(6),
 	  History: History
 	};
@@ -276,91 +276,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
+	var Prerenderer = __webpack_require__(21);
 
-	function fireEvent(element, type, params) {
-	  var event; // The custom event that will be created
-	  var param;
-
-	  if (document.createEvent) {
-	    event = document.createEvent('HTMLEvents');
-	    event.initEvent(type, true, true);
-	  } else {
-	    event = document.createEventObject();
-	    event.eventType = type;
-	  }
-
-	  event.eventName = type;
-	  event.bubbles = false;
-	  if (params) {
-	    for (param in params) {
-	      if (params.hasOwnProperty(param)) {
-	        event[param] = params[param];
-	      }
-	    }
-	  }
-
-	  if (document.createEvent) {
-	    element.dispatchEvent(event);
-	  } else {
-	    element.fireEvent('on' + event.eventType, event);
-	  }
-	}
-
-	function addEvent(elem, event, fn) {
-	  if (elem.addEventListener) {
-	    elem.addEventListener(event, fn, false);
-	  } else {
-	    elem.attachEvent('on' + event, function () {
-	      // set the this pointer same as addEventListener when fn is called
-	      return (fn.call(elem, window.event));
-	    });
-	  }
-	}
-
-	function killEvent(e) {
-	  e.stopPropagation();
-	  e.preventDefault();
-	}
-
-	/**
-	 * Creates a function which can be called from an event handler independent of
-	 * scope.
-	 *
-	 * @param {Object} obj the object the function will be called on
-	 * @param {String} func the name of the function to be called
-	 * @retuns {function}
-	 */
-	function createHandler(obj, func) {
-	  var handler;
-
-	  if (typeof func === typeof 'aaa') {
-	    handler = function (e) {
-	      if (obj[func]) {
-	        return obj[func](e);
-	      }
-	    };
-	  } else {
-	    handler = function () { return func(obj); };
-	  }
-	  return handler;
-	}
-
-	module.exports.preventDefault = preventDefault;
-	module.exports.fireEvent = fireEvent;
-	module.exports.addEvent = addEvent;
-	module.exports.killEvent = killEvent;
-	module.exports.createHandler = createHandler;
+	module.exports = {
+	  rectangular: new Prerenderer(__webpack_require__(22)),
+	  circular: new Prerenderer(__webpack_require__(23)),
+	  radial: new Prerenderer(__webpack_require__(20)),
+	  diagonal: new Prerenderer(__webpack_require__(24)),
+	  hierarchical: new Prerenderer(__webpack_require__(25))
+	};
 
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var fireEvent = __webpack_require__(1).fireEvent;
+	var fireEvent = __webpack_require__(13).fireEvent;
 
 	function setupDownloadLink(data, filename) {
 	  var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
@@ -448,18 +379,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Tooltip = __webpack_require__(7);
 	var Navigator = __webpack_require__(8);
 
-	var Angles = __webpack_require__(5).Angles;
-	var Shapes = __webpack_require__(5).Shapes;
+	var Shapes = __webpack_require__(9).Shapes;
 
 	var addClass = __webpack_require__(2).addClass;
 	var getX = __webpack_require__(2).getX;
 	var getY = __webpack_require__(2).getY;
 
-	var fireEvent = __webpack_require__(1).fireEvent;
-	var addEvent = __webpack_require__(1).addEvent;
+	var fireEvent = __webpack_require__(13).fireEvent;
+	var addEvent = __webpack_require__(13).addEvent;
 
 	var getBackingStorePixelRatio =
-	  __webpack_require__(9).getBackingStorePixelRatio;
+	  __webpack_require__(10).getBackingStorePixelRatio;
 
 	/**
 	 * The instance of a PhyloCanvas Widget
@@ -522,7 +452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  addClass(this.canvasEl, 'pc-container');
 
-	  //Set up the div and canvas element
+	  // Set up the div and canvas element
 	  if (window.getComputedStyle(this.canvasEl).position === 'static') {
 	    this.canvasEl.style.position = 'relative';
 	  }
@@ -623,11 +553,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
 	  addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
 	  addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	  addEvent(window, 'resize', function (evt) {
+	  addEvent(window, 'resize', function () {
 	    this.resizeToContainer();
 	  }.bind(this));
 
-	  this.addListener('loaded', function (evt) {
+	  this.addListener('loaded', function () {
 	    this.origBranches = this.branches;
 	    this.origLeaves = this.leaves;
 	    this.origRoot = this.root;
@@ -660,6 +590,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.metadataHeadingDrawn = false;
 	}
 
+	Tree.prototype.branchRenderers = __webpack_require__(11);
+	Tree.prototype.nodeRenderers = __webpack_require__(12);
 
 	Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
 	  var xmlhttp;
@@ -689,194 +621,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	Tree.prototype.checkInitialTreeCollapseRange = function (node) {
-	  // Collapse nodes on default
-	  var childIds = node.getChildIds();
+	Tree.prototype.setInitialCollapsedBranches = function (node) {
+	  var childIds;
+	  var i;
+
+	  node = node || this.root; // default param
+
+	  childIds = node.getChildIds();
 	  if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
 	      childIds.length < this.defaultCollapsedOptions.max) {
 	    node.collapsed = true;
+	    return;
 	  }
-	};
 
-	/**
-	 * A dictionary of functions. Each function draws a different tree structure
-	 */
-	Tree.prototype.branchRenderers = {
-	  rectangular: function (tree, node, collapse) {
-	    var  bl = node.branchLength * tree.branchScalar;
-	    node.angle = 0;
-	    if (node.parent) {
-	      node.centerx = node.startx + bl;
-	    }
-	    if (node.selected) {
-	      //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-	      node.canvas.fillStyle = tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    node.canvas.strokeStyle = node.getColour();
-	    node.canvas.beginPath();
-
-	    if (!collapse) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.startx, node.centery);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      node.children[i].startx = node.centerx;
-	      node.children[i].starty = node.centery;
-	      tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  circular: function (tree, node, collapse) {
-	    var bl = node.totalBranchLength * tree.branchScalar;
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (!collapse) {
-	      node.canvas.beginPath();
-	      node.canvas.moveTo(node.startx, node.starty);
-	      if (node.leaf) {
-	        node.canvas.lineTo(node.interx, node.intery);
-	        node.canvas.stroke();
-	        var ss = node.getColour();
-	        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
-	        node.canvas.lineTo(node.centerx, node.centery);
-	        node.canvas.stroke();
-	        node.canvas.strokeStyle = ss;
-	      } else {
-	        node.canvas.lineTo(node.centerx, node.centery);
-	        node.canvas.stroke();
-	      }
-
-	      node.canvas.strokeStyle = node.getColour();
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-
-	      if (node.children.length > 1 && !node.collapsed) {
-	        node.canvas.beginPath();
-	        node.canvas.arc(0, 0, (bl), node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-	        node.canvas.stroke();
-	        node.canvas.closePath();
-	      }
-	      node.drawNode();
-	    }
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  radial: function (tree, node, collapse) {
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    }
-	    else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (node.parent && !collapse) {
-	      node.canvas.beginPath();
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  diagonal: function (tree, node, collapse) {
-	    node.angle = 0;
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    node.canvas.beginPath();
-	    // alert(node.starty);
-
-	    if (!collapse) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      node.children[i].startx = node.centerx;
-	      node.children[i].starty = node.centery;
-	      tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  hierarchy: function (tree, node, collapse) {
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (!collapse) {
-	      node.canvas.beginPath();
-	      if (node !== node.tree.root) {
-	        node.canvas.moveTo(node.startx, node.starty);
-	        node.canvas.lineTo(node.centerx, node.starty);
-	      }
-
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-	    }
+	  for (i = 0; i < node.children.length; i++) {
+	    this.setInitialCollapsedBranches(node.children[i]);
 	  }
 	};
 
@@ -1007,7 +766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
 	  if (!this.drawn || forceRedraw) {
-	    this.prerenderers[this.treeType](this);
+	    this.prerenderers[this.treeType].run(this);
 	    if (!forceRedraw) { this.fitInPanel(); }
 	  }
 
@@ -1015,7 +774,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.translate(this.offsetx, this.offsety);
 	  this.canvas.scale(this.zoom, this.zoom);
 
-	  this.branchRenderers[this.treeType](this, this.root);
+	  this.branchRenderers[this.treeType].render(this, this.root);
 	  // Making default collapsed false so that it will collapse on initial load only
 	  this.defaultCollapsed = false;
 	  this.metadataHeadingDrawn = false;
@@ -1106,98 +865,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  scope.draw();
 	  scope.loadCompleted();
-	};
-
-	Tree.prototype.nodePrerenderers = {
-	  radial: function (tree, node) {
-	    if (node.parent) {
-	      node.startx = node.parent.centerx;
-	      node.starty = node.parent.centery;
-	    } else {
-	      node.startx = 0;
-	      node.starty = 0;
-	    }
-	    node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
-	    node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
-
-	    for (var i = 0; i < node.children.length; i++) {
-	      this.radial(tree, node.children[i]);
-	    }
-	  }
-	};
-
-	Tree.prototype.nodeRenderers = {
-	  circle: function (node) {
-	    var r = node.getNodeSize();
-	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  square: function (node) {
-	    var r = node.getNodeSize();
-	    var x1 = 0;
-	    var x2 = r * 2;
-	    var y1 = -r;
-	    var y2 = r;
-	    node.canvas.moveTo(x1, y1);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x2, y1);
-	    node.canvas.lineTo(x1, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  star: function (node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var spikes = 6;
-	    var outerRadius = 6;
-	    var innerRadius = 2;
-	    var rot = Math.PI / 2 * 3;
-	    var x = cx;
-	    var y = cy;
-	    var step = Math.PI / spikes;
-	    var i = 0;
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(cx, cy - outerRadius);
-	    for (i = 0; i < spikes; i++) {
-	      x = cx + Math.cos(rot) * outerRadius;
-	      y = cy + Math.sin(rot) * outerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-
-	      x = cx + Math.cos(rot) * innerRadius;
-	      y = cy + Math.sin(rot) * innerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-	    }
-	    node.canvas.lineTo(cx, cy - outerRadius);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.moveTo(cx, cy);
-	    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
-	  },
-	  triangle: function (node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var x1 = cx - r;
-	    var x2 = cx + r;
-	    var y1 = cy - r;
-	    var y2 = cy + r;
-	    node.canvas.moveTo(cx, y1);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(cx, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.moveTo(x1, (y1 + y2) / 2);
-	    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-	    node.canvas.stroke();
-	  }
 	};
 
 	Tree.prototype.parseNexus = function (str, name) {
@@ -1319,6 +986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  this.buildLeaves();
+	  this.setInitialCollapsedBranches();
 
 	  this.loadCompleted();
 	};
@@ -1342,217 +1010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.starty = event.clientY;
 	};
 
-	Tree.prototype.prerenderers = {
-	  rectangular: function (tree, forcedDraw) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-	    tree.farthestNodeFromRootX = 0;
-	    tree.farthestNodeFromRootY = 0;
-
-	    // Calculate branchScalar based on canvas width and total branch length
-	    // This is used to transform the X coordinate based on the canvas width and no. of branches
-	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
-	    // ystep is the vertical distance between 2 nodes
-	    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-
-	    //set initial positons of the branches
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = 0; // for rectangle
-	      // Calculate and assign y coordinate for all the leaves
-	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-
-	      // Calculate and assign y coordinate for all the parent branches
-	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
-	        // Get all the children of a parent
-	        var childrenArray = branch.parent.children;
-	        // Assign parent's y coordinate
-	        // Logic: Total ystep of all the children of this parent / 2
-	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(ystep);
-	    tree.setMaxLabelLength();
-	  },
-	  circular: function (tree) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
-	    if (tree.branchScalar * tree.maxBranchLength > r) {
-	      r = tree.branchScalar * tree.maxBranchLength;
-	    } else {
-	      tree.branchScalar = r / tree.maxBranchLength;
-	    }
-
-	    var step = Angles.FULL / tree.leaves.length;
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.angle = nd.angle;
-	          nd.parent.minChildAngle = nd.angle;
-	        }
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.maxChildAngle = nd.angle;
-	          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
-	          nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
-	          nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
-	          nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
-	          nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(step);
-	    tree.setMaxLabelLength();
-	  },
-	  radial: function (tree, forcedDraw) {
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-
-	    var step = Angles.FULL / tree.leaves.length;
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.angle = 0;
-	        }
-	        nd.parent.angle += (nd.angle * nd.getChildCount());
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    tree.nodePrerenderers.radial(tree, tree.root);
-	    // Set font size for tree and its branches
-	    tree.setFontSize(step);
-	    tree.setMaxLabelLength();
-	  },
-	  diagonal: function (tree, forceRender) {
-	    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].centerx = 0;
-	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-	      tree.leaves[i].angle = 0;
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-	          nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(ystep);
-	    tree.setMaxLabelLength();
-	  },
-	  hierarchy: function (tree) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-	    tree.farthestNodeFromRootX = 0;
-	    tree.farthestNodeFromRootY = 0;
-
-	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-	    var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
-	                    (tree.leaves[0].getNodeSize() + 2) * 2);
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = Angles.QUARTER;
-	      tree.leaves[i].centerx = (i > 0 ? tree.leaves[i - 1].centerx + xstep : 0);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.centerx = nd.centerx;
-	        }
-
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.angle = Angles.QUARTER;
-	          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
-	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(xstep);
-	    tree.setMaxLabelLength();
-	  }
-	};
+	Tree.prototype.prerenderers = __webpack_require__(1);
 
 	Tree.prototype.redrawGetNodes = function (node, leafIds) {
 	  for (var i = 0; i < node.children.length; i++) {
@@ -1594,7 +1052,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType](this);
+	  this.prerenderers[this.treeType].run(this);
 	  this.draw();
 	  this.subtreeDrawn(node.id);
 	};
@@ -1604,7 +1062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.resetTree();
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType](this);
+	  this.prerenderers[this.treeType].run(this);
 	  this.draw();
 
 	  this.subtreeDrawn(this.root.id);
@@ -1614,18 +1072,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!node.id || node.id === '') {
 	    node.id = node.tree.genId();
 	  }
+
 	  if (this.branches[node.id]) {
 	    if (node !== this.branches[node.id]) {
 	      if (!this.leaf) {
 	        node.id = this.genId();
-	        this.branches[node.id] = node;
 	      } else {
-	        throw 'Two nodes on this tree share the id ' + node.id;
+	        throw new Error('Two nodes on this tree share the id ' + node.id);
 	      }
 	    }
-	  } else {
-	    this.branches[node.id] = node;
 	  }
+
+	  this.branches[node.id] = node;
 	};
 
 	Tree.prototype.scroll = function (e) {
@@ -2002,8 +1460,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Angles = __webpack_require__(5).Angles;
-	var Shapes = __webpack_require__(5).Shapes;
+	var Angles = __webpack_require__(9).Angles;
+	var Shapes = __webpack_require__(9).Shapes;
 	var setupDownloadLink = __webpack_require__(2).setupDownloadLink;
 
 	/**
@@ -2775,54 +2233,145 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * An enumeration of certain pre-defined angles to enable faster drawing of
-	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-	 *
-	 * @enum
+	 * @constructor
 	 * @memberof PhyloCanvas
-	 * @constant
 	 */
-	module.exports.Angles = {
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 4
-	   */
-	  FORTYFIVE: Math.PI / 4,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 2
-	   */
-	  QUARTER: Math.PI / 2,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI
-	   */
-	  HALF: Math.PI,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI * 2
-	   */
-	  FULL: 2 * Math.PI
+	function Loader(div) {
+	  this.div = div;
+	  this.cl = document.createElement('canvas');
+	  this.cl.id = div.id + 'Loader';
+	  this.cl.style.position = 'absolute';
+	  this.cl.style.backgroundColor = '#FFFFFF';
+	  this.cl.style.top = (div.offsetHeight / 4) + 'px';
+	  this.cl.style.left = (div.offsetWidth / 4) + 'px';
+	  this.cl.height = div.offsetHeight / 2;
+	  this.cl.width = div.offsetWidth / 2;
+	  this.cl.style.zIndex = '1000';
+	  div.appendChild(this.cl);
+
+	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
+	  this.drawer = null;
+	  this.loaderRadius = null;
+	  this.loaderStep = (2 * Math.PI) / 360;
+
+	  this.message = 'Loading ...';
+	}
+
+	Loader.prototype.run = function () {
+	  var i = 0;
+	  var _this = this;
+	  this.cl.style.diangle = 'block';
+	  this.initLoader();
+	  this.drawer = setInterval(function () {
+	    _this.drawLoader(i);
+	    i++;
+	  }, 10);
 	};
 
+	Loader.prototype.resize = function () {
+	  this.cl.style.top = '2px';
+	  this.cl.style.left = '2px';
+	  this.cl.height = this.div.offsetHeight * 0.75;
+	  this.cl.width = this.div.offsetWidth * 0.75;
 
-	/**
-	 * dictionary to translate annotations in NWK to branch renderer ids
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	module.exports.Shapes = {
-	  x: 'star',
-	  s: 'square',
-	  o: 'circle',
-	  t: 'triangle'
+	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
+	  this.ctx.lineWidth = 10.0;
+
+	  this.ctx.font = '24px sans-serif';
+
+	  this.ctx.shadowOffsetX = 2.0;
+	  this.ctx.shadowOffsetY = 2.0;
 	};
+
+	Loader.prototype.initLoader = function () {
+	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
+	  this.ctx.lineWidth = 10.0;
+
+	  this.ctx.font = '24px sans-serif';
+
+	  this.ctx.shadowOffsetX = 2.0;
+	  this.ctx.shadowOffsetY = 2.0;
+	};
+
+	Loader.prototype.drawLoader = function (t) {
+	  this.ctx.restore();
+
+	  this.ctx.translate(0, 0);
+	  this.loaderRadius = Math.min(
+	    this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
+	  );
+
+	  this.ctx.save();
+	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+	  this.ctx.beginPath();
+	  this.ctx.arc(
+	    0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
+	  );
+	  this.ctx.stroke();
+
+	  this.ctx.beginPath();
+	  this.ctx.arc(
+	    0, 0,
+	    this.loaderRadius,
+	    this.loaderStep * t + 3,
+	    this.loaderStep * t + 5
+	  );
+	  this.ctx.stroke();
+	  this.ctx.fillText(
+	    this.message,
+	    -(this.ctx.measureText(this.message).width / 2),
+	    this.loaderRadius + 50, this.cl.width
+	  );
+	};
+
+	Loader.prototype.stop = function () {
+	  clearInterval(this.drawer);
+	  this.cl.style.display = 'none';
+	};
+
+	Loader.prototype.fail = function (message) {
+	  clearInterval(this.drawer);
+	  this.loaderRadius = Math.min(
+	    this.ctx.canvas.width / 4,
+	    this.ctx.canvas.height / 4
+	  );
+	  this.ctx.restore();
+
+	  this.ctx.translate(0, 0);
+	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
+	  this.ctx.beginPath();
+
+	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
+	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
+
+	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+
+	  this.ctx.beginPath();
+
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
+	  this.ctx.moveTo(0, 0);
+	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
+	  this.ctx.stroke();
+
+	  this.ctx.fillText(
+	    message,
+	    -(this.ctx.measureText(message).width / 2),
+	    this.loaderRadius + 50,
+	    this.loaderRadius * 2
+	  );
+	};
+
+	module.exports = Loader;
 
 
 /***/ },
@@ -2831,8 +2380,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Tooltip = __webpack_require__(7);
 
-	var createHandler = __webpack_require__(1).createHandler;
-	var preventDefault = __webpack_require__(1).preventDefault;
+	var createHandler = __webpack_require__(13).createHandler;
+	var preventDefault = __webpack_require__(13).preventDefault;
 
 	var DEFAULT_MENU_ITEMS = [ {
 	    text: 'Redraw Subtree',
@@ -3132,6 +2681,61 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
+	 * An enumeration of certain pre-defined angles to enable faster drawing of
+	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	module.exports.Angles = {
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 4
+	   */
+	  FORTYFIVE: Math.PI / 4,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 2
+	   */
+	  QUARTER: Math.PI / 2,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI
+	   */
+	  HALF: Math.PI,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI * 2
+	   */
+	  FULL: 2 * Math.PI
+	};
+
+
+	/**
+	 * dictionary to translate annotations in NWK to branch renderer ids
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	module.exports.Shapes = {
+	  x: 'star',
+	  s: 'square',
+	  o: 'circle',
+	  t: 'triangle'
+	};
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
 	 * Return backing store pixel ratio of context.
 	 *
 	 * @param context - The rendering context of HTMl5 canvas.
@@ -3152,149 +2756,598 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * @constructor
-	 * @memberof PhyloCanvas
-	 */
-	function Loader(div) {
-	  this.div = div;
-	  this.cl = document.createElement('canvas');
-	  this.cl.id = div.id + 'Loader';
-	  this.cl.style.position = 'absolute';
-	  this.cl.style.backgroundColor = '#FFFFFF';
-	  this.cl.style.top = (div.offsetHeight / 4) + 'px';
-	  this.cl.style.left = (div.offsetWidth / 4) + 'px';
-	  this.cl.height = div.offsetHeight / 2;
-	  this.cl.width = div.offsetWidth / 2;
-	  this.cl.style.zIndex = '1000';
-	  div.appendChild(this.cl);
+	var BranchRenderer = __webpack_require__(15);
 
-	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-	  this.drawer = null;
-	  this.loaderRadius = null;
-	  this.loaderStep = (2 * Math.PI) / 360;
+	module.exports = {
+	  rectangular: new BranchRenderer(__webpack_require__(16)),
+	  circular: new BranchRenderer(__webpack_require__(17)),
+	  radial: new BranchRenderer(__webpack_require__(14)),
+	  diagonal: new BranchRenderer(__webpack_require__(18)),
+	  hierarchical: new BranchRenderer(__webpack_require__(19))
+	};
 
-	  this.message = 'Loading ...';
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Angles = __webpack_require__(9).Angles;
+
+	module.exports = {
+	  circle: function (node) {
+	    var r = node.getNodeSize();
+	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  square: function (node) {
+	    var r = node.getNodeSize();
+	    var x1 = 0;
+	    var x2 = r * 2;
+	    var y1 = -r;
+	    var y2 = r;
+	    node.canvas.moveTo(x1, y1);
+	    node.canvas.lineTo(x1, y2);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x2, y1);
+	    node.canvas.lineTo(x1, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  star: function (node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var spikes = 6;
+	    var outerRadius = 6;
+	    var innerRadius = 2;
+	    var rot = Math.PI / 2 * 3;
+	    var x = cx;
+	    var y = cy;
+	    var step = Math.PI / spikes;
+	    var i = 0;
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(cx, cy - outerRadius);
+	    for (i = 0; i < spikes; i++) {
+	      x = cx + Math.cos(rot) * outerRadius;
+	      y = cy + Math.sin(rot) * outerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+
+	      x = cx + Math.cos(rot) * innerRadius;
+	      y = cy + Math.sin(rot) * innerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+	    }
+	    node.canvas.lineTo(cx, cy - outerRadius);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	    node.canvas.moveTo(cx, cy);
+	    node.canvas.lineTo(cx - (outerRadius - 1), cy);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  },
+	  triangle: function (node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var x1 = cx - r;
+	    var x2 = cx + r;
+	    var y1 = cy - r;
+	    var y2 = cy + r;
+	    node.canvas.moveTo(cx, y1);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x1, y2);
+	    node.canvas.lineTo(cx, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	    node.canvas.moveTo(x1, (y1 + y2) / 2);
+	    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
+	    node.canvas.stroke();
+	  }
+	};
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function preventDefault(event) {
+	  event.preventDefault();
+	  return false;
 	}
 
-	Loader.prototype.run = function () {
-	  var i = 0;
-	  var _this = this;
-	  this.cl.style.diangle = 'block';
-	  this.initLoader();
-	  this.drawer = setInterval(function () {
-	    _this.drawLoader(i);
-	    i++;
-	  }, 10);
+	function fireEvent(element, type, params) {
+	  var event; // The custom event that will be created
+	  var param;
+
+	  if (document.createEvent) {
+	    event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	  } else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	  }
+
+	  event.eventName = type;
+	  event.bubbles = false;
+	  if (params) {
+	    for (param in params) {
+	      if (params.hasOwnProperty(param)) {
+	        event[param] = params[param];
+	      }
+	    }
+	  }
+
+	  if (document.createEvent) {
+	    element.dispatchEvent(event);
+	  } else {
+	    element.fireEvent('on' + event.eventType, event);
+	  }
+	}
+
+	function addEvent(elem, event, fn) {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(event, fn, false);
+	  } else {
+	    elem.attachEvent('on' + event, function () {
+	      // set the this pointer same as addEventListener when fn is called
+	      return (fn.call(elem, window.event));
+	    });
+	  }
+	}
+
+	function killEvent(e) {
+	  e.stopPropagation();
+	  e.preventDefault();
+	}
+
+	/**
+	 * Creates a function which can be called from an event handler independent of
+	 * scope.
+	 *
+	 * @param {Object} obj the object the function will be called on
+	 * @param {String} func the name of the function to be called
+	 * @retuns {function}
+	 */
+	function createHandler(obj, func) {
+	  var handler;
+
+	  if (typeof func === typeof 'aaa') {
+	    handler = function (e) {
+	      if (obj[func]) {
+	        return obj[func](e);
+	      }
+	    };
+	  } else {
+	    handler = function () { return func(obj); };
+	  }
+	  return handler;
+	}
+
+	module.exports.preventDefault = preventDefault;
+	module.exports.fireEvent = fireEvent;
+	module.exports.addEvent = addEvent;
+	module.exports.killEvent = killEvent;
+	module.exports.createHandler = createHandler;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	  draw: function (tree, node) {
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  }
 	};
 
-	Loader.prototype.resize = function () {
-	  this.cl.style.top = '2px';
-	  this.cl.style.left = '2px';
-	  this.cl.height = this.div.offsetHeight * 0.75;
-	  this.cl.width = this.div.offsetWidth * 0.75;
 
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
 
-	  this.ctx.font = '24px sans-serif';
+	function BranchRenderer(options) {
+	  if (!options || !options.draw) {
+	    throw new Error('`draw` function is required for branch renderers');
+	  }
 
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
+	  this.draw = options.draw;
+	  this.prepareChild = options.prepareChild;
+	}
+
+	BranchRenderer.prototype.render = function (tree, branch, collapse) {
+	  var i;
+	  if (collapse || !branch) return;
+
+	  if (branch.selected) {
+	    branch.canvas.fillStyle = tree.selectedColour;
+	  } else {
+	    branch.canvas.fillStyle = branch.colour;
+	  }
+	  branch.canvas.strokeStyle = branch.getColour();
+
+	  this.draw(tree, branch);
+
+	  branch.drawNode();
+
+	  for (i = 0; i < branch.children.length; i++) {
+	    if (this.prepareChild) {
+	      this.prepareChild(branch, branch.children[i]);
+	    }
+	    this.render(tree, branch.children[i], branch.collapsed || collapse);
+	  }
 	};
 
-	Loader.prototype.initLoader = function () {
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
+	module.exports = BranchRenderer;
 
-	  this.ctx.font = '24px sans-serif';
 
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	  draw: function (tree, node) {
+	    var branchLength = node.branchLength * tree.branchScalar;
+
+	    node.angle = 0;
+	    if (node.parent) {
+	      node.centerx = node.startx + branchLength;
+	    }
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.startx, node.centery);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function (node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
 	};
 
-	Loader.prototype.drawLoader = function (t) {
-	  this.ctx.restore();
 
-	  this.ctx.translate(0, 0);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
-	  );
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
 
-	  this.ctx.save();
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+	module.exports = {
+	  draw: function (tree, node) {
+	    var strokeStyle = node.getColour();
+	    var branchLength = node.totalBranchLength * tree.branchScalar;
 
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
-	  );
-	  this.ctx.stroke();
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    if (node.leaf) {
+	      node.canvas.lineTo(node.interx, node.intery);
+	      node.canvas.stroke();
+	      node.canvas.strokeStyle = node.selected ? node.tree.selectedColour : 'rgba(0,0,0,0.5)';
+	      node.canvas.lineTo(node.centerx, node.centery);
+	      node.canvas.stroke();
+	      node.canvas.strokeStyle = strokeStyle;
+	    } else {
+	      node.canvas.lineTo(node.centerx, node.centery);
+	      node.canvas.stroke();
+	    }
+	    node.canvas.closePath();
 
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0,
-	    this.loaderRadius,
-	    this.loaderStep * t + 3,
-	    this.loaderStep * t + 5
-	  );
-	  this.ctx.stroke();
-	  this.ctx.fillText(
-	    this.message,
-	    -(this.ctx.measureText(this.message).width / 2),
-	    this.loaderRadius + 50, this.cl.width
-	  );
+	    node.canvas.strokeStyle = node.getColour();
+
+	    if (node.children.length > 1 && !node.collapsed) {
+	      node.canvas.beginPath();
+	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
+	      node.canvas.stroke();
+	      node.canvas.closePath();
+	    }
+	  }
 	};
 
-	Loader.prototype.stop = function () {
-	  clearInterval(this.drawer);
-	  this.cl.style.display = 'none';
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	  draw: function (tree, node) {
+	    node.angle = 0;
+	    node.canvas.beginPath();
+
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function (node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
 	};
 
-	Loader.prototype.fail = function (message) {
-	  clearInterval(this.drawer);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4,
-	    this.ctx.canvas.height / 4
-	  );
-	  this.ctx.restore();
 
-	  this.ctx.translate(0, 0);
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
 
-	  this.ctx.beginPath();
+	module.exports = {
+	  draw: function (tree, node) {
+	    node.canvas.beginPath();
 
-	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
+	    if (node !== node.tree.root) {
+	      node.canvas.moveTo(node.startx, node.starty);
+	      node.canvas.lineTo(node.centerx, node.starty);
+	    }
 
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
 
-	  this.ctx.beginPath();
-
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
-	  this.ctx.stroke();
-
-	  this.ctx.fillText(
-	    message,
-	    -(this.ctx.measureText(message).width / 2),
-	    this.loaderRadius + 50,
-	    this.loaderRadius * 2
-	  );
+	    node.canvas.closePath();
+	  }
 	};
 
-	module.exports = Loader;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Angles = __webpack_require__(9).Angles;
+
+	function prerenderNodes(tree, node) {
+	  if (node.parent) {
+	    node.startx = node.parent.centerx;
+	    node.starty = node.parent.centery;
+	  } else {
+	    node.startx = 0;
+	    node.starty = 0;
+	  }
+	  node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
+	  node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
+
+	  for (var i = 0; i < node.children.length; i++) {
+	    prerenderNodes(tree, node.children[i]);
+	  }
+	}
+
+	module.exports = {
+	  step: function (tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function (tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+
+	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.angle = 0;
+	        }
+	        nd.parent.angle += (nd.angle * nd.getChildCount());
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+
+	    prerenderNodes(tree, tree.root);
+	  }
+	};
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	function Prerenderer(options) {
+	  this.step = options.step;
+	  this.calculate = options.calculate;
+	}
+
+	Prerenderer.prototype.run = function (tree) {
+	  var step = this.step(tree);
+
+	  tree.root.startx = 0;
+	  tree.root.starty = 0;
+	  tree.root.centerx = 0;
+	  tree.root.centery = 0;
+	  tree.farthestNodeFromRootX = 0;
+	  tree.farthestNodeFromRootY = 0;
+
+	  this.calculate(tree, step);
+
+	  // Assign root startx and starty
+	  tree.root.startx = tree.root.centerx;
+	  tree.root.starty = tree.root.centery;
+	  // Set font size for tree and its branches
+	  tree.setFontSize(step);
+	  tree.setMaxLabelLength();
+	};
+
+	module.exports = Prerenderer;
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	  step: function (tree) {
+	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function (tree, ystep) {
+	    // Calculate branchScalar based on canvas width and total branch length
+	    // This is used to transform the X coordinate based on the canvas width and no. of branches
+	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+
+	    // set initial positons of the branches
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = 0; // for rectangle
+	      // Calculate and assign y coordinate for all the leaves
+	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+
+	      // Calculate and assign y coordinate for all the parent branches
+	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
+	        // Get all the children of a parent
+	        var childrenArray = branch.parent.children;
+	        // Assign parent's y coordinate
+	        // Logic: Total ystep of all the children of this parent / 2
+	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Angles = __webpack_require__(9).Angles;
+
+	module.exports = {
+	  step: function (tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function (tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+	    // work out radius of tree and the make branch scalar proportinal to the
+	    var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
+	    if (tree.branchScalar * tree.maxBranchLength > r) {
+	      r = tree.branchScalar * tree.maxBranchLength;
+	    } else {
+	      tree.branchScalar = r / tree.maxBranchLength;
+	    }
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.angle = nd.angle;
+	          nd.parent.minChildAngle = nd.angle;
+	        }
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.maxChildAngle = nd.angle;
+	          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
+	          nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
+	          nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
+	          nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
+	          nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Angles = __webpack_require__(9).Angles;
+
+	module.exports = {
+	  step: function (tree) {
+	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function (tree, ystep) {
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].centerx = 0;
+	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
+	      tree.leaves[i].angle = 0;
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
+	          nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
+	          for (var j = 0; j < nd.parent.children.length; j++) {
+	            nd.parent.children[j].startx = nd.parent.centerx;
+	            nd.parent.children[j].starty = nd.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Angles = __webpack_require__(9).Angles;
+
+	module.exports = {
+	  step: function (tree) {
+	    return Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
+	                    (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function (tree, xstep) {
+	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = Angles.QUARTER;
+	      tree.leaves[i].centerx = (i > 0 ? tree.leaves[i - 1].centerx + xstep : 0);
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.centerx = nd.centerx;
+	        }
+
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.angle = Angles.QUARTER;
+	          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
+	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
+	          for (var j = 0; j < nd.parent.children.length; j++) {
+	            nd.parent.children[j].startx = nd.parent.centerx;
+	            nd.parent.children[j].starty = nd.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+	    }
+	  }
+	};
 
 
 /***/ }
