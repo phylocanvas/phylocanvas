@@ -24,7 +24,6 @@ Object.keys(tree.branchRenderers).forEach(function (treeType) {
   var button = document.createElement('button');
 
   button.innerHTML = treeType;
-  button.style.textTransform = 'capitalize';
 
   button.addEventListener('click', function () {
     tree.setTreeType(treeType);
