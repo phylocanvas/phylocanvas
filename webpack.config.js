@@ -31,7 +31,16 @@ function config(options) {
       library: 'PhyloCanvas',
       libraryTarget: 'umd'
     },
-    plugins: plugins
+    module: {
+      loaders: [
+        { test: /\.js$/,
+          loader: 'babel?stage=0',
+          exclude: path.join(__dirname, 'node_modules')
+        }
+      ]
+    },
+    plugins: plugins,
+    target: 'web'
   };
 }
 

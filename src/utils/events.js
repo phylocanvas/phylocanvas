@@ -16,6 +16,7 @@ function fireEvent(element, type, params) {
   }
 
   event.eventName = type;
+
   if (params) {
     for (param in params) {
       if (params.hasOwnProperty(param)) {

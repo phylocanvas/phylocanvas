@@ -1,41 +1,33 @@
-var Branch = require('./Branch');
-var ContextMenu = require('./ContextMenu');
-var Tooltip = require('./Tooltip');
-var Navigator = require('./Navigator');
+import Branch from './Branch';
+import ContextMenu from './ContextMenu';
+import Tooltip from './Tooltip';
+import Navigator from './Navigator';
 
-var Shapes = require('./utils/constants').Shapes;
-
-var addClass = require('./utils/dom').addClass;
-var getX = require('./utils/dom').getX;
-var getY = require('./utils/dom').getY;
-
-var fireEvent = require('./utils/events').fireEvent;
-var addEvent = require('./utils/events').addEvent;
-
-var getBackingStorePixelRatio =
-  require('./utils/canvas').getBackingStorePixelRatio;
+import { Shapes } from './utils/constants';
+import { addClass, getX, getY } from './utils/dom';
+import { fireEvent, addEvent } from './utils/events';
+import { getBackingStorePixelRatio } from './utils/canvas';
 
 /**
  * The instance of a PhyloCanvas Widget
  *
  * @constructor
  * @memberof PhyloCanvas
- * @param div {string|HTMLDivElement} the div or id of a div that phylocanvas
+ * @param element {string|HTMLElement} the element or id of an element that phylocanvas
  * will be drawn in
  *
  * {@link PhyoCanvas.Tree}
  *
  * @example
- *  new PhyloCanvas.Tree('div_id');
+ *  new PhyloCanvas.Tree('element_id');
  *
  * @example
- *  new PhyloCanvas.Tree(div);
+ *  new PhyloCanvas.Tree(element);
  */
-function Tree(div, conf) {
-  if (!conf) conf = {};
-  // if the ID is provided get the element, if not assume div
-  if (typeof div === 'string') div = document.getElementById(div);
-
+function Tree(element, conf = {}) {
+  this.canvasEl =
+    (typeof element === 'string' ? document.getElementById(element) : element);
+  addClass(this.canvasEl, 'pc-container');
   /**
    *
    * Dictionary of all branches indexed by Id
@@ -49,7 +41,7 @@ function Tree(div, conf) {
   /**
    * Loading dialog displayed while waiting for the tree
    */
-  // this.loader = new Loader(div);
+  // this.loader = new Loader(element);
   /**
    * The root node of the tree
    * (not neccesarily a root in the Phylogenetic sense)
@@ -72,34 +64,26 @@ function Tree(div, conf) {
   this.origBL = {};
   this.origP = {};
 
-  this.canvasEl = div;
-
-  addClass(this.canvasEl, 'pc-container');
-
-  // Set up the div and canvas element
+  // Set up the element and canvas
   if (window.getComputedStyle(this.canvasEl).position === 'static') {
     this.canvasEl.style.position = 'relative';
   }
   this.canvasEl.style.boxSizing = 'border-box';
-  var cl = document.createElement('canvas');
-  cl.id = div.id + 'pCanvas';
-  cl.className = 'phylocanvas';
-  cl.style.position = 'relative';
-  cl.style.backgroundColor = '#FFFFFF';
-  cl.height = div.clientHeight || 400;
-  cl.width = div.clientWidth || 400;
-  cl.style.zIndex = '1';
-  this.canvasEl.appendChild(cl);
+  let canvas = document.createElement('canvas');
+  canvas.id = element.id + 'pCanvas';
+  canvas.className = 'phylocanvas';
+  canvas.style.position = 'relative';
+  canvas.style.backgroundColor = '#FFFFFF';
+  canvas.height = element.clientHeight || 400;
+  canvas.width = element.clientWidth || 400;
+  canvas.style.zIndex = '1';
+  this.canvasEl.appendChild(canvas);
 
   /***
    * Right click menu
    * Users could pass options while creating the Tree object
    */
-  var menuOptions = [];
-  if (conf.contextMenu !== undefined) {
-    menuOptions = conf.contextMenu;
-  }
-  this.contextMenu = new ContextMenu(this, menuOptions);
+  this.contextMenu = new ContextMenu(this, conf.contextMenu);
 
   this.defaultCollapsedOptions = {};
   this.defaultCollapsed = false;
@@ -127,7 +111,7 @@ function Tree(div, conf) {
   this.origx = null;
   this.origy = null;
 
-  this.canvas = cl.getContext('2d');
+  this.canvas = canvas.getContext('2d');
 
   this.canvas.canvas.onselectstart = function () { return false; };
   this.canvas.fillStyle = '#000000';
