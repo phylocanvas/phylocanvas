@@ -95,11 +95,7 @@ function Tree(div, conf) {
    * Right click menu
    * Users could pass options while creating the Tree object
    */
-  var menuOptions = [];
-  if (conf.contextMenu !== undefined) {
-    menuOptions = conf.contextMenu;
-  }
-  this.contextMenu = new ContextMenu(this, menuOptions);
+  this.contextMenu = new ContextMenu(this, conf.contextMenu);
 
   this.defaultCollapsedOptions = {};
   this.defaultCollapsed = false;
