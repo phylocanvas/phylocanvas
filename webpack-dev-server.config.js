@@ -2,7 +2,7 @@ var path = require('path');
 
 module.exports = {
   context: path.join(__dirname, 'dev'),
-  devtool: 'eval',
+  devtool: '#eval-source-map',
   debug: true,
   entry: './index',
   module: {
