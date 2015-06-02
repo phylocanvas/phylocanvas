@@ -56,6 +56,10 @@ function mouseout(element) {
   element.style.backgroundColor = 'transparent';
 }
 
+function transferMenuItem({ handler, text = 'New menu Item', nodeType }) {
+  return { handler, text, nodeType };
+}
+
 /**
  * The menu that is shown when the PhyloCanvas widget is right-clicked
  *
@@ -68,13 +72,7 @@ export default class ContextMenu extends Tooltip {
   constructor(tree, menuItems = DEFAULT_MENU_ITEMS) {
     super(tree, 'pc-context-menu');
 
-    this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
-      return {
-        handler: menuItem.handler,
-        text: menuItem.text || 'New Menu Item',
-        nodeType: menuItem.nodeType || undefined
-      };
-    });
+    this.menuItems = menuItems.map(transferMenuItem);
     this.fontSize = '8pt';
   }
 
