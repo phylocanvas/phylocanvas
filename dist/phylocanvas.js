@@ -366,43 +366,53 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var Branch = __webpack_require__(4);
-	var ContextMenu = __webpack_require__(6);
-	var Tooltip = __webpack_require__(7);
-	var Navigator = __webpack_require__(8);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var Shapes = __webpack_require__(9).Shapes;
+	var _Branch = __webpack_require__(4);
 
-	var addClass = __webpack_require__(2).addClass;
-	var getX = __webpack_require__(2).getX;
-	var getY = __webpack_require__(2).getY;
+	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var fireEvent = __webpack_require__(13).fireEvent;
-	var addEvent = __webpack_require__(13).addEvent;
+	var _ContextMenu = __webpack_require__(6);
 
-	var getBackingStorePixelRatio = __webpack_require__(10).getBackingStorePixelRatio;
+	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
+
+	var _Tooltip = __webpack_require__(7);
+
+	var _Tooltip2 = _interopRequireDefault(_Tooltip);
+
+	var _Navigator = __webpack_require__(8);
+
+	var _Navigator2 = _interopRequireDefault(_Navigator);
+
+	var _utilsConstants = __webpack_require__(9);
+
+	var _utilsDom = __webpack_require__(2);
+
+	var _utilsEvents = __webpack_require__(13);
+
+	var _utilsCanvas = __webpack_require__(10);
 
 	/**
 	 * The instance of a PhyloCanvas Widget
 	 *
 	 * @constructor
 	 * @memberof PhyloCanvas
-	 * @param div {string|HTMLDivElement} the div or id of a div that phylocanvas
+	 * @param element {string|HTMLElement} the element or id of an element that phylocanvas
 	 * will be drawn in
 	 *
 	 * {@link PhyoCanvas.Tree}
 	 *
 	 * @example
-	 *  new PhyloCanvas.Tree('div_id');
+	 *  new PhyloCanvas.Tree('element_id');
 	 *
 	 * @example
-	 *  new PhyloCanvas.Tree(div);
+	 *  new PhyloCanvas.Tree(element);
 	 */
-	function Tree(div, conf) {
-	  if (!conf) conf = {};
-	  // if the ID is provided get the element, if not assume div
-	  if (typeof div === 'string') div = document.getElementById(div);
+	function Tree(element) {
+	  var conf = arguments[1] === undefined ? {} : arguments[1];
 
+	  this.canvasEl = typeof element === 'string' ? document.getElementById(element) : element;
+	  (0, _utilsDom.addClass)(this.canvasEl, 'pc-container');
 	  /**
 	   *
 	   * Dictionary of all branches indexed by Id
@@ -416,7 +426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * Loading dialog displayed while waiting for the tree
 	   */
-	  // this.loader = new Loader(div);
+	  // this.loader = new Loader(element);
 	  /**
 	   * The root node of the tree
 	   * (not neccesarily a root in the Phylogenetic sense)
@@ -439,34 +449,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.origBL = {};
 	  this.origP = {};
 
-	  this.canvasEl = div;
-
-	  addClass(this.canvasEl, 'pc-container');
-
-	  // Set up the div and canvas element
+	  // Set up the element and canvas
 	  if (window.getComputedStyle(this.canvasEl).position === 'static') {
 	    this.canvasEl.style.position = 'relative';
 	  }
 	  this.canvasEl.style.boxSizing = 'border-box';
-	  var cl = document.createElement('canvas');
-	  cl.id = div.id + 'pCanvas';
-	  cl.className = 'phylocanvas';
-	  cl.style.position = 'relative';
-	  cl.style.backgroundColor = '#FFFFFF';
-	  cl.height = div.clientHeight || 400;
-	  cl.width = div.clientWidth || 400;
-	  cl.style.zIndex = '1';
-	  this.canvasEl.appendChild(cl);
+	  var canvas = document.createElement('canvas');
+	  canvas.id = element.id + 'pCanvas';
+	  canvas.className = 'phylocanvas';
+	  canvas.style.position = 'relative';
+	  canvas.style.backgroundColor = '#FFFFFF';
+	  canvas.height = element.clientHeight || 400;
+	  canvas.width = element.clientWidth || 400;
+	  canvas.style.zIndex = '1';
+	  this.canvasEl.appendChild(canvas);
 
 	  /***
 	   * Right click menu
 	   * Users could pass options while creating the Tree object
 	   */
-	  var menuOptions = [];
-	  if (conf.contextMenu !== undefined) {
-	    menuOptions = conf.contextMenu;
-	  }
-	  this.contextMenu = new ContextMenu(this, menuOptions);
+	  this.contextMenu = new _ContextMenu2['default'](this, conf.contextMenu);
 
 	  this.defaultCollapsedOptions = {};
 	  this.defaultCollapsed = false;
@@ -477,7 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  this.tooltip = new Tooltip(this);
+	  this.tooltip = new _Tooltip2['default'](this);
 
 	  this.drawn = false;
 
@@ -494,7 +496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.origx = null;
 	  this.origy = null;
 
-	  this.canvas = cl.getContext('2d');
+	  this.canvas = canvas.getContext('2d');
 
 	  this.canvas.canvas.onselectstart = function () {
 	    return false;
@@ -529,7 +531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.rightClickZoom = true;
 
 	  if (this.useNavigator) {
-	    this.navigator = new Navigator(this);
+	    this.navigator = new _Navigator2['default'](this);
 	  }
 
 	  this.adjustForPixelRatio();
@@ -543,10 +545,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.addListener('mouseup', this.drop.bind(this));
 	  this.addListener('mouseout', this.drop.bind(this));
 
-	  addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	  addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	  addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	  addEvent(window, 'resize', (function () {
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	  (0, _utilsEvents.addEvent)(window, 'resize', (function () {
 	    this.resizeToContainer();
 	  }).bind(this));
 
@@ -692,7 +694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.drag = function (event) {
 	  // get window ratio
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
 
 	  if (!this.drawn) return false;
 
@@ -751,7 +753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.strokeStyle = this.branchColour;
 	  this.canvas.save();
 
-	  this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
+	  this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
 
 	  if (!this.drawn || forceRedraw) {
 	    this.prerenderers[this.treeType].run(this);
@@ -923,7 +925,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.leaves = [];
 	  this.branches = {};
 	  this.drawn = false;
-	  var curNode = new Branch();
+	  var curNode = new _Branch2['default']();
 	  curNode.id = 'root';
 	  this.branches.root = curNode;
 	  this.setRoot(curNode);
@@ -933,7 +935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    switch (nwk[i]) {
 	      case '(':
 	        // new Child
-	        node = new Branch();
+	        node = new _Branch2['default']();
 	        curNode.addChild(node);
 	        curNode = node;
 	        break;
@@ -943,7 +945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	      case ',':
 	        // new sibiling
-	        node = new Branch();
+	        node = new _Branch2['default']();
 	        curNode.parent.addChild(node);
 	        curNode = node;
 	        break;
@@ -1135,7 +1137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.branches[arr[i]].colour = colour;
 	          }
 	          if (shape) {
-	            this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
+	            this.branches[arr[i]].nodeShape = _utilsConstants.Shapes[shape] ? _utilsConstants.Shapes[shape] : shape;
 	          }
 	          if (size) {
 	            this.branches[arr[i]].radius = size;
@@ -1225,9 +1227,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.translateClickX = function (x) {
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
 
-	  x = x - getX(this.canvas.canvas) + window.pageXOffset;
+	  x = x - (0, _utilsDom.getX)(this.canvas.canvas) + window.pageXOffset;
 	  x *= ratio;
 	  x -= this.canvas.canvas.width / 2;
 	  x -= this.offsetx;
@@ -1237,9 +1239,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.translateClickY = function (y) {
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
 
-	  y = y - getY(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
+	  y = y - (0, _utilsDom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
 	  y *= ratio;
 	  y -= this.canvas.canvas.height / 2;
 	  y -= this.offsety;
@@ -1298,27 +1300,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.loadCompleted = function () {
-	  fireEvent(this.canvasEl, 'loaded');
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loaded');
 	};
 
 	Tree.prototype.loadStarted = function () {
-	  fireEvent(this.canvasEl, 'loading');
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loading');
 	};
 
 	Tree.prototype.loadError = function (message) {
-	  fireEvent(this.canvasEl, 'error', { message: message });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { message: message });
 	};
 
 	Tree.prototype.subtreeDrawn = function (node) {
-	  fireEvent(this.canvasEl, 'subtree', { node: node });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'subtree', { node: node });
 	};
 
 	Tree.prototype.nodesSelected = function (nids) {
-	  fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'selected', { nodeIds: nids });
 	};
 
 	Tree.prototype.addListener = function (event, listener) {
-	  addEvent(this.canvasEl, event, listener);
+	  (0, _utilsEvents.addEvent)(this.canvasEl, event, listener);
 	};
 
 	Tree.prototype.getBounds = function () {
@@ -1362,7 +1364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.adjustForPixelRatio = function () {
 	  // Adjust canvas size for Retina screen
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
 
 	  this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
 	  this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
@@ -1374,7 +1376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.treeTypeChanged = function (oldType, newType) {
-	  fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
 	};
 
 	Tree.prototype.resetTree = function () {

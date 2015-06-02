@@ -3,10 +3,10 @@ import ContextMenu from './ContextMenu';
 import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
-import Shapes from './utils/constants';
+import { Shapes } from './utils/constants';
 import { addClass, getX, getY } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
-import getBackingStorePixelRatio from './utils/canvas';
+import { getBackingStorePixelRatio } from './utils/canvas';
 
 /**
  * The instance of a PhyloCanvas Widget
@@ -26,7 +26,7 @@ import getBackingStorePixelRatio from './utils/canvas';
  */
 function Tree(element, conf = {}) {
   this.canvasEl =
-    typeof element === 'string' ? document.getElementById(element) : element;
+    (typeof element === 'string' ? document.getElementById(element) : element);
   addClass(this.canvasEl, 'pc-container');
   /**
    *
@@ -69,15 +69,15 @@ function Tree(element, conf = {}) {
     this.canvasEl.style.position = 'relative';
   }
   this.canvasEl.style.boxSizing = 'border-box';
-  var cl = document.createElement('canvas');
-  cl.id = element.id + 'pCanvas';
-  cl.className = 'phylocanvas';
-  cl.style.position = 'relative';
-  cl.style.backgroundColor = '#FFFFFF';
-  cl.height = element.clientHeight || 400;
-  cl.width = element.clientWidth || 400;
-  cl.style.zIndex = '1';
-  this.canvasEl.appendChild(cl);
+  let canvas = document.createElement('canvas');
+  canvas.id = element.id + 'pCanvas';
+  canvas.className = 'phylocanvas';
+  canvas.style.position = 'relative';
+  canvas.style.backgroundColor = '#FFFFFF';
+  canvas.height = element.clientHeight || 400;
+  canvas.width = element.clientWidth || 400;
+  canvas.style.zIndex = '1';
+  this.canvasEl.appendChild(canvas);
 
   /***
    * Right click menu
@@ -111,7 +111,7 @@ function Tree(element, conf = {}) {
   this.origx = null;
   this.origy = null;
 
-  this.canvas = cl.getContext('2d');
+  this.canvas = canvas.getContext('2d');
 
   this.canvas.canvas.onselectstart = function () { return false; };
   this.canvas.fillStyle = '#000000';
