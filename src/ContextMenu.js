@@ -67,7 +67,7 @@ export default class ContextMenu extends Tooltip {
 
   constructor(tree, menuItems = DEFAULT_MENU_ITEMS) {
     super(tree, 'pc-context-menu');
-    console.log(menuItems);
+
     this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
       return {
         handler: menuItem.handler,
