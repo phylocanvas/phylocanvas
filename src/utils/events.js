@@ -16,7 +16,6 @@ function fireEvent(element, type, params) {
   }
 
   event.eventName = type;
-  event.bubbles = false;
   if (params) {
     for (param in params) {
       if (params.hasOwnProperty(param)) {
