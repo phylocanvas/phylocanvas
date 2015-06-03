@@ -376,23 +376,13 @@
     }
     else {
       this.elements = [ {
-        text: 'Redraw Subtree',
-        handler: 'redrawTreeFromBranch',
+        text: 'Collapse/Expand Branch',
+        handler: 'toggleCollapsed',
         internal: true,
         leaf: false
       }, {
-        text: 'Show Labels',
-        handler: 'displayLabels',
-        internal: false,
-        leaf: false
-      }, {
-        text: 'Hide Labels',
-        handler: 'hideLabels',
-        internal: false,
-        leaf: false
-      }, {
-        text: 'Collapse/Expand branch',
-        handler: 'toggleCollapsed',
+        text: 'Redraw Subtree',
+        handler: 'redrawTreeFromBranch',
         internal: true,
         leaf: false
       }, {
@@ -401,17 +391,22 @@
         internal: true,
         leaf: false
       }, {
-        text: 'Export PNG',
+        text: 'Show/Hide Labels',
+        handler: 'toggleLabels',
+        internal: false,
+        leaf: false
+      }, {
+        text: 'Export as Image',
         handler: 'exportCurrentTreeView',
         internal: false,
         leaf: false
       }, {
-        text: 'Download All Leaf IDs',
+        text: 'Export Leaf IDs',
         handler: 'downloadAllLeafIds',
         internal: false,
         leaf: false
       }, {
-        text: 'Download Branch Leaf IDs',
+        text: 'Export Leaf IDs on Branch',
         handler: 'downloadLeafIdsFromBranch',
         internal: true,
         leaf: false
