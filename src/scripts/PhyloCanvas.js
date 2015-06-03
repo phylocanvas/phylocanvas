@@ -2476,7 +2476,7 @@
     },
     scroll: function (e) {
       var z = Math.log(this.zoom) / Math.log(10);
-      this.setZoom(z + (e.wheelDelta ? e.wheelDelta / 1000 : e.detail / -100));
+      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
       e.preventDefault();
     },
     selectNodes: function (nIds) {
