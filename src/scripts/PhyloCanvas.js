@@ -1208,11 +1208,6 @@
 
         // Swapping back the line width if it was changed due to nodeAlign
         this.canvas.lineWidth = origLineWidth;
-
-        // setLineDash does not work in firefox  and safari
-        if (this.canvas.setLineDash) {
-          this.canvas.setLineDash([0]);
-        }
       }
       this.canvas.closePath();
 
