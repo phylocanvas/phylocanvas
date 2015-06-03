@@ -381,13 +381,13 @@
         internal: true,
         leaf: false
       }, {
-        text: 'Redraw Subtree',
-        handler: 'redrawTreeFromBranch',
+        text: 'Rotate Branch',
+        handler: 'rotate',
         internal: true,
         leaf: false
       }, {
-        text: 'Rotate Branch',
-        handler: 'rotate',
+        text: 'Redraw Subtree',
+        handler: 'redrawTreeFromBranch',
         internal: true,
         leaf: false
       }, {
