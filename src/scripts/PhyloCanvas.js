@@ -376,22 +376,7 @@
     }
     else {
       this.elements = [ {
-        text: 'Redraw Subtree',
-        handler: 'redrawTreeFromBranch',
-        internal: true,
-        leaf: false
-      }, {
-        text: 'Show Labels',
-        handler: 'displayLabels',
-        internal: false,
-        leaf: false
-      }, {
-        text: 'Hide Labels',
-        handler: 'hideLabels',
-        internal: false,
-        leaf: false
-      }, {
-        text: 'Collapse/Expand branch',
+        text: 'Collapse/Expand Branch',
         handler: 'toggleCollapsed',
         internal: true,
         leaf: false
@@ -401,17 +386,27 @@
         internal: true,
         leaf: false
       }, {
-        text: 'Export PNG',
+        text: 'Redraw Subtree',
+        handler: 'redrawTreeFromBranch',
+        internal: true,
+        leaf: false
+      }, {
+        text: 'Show/Hide Labels',
+        handler: 'toggleLabels',
+        internal: false,
+        leaf: false
+      }, {
+        text: 'Export as Image',
         handler: 'exportCurrentTreeView',
         internal: false,
         leaf: false
       }, {
-        text: 'Download All Leaf IDs',
+        text: 'Export Leaf IDs',
         handler: 'downloadAllLeafIds',
         internal: false,
         leaf: false
       }, {
-        text: 'Download Branch Leaf IDs',
+        text: 'Export Leaf IDs on Branch',
         handler: 'downloadLeafIdsFromBranch',
         internal: true,
         leaf: false
@@ -1208,11 +1203,6 @@
 
         // Swapping back the line width if it was changed due to nodeAlign
         this.canvas.lineWidth = origLineWidth;
-
-        // setLineDash does not work in firefox  and safari
-        if (this.canvas.setLineDash) {
-          this.canvas.setLineDash([0]);
-        }
       }
       this.canvas.closePath();
 
@@ -1951,11 +1941,11 @@
           this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'nexus', name:name}, this);
         } else if (tree.match(/\.nwk$/)) {
           this.AJAX(tree, 'GET', '', this.loadFileCallback, {format:'newick'}, this);
-        } else if (tree.match(/^#NEXUS[\s\n;\w\.\*\:(\),-=\[\]\/&]+$/i)) {
+        } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
           this.parseNexus(tree, name);
           this.draw();
           this.loadCompleted();
-        } else if (tree.match(/^[\w\.\*\:(\),-\/]+;\s?$/gi)) {
+        } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
           this.parseNwk(tree, name);
           this.draw();
           this.loadCompleted();
@@ -2481,7 +2471,7 @@
     },
     scroll: function (e) {
       var z = Math.log(this.zoom) / Math.log(10);
-      this.setZoom(z + (e.wheelDelta ? e.wheelDelta / 1000 : e.detail / -100));
+      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
       e.preventDefault();
     },
     selectNodes: function (nIds) {
