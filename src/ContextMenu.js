@@ -2,17 +2,7 @@ import Tooltip from './Tooltip';
 import { createHandler, preventDefault } from './utils/events';
 
 const DEFAULT_MENU_ITEMS = [
-  { text: 'Redraw Subtree',
-    handler: 'redrawTreeFromBranch',
-    nodeType: 'internal'
-  }, {
-    text: 'Show Labels',
-    handler: 'displayLabels'
-  }, {
-    text: 'Hide Labels',
-    handler: 'hideLabels'
-  }, {
-    text: 'Collapse/Expand branch',
+  { text: 'Collapse/Expand Branch',
     handler: 'toggleCollapsed',
     nodeType: 'internal'
   }, {
@@ -20,13 +10,20 @@ const DEFAULT_MENU_ITEMS = [
     handler: 'rotate',
     nodeType: 'internal'
   }, {
+    text: 'Redraw Subtree',
+    handler: 'redrawTreeFromBranch',
+    nodeType: 'internal'
+  }, {
+    text: 'Show/Hide Labels',
+    handler: 'toggleLabels'
+  }, {
     text: 'Export As Image',
     handler: 'exportCurrentTreeView'
   }, {
-    text: 'Download All Leaf IDs',
+    text: 'Export Leaf IDs',
     handler: 'downloadAllLeafIds'
   }, {
-    text: 'Download Branch Leaf IDs',
+    text: 'Export Leaf IDs on Branch',
     handler: 'downloadLeafIdsFromBranch',
     nodeType: 'internal'
   }
