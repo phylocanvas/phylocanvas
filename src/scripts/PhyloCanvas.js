@@ -1361,6 +1361,12 @@
         this.children[i].saveChildren();
       }
     },
+    hasCollapsedAncestor: function () {
+      if (this.parent) {
+        return this.parent.collapsed || this.parent.hasCollapsedAncestor();
+      }
+      return false;
+    },
     collapse: function () {
       // don't collapse the node if it is a leaf... that would be silly!
       this.collapsed = this.leaf === false;
@@ -1840,7 +1846,7 @@
           this.root.setHighlighted(false);
           nd.setHighlighted(true);
           // For mouseover tooltip to show no. of children on the internal nodes
-          if (!nd.leaf && this.contextMenu.closed) {
+          if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
             this.tooltip.open(nd.getChildIds().length, e.clientX, e.clientY);
           }
         } else {
