@@ -3,7 +3,7 @@ function preventDefault(event) {
   return false;
 }
 
-function fireEvent(element, type, params) {
+function fireEvent(element, type, params = {}) {
   var event; // The custom event that will be created
   var param;
 
@@ -17,11 +17,9 @@ function fireEvent(element, type, params) {
 
   event.eventName = type;
 
-  if (params) {
-    for (param in params) {
-      if (params.hasOwnProperty(param)) {
-        event[param] = params[param];
-      }
+  for (param in params) {
+    if (params.hasOwnProperty(param)) {
+      event[param] = params[param];
     }
   }
 

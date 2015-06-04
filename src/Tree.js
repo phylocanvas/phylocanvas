@@ -4,7 +4,7 @@ import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
 import { Shapes } from './utils/constants';
-import { addClass, getX, getY } from './utils/dom';
+import { addClass, getX, getY, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio } from './utils/canvas';
 
@@ -1039,24 +1039,7 @@ Tree.prototype.downloadAllLeafIds = function () {
 };
 
 Tree.prototype.exportCurrentTreeView = function () {
-  var dataUrl = this.getPngUrl();
-  var anchor = document.createElement('a');
-  var isDownloadSupported = (typeof anchor.download !== 'undefined');
-  var event = document.createEvent('Event');
-
-  anchor.href = dataUrl;
-  anchor.target = '_blank';
-
-  if (isDownloadSupported) {
-    anchor.download = 'phylocanvas.png';
-  }
-
-  event.initEvent('click', true, true);
-  anchor.dispatchEvent(event);
-
-  if (isDownloadSupported) {
-    (window.URL || window.webkitURL).revokeObjectURL(anchor.href);
-  }
+  setupDownloadLink(this.getPngUrl(), 'phylocanvas.png');
 };
 
 module.exports = Tree;

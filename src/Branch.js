@@ -1,6 +1,5 @@
-var Angles = require('./utils/constants').Angles;
-var Shapes = require('./utils/constants').Shapes;
-var setupDownloadLink = require('./utils/dom').setupDownloadLink;
+import { Angles, Shapes } from './utils/constants';
+import { setupDownloadLink, createBlobUrl } from './utils/dom';
 
 /**
  * Creates a branch
@@ -764,10 +763,8 @@ Branch.prototype.getChildNo = function () {
 };
 
 Branch.prototype.downloadLeafIdsFromBranch = function () {
-  var downloadData;
-  var childIds = this.getChildIds();
-  downloadData = childIds.join('\n');
-  setupDownloadLink(downloadData, 'pc_leaves.txt');
+  var downloadData = this.getChildIds().join('\n');
+  setupDownloadLink(createBlobUrl(downloadData), 'pc_leaves.txt');
 };
 
 module.exports = Branch;
