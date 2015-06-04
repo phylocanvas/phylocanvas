@@ -721,7 +721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.root.setHighlighted(false);
 	      nd.setHighlighted(true);
 	      // For mouseover tooltip to show no. of children on the internal nodes
-	      if (!nd.leaf && !nd.isCollapsed() && this.contextMenu.closed) {
+	      if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
 	        this.tooltip.open(e.clientX, e.clientY, nd);
 	      }
 	    } else {
@@ -2013,8 +2013,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	Branch.prototype.isCollapsed = function () {
-	  return this.collapsed || this.parent && this.parent.isCollapsed();
+	Branch.prototype.hasCollapsedAncestor = function () {
+	  if (this.parent) {
+	    return this.parent.collapsed || this.parent.hasCollapsedAncestor();
+	  }
+	  return false;
 	};
 
 	Branch.prototype.collapse = function () {

@@ -336,7 +336,7 @@ Tree.prototype.drag = function (event) {
       this.root.setHighlighted(false);
       nd.setHighlighted(true);
       // For mouseover tooltip to show no. of children on the internal nodes
-      if (!nd.leaf && !nd.isCollapsed() && this.contextMenu.closed) {
+      if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
         this.tooltip.open(e.clientX, e.clientY, nd);
       }
     } else {

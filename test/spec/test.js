@@ -113,7 +113,7 @@ describe('PhyloCanvas', function () {
       expect(col).to.equal(colour3);
     });
 
-    it('should be collapsed if parent is collapsed', function () {
+    it('should be true if parent is collapsed', function () {
       var branch = new PhyloCanvas.Branch();
       var branch1 = new PhyloCanvas.Branch();
       var branch2 = new PhyloCanvas.Branch();
@@ -123,8 +123,21 @@ describe('PhyloCanvas', function () {
 
       branch.collapsed = true;
 
-      expect(branch1.isCollapsed()).to.equal(true);
-      expect(branch2.isCollapsed()).to.equal(true);
+      expect(branch1.hasCollapsedAncestor()).to.equal(true);
+      expect(branch2.hasCollapsedAncestor()).to.equal(true);
+    });
+
+    it('should be true if grandparent is collapsed', function () {
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+
+      branch.addChild(branch1);
+      branch1.addChild(branch2);
+
+      branch.collapsed = true;
+
+      expect(branch2.hasCollapsedAncestor()).to.equal(true);
     });
 
   });

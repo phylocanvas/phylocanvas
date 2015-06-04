@@ -576,8 +576,11 @@ Branch.prototype.saveChildren = function () {
   }
 };
 
-Branch.prototype.isCollapsed = function () {
-  return this.collapsed || this.parent && this.parent.isCollapsed();
+Branch.prototype.hasCollapsedAncestor = function () {
+  if (this.parent) {
+    return this.parent.collapsed || this.parent.hasCollapsedAncestor();
+  }
+  return false;
 };
 
 Branch.prototype.collapse = function () {
