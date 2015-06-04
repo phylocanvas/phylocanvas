@@ -377,7 +377,10 @@
     else {
       this.elements = [ {
         text: 'Collapse/Expand Branch',
-        handler: 'toggleCollapsed',
+        handler: function (branch) {
+          branch.toggleCollapsed();
+          branch.tree.draw(); // some browsers do not fire mousemove after clicking
+        },
         internal: true,
         leaf: false
       }, {
