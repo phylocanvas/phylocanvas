@@ -615,11 +615,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	Tree.prototype.setInitialCollapsedBranches = function (node) {
+	Tree.prototype.setInitialCollapsedBranches = function () {
+	  var node = arguments[0] === undefined ? this.root : arguments[0];
+
 	  var childIds;
 	  var i;
-
-	  node = node || this.root; // default param
 
 	  childIds = node.getChildIds();
 	  if (childIds && childIds.length > this.defaultCollapsedOptions.min && childIds.length < this.defaultCollapsedOptions.max) {
@@ -721,7 +721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.root.setHighlighted(false);
 	      nd.setHighlighted(true);
 	      // For mouseover tooltip to show no. of children on the internal nodes
-	      if (!nd.leaf && this.contextMenu.closed) {
+	      if (!nd.leaf && !nd.isCollapsed() && this.contextMenu.closed) {
 	        this.tooltip.open(e.clientX, e.clientY, nd);
 	      }
 	    } else {
@@ -2013,6 +2013,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	Branch.prototype.isCollapsed = function () {
+	  return this.collapsed || this.parent && this.parent.isCollapsed();
+	};
+
 	Branch.prototype.collapse = function () {
 	  // don't collapse the node if it is a leaf... that would be silly!
 	  this.collapsed = this.leaf === false;
@@ -2352,17 +2356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utilsEvents = __webpack_require__(13);
 
-	var DEFAULT_MENU_ITEMS = [{ text: 'Redraw Subtree',
-	  handler: 'redrawTreeFromBranch',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Show Labels',
-	  handler: 'displayLabels'
-	}, {
-	  text: 'Hide Labels',
-	  handler: 'hideLabels'
-	}, {
-	  text: 'Collapse/Expand branch',
+	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
 	  handler: 'toggleCollapsed',
 	  nodeType: 'internal'
 	}, {
@@ -2370,13 +2364,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  handler: 'rotate',
 	  nodeType: 'internal'
 	}, {
+	  text: 'Redraw Subtree',
+	  handler: 'redrawTreeFromBranch',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Show/Hide Labels',
+	  handler: 'toggleLabels'
+	}, {
 	  text: 'Export As Image',
 	  handler: 'exportCurrentTreeView'
 	}, {
-	  text: 'Download All Leaf IDs',
+	  text: 'Export Leaf IDs',
 	  handler: 'downloadAllLeafIds'
 	}, {
-	  text: 'Download Branch Leaf IDs',
+	  text: 'Export Leaf IDs on Branch',
 	  handler: 'downloadLeafIdsFromBranch',
 	  nodeType: 'internal'
 	}];
@@ -2405,6 +2406,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  element.style.backgroundColor = 'transparent';
 	}
 
+	function transferMenuItem(_ref) {
+	  var handler = _ref.handler;
+	  var _ref$text = _ref.text;
+	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
+	  var nodeType = _ref.nodeType;
+
+	  return { handler: handler, text: text, nodeType: nodeType };
+	}
+
 	/**
 	 * The menu that is shown when the PhyloCanvas widget is right-clicked
 	 *
@@ -2421,13 +2431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
 
-	    this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
-	      return {
-	        handler: menuItem.handler,
-	        text: menuItem.text || 'New Menu Item',
-	        nodeType: menuItem.nodeType || undefined
-	      };
-	    });
+	    this.menuItems = menuItems.map(transferMenuItem);
 	    this.fontSize = '8pt';
 	  }
 

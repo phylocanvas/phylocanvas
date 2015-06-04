@@ -576,6 +576,10 @@ Branch.prototype.saveChildren = function () {
   }
 };
 
+Branch.prototype.isCollapsed = function () {
+  return this.collapsed || this.parent && this.parent.isCollapsed();
+};
+
 Branch.prototype.collapse = function () {
   // don't collapse the node if it is a leaf... that would be silly!
   this.collapsed = this.leaf === false;

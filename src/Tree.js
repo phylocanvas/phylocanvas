@@ -229,11 +229,9 @@ Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, sco
   }
 };
 
-Tree.prototype.setInitialCollapsedBranches = function (node) {
+Tree.prototype.setInitialCollapsedBranches = function (node = this.root) {
   var childIds;
   var i;
-
-  node = node || this.root; // default param
 
   childIds = node.getChildIds();
   if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
@@ -338,7 +336,7 @@ Tree.prototype.drag = function (event) {
       this.root.setHighlighted(false);
       nd.setHighlighted(true);
       // For mouseover tooltip to show no. of children on the internal nodes
-      if (!nd.leaf && this.contextMenu.closed) {
+      if (!nd.leaf && !nd.isCollapsed() && this.contextMenu.closed) {
         this.tooltip.open(e.clientX, e.clientY, nd);
       }
     } else {

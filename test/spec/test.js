@@ -113,6 +113,20 @@ describe('PhyloCanvas', function () {
       expect(col).to.equal(colour3);
     });
 
+    it('should be collapsed if parent is collapsed', function () {
+      var branch = new PhyloCanvas.Branch();
+      var branch1 = new PhyloCanvas.Branch();
+      var branch2 = new PhyloCanvas.Branch();
+
+      branch.addChild(branch1);
+      branch.addChild(branch2);
+
+      branch.collapsed = true;
+
+      expect(branch1.isCollapsed()).to.equal(true);
+      expect(branch2.isCollapsed()).to.equal(true);
+    });
+
   });
 
 });
