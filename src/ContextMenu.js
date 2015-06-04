@@ -3,7 +3,10 @@ import { createHandler, preventDefault } from './utils/events';
 
 const DEFAULT_MENU_ITEMS = [
   { text: 'Collapse/Expand Branch',
-    handler: 'toggleCollapsed',
+    handler: function (branch) {
+      branch.toggleCollapsed();
+      branch.tree.draw(); // some browsers do not fire mousemove after clicking
+    },
     nodeType: 'internal'
   }, {
     text: 'Rotate Branch',
