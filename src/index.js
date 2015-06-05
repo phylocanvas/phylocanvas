@@ -210,7 +210,6 @@ Tree.prototype.initialiseHistory = function (config) {
 module.exports = {
   Tree: Tree,
   Branch: require('./Branch'),
-  Loader: require('./Loader'),
   ContextMenu: require('./ContextMenu'),
   History: History
 };

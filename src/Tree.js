@@ -7,6 +7,7 @@ import { Shapes } from './utils/constants';
 import { addClass, getX, getY, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio } from './utils/canvas';
+import http from './utils/http';
 
 /**
  * The instance of a PhyloCanvas Widget
@@ -38,10 +39,6 @@ function Tree(element, conf = {}) {
    * List of leaves
    */
   this.leaves = [];
-  /**
-   * Loading dialog displayed while waiting for the tree
-   */
-  // this.loader = new Loader(element);
   /**
    * The root node of the tree
    * (not neccesarily a root in the Phylogenetic sense)
@@ -200,34 +197,6 @@ function Tree(element, conf = {}) {
 
 Tree.prototype.branchRenderers = require('./renderers/branch');
 Tree.prototype.nodeRenderers = require('./renderers/node');
-
-Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
-  var xmlhttp;
-  if (window.XMLHttpRequest) {
-    // code for IE7+, Firefox, Chrome, Opera, Safari
-    xmlhttp = new XMLHttpRequest();
-  } else {
-    // code for IE6, IE5
-    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-  }
-
-  xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState === 4) {
-      if (xmlhttp.status === 200) {
-        callback(xmlhttp, callbackPars, scope);
-      } else {
-        if (errorCallback) errorCallback(xmlhttp, callbackPars, scope);
-      }
-    }
-  };
-  xmlhttp.open(method, url, true);
-  if (method === 'GET') {
-    xmlhttp.send();
-  }
-  else {
-    xmlhttp.send(params);
-  }
-};
 
 Tree.prototype.setInitialCollapsedBranches = function (node = this.root) {
   var childIds;
@@ -431,22 +400,34 @@ Tree.prototype.load = function (tree, name, format) {
   if (format) {
     if (format.match(/nexus/i)) {
       if (tree.match(/\.\w+$/)) {
-        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
+        http({
+          url: tree,
+          method: 'GET'
+        }, this.loadFileCallback.bind(this, { format: 'nexus', name: name }));
       } else {
         this.parseNexus(tree, name);
       }
     } else if (format.match(/newick/i)) {
       if (tree.match(/\.\w+$/)) {
-        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
+        http({
+          url: tree,
+          method: 'GET'
+        }, this.loadFileCallback.bind(this, { format: 'newick' }));
       } else {
         this.parseNwk(tree, name);
       }
     }
   } else {
     if (tree.match(/\.n(ex|xs)$/)) {
-      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
+      http({
+        url: tree,
+        method: 'GET'
+      }, this.loadFileCallback.bind(this, { format: 'nexus', name: name }));
     } else if (tree.match(/\.nwk$/)) {
-      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
+      http({
+        url: tree,
+        method: 'GET'
+      }, this.loadFileCallback.bind(this, { format: 'newick' }));
     } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
       this.parseNexus(tree, name);
       this.draw();
@@ -461,16 +442,16 @@ Tree.prototype.load = function (tree, name, format) {
   }
 };
 
-Tree.prototype.loadFileCallback = function (response, opts, scope) {
-  if (opts.format.match(/nexus/i)) {
-    scope.parseNexus(response.responseText, opts.name);
-  } else if (opts.format.match(/newick/i)) {
-    scope.parseNwk(response.responseText);
+Tree.prototype.loadFileCallback = function ({ format, name }, response) {
+  if (format.match(/nexus/i)) {
+    this.parseNexus(response.responseText, name);
+  } else if (format.match(/newick/i)) {
+    this.parseNwk(response.responseText);
   } else {
     throw new Error('file type not recognised by PhyloCanvas');
   }
-  scope.draw();
-  scope.loadCompleted();
+  this.draw();
+  this.loadCompleted();
 };
 
 Tree.prototype.parseNexus = function (str, name) {
