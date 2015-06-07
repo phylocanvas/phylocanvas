@@ -5,21 +5,20 @@
  * @modified Jyothish NT 01/03/15
  */
 
-var addClass = require('./utils/dom').addClass;
-var hasClass = require('./utils/dom').hasClass;
-var removeClass = require('./utils/dom').removeClass;
-
-var fireEvent = require('./utils/events').fireEvent;
-var addEvent = require('./utils/events').addEvent;
-var killEvent = require('./utils/events').killEvent;
+import { addClass, hasClass, removeClass } from './utils/dom';
+import { fireEvent, addEvent, killEvent } from './utils/events';
 
 /**
  * @namespace PhyloCanvas
  */
 
-var Tree = require('./Tree');
+import Tree from './Tree';
+import Branch from './Branch';
+import ContextMenu from './ContextMenu';
 
-function History(tree) {
+export { Tree, Branch, ContextMenu };
+
+export function History(tree) {
   this.tree = tree;
 
   this.injectCss();
@@ -205,11 +204,4 @@ Tree.prototype.initialiseHistory = function (config) {
     this.historySnapshots = [];
     this.history = new History(this);
   }
-};
-
-module.exports = {
-  Tree: Tree,
-  Branch: require('./Branch'),
-  ContextMenu: require('./ContextMenu'),
-  History: History
 };
