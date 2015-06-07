@@ -1,7 +1,7 @@
-var PhyloCanvas = require('../src/index');
-var buttonForm = document.getElementById('buttons');
+import * as PhyloCanvas from '../src/index';
 
-var tree = new PhyloCanvas.Tree('phylocanvas', {
+let buttonForm = document.getElementById('buttons');
+let tree = new PhyloCanvas.Tree('phylocanvas', {
   history: {
     collapsed: true
   },
@@ -20,16 +20,17 @@ buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
 });
 
-Object.keys(tree.branchRenderers).forEach(function (treeType) {
-  var button = document.createElement('button');
+for (let treeType of Object.keys(tree.branchRenderers)) {
+  let button = document.createElement('button');
 
   button.innerHTML = treeType;
 
-  button.addEventListener('click', function () {
-    tree.setTreeType(treeType);
-  });
+  button.addEventListener('click', () => tree.setTreeType(treeType));
 
   buttonForm.appendChild(button);
-});
+}
 
-tree.load('./data/tree.nwk');
+tree.on('error', function (e) { throw e.message; });
+
+// tree.load('./data/tree.nwk');
+tree.load('(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);');

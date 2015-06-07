@@ -7,6 +7,7 @@ import { Shapes } from './utils/constants';
 import { addClass, getX, getY, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio } from './utils/canvas';
+import parsers from './parsers';
 import http from './utils/http';
 
 /**
@@ -377,7 +378,7 @@ Tree.prototype.clearSelect = function () {
   this.draw();
 };
 
-Tree.prototype.genId = function () {
+Tree.prototype.generateBranchId = function () {
   return 'pcn' + this.lastId++;
 };
 
@@ -390,66 +391,50 @@ Tree.prototype.hideLabels = function () {
   this.draw();
 };
 
-Tree.prototype.dangerouslySetData = function (treeData) {
-  this.parseNwk(treeData, null);
+Tree.prototype.load = function (inputString, options = {}) {
+  if (options.format) {
+    if (inputString.match(/\.\w+$/)) {
+      http({
+        url: inputString,
+        method: 'GET'
+      }, this.loadFileCallback.bind(this, parsers[options.format], options));
+      return;
+    } else {
+      this.build(inputString, parsers[options.format], options);
+    }
+  } else {
+    for (let parserName of Object.keys(parsers)) {
+      let parser = parsers[parserName];
+
+      if (inputString.match(parser.fileExtension)) {
+        http({
+          url: inputString,
+          method: 'GET'
+        }, this.loadFileCallback.bind(this, parser, options));
+        return;
+      }
+
+      if (inputString.match(parser.validation)) {
+        try {
+          this.build(inputString, parser, options);
+        } catch (e) {
+          this.loadError(e);
+          return;
+        }
+        break;
+      }
+
+      this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
+    }
+  }
+
   this.draw();
   this.loadCompleted();
 };
 
-Tree.prototype.load = function (tree, name, format) {
-  if (format) {
-    if (format.match(/nexus/i)) {
-      if (tree.match(/\.\w+$/)) {
-        http({
-          url: tree,
-          method: 'GET'
-        }, this.loadFileCallback.bind(this, { format: 'nexus', name: name }));
-      } else {
-        this.parseNexus(tree, name);
-      }
-    } else if (format.match(/newick/i)) {
-      if (tree.match(/\.\w+$/)) {
-        http({
-          url: tree,
-          method: 'GET'
-        }, this.loadFileCallback.bind(this, { format: 'newick' }));
-      } else {
-        this.parseNwk(tree, name);
-      }
-    }
-  } else {
-    if (tree.match(/\.n(ex|xs)$/)) {
-      http({
-        url: tree,
-        method: 'GET'
-      }, this.loadFileCallback.bind(this, { format: 'nexus', name: name }));
-    } else if (tree.match(/\.nwk$/)) {
-      http({
-        url: tree,
-        method: 'GET'
-      }, this.loadFileCallback.bind(this, { format: 'newick' }));
-    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
-      this.parseNexus(tree, name);
-      this.draw();
-      this.loadCompleted();
-    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
-      this.parseNwk(tree, name);
-      this.draw();
-      this.loadCompleted();
-    } else {
-      this.loadError('PhyloCanvas did not recognise the string as a file or a newick or Nexus format string');
-    }
-  }
-};
 
-Tree.prototype.loadFileCallback = function ({ format, name }, response) {
-  if (format.match(/nexus/i)) {
-    this.parseNexus(response.responseText, name);
-  } else if (format.match(/newick/i)) {
-    this.parseNwk(response.responseText);
-  } else {
-    throw new Error('file type not recognised by PhyloCanvas');
-  }
+Tree.prototype.loadFileCallback = function (parser, options, response) {
+  this.build(response.responseText, parser, options);
   this.draw();
   this.loadCompleted();
 };
@@ -509,7 +494,7 @@ Tree.prototype.parseNexus = function (str, name) {
   }
 };
 
-Tree.prototype.parseNwk = function (nwk) {
+Tree.prototype.build = function (string, parser, options) {
   this.origBranches = false;
   this.origLeaves = false;
   this.origRoot = false;
@@ -520,45 +505,13 @@ Tree.prototype.parseNwk = function (nwk) {
   this.leaves = [];
   this.branches = {};
   this.drawn = false;
-  var curNode = new Branch();
-  curNode.id = 'root';
-  this.branches.root = curNode;
-  this.setRoot(curNode);
 
-  for (var i = 0; i < nwk.length; i++) {
-    var node;
-    switch (nwk[i]) {
-      case '(': // new Child
-        node = new Branch();
-        curNode.addChild(node);
-        curNode = node;
-        break;
-      case ')': // return to parent
-        curNode = curNode.parent;
-        break;
-      case ',': // new sibiling
-        node = new Branch();
-        curNode.parent.addChild(node);
-        curNode = node;
-        break;
-      case ';':
-        for (var l = 0; l < this.leaves.length; l++) {
-          if (this.leaves[l].totalBranchLength > this.maxBranchLength) {
-            this.maxBranchLength = this.leaves[l].totalBranchLength;
-          }
-        }
-        break;
-      default:
-        try {
-          i = curNode.parseNwk(nwk, i);
-          i--;
-        } catch (e) {
-          this.loadError('Error parsing nwk file' + e);
-          return;
-        }
-        break;
-    }
-  }
+  let newRoot = new Branch();
+  newRoot.id = 'root';
+  this.branches.root = newRoot;
+  this.setRoot(newRoot);
+
+  parser.parse(string, newRoot, options);
 
   this.saveNode(this.root);
   this.root.saveChildren();
