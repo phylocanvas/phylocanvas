@@ -32,5 +32,5 @@ for (let treeType of Object.keys(tree.branchRenderers)) {
 
 tree.on('error', function (e) { throw e.message; });
 
-// tree.load('./data/tree.nwk');
-tree.load('(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);');
+tree.load('./data/tree.nwk');
+// tree.load('(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);');

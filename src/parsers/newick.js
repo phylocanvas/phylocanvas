@@ -5,13 +5,17 @@ const format = 'newick';
 const fileExtension = /\.nwk$/;
 const validation = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
 
+function isTerminatingChar(terminatingChar) {
+  return this === terminatingChar;
+}
+
 const labelTerminatingChars = [ ':', ',', ')' ];
 
 function parseLabel(string) {
   let label = '';
 
   for (let char of string) {
-    if (labelTerminatingChars.some((c) => c === char)) {
+    if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
       return label;
     }
     label += char;
@@ -58,11 +62,11 @@ function parseAnnotations(label, branch) {
 
 const nodeTerminatingChars = [ ')', ',' ];
 
-function parseNodeLength(string) {
+function parseBranchLength(string) {
   let nodeLength = '';
 
   for (let char of string) {
-    if (char in nodeTerminatingChars) {
+    if (nodeTerminatingChars.some(isTerminatingChar.bind(char))) {
       break;
     }
     nodeLength += char;
@@ -74,21 +78,21 @@ function parseNodeLength(string) {
 function parseBranch(branch, string, index) {
   let label = parseLabel(string.slice(index));
   let postLabelIndex = index + label.length;
-  let nodeLength = 0;
+  let branchLengthStr = 0;
 
   if (label.match(/\*/)) {
     parseAnnotations(label, branch);
   }
 
   if (string[postLabelIndex] === ':') {
-    nodeLength = parseNodeLength(string.slice(postLabelIndex + 1));
-    branch.branchLength = Math.max(parseFloat(nodeLength), 0);
+    branchLengthStr = parseBranchLength(string.slice(postLabelIndex + 1));
+    branch.branchLength = Math.max(parseFloat(branchLengthStr), 0);
   } else {
     branch.branchLength = 0;
   }
 
-  branch.id = label || branch.tree.generateId();
-  return postLabelIndex + branch.branchLength;
+  branch.id = label || branch.tree.generateBranchId();
+  return postLabelIndex + branchLengthStr.length;
 }
 
 function parse(string, root) {
@@ -111,15 +115,9 @@ function parse(string, root) {
         currentNode = node;
         break;
       case ';':
-        for (let l = 0; l < this.leaves.length; l++) {
-          if (this.leaves[l].totalBranchLength > this.maxBranchLength) {
-            this.maxBranchLength = this.leaves[l].totalBranchLength;
-          }
-        }
-        break;
+        return;
       default:
           i = parseBranch(currentNode, string, i);
-          i--;
         break;
     }
   }
