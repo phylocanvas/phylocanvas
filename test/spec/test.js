@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 describe('PhyloCanvas', function () {
 
   beforeEach(function () {
@@ -47,7 +49,7 @@ describe('PhyloCanvas', function () {
       var branch2 = new PhyloCanvas.Branch();
       var cols;
 
-      tree.backColour = true;
+      tree.backColour = false;
 
       branch1.colour = colour1;
       branch2.colour = colour2;
