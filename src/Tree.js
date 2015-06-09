@@ -8,7 +8,6 @@ import { addClass, getX, getY, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio } from './utils/canvas';
 import parsers from './parsers';
-import http from './utils/http';
 
 /**
  * The instance of a PhyloCanvas Widget
@@ -393,108 +392,24 @@ Tree.prototype.hideLabels = function () {
 
 Tree.prototype.load = function (inputString, options = {}) {
   if (options.format) {
-    if (inputString.match(/\.\w+$/)) {
-      http({
-        url: inputString,
-        method: 'GET'
-      }, this.loadFileCallback.bind(this, parsers[options.format], options));
+    this.build(inputString, parsers[options.format], options);
+    return;
+  }
+
+  for (let parserName of Object.keys(parsers)) {
+    let parser = parsers[parserName];
+
+    if (inputString.match(parser.fileExtension) ||
+        inputString.match(parser.validation)) {
+      this.build(inputString, parser, options);
       return;
-    } else {
-      this.build(inputString, parsers[options.format], options);
     }
-  } else {
-    for (let parserName of Object.keys(parsers)) {
-      let parser = parsers[parserName];
 
-      if (inputString.match(parser.fileExtension)) {
-        http({
-          url: inputString,
-          method: 'GET'
-        }, this.loadFileCallback.bind(this, parser, options));
-        return;
-      }
-
-      if (inputString.match(parser.validation)) {
-        try {
-          this.build(inputString, parser, options);
-        } catch (e) {
-          this.loadError(e);
-          return;
-        }
-        break;
-      }
-
-      this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
-    }
-  }
-
-  this.draw();
-  this.loadCompleted();
-};
-
-
-Tree.prototype.loadFileCallback = function (parser, options, response) {
-  this.build(response.responseText, parser, options);
-  this.draw();
-  this.loadCompleted();
-};
-
-Tree.prototype.parseNexus = function (str, name) {
-  if (!str.match(/BEGIN TREES/gi)) {
-    throw 'The nexus file does not contain a tree block';
-  }
-
-  //Get everything between BEGIN TREES and next END;
-  var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
-  //get translate section
-
-  var leafNameObject = {};
-  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
-  if (translateSection && translateSection.length) {
-    translateSection = translateSection[0];
-    //remove translate section from tree section
-    treeSection = treeSection.replace(translateSection, '');
-
-    //parse translate section into kv pairs
-    translateSection = translateSection.replace(/translate|;/gi, '');
-
-    var tIntArr = translateSection.split(',');
-    var ia;
-    for (var i = 0; i < tIntArr.length; i++) {
-      ia = tIntArr[i].trim().replace('\n', '').split(' ');
-      if (ia[0] && ia[1]) {
-        leafNameObject[ia[0].trim()] = ia[1].trim();
-      }
-    }
-  }
-
-  // find each line starting with tree.
-  var tArr = treeSection.split('\n');
-  var trees = {};
-  // id name is '' or does not exist, ask user to choose which tree.
-  for (var i = 0; i < tArr.length; i++) {
-    if (tArr[i].trim() === '') continue;
-    var s = tArr[i].replace(/tree\s/i, '');
-    if (!name) {
-      name = s.trim().match(/^\w+/)[0]
-    }
-    trees[name] = s.trim().match(/[\S]*$/)[0];
-  }
-  if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
-
-  this.parseNwk(trees[name].trim());
-  // translate in accordance with translate block
-  if (leafNameObject) {
-    for (var n in leafNameObject) {
-      var b = this.branches[n];
-      delete this.branches[n];
-      b.id = leafNameObject[n];
-      this.branches[b.id] = b;
-    }
+    this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
   }
 };
 
-Tree.prototype.build = function (string, parser, options) {
+Tree.prototype.build = function (inputString, parser, options) {
   this.origBranches = false;
   this.origLeaves = false;
   this.origRoot = false;
@@ -506,29 +421,35 @@ Tree.prototype.build = function (string, parser, options) {
   this.branches = {};
   this.drawn = false;
 
-  let newRoot = new Branch();
-  newRoot.id = 'root';
-  this.branches.root = newRoot;
-  this.setRoot(newRoot);
+  let root = new Branch();
+  root.id = 'root';
+  this.branches.root = root;
+  this.setRoot(root);
 
-  parser.parse(string, newRoot, options);
+  parser.parse({ inputString, root, options }, (error) => {
+    if (error) {
+      this.loadError(error);
+      return;
+    }
 
-  this.saveNode(this.root);
-  this.root.saveChildren();
+    this.saveNode(this.root);
+    this.root.saveChildren();
 
-  this.root.branchLength = 0;
-  this.maxBranchLength = 0;
-  this.root.setTotalLength();
+    this.root.branchLength = 0;
+    this.maxBranchLength = 0;
+    this.root.setTotalLength();
 
-  if (this.maxBranchLength === 0) {
-    this.loadError('All branches in the tree are identical.');
-    return;
-  }
+    if (this.maxBranchLength === 0) {
+      this.loadError('All branches in the tree are identical.');
+      return;
+    }
 
-  this.buildLeaves();
-  this.setInitialCollapsedBranches();
+    this.buildLeaves();
+    this.setInitialCollapsedBranches();
 
-  this.loadCompleted();
+    this.loadCompleted();
+    this.draw();
+  });
 };
 
 Tree.prototype.pickup = function (event) {

@@ -1,5 +1,6 @@
+import Parser from '../Parser';
 import newickParserDefinition from './newick';
 
 export default {
-  newick: newickParserDefinition
+  newick: new Parser(newickParserDefinition)
 };

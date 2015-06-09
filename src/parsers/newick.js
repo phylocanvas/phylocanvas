@@ -3,7 +3,7 @@ import { Shapes } from '../utils/constants';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;
-const validation = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
+const validator = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
 
 function isTerminatingChar(terminatingChar) {
   return this === terminatingChar;
@@ -95,7 +95,7 @@ function parseBranch(branch, string, index) {
   return postLabelIndex + branchLengthStr.length;
 }
 
-function parse(string, root) {
+function parseFn(string, root) {
   let currentNode = root;
 
   for (let i = 0; i < string.length; i++) {
@@ -126,6 +126,6 @@ function parse(string, root) {
 export default {
   format,
   fileExtension,
-  validation,
-  parse
+  validator,
+  parseFn
 };
