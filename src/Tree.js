@@ -400,13 +400,13 @@ Tree.prototype.load = function (inputString, options = {}) {
     let parser = parsers[parserName];
 
     if (inputString.match(parser.fileExtension) ||
-        inputString.match(parser.validation)) {
+        inputString.match(parser.validator)) {
       this.build(inputString, parser, options);
       return;
     }
-
-    this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
   }
+
+  this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
 };
 
 Tree.prototype.build = function (inputString, parser, options) {
@@ -447,8 +447,8 @@ Tree.prototype.build = function (inputString, parser, options) {
     this.buildLeaves();
     this.setInitialCollapsedBranches();
 
-    this.loadCompleted();
     this.draw();
+    this.loadCompleted();
   });
 };
 

@@ -95,7 +95,7 @@ function parseBranch(branch, string, index) {
   return postLabelIndex + branchLengthStr.length;
 }
 
-function parseFn(string, root) {
+function parseFn({ string, root }, callback) {
   let currentNode = root;
 
   for (let i = 0; i < string.length; i++) {
@@ -115,9 +115,13 @@ function parseFn(string, root) {
         currentNode = node;
         break;
       case ';':
-        return;
+        return callback();
       default:
-          i = parseBranch(currentNode, string, i);
+          try {
+            i = parseBranch(currentNode, string, i);
+          } catch (e) {
+            return callback(e);
+          }
         break;
     }
   }

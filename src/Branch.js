@@ -1,4 +1,4 @@
-import { Angles, Shapes } from './utils/constants';
+import { Angles } from './utils/constants';
 import { setupDownloadLink, createBlobUrl } from './utils/dom';
 
 /**

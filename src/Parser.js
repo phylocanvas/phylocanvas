@@ -12,8 +12,7 @@ export default class Parser {
   parse({ inputString, root, options = {} }, callback) {
     let doParse = (string) => {
       if (string.match(this.validator)) {
-        this.parseFn(string, root, options);
-        return callback();
+        return this.parseFn({ string, root, options }, callback);
       }
       return callback(new Error(`Format string does not validate as "${this.format}"`));
     };
