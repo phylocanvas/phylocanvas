@@ -4,9 +4,9 @@ import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
 import { Shapes } from './utils/constants';
-import { addClass, getX, getY, setupDownloadLink } from './utils/dom';
+import { addClass, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
-import { getBackingStorePixelRatio } from './utils/canvas';
+import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
 import parsers from './parsers';
 
 /**
@@ -227,7 +227,7 @@ Tree.prototype.clicked = function (e) {
     }
 
     if (!this.root) return false;
-    node = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+    node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
 
     if (node) {
       this.root.setSelected(false, true);
@@ -248,9 +248,7 @@ Tree.prototype.clicked = function (e) {
     this.nodesSelected(nids);
   } else if (e.button === 2) {
     e.preventDefault();
-    node = this.root.clicked(
-      this.translateClickX(e.clientX), this.translateClickY(e.clientY)
-    );
+    node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
     this.contextMenu.open(e.clientX, e.clientY, node);
     this.contextMenu.closed = false;
     this.tooltip.close();
@@ -259,7 +257,7 @@ Tree.prototype.clicked = function (e) {
 
 Tree.prototype.dblclicked = function (e) {
   if (!this.root) return false;
-  var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+  var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
   if (nd) {
     nd.setSelected(false, true);
     nd.toggleCollapsed();
@@ -278,7 +276,7 @@ Tree.prototype.displayLabels = function () {
 
 Tree.prototype.drag = function (event) {
   // get window ratio
-  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+  var ratio = getPixelRatio(this.canvas);
 
   if (!this.drawn) return false;
 
@@ -299,7 +297,7 @@ Tree.prototype.drag = function (event) {
   } else {
     // hover
     var e = event;
-    var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+    var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
     if (nd && (this.internalNodesSelectable || nd.leaf)) {
       this.root.setHighlighted(false);
@@ -692,30 +690,6 @@ Tree.prototype.toggleLabels = function () {
   this.draw();
 };
 
-Tree.prototype.translateClickX = function (x) {
-  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-
-  x = (x - getX(this.canvas.canvas) + window.pageXOffset);
-  x *= ratio;
-  x -= this.canvas.canvas.width / 2;
-  x -= this.offsetx;
-  x = x / this.zoom;
-
-  return x;
-};
-
-Tree.prototype.translateClickY = function (y) {
-  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-
-  y = (y - getY(this.canvas.canvas) + window.pageYOffset); // account for positioning and scroll
-  y *= ratio;
-  y -= this.canvas.canvas.height / 2;
-  y -= this.offsety;
-  y = y / this.zoom;
-
-  return y;
-};
-
 Tree.prototype.viewMetadataColumns = function (metadataColumnArray) {
   this.showMetadata = true;
   if (metadataColumnArray === undefined) {
@@ -836,7 +810,7 @@ Tree.prototype.on = Tree.prototype.addListener;
 
 Tree.prototype.adjustForPixelRatio = function () {
   // Adjust canvas size for Retina screen
-  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+  var ratio = getPixelRatio(this.canvas);
 
   this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
   this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';

@@ -30,7 +30,7 @@ export function setupDownloadLink(url, filename) {
  */
 export function getX(domElement) {
   var xValue = 0;
-  while (domElement != null) {
+  while (domElement) {
     xValue += domElement.offsetLeft;
     domElement = domElement.offsetParent;
   }
