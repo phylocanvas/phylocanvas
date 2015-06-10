@@ -1,5 +1,7 @@
 import { expect } from 'chai';
 
+import { Tree, Branch } from '../../src/index';
+
 describe('PhyloCanvas', function () {
 
   beforeEach(function () {
@@ -18,11 +20,11 @@ describe('PhyloCanvas', function () {
     it('should get the right colour', function () {
       var colour1 = 'rgba(255,0,0,1)';
       var colour2 = 'rgba(0,255,0,1)';
-      var tree = new PhyloCanvas.Tree('test');
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
-      var cols;
+      var tree = new Tree('test');
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
+      var colours;
 
       tree.backColour = true;
 
@@ -34,22 +36,22 @@ describe('PhyloCanvas', function () {
 
       branch.tree = tree;
 
-      cols = branch.getChildColours();
+      colours = branch.getChildColours();
 
-      expect(cols.length).to.equal(2);
-      expect(cols[0]).to.equal(colour1);
+      expect(colours.length).to.equal(2);
+      expect(colours[0]).to.equal(colour1);
     });
 
     it('should get the right colours', function () {
       var colour1 = 'rgba(255,0,0,1)';
       var colour2 = 'rgba(0,255,0,1)';
-      var tree = new PhyloCanvas.Tree('test');
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
-      var cols;
+      var tree = new Tree('test');
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
+      var colours;
 
-      tree.backColour = false;
+      tree.backColour = true;
 
       branch1.colour = colour1;
       branch2.colour = colour2;
@@ -59,20 +61,20 @@ describe('PhyloCanvas', function () {
 
       branch.tree = tree;
 
-      cols = branch.getChildColours();
+      colours = branch.getChildColours();
 
-      expect(cols.length).to.equal(2);
-      expect(cols[0]).to.equal(colour1);
-      expect(cols[1]).to.equal(colour2);
+      expect(colours.length).to.equal(2);
+      expect(colours[0]).to.equal(colour1);
+      expect(colours[1]).to.equal(colour2);
     });
 
     it('should get the right parent branch colour', function () {
       var colour1 = 'rgba(255,0,0,1)';
-      var tree = new PhyloCanvas.Tree('test');
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
-      var col;
+      var tree = new Tree('test');
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
+      var colour;
 
       tree.backColour = true;
 
@@ -84,20 +86,20 @@ describe('PhyloCanvas', function () {
 
       branch.tree = tree;
 
-      col = branch.getColour();
+      colour = branch.getColour();
 
-      expect(col).to.equal(colour1);
+      expect(colour).to.equal(colour1);
     });
 
     it('should get the right colours', function () {
       var colour1 = 'rgba(255,0,0,1)';
       var colour2 = 'rgba(0,255,0,1)';
       var colour3 = 'rgba(0,0,0,1)';
-      var tree = new PhyloCanvas.Tree('test');
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
-      var col;
+      var tree = new Tree('test');
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
+      var colour;
 
       tree.branchColour = colour3;
       tree.backColour = true;
@@ -110,15 +112,15 @@ describe('PhyloCanvas', function () {
 
       branch.tree = tree;
 
-      col = branch.getColour();
+      colour = branch.getColour();
 
-      expect(col).to.equal(colour3);
+      expect(colour).to.equal(colour3);
     });
 
     it('should be true if parent is collapsed', function () {
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
 
       branch.addChild(branch1);
       branch.addChild(branch2);
@@ -130,9 +132,9 @@ describe('PhyloCanvas', function () {
     });
 
     it('should be true if grandparent is collapsed', function () {
-      var branch = new PhyloCanvas.Branch();
-      var branch1 = new PhyloCanvas.Branch();
-      var branch2 = new PhyloCanvas.Branch();
+      var branch = new Branch();
+      var branch1 = new Branch();
+      var branch2 = new Branch();
 
       branch.addChild(branch1);
       branch1.addChild(branch2);

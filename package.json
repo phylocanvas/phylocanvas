@@ -29,7 +29,8 @@
   "homepage": "http://www.phylocanvas.net",
   "scripts": {
     "build": "webpack",
-    "dev-server": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --port 8000"
+    "dev-server": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --port 8000",
+    "test-server": "webpack-dev-server --config webpack-test-server.config.js --port 8001"
   },
   "dependencies": {},
   "devDependencies": {
@@ -41,7 +42,7 @@
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",
-    "webpack": "^1.9.5",
-    "webpack-dev-server": "^1.8.2"
+    "webpack": "^1.9.10",
+    "webpack-dev-server": "^1.9.0"
   }
 }
