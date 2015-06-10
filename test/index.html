@@ -6,17 +6,7 @@
 </head>
 <body>
   <div id="mocha"></div>
-  <script src="../node_modules/mocha/mocha.js"></script>
-  <script>mocha.setup('bdd')</script>
-  <!-- assertion framework -->
-  <script src="../node_modules/chai/chai.js"></script>
-  <script>var expect = chai.expect</script>
-
-  <!-- include source files here... -->
-  <script src="../dist/phylocanvas.js"></script>
-  <!-- include spec files here... -->
-  <script src="spec/test.js"></script>
-
-  <script>mocha.run()</script>
+  <script src="http://localhost:8001/webpack-dev-server.js"></script>
+  <script src="/phylocanvas-test.js"></script>
 </body>
 </html>

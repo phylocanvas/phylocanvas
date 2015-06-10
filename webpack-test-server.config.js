@@ -4,12 +4,16 @@ var sourceConfig = require('./webpack.config')[0];
 sourceConfig.debug = true;
 
 module.exports = {
-  context: path.join(__dirname, 'dev'),
+  context: path.join(__dirname, 'test'),
   devtool: '#eval-source-map',
   debug: true,
-  entry: './index',
+  entry: './spec/test',
   module: {
     loaders: [
+      { test: /test\.js$/,
+        loader: 'mocha',
+        exclude: path.join(__dirname, 'node_modules')
+      },
       { test: /\.js$/,
         loader: 'babel?stage=0',
         exclude: path.join(__dirname, 'node_modules')
@@ -17,7 +21,7 @@ module.exports = {
     ]
   },
   output: {
-    filename: 'phylocanvas-dev.js'
+    filename: 'phylocanvas-test.js'
   },
   target: 'web'
 };
