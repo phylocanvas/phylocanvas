@@ -1,6 +1,8 @@
 import { Angles } from './utils/constants';
 import { setupDownloadLink, createBlobUrl } from './utils/dom';
 
+import nodeRenderers from './renderers/node';
+
 /**
  * Creates a branch
  *
@@ -370,7 +372,7 @@ Branch.prototype.drawNode = function () {
     // rotate canvas (mainly for circular, radial trees etc)
     this.canvas.rotate(this.angle);
     // Draw node shape as chosen - default is circle
-    this.tree.nodeRenderers[this.nodeShape](this);
+    nodeRenderers[this.nodeShape](this);
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
       this.drawLabel();

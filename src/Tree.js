@@ -3,6 +3,9 @@ import ContextMenu from './ContextMenu';
 import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
+import branchRenderers from './renderers/branch';
+import prerenderers from './renderers/pre';
+
 import { Shapes } from './utils/constants';
 import { addClass, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
@@ -195,9 +198,6 @@ function Tree(element, conf = {}) {
   this.metadataHeadingDrawn = false;
 }
 
-Tree.prototype.branchRenderers = require('./renderers/branch');
-Tree.prototype.nodeRenderers = require('./renderers/node');
-
 Tree.prototype.setInitialCollapsedBranches = function (node = this.root) {
   var childIds;
   var i;
@@ -339,7 +339,7 @@ Tree.prototype.draw = function (forceRedraw) {
     (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
   if (!this.drawn || forceRedraw) {
-    this.prerenderers[this.treeType].run(this);
+    prerenderers[this.treeType].run(this);
     if (!forceRedraw) { this.fitInPanel(); }
   }
 
@@ -347,7 +347,7 @@ Tree.prototype.draw = function (forceRedraw) {
   this.canvas.translate(this.offsetx, this.offsety);
   this.canvas.scale(this.zoom, this.zoom);
 
-  this.branchRenderers[this.treeType].render(this, this.root);
+  branchRenderers[this.treeType].render(this, this.root);
   // Making default collapsed false so that it will collapse on initial load only
   this.defaultCollapsed = false;
   this.metadataHeadingDrawn = false;
@@ -469,8 +469,6 @@ Tree.prototype.pickup = function (event) {
   this.starty = event.clientY;
 };
 
-Tree.prototype.prerenderers = require('./renderers/pre');
-
 Tree.prototype.redrawGetNodes = function (node, leafIds) {
   for (var i = 0; i < node.children.length; i++) {
     this.branches[node.children[i].id] = node.children[i];
@@ -511,7 +509,7 @@ Tree.prototype.redrawFromBranch = function (node) {
   }
 
   this.root.setTotalLength();
-  this.prerenderers[this.treeType].run(this);
+  prerenderers[this.treeType].run(this);
   this.draw();
   this.subtreeDrawn(node.id);
 };
@@ -521,7 +519,7 @@ Tree.prototype.redrawOriginalTree = function () {
   this.resetTree();
 
   this.root.setTotalLength();
-  this.prerenderers[this.treeType].run(this);
+  prerenderers[this.treeType].run(this);
   this.draw();
 
   this.subtreeDrawn(this.root.id);
@@ -770,13 +768,13 @@ Tree.prototype.getBounds = function () {
   var miny = this.root.starty;
   var maxy = this.root.starty;
 
-  for (var i = this.leaves.length; i--;) {
-    var x = this.leaves[i].centerx;
-    var y = this.leaves[i].centery;
-    var theta = this.leaves[i].angle;
-    var pad = this.leaves[i].getNodeSize()
+  for (let i = this.leaves.length; i--; ) {
+    let x = this.leaves[i].centerx;
+    let y = this.leaves[i].centery;
+    let theta = this.leaves[i].angle;
+    let pad = this.leaves[i].getNodeSize()
               + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0)
-              + (this.showMetadata ?  this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+              + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
 
     x = x + (pad * Math.cos(theta));
     y = y + (pad * Math.sin(theta));
@@ -829,7 +827,7 @@ Tree.prototype.resetTree = function () {
   if (!this.origBranches) return;
 
   this.branches = this.origBranches;
-  for (var n in this.origBL) {
+  for (let n of Object.keys(this.origBL)) {
     this.branches[n].branchLength = this.origBL[n];
     this.branches[n].parent = this.origP[n];
   }
@@ -844,11 +842,8 @@ Tree.prototype.rotateBranch = function (branch) {
 
 Tree.prototype.buildLeaves = function () {
   this.leaves = [];
-
-  var leafIds = this.root.getChildIds();
-
-  for (var i = 0; i < leafIds.length; i++) {
-    this.leaves.push(this.branches[leafIds[i]]);
+  for (let leafId of this.root.getChildIds()) {
+    this.leaves.push(this.branches[leafId]);
   }
 };
 

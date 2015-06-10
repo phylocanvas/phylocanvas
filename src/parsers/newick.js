@@ -1,5 +1,6 @@
 import Branch from '../Branch';
 import { Shapes } from '../utils/constants';
+import nodeRenderers from './renderers/node';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;
@@ -37,7 +38,7 @@ function parseAnnotations(label, branch) {
       case 'nsh' :
         if (Shapes[value]) {
           branch.nodeShape = Shapes[value];
-        } else if (branch.nodeRenderers[value]) {
+        } else if (nodeRenderers[value]) {
           branch.nodeShape = value;
         } else {
           branch.nodeShape = 'circle';
