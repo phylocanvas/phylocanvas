@@ -20,7 +20,7 @@ buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
 });
 
-for (let treeType of Object.keys(tree.branchRenderers)) {
+for (let treeType of Object.keys(PhyloCanvas.branchRenderers)) {
   let button = document.createElement('button');
 
   button.innerHTML = treeType;
