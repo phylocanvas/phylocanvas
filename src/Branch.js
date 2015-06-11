@@ -163,7 +163,11 @@ Branch.prototype.clicked = function (x, y) {
 };
 
 Branch.prototype.drawMetadata = function () {
-  var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
+  var padMaxLabelWidth = 0;
+  if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+    padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
+  }
+  var tx = this.getLabelStartX() + padMaxLabelWidth;
   var ty = 0;
   var metadata = [];
   var height = this.tree.textSize;
@@ -185,11 +189,16 @@ Branch.prototype.drawMetadata = function () {
     this.tree.metadataHeadingDrawn = true;
   }
 
+  var metadataXStep = this.tree.metadataXStep;
+
   if (Object.keys(this.data).length > 0) {
     this.canvas.beginPath();
     if (this.angle > Angles.QUARTER &&
         this.angle < (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
+      tx = -tx - (padMaxLabelWidth);
+      // Changing the xStep for radial and circular tree
+      metadataXStep = -metadataXStep;
     }
 
     // If no columns specified, then draw all columns
@@ -203,7 +212,7 @@ Branch.prototype.drawMetadata = function () {
 
     for (i = 0; i < metadata.length; i++) {
       columnName = metadata[i];
-      tx += this.tree.metadataXStep;
+      tx += metadataXStep;
 
       if (window.parseInt(this.data[columnName])) {
         this.canvas.fillStyle = this.tree.colour1;
