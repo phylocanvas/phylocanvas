@@ -1,17 +1,25 @@
-var fireEvent = require('./events').fireEvent;
+import { fireEvent } from './events';
 
-function setupDownloadLink(data, filename) {
+let windowURL = window.URL || window.webkitURL;
+
+export function createBlobUrl(data) {
   var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
-  var url = window.URL || window.webkitURL;
+  return windowURL.createObjectURL(blob);
+}
+
+export function setupDownloadLink(url, filename) {
   var anchor = document.createElement('a');
   var isDownloadSupported = (typeof anchor.download !== 'undefined');
 
-  anchor.href = url.createObjectURL(blob);
+  anchor.href = url;
   anchor.target = '_blank';
   if (isDownloadSupported) {
-    anchor.download = (filename) ? filename : 'pc-download.txt';
+    anchor.download = filename;
   }
   fireEvent(anchor, 'click');
+  if (isDownloadSupported) {
+    windowURL.revokeObjectURL(anchor.href);
+  }
 }
 
 /**
@@ -20,9 +28,9 @@ function setupDownloadLink(data, filename) {
  * @param domElement - The element to get the X position of.
  *
  */
-function getX(domElement) {
+export function getX(domElement) {
   var xValue = 0;
-  while (domElement != null) {
+  while (domElement) {
     xValue += domElement.offsetLeft;
     domElement = domElement.offsetParent;
   }
@@ -35,7 +43,7 @@ function getX(domElement) {
  * @param domElement - The element to get the Y position of.
  *
  */
-function getY(domElement) {
+export function getY(domElement) {
   var yValue = 0;
   while (domElement) {
     yValue += domElement.offsetTop;
@@ -44,7 +52,7 @@ function getY(domElement) {
   return yValue;
 }
 
-function addClass(element, className) {
+export function addClass(element, className) {
   var classes = element.className.split(' ');
   if (classes.indexOf(className) === -1) {
     classes.push(className);
@@ -52,7 +60,7 @@ function addClass(element, className) {
   }
 }
 
-function removeClass(element, className) {
+export function removeClass(element, className) {
   var classes = element.className.split(' ');
   var index = classes.indexOf(className);
 
@@ -62,16 +70,9 @@ function removeClass(element, className) {
   }
 }
 
-function hasClass(element, className) {
+export function hasClass(element, className) {
   var classes = element.className.split(' ');
   var index = classes.indexOf(className);
 
   return index !== -1;
 }
-
-module.exports.setupDownloadLink = setupDownloadLink;
-module.exports.getX = getX;
-module.exports.getY = getY;
-module.exports.addClass = addClass;
-module.exports.removeClass = removeClass;
-module.exports.hasClass = hasClass;

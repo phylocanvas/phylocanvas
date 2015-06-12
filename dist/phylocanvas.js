@@ -61,19 +61,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @modified Jyothish NT 01/03/15
 	 */
 
-	var addClass = __webpack_require__(2).addClass;
-	var hasClass = __webpack_require__(2).hasClass;
-	var removeClass = __webpack_require__(2).removeClass;
+	'use strict';
 
-	var fireEvent = __webpack_require__(1).fireEvent;
-	var addEvent = __webpack_require__(1).addEvent;
-	var killEvent = __webpack_require__(1).killEvent;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.History = History;
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _utilsEvents = __webpack_require__(3);
 
 	/**
 	 * @namespace PhyloCanvas
 	 */
 
-	var Tree = __webpack_require__(3);
+	var _Tree = __webpack_require__(5);
+
+	var _Tree2 = _interopRequireDefault(_Tree);
+
+	var _Branch = __webpack_require__(6);
+
+	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _ContextMenu = __webpack_require__(1);
+
+	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
+
+	var _renderersBranch = __webpack_require__(10);
+
+	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+
+	var _renderersPre = __webpack_require__(17);
+
+	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+
+	exports.Tree = _Tree2['default'];
+	exports.Branch = _Branch2['default'];
+	exports.ContextMenu = _ContextMenu2['default'];
+	exports.branchRenderers = _renderersBranch2['default'];
+	exports.nodeRenderers = _renderersNode2['default'];
+	exports.prerenderers = _renderersPre2['default'];
 
 	function History(tree) {
 	  this.tree = tree;
@@ -83,13 +117,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.resizeTree(tree);
 
-	  this.tree.addListener('subtree', function (evt) {
+	  this.tree.addListener('subtree', (function (evt) {
 	    this.addSnapshot(evt.node);
-	  }.bind(this));
+	  }).bind(this));
 	  this.tree.addListener('loaded', this.reset.bind(this));
-	  this.tree.addListener('typechanged', function () {
+	  this.tree.addListener('typechanged', (function () {
 	    this.addSnapshot(this.tree.root.id);
-	  }.bind(this));
+	  }).bind(this));
 
 	  if (tree.historyCollapsed) {
 	    this.collapse();
@@ -105,19 +139,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	History.prototype.collapse = function () {
-	  addClass(this.div, 'collapsed');
+	  (0, _utilsDom.addClass)(this.div, 'collapsed');
 	  this.toggleDiv.firstChild.data = '>';
 	  this.resizeTree();
 	};
 
 	History.prototype.expand = function () {
-	  removeClass(this.div, 'collapsed');
+	  (0, _utilsDom.removeClass)(this.div, 'collapsed');
 	  this.toggleDiv.firstChild.data = '<';
 	  this.resizeTree();
 	};
 
 	History.prototype.isCollapsed = function () {
-	  return hasClass(this.div, 'collapsed');
+	  return (0, _utilsDom.hasClass)(this.div, 'collapsed');
 	};
 
 	History.prototype.toggle = function () {
@@ -126,14 +160,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    this.collapse();
 	  }
-	  fireEvent(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
+	  (0, _utilsEvents.fireEvent)(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
 	};
 
 	History.prototype.createDiv = function (parentDiv) {
 	  var div = document.createElement('div');
 	  div.className = 'pc-history';
-	  addEvent(div, 'click', killEvent);
-	  addEvent(div, 'contextmenu', killEvent);
+	  (0, _utilsEvents.addEvent)(div, 'click', _utilsEvents.killEvent);
+	  (0, _utilsEvents.addEvent)(div, 'contextmenu', _utilsEvents.killEvent);
 
 	  var title = document.createElement('div');
 	  title.innerHTML = 'History';
@@ -143,7 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var tabDiv = document.createElement('div');
 	  tabDiv.appendChild(document.createTextNode('<'));
 	  tabDiv.className = 'toggle';
-	  addEvent(tabDiv, 'click', this.toggle.bind(this));
+	  (0, _utilsEvents.addEvent)(tabDiv, 'click', this.toggle.bind(this));
 	  div.appendChild(tabDiv);
 	  this.toggleDiv = tabDiv;
 
@@ -209,12 +243,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  listElement.appendChild(thumbnail);
 	  this.snapshotList.appendChild(listElement);
 
-	  addEvent(thumbnail, 'click', this.goBackTo.bind(this));
+	  (0, _utilsEvents.addEvent)(thumbnail, 'click', this.goBackTo.bind(this));
 	};
 
 	History.prototype.clear = function () {
 	  var listElements = this.snapshotList.getElementsByTagName('li');
-	  for (var i = listElements.length; i-- ;) {
+	  for (var i = listElements.length; i--;) {
 	    this.snapshotList.removeChild(listElements[0]);
 	  }
 	};
@@ -226,19 +260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	History.prototype.injectCss = function () {
-	  var css =
-	    '.pc-history { position: absolute; top: 0; bottom: 0; left: 0; box-sizing: border-box; width: 20%; overflow: hidden; background: #EEE }' +
-	    '.pc-history .pc-history-title { box-sizing: border-box; height: 20px; text-align: center; font-size: 13px; color: #666; padding: 2px; border-bottom: 1px solid #bbb }' +
-	    '.pc-history .toggle { position: absolute; top: 0; right: 0; padding: 2px 8px; cursor: pointer; border-top-left-radius: 50%; border-bottom-left-radius: 50%; background-color: #666; color: #FFF; box-sizing: border-box; height: 20px; }' +
-	    '.pc-history.collapsed .toggle { border-radius: 0 50% 50% 0 }' +
-	    '.pc-history .toggle:hover { background-color: #FFF; color: #CCC }' +
-	    '.pc-history.collapsed { width: 25px }' +
-	    '.pc-history.collapsed .pc-history-snapshots { display: none }' +
-	    '.pc-history.collapsed .pc-history-title { writing-mode: tb-rl; -webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); margin-top: 70px; background: 0 0; color: #666; letter-spacing: 1.2px; border-bottom: none }' +
-	    '.pc-history-snapshots { position: absolute; top: 20px; bottom: 0; margin: 0; padding: 0; overflow-x: hidden; overflow-y: scroll; }' +
-	    '.pc-history-snapshots li { list-style: outside none none }' +
-	    '.pc-history img { border: 0px solid #CCC; border-top-width: 1px; cursor: pointer; width: 100%; box-sizing: border-box; transition: background-color .25s ease; display: block }' +
-	    '.pc-history img:hover { background-color: #fff }';
+	  var css = '.pc-history { position: absolute; top: 0; bottom: 0; left: 0; box-sizing: border-box; width: 20%; overflow: hidden; background: #EEE }' + '.pc-history .pc-history-title { box-sizing: border-box; height: 20px; text-align: center; font-size: 13px; color: #666; padding: 2px; border-bottom: 1px solid #bbb }' + '.pc-history .toggle { position: absolute; top: 0; right: 0; padding: 2px 8px; cursor: pointer; border-top-left-radius: 50%; border-bottom-left-radius: 50%; background-color: #666; color: #FFF; box-sizing: border-box; height: 20px; }' + '.pc-history.collapsed .toggle { border-radius: 0 50% 50% 0 }' + '.pc-history .toggle:hover { background-color: #FFF; color: #CCC }' + '.pc-history.collapsed { width: 25px }' + '.pc-history.collapsed .pc-history-snapshots { display: none }' + '.pc-history.collapsed .pc-history-title { writing-mode: tb-rl; -webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); margin-top: 70px; background: 0 0; color: #666; letter-spacing: 1.2px; border-bottom: none }' + '.pc-history-snapshots { position: absolute; top: 20px; bottom: 0; margin: 0; padding: 0; overflow-x: hidden; overflow-y: scroll; }' + '.pc-history-snapshots li { list-style: outside none none }' + '.pc-history img { border: 0px solid #CCC; border-top-width: 1px; cursor: pointer; width: 100%; box-sizing: border-box; transition: background-color .25s ease; display: block }' + '.pc-history img:hover { background-color: #fff }';
 	  var head = document.head || document.getElementsByTagName('head')[0];
 	  var style = document.createElement('style');
 
@@ -251,37 +273,302 @@ return /******/ (function(modules) { // webpackBootstrap
 	  head.appendChild(style);
 	};
 
-
-	Tree.prototype.initialiseHistory = function (config) {
+	_Tree2['default'].prototype.initialiseHistory = function (config) {
 	  var isCollapsedConfigured;
 
 	  if (config.history || typeof config.history === 'undefined') {
-	    isCollapsedConfigured = (config.history && typeof config.history.collapsed !== 'undefined');
+	    isCollapsedConfigured = config.history && typeof config.history.collapsed !== 'undefined';
 	    this.historyCollapsed = isCollapsedConfigured ? config.history.collapsed : true;
 	    this.historySnapshots = [];
 	    this.history = new History(this);
 	  }
 	};
 
-	module.exports = {
-	  Tree: Tree,
-	  Branch: __webpack_require__(4),
-	  Loader: __webpack_require__(10),
-	  ContextMenu: __webpack_require__(6),
-	  History: History
-	};
-
-
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _Tooltip2 = __webpack_require__(2);
+
+	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
+
+	var _utilsEvents = __webpack_require__(3);
+
+	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
+	  handler: function handler(branch) {
+	    branch.toggleCollapsed();
+	    branch.tree.draw(); // some browsers do not fire mousemove after clicking
+	  },
+	  nodeType: 'internal'
+	}, {
+	  text: 'Rotate Branch',
+	  handler: 'rotate',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Redraw Subtree',
+	  handler: 'redrawTreeFromBranch',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Show/Hide Labels',
+	  handler: 'toggleLabels'
+	}, {
+	  text: 'Export As Image',
+	  handler: 'exportCurrentTreeView'
+	}, {
+	  text: 'Export Leaf IDs',
+	  handler: 'downloadAllLeafIds'
+	}, {
+	  text: 'Export Leaf IDs on Branch',
+	  handler: 'downloadLeafIdsFromBranch',
+	  nodeType: 'internal'
+	}];
+
+	function menuItemApplicable(menuItem, node) {
+	  if (!node) {
+	    return !menuItem.nodeType;
+	  }
+
+	  if (node.leaf && menuItem.nodeType !== 'internal') {
+	    return true;
+	  }
+
+	  if (!node.leaf && menuItem.nodeType === 'internal') {
+	    return true;
+	  }
+
+	  return false;
+	}
+
+	function mouseover(element) {
+	  element.style.backgroundColor = '#E2E3DF';
+	}
+
+	function mouseout(element) {
+	  element.style.backgroundColor = 'transparent';
+	}
+
+	function transferMenuItem(_ref) {
+	  var handler = _ref.handler;
+	  var _ref$text = _ref.text;
+	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
+	  var nodeType = _ref.nodeType;
+
+	  return { handler: handler, text: text, nodeType: nodeType };
+	}
+
+	/**
+	 * The menu that is shown when the PhyloCanvas widget is right-clicked
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 * @extends Tooltip
+	 */
+
+	var ContextMenu = (function (_Tooltip) {
+	  function ContextMenu(tree) {
+	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
+
+	    _classCallCheck(this, ContextMenu);
+
+	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
+
+	    this.menuItems = menuItems.map(transferMenuItem);
+	    this.fontSize = '8pt';
+	  }
+
+	  _inherits(ContextMenu, _Tooltip);
+
+	  _createClass(ContextMenu, [{
+	    key: 'click',
+	    value: function click() {
+	      (0, _utilsEvents.createHandler)(this, 'close');
+	    }
+	  }, {
+	    key: 'createContent',
+	    value: function createContent(node) {
+	      var list = document.createElement('ul');
+
+	      list.style.margin = '0';
+	      list.style.padding = '0';
+
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var menuItem = _step.value;
+
+	          if (!menuItemApplicable(menuItem, node)) {
+	            continue;
+	          }
+
+	          var listElement = this.createElement('li', menuItem.text);
+	          listElement.style.listStyle = 'none outside none';
+
+	          if (menuItem.nodeType) {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
+	          } else {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
+	          }
+	          listElement.addEventListener('click', this.click);
+	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
+	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
+	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
+
+	          list.appendChild(listElement);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
+	      this.element.appendChild(list);
+	    }
+	  }]);
+
+	  return ContextMenu;
+	})(_Tooltip3['default']);
+
+	exports['default'] = ContextMenu;
+	module.exports = exports['default'];
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Tooltip
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 */
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Tooltip = (function () {
+	  function Tooltip(tree) {
+	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
+	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
+
+	    _classCallCheck(this, Tooltip);
+
+	    this.tree = tree;
+	    this.element = element;
+	    this.element.className = className;
+	    this.element.style.display = 'none';
+	    this.element.style.position = 'fixed';
+	    this.element.style.border = '1px solid #CCCCCC';
+	    this.element.style.background = '#FFFFFF';
+	    this.element.style.letterSpacing = '0.5px';
+	    this.closed = true;
+
+	    this.tree.canvasEl.appendChild(this.element);
+	  }
+
+	  _createClass(Tooltip, [{
+	    key: 'close',
+	    value: function close() {
+	      this.element.style.display = 'none';
+	      this.closed = true;
+	    }
+	  }, {
+	    key: 'createElement',
+	    value: function createElement(tagName, textContent) {
+	      var element = document.createElement(tagName);
+	      element.style.cursor = 'pointer';
+	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
+	      element.style.fontFamily = this.tree.font;
+	      element.style.fontSize = this.fontSize || '12pt';
+	      element.appendChild(document.createTextNode(textContent));
+	      return element;
+	    }
+	  }, {
+	    key: 'createContent',
+
+	    /**
+	     * Shows number of child nodes by default
+	     */
+	    value: function createContent(node) {
+	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
+	    }
+	  }, {
+	    key: 'open',
+	    value: function open(_x3, _x4, node) {
+	      var x = arguments[0] === undefined ? 100 : arguments[0];
+	      var y = arguments[1] === undefined ? 100 : arguments[1];
+
+	      while (this.element.hasChildNodes()) {
+	        this.element.removeChild(this.element.firstChild);
+	      }
+
+	      this.createContent(node);
+
+	      this.element.style.top = y + 'px';
+	      this.element.style.left = x + 'px';
+
+	      this.element.style.zIndex = 2000;
+	      this.element.style.display = 'block';
+	      this.element.style.backgroundColor = '#FFFFFF';
+
+	      this.closed = false;
+	    }
+	  }]);
+
+	  return Tooltip;
+	})();
+
+	exports['default'] = Tooltip;
+	module.exports = exports['default'];
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
 
 	function preventDefault(event) {
 	  event.preventDefault();
 	  return false;
 	}
 
-	function fireEvent(element, type, params) {
+	function fireEvent(element, type) {
+	  var params = arguments[2] === undefined ? {} : arguments[2];
+
 	  var event; // The custom event that will be created
 	  var param;
 
@@ -294,12 +581,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  event.eventName = type;
-	  event.bubbles = false;
-	  if (params) {
-	    for (param in params) {
-	      if (params.hasOwnProperty(param)) {
-	        event[param] = params[param];
-	      }
+
+	  for (param in params) {
+	    if (params.hasOwnProperty(param)) {
+	      event[param] = params[param];
 	    }
 	  }
 
@@ -316,7 +601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    elem.attachEvent('on' + event, function () {
 	      // set the this pointer same as addEventListener when fn is called
-	      return (fn.call(elem, window.event));
+	      return fn.call(elem, window.event);
 	    });
 	  }
 	}
@@ -344,7 +629,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    };
 	  } else {
-	    handler = function () { return func(obj); };
+	    handler = function () {
+	      return func(obj);
+	    };
 	  }
 	  return handler;
 	}
@@ -355,25 +642,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports.killEvent = killEvent;
 	module.exports.createHandler = createHandler;
 
-
 /***/ },
-/* 2 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var fireEvent = __webpack_require__(1).fireEvent;
+	'use strict';
 
-	function setupDownloadLink(data, filename) {
-	  var blob = new Blob([ data ], { type: 'text/csv;charset=utf-8' });
-	  var url = window.URL || window.webkitURL;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.createBlobUrl = createBlobUrl;
+	exports.setupDownloadLink = setupDownloadLink;
+	exports.getX = getX;
+	exports.getY = getY;
+	exports.addClass = addClass;
+	exports.removeClass = removeClass;
+	exports.hasClass = hasClass;
+
+	var _events = __webpack_require__(3);
+
+	var windowURL = window.URL || window.webkitURL;
+
+	function createBlobUrl(data) {
+	  var blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
+	  return windowURL.createObjectURL(blob);
+	}
+
+	function setupDownloadLink(url, filename) {
 	  var anchor = document.createElement('a');
-	  var isDownloadSupported = (typeof anchor.download !== 'undefined');
+	  var isDownloadSupported = typeof anchor.download !== 'undefined';
 
-	  anchor.href = url.createObjectURL(blob);
+	  anchor.href = url;
 	  anchor.target = '_blank';
 	  if (isDownloadSupported) {
-	    anchor.download = (filename) ? filename : 'pc-download.txt';
+	    anchor.download = filename;
 	  }
-	  fireEvent(anchor, 'click');
+	  (0, _events.fireEvent)(anchor, 'click');
+	  if (isDownloadSupported) {
+	    windowURL.revokeObjectURL(anchor.href);
+	  }
 	}
 
 	/**
@@ -382,9 +689,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param domElement - The element to get the X position of.
 	 *
 	 */
+
 	function getX(domElement) {
 	  var xValue = 0;
-	  while (domElement != null) {
+	  while (domElement) {
 	    xValue += domElement.offsetLeft;
 	    domElement = domElement.offsetParent;
 	  }
@@ -397,6 +705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param domElement - The element to get the Y position of.
 	 *
 	 */
+
 	function getY(domElement) {
 	  var yValue = 0;
 	  while (domElement) {
@@ -431,57 +740,73 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index !== -1;
 	}
 
-	module.exports.setupDownloadLink = setupDownloadLink;
-	module.exports.getX = getX;
-	module.exports.getY = getY;
-	module.exports.addClass = addClass;
-	module.exports.removeClass = removeClass;
-	module.exports.hasClass = hasClass;
-
-
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Branch = __webpack_require__(4);
-	var ContextMenu = __webpack_require__(6);
-	var Tooltip = __webpack_require__(7);
-	var Navigator = __webpack_require__(8);
+	'use strict';
 
-	var Angles = __webpack_require__(5).Angles;
-	var Shapes = __webpack_require__(5).Shapes;
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var addClass = __webpack_require__(2).addClass;
-	var getX = __webpack_require__(2).getX;
-	var getY = __webpack_require__(2).getY;
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
 
-	var fireEvent = __webpack_require__(1).fireEvent;
-	var addEvent = __webpack_require__(1).addEvent;
+	var _Branch = __webpack_require__(6);
 
-	var getBackingStorePixelRatio =
-	  __webpack_require__(9).getBackingStorePixelRatio;
+	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _ContextMenu = __webpack_require__(1);
+
+	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
+
+	var _Tooltip = __webpack_require__(2);
+
+	var _Tooltip2 = _interopRequireDefault(_Tooltip);
+
+	var _Navigator = __webpack_require__(9);
+
+	var _Navigator2 = _interopRequireDefault(_Navigator);
+
+	var _renderersBranch = __webpack_require__(10);
+
+	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
+
+	var _renderersPre = __webpack_require__(17);
+
+	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _utilsEvents = __webpack_require__(3);
+
+	var _utilsCanvas = __webpack_require__(24);
+
+	var _parsers = __webpack_require__(25);
+
+	var _parsers2 = _interopRequireDefault(_parsers);
 
 	/**
 	 * The instance of a PhyloCanvas Widget
 	 *
 	 * @constructor
 	 * @memberof PhyloCanvas
-	 * @param div {string|HTMLDivElement} the div or id of a div that phylocanvas
+	 * @param element {string|HTMLElement} the element or id of an element that phylocanvas
 	 * will be drawn in
 	 *
 	 * {@link PhyoCanvas.Tree}
 	 *
 	 * @example
-	 *  new PhyloCanvas.Tree('div_id');
+	 *  new PhyloCanvas.Tree('element_id');
 	 *
 	 * @example
-	 *  new PhyloCanvas.Tree(div);
+	 *  new PhyloCanvas.Tree(element);
 	 */
-	function Tree(div, conf) {
-	  if (!conf) conf = {};
-	  // if the ID is provided get the element, if not assume div
-	  if (typeof div === 'string') div = document.getElementById(div);
+	function Tree(element) {
+	  var conf = arguments[1] === undefined ? {} : arguments[1];
 
+	  this.canvasEl = typeof element === 'string' ? document.getElementById(element) : element;
+	  (0, _utilsDom.addClass)(this.canvasEl, 'pc-container');
 	  /**
 	   *
 	   * Dictionary of all branches indexed by Id
@@ -492,10 +817,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * List of leaves
 	   */
 	  this.leaves = [];
-	  /**
-	   * Loading dialog displayed while waiting for the tree
-	   */
-	  // this.loader = new Loader(div);
 	  /**
 	   * The root node of the tree
 	   * (not neccesarily a root in the Phylogenetic sense)
@@ -518,34 +839,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.origBL = {};
 	  this.origP = {};
 
-	  this.canvasEl = div;
-
-	  addClass(this.canvasEl, 'pc-container');
-
-	  //Set up the div and canvas element
+	  // Set up the element and canvas
 	  if (window.getComputedStyle(this.canvasEl).position === 'static') {
 	    this.canvasEl.style.position = 'relative';
 	  }
 	  this.canvasEl.style.boxSizing = 'border-box';
-	  var cl = document.createElement('canvas');
-	  cl.id = div.id + 'pCanvas';
-	  cl.className = 'phylocanvas';
-	  cl.style.position = 'relative';
-	  cl.style.backgroundColor = '#FFFFFF';
-	  cl.height = div.clientHeight || 400;
-	  cl.width = div.clientWidth || 400;
-	  cl.style.zIndex = '1';
-	  this.canvasEl.appendChild(cl);
+	  var canvas = document.createElement('canvas');
+	  canvas.id = element.id + 'pCanvas';
+	  canvas.className = 'phylocanvas';
+	  canvas.style.position = 'relative';
+	  canvas.style.backgroundColor = '#FFFFFF';
+	  canvas.height = element.clientHeight || 400;
+	  canvas.width = element.clientWidth || 400;
+	  canvas.style.zIndex = '1';
+	  this.canvasEl.appendChild(canvas);
 
 	  /***
 	   * Right click menu
 	   * Users could pass options while creating the Tree object
 	   */
-	  var menuOptions = [];
-	  if (conf.contextMenu !== undefined) {
-	    menuOptions = conf.contextMenu;
-	  }
-	  this.contextMenu = new ContextMenu(this, menuOptions);
+	  this.contextMenu = new _ContextMenu2['default'](this, conf.contextMenu);
 
 	  this.defaultCollapsedOptions = {};
 	  this.defaultCollapsed = false;
@@ -556,7 +869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  this.tooltip = new Tooltip(this);
+	  this.tooltip = new _Tooltip2['default'](this);
 
 	  this.drawn = false;
 
@@ -565,7 +878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.zoom = 1;
 	  this.pickedup = false;
 	  this.dragging = false;
-	  this.startx = null; this.starty = null;
+	  this.startx = null;this.starty = null;
 	  this.pickedup = false;
 	  this.baseNodeSize = 1;
 	  this.curx = null;
@@ -573,9 +886,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.origx = null;
 	  this.origy = null;
 
-	  this.canvas = cl.getContext('2d');
+	  this.canvas = canvas.getContext('2d');
 
-	  this.canvas.canvas.onselectstart = function () { return false; };
+	  this.canvas.canvas.onselectstart = function () {
+	    return false;
+	  };
 	  this.canvas.fillStyle = '#000000';
 	  this.canvas.strokeStyle = '#000000';
 	  this.canvas.save();
@@ -584,10 +899,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.offsety = this.canvas.canvas.height / 2;
 	  this.selectedColour = 'rgba(49,151,245,1)';
 	  this.highlightColour = 'rgba(49,151,245,1)';
-	  this.highlightWidth = 5.0;
+	  this.highlightWidth = 5;
 	  this.selectedNodeSizeIncrease = 0;
 	  this.branchColour = 'rgba(0,0,0,1)';
-	  this.branchScalar = 1.0;
+	  this.branchScalar = 1;
 
 	  this.hoverLabel = false;
 
@@ -598,7 +913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.treeType = 'radial';
 	  this.maxBranchLength = 0;
-	  this.lineWidth = 1.0;
+	  this.lineWidth = 1;
 	  this.textSize = 7;
 	  this.font = 'sans-serif';
 
@@ -606,7 +921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.rightClickZoom = true;
 
 	  if (this.useNavigator) {
-	    this.navigator = new Navigator(this);
+	    this.navigator = new _Navigator2['default'](this);
 	  }
 
 	  this.adjustForPixelRatio();
@@ -620,18 +935,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.addListener('mouseup', this.drop.bind(this));
 	  this.addListener('mouseout', this.drop.bind(this));
 
-	  addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	  addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	  addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	  addEvent(window, 'resize', function (evt) {
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	  (0, _utilsEvents.addEvent)(window, 'resize', (function () {
 	    this.resizeToContainer();
-	  }.bind(this));
+	  }).bind(this));
 
-	  this.addListener('loaded', function (evt) {
+	  this.addListener('loaded', (function () {
 	    this.origBranches = this.branches;
 	    this.origLeaves = this.leaves;
 	    this.origRoot = this.root;
-	  }.bind(this));
+	  }).bind(this));
 
 	  /**
 	   * Align nodes vertically
@@ -660,223 +975,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.metadataHeadingDrawn = false;
 	}
 
+	Tree.prototype.setInitialCollapsedBranches = function () {
+	  var node = arguments[0] === undefined ? this.root : arguments[0];
 
-	Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
-	  var xmlhttp;
-	  if (window.XMLHttpRequest) {
-	    // code for IE7+, Firefox, Chrome, Opera, Safari
-	    xmlhttp = new XMLHttpRequest();
-	  } else {
-	    // code for IE6, IE5
-	    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-	  }
+	  var childIds;
+	  var i;
 
-	  xmlhttp.onreadystatechange = function () {
-	    if (xmlhttp.readyState === 4) {
-	      if (xmlhttp.status === 200) {
-	        callback(xmlhttp, callbackPars, scope);
-	      } else {
-	        if (errorCallback) errorCallback(xmlhttp, callbackPars, scope);
-	      }
-	    }
-	  };
-	  xmlhttp.open(method, url, true);
-	  if (method === 'GET') {
-	    xmlhttp.send();
-	  }
-	  else {
-	    xmlhttp.send(params);
-	  }
-	};
-
-	Tree.prototype.checkInitialTreeCollapseRange = function (node) {
-	  // Collapse nodes on default
-	  var childIds = node.getChildIds();
-	  if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
-	      childIds.length < this.defaultCollapsedOptions.max) {
+	  childIds = node.getChildIds();
+	  if (childIds && childIds.length > this.defaultCollapsedOptions.min && childIds.length < this.defaultCollapsedOptions.max) {
 	    node.collapsed = true;
+	    return;
 	  }
-	};
 
-	/**
-	 * A dictionary of functions. Each function draws a different tree structure
-	 */
-	Tree.prototype.branchRenderers = {
-	  rectangular: function (tree, node, collapse) {
-	    var  bl = node.branchLength * tree.branchScalar;
-	    node.angle = 0;
-	    if (node.parent) {
-	      node.centerx = node.startx + bl;
-	    }
-	    if (node.selected) {
-	      //this.parent && this.parent.selected ? this.tree.selectedColour : this.tree.branchColour;
-	      node.canvas.fillStyle = tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    node.canvas.strokeStyle = node.getColour();
-	    node.canvas.beginPath();
-
-	    if (!collapse) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.startx, node.centery);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      node.children[i].startx = node.centerx;
-	      node.children[i].starty = node.centery;
-	      tree.branchRenderers.rectangular(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  circular: function (tree, node, collapse) {
-	    var bl = node.totalBranchLength * tree.branchScalar;
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (!collapse) {
-	      node.canvas.beginPath();
-	      node.canvas.moveTo(node.startx, node.starty);
-	      if (node.leaf) {
-	        node.canvas.lineTo(node.interx, node.intery);
-	        node.canvas.stroke();
-	        var ss = node.getColour();
-	        node.canvas.strokeStyle = node.selected ? node.tree.selectedColour :  'rgba(0,0,0,0.5)';
-	        node.canvas.lineTo(node.centerx, node.centery);
-	        node.canvas.stroke();
-	        node.canvas.strokeStyle = ss;
-	      } else {
-	        node.canvas.lineTo(node.centerx, node.centery);
-	        node.canvas.stroke();
-	      }
-
-	      node.canvas.strokeStyle = node.getColour();
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-
-	      if (node.children.length > 1 && !node.collapsed) {
-	        node.canvas.beginPath();
-	        node.canvas.arc(0, 0, (bl), node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-	        node.canvas.stroke();
-	        node.canvas.closePath();
-	      }
-	      node.drawNode();
-	    }
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.circular(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  radial: function (tree, node, collapse) {
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    }
-	    else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (node.parent && !collapse) {
-	      node.canvas.beginPath();
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.radial(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  diagonal: function (tree, node, collapse) {
-	    node.angle = 0;
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    node.canvas.beginPath();
-	    // alert(node.starty);
-
-	    if (!collapse) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      node.children[i].startx = node.centerx;
-	      node.children[i].starty = node.centery;
-	      tree.branchRenderers.diagonal(tree, node.children[i], node.collapsed || collapse);
-	    }
-	  },
-	  hierarchy: function (tree, node, collapse) {
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.selected) {
-	      node.canvas.fillStyle = node.tree.selectedColour;
-	    } else {
-	      node.canvas.fillStyle = node.colour;
-	    }
-
-	    if (!collapse) {
-	      node.canvas.beginPath();
-	      if (node !== node.tree.root) {
-	        node.canvas.moveTo(node.startx, node.starty);
-	        node.canvas.lineTo(node.centerx, node.starty);
-	      }
-
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-
-	      // Check initial tree collapse range
-	      if (tree.defaultCollapsed && tree.defaultCollapsedOptions) {
-	        tree.checkInitialTreeCollapseRange(node);
-	      }
-	      node.drawNode();
-	    }
-	    node.canvas.closePath();
-
-	    for (var i = 0; i < node.children.length && !collapse; i++) {
-	      tree.branchRenderers.hierarchy(tree, node.children[i], node.collapsed || collapse);
-	    }
+	  for (i = 0; i < node.children.length; i++) {
+	    this.setInitialCollapsedBranches(node.children[i]);
 	  }
 	};
 
@@ -884,6 +996,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var node;
 	  var nids;
 	  if (e.button === 0) {
+	    var _root;
+
 	    nids = [];
 	    // if this is triggered by the release after a drag then the click
 	    // shouldn't be triggered.
@@ -893,7 +1007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!this.root) return false;
-	    node = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+	    node = (_root = this.root).clicked.apply(_root, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
 
 	    if (node) {
 	      this.root.setSelected(false, true);
@@ -913,10 +1027,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.nodesSelected(nids);
 	  } else if (e.button === 2) {
+	    var _root2;
+
 	    e.preventDefault();
-	    node = this.root.clicked(
-	      this.translateClickX(e.clientX), this.translateClickY(e.clientY)
-	    );
+	    node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
 	    this.contextMenu.open(e.clientX, e.clientY, node);
 	    this.contextMenu.closed = false;
 	    this.tooltip.close();
@@ -924,8 +1038,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.dblclicked = function (e) {
+	  var _root3;
+
 	  if (!this.root) return false;
-	  var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+	  var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
 	  if (nd) {
 	    nd.setSelected(false, true);
 	    nd.toggleCollapsed();
@@ -944,7 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.drag = function (event) {
 	  // get window ratio
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
 
 	  if (!this.drawn) return false;
 
@@ -959,19 +1075,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  } else if (this.zoomPickedUp) {
 	    // right click and drag
-	    this.d = ((this.starty - event.clientY) / 100);
+	    this.d = (this.starty - event.clientY) / 100;
 	    this.setZoom(this.origZoom + this.d);
 	    this.draw();
 	  } else {
+	    var _root4;
+
 	    // hover
 	    var e = event;
-	    var nd = this.root.clicked(this.translateClickX(e.clientX * 1.0), this.translateClickY(e.clientY * 1.0));
+	    var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
 
 	    if (nd && (this.internalNodesSelectable || nd.leaf)) {
 	      this.root.setHighlighted(false);
 	      nd.setHighlighted(true);
 	      // For mouseover tooltip to show no. of children on the internal nodes
-	      if (!nd.leaf && this.contextMenu.closed) {
+	      if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
 	        this.tooltip.open(e.clientX, e.clientY, nd);
 	      }
 	    } else {
@@ -1003,19 +1121,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.strokeStyle = this.branchColour;
 	  this.canvas.save();
 
-	  this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas),
-	    (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
+	  this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
 
 	  if (!this.drawn || forceRedraw) {
-	    this.prerenderers[this.treeType](this);
-	    if (!forceRedraw) { this.fitInPanel(); }
+	    _renderersPre2['default'][this.treeType].run(this);
+	    if (!forceRedraw) {
+	      this.fitInPanel();
+	    }
 	  }
 
 	  this.canvas.lineWidth = this.lineWidth / this.zoom;
 	  this.canvas.translate(this.offsetx, this.offsety);
 	  this.canvas.scale(this.zoom, this.zoom);
 
-	  this.branchRenderers[this.treeType](this, this.root);
+	  _renderersBranch2['default'][this.treeType].render(this, this.root);
 	  // Making default collapsed false so that it will collapse on initial load only
 	  this.defaultCollapsed = false;
 	  this.metadataHeadingDrawn = false;
@@ -1043,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.draw();
 	};
 
-	Tree.prototype.genId = function () {
+	Tree.prototype.generateBranchId = function () {
 	  return 'pcn' + this.lastId++;
 	};
 
@@ -1056,203 +1175,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.draw();
 	};
 
-	Tree.prototype.dangerouslySetData = function (treeData) {
-	  this.parseNwk(treeData, null);
-	  this.draw();
-	  this.loadCompleted();
-	};
+	Tree.prototype.load = function (inputString) {
+	  var options = arguments[1] === undefined ? {} : arguments[1];
 
-	Tree.prototype.load = function (tree, name, format) {
-	  if (format) {
-	    if (format.match(/nexus/i)) {
-	      if (tree.match(/\.\w+$/)) {
-	        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
-	      } else {
-	        this.parseNexus(tree, name);
+	  if (options.format) {
+	    this.build(inputString, _parsers2['default'][options.format], options);
+	    return;
+	  }
+
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
+
+	  try {
+	    for (var _iterator = Object.keys(_parsers2['default'])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var parserName = _step.value;
+
+	      var parser = _parsers2['default'][parserName];
+
+	      if (inputString.match(parser.fileExtension) || inputString.match(parser.validator)) {
+	        this.build(inputString, parser, options);
+	        return;
 	      }
-	    } else if (format.match(/newick/i)) {
-	      if (tree.match(/\.\w+$/)) {
-	        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-	      } else {
-	        this.parseNwk(tree, name);
+	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator['return']) {
+	        _iterator['return']();
 	      }
-	    }
-	  } else {
-	    if (tree.match(/\.n(ex|xs)$/)) {
-	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
-	    } else if (tree.match(/\.nwk$/)) {
-	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-	    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
-	      this.parseNexus(tree, name);
-	      this.draw();
-	      this.loadCompleted();
-	    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
-	      this.parseNwk(tree, name);
-	      this.draw();
-	      this.loadCompleted();
-	    } else {
-	      this.loadError('PhyloCanvas did not recognise the string as a file or a newick or Nexus format string');
-	    }
-	  }
-	};
-
-	Tree.prototype.loadFileCallback = function (response, opts, scope) {
-	  if (opts.format.match(/nexus/i)) {
-	    scope.parseNexus(response.responseText, opts.name);
-	  } else if (opts.format.match(/newick/i)) {
-	    scope.parseNwk(response.responseText);
-	  } else {
-	    throw new Error('file type not recognised by PhyloCanvas');
-	  }
-	  scope.draw();
-	  scope.loadCompleted();
-	};
-
-	Tree.prototype.nodePrerenderers = {
-	  radial: function (tree, node) {
-	    if (node.parent) {
-	      node.startx = node.parent.centerx;
-	      node.starty = node.parent.centery;
-	    } else {
-	      node.startx = 0;
-	      node.starty = 0;
-	    }
-	    node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
-	    node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
-
-	    for (var i = 0; i < node.children.length; i++) {
-	      this.radial(tree, node.children[i]);
-	    }
-	  }
-	};
-
-	Tree.prototype.nodeRenderers = {
-	  circle: function (node) {
-	    var r = node.getNodeSize();
-	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  square: function (node) {
-	    var r = node.getNodeSize();
-	    var x1 = 0;
-	    var x2 = r * 2;
-	    var y1 = -r;
-	    var y2 = r;
-	    node.canvas.moveTo(x1, y1);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x2, y1);
-	    node.canvas.lineTo(x1, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  star: function (node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var spikes = 6;
-	    var outerRadius = r * 1.6;
-	    var innerRadius = r;
-	    var rot = Math.PI / 2 * 3;
-	    var x = cx;
-	    var y = cy;
-	    var step = Math.PI / spikes;
-	    var i = 0;
-
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(cx, cy - outerRadius);
-	    for (i = 0; i < spikes; i++) {
-	      x = cx + Math.cos(rot) * outerRadius;
-	      y = cy + Math.sin(rot) * outerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-
-	      x = cx + Math.cos(rot) * innerRadius;
-	      y = cy + Math.sin(rot) * innerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-	    }
-	    node.canvas.lineTo(cx, cy - outerRadius);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.closePath();
-	  },
-	  triangle: function (node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var x1 = cx - r;
-	    var x2 = cx + r;
-	    var y1 = cy - r;
-	    var y2 = cy + r;
-
-	    node.canvas.moveTo(x2, y1);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x1, (y2+y1)/2);
-	    node.canvas.lineTo(x2, y1);
-
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  }
-	};
-
-	Tree.prototype.parseNexus = function (str, name) {
-	  if (!str.match(/BEGIN TREES/gi)) {
-	    throw 'The nexus file does not contain a tree block';
-	  }
-
-	  //Get everything between BEGIN TREES and next END;
-	  var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
-	  //get translate section
-
-	  var leafNameObject = {};
-	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
-	  if (translateSection && translateSection.length) {
-	    translateSection = translateSection[0];
-	    //remove translate section from tree section
-	    treeSection = treeSection.replace(translateSection, '');
-
-	    //parse translate section into kv pairs
-	    translateSection = translateSection.replace(/translate|;/gi, '');
-
-	    var tIntArr = translateSection.split(',');
-	    var ia;
-	    for (var i = 0; i < tIntArr.length; i++) {
-	      ia = tIntArr[i].trim().replace('\n', '').split(' ');
-	      if (ia[0] && ia[1]) {
-	        leafNameObject[ia[0].trim()] = ia[1].trim();
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
 	      }
 	    }
 	  }
 
-	  // find each line starting with tree.
-	  var tArr = treeSection.split('\n');
-	  var trees = {};
-	  // id name is '' or does not exist, ask user to choose which tree.
-	  for (var i = 0; i < tArr.length; i++) {
-	    if (tArr[i].trim() === '') continue;
-	    var s = tArr[i].replace(/tree\s/i, '');
-	    if (!name) {
-	      name = s.trim().match(/^\w+/)[0]
-	    }
-	    trees[name] = s.trim().match(/[\S]*$/)[0];
-	  }
-	  if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
-
-	  this.parseNwk(trees[name].trim());
-	  // translate in accordance with translate block
-	  if (leafNameObject) {
-	    for (var n in leafNameObject) {
-	      var b = this.branches[n];
-	      delete this.branches[n];
-	      b.id = leafNameObject[n];
-	      this.branches[b.id] = b;
-	    }
-	  }
+	  this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
 	};
 
-	Tree.prototype.parseNwk = function (nwk) {
+	Tree.prototype.build = function (inputString, parser, options) {
+	  var _this2 = this;
+
 	  this.origBranches = false;
 	  this.origLeaves = false;
 	  this.origRoot = false;
@@ -1263,61 +1229,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.leaves = [];
 	  this.branches = {};
 	  this.drawn = false;
-	  var curNode = new Branch();
-	  curNode.id = 'root';
-	  this.branches.root = curNode;
-	  this.setRoot(curNode);
 
-	  for (var i = 0; i < nwk.length; i++) {
-	    var node;
-	    switch (nwk[i]) {
-	      case '(': // new Child
-	        node = new Branch();
-	        curNode.addChild(node);
-	        curNode = node;
-	        break;
-	      case ')': // return to parent
-	        curNode = curNode.parent;
-	        break;
-	      case ',': // new sibiling
-	        node = new Branch();
-	        curNode.parent.addChild(node);
-	        curNode = node;
-	        break;
-	      case ';':
-	        for (var l = 0; l < this.leaves.length; l++) {
-	          if (this.leaves[l].totalBranchLength > this.maxBranchLength) {
-	            this.maxBranchLength = this.leaves[l].totalBranchLength;
-	          }
-	        }
-	        break;
-	      default:
-	        try {
-	          i = curNode.parseNwk(nwk, i);
-	          i--;
-	        } catch (e) {
-	          this.loadError('Error parsing nwk file' + e);
-	          return;
-	        }
-	        break;
+	  var root = new _Branch2['default']();
+	  root.id = 'root';
+	  this.branches.root = root;
+	  this.setRoot(root);
+
+	  parser.parse({ inputString: inputString, root: root, options: options }, function (error) {
+	    if (error) {
+	      _this2.loadError(error);
+	      return;
 	    }
-	  }
 
-	  this.saveNode(this.root);
-	  this.root.saveChildren();
+	    _this2.saveNode(_this2.root);
+	    _this2.root.saveChildren();
 
-	  this.root.branchLength = 0;
-	  this.maxBranchLength = 0;
-	  this.root.setTotalLength();
+	    _this2.root.branchLength = 0;
+	    _this2.maxBranchLength = 0;
+	    _this2.root.setTotalLength();
 
-	  if (this.maxBranchLength === 0) {
-	    this.loadError('All branches in the tree are identical.');
-	    return;
-	  }
+	    if (_this2.maxBranchLength === 0) {
+	      _this2.loadError('All branches in the tree are identical.');
+	      return;
+	    }
 
-	  this.buildLeaves();
+	    _this2.buildLeaves();
+	    _this2.setInitialCollapsedBranches();
 
-	  this.loadCompleted();
+	    _this2.draw();
+	    _this2.loadCompleted();
+	  });
 	};
 
 	Tree.prototype.pickup = function (event) {
@@ -1337,218 +1278,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  this.startx = event.clientX;
 	  this.starty = event.clientY;
-	};
-
-	Tree.prototype.prerenderers = {
-	  rectangular: function (tree, forcedDraw) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-	    tree.farthestNodeFromRootX = 0;
-	    tree.farthestNodeFromRootY = 0;
-
-	    // Calculate branchScalar based on canvas width and total branch length
-	    // This is used to transform the X coordinate based on the canvas width and no. of branches
-	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
-	    // ystep is the vertical distance between 2 nodes
-	    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-
-	    //set initial positons of the branches
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = 0; // for rectangle
-	      // Calculate and assign y coordinate for all the leaves
-	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-
-	      // Calculate and assign y coordinate for all the parent branches
-	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
-	        // Get all the children of a parent
-	        var childrenArray = branch.parent.children;
-	        // Assign parent's y coordinate
-	        // Logic: Total ystep of all the children of this parent / 2
-	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(ystep);
-	    tree.setMaxLabelLength();
-	  },
-	  circular: function (tree) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
-	    if (tree.branchScalar * tree.maxBranchLength > r) {
-	      r = tree.branchScalar * tree.maxBranchLength;
-	    } else {
-	      tree.branchScalar = r / tree.maxBranchLength;
-	    }
-
-	    var step = Angles.FULL / tree.leaves.length;
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].intery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].interx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.angle = nd.angle;
-	          nd.parent.minChildAngle = nd.angle;
-	        }
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.maxChildAngle = nd.angle;
-	          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
-	          nd.parent.centery = (nd.parent.totalBranchLength * tree.branchScalar) * Math.sin(nd.parent.angle);
-	          nd.parent.centerx = (nd.parent.totalBranchLength * tree.branchScalar) * Math.cos(nd.parent.angle);
-	          nd.parent.starty = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.sin(nd.parent.angle);
-	          nd.parent.startx = ((nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar) * Math.cos(nd.parent.angle);
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(step);
-	    tree.setMaxLabelLength();
-	  },
-	  radial: function (tree, forcedDraw) {
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-
-	    var step = Angles.FULL / tree.leaves.length;
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.angle = 0;
-	        }
-	        nd.parent.angle += (nd.angle * nd.getChildCount());
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    tree.nodePrerenderers.radial(tree, tree.root);
-	    // Set font size for tree and its branches
-	    tree.setFontSize(step);
-	    tree.setMaxLabelLength();
-	  },
-	  diagonal: function (tree, forceRender) {
-	    var ystep = Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].centerx = 0;
-	      tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
-	      tree.leaves[i].angle = 0;
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-	          nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(ystep);
-	    tree.setMaxLabelLength();
-	  },
-	  hierarchy: function (tree) {
-	    tree.root.startx = 0;
-	    tree.root.starty = 0;
-	    tree.root.centerx = 0;
-	    tree.root.centery = 0;
-	    tree.farthestNodeFromRootX = 0;
-	    tree.farthestNodeFromRootY = 0;
-
-	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-	    var xstep = Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2),
-	                    (tree.leaves[0].getNodeSize() + 2) * 2);
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = Angles.QUARTER;
-	      tree.leaves[i].centerx = (i > 0 ? tree.leaves[i - 1].centerx + xstep : 0);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() == 0) {
-	          nd.parent.centerx = nd.centerx;
-	        }
-
-	        if (nd.getChildNo() == nd.parent.children.length - 1) {
-	          nd.parent.angle = Angles.QUARTER;
-	          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
-	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-	    }
-	    // Assign root startx and starty
-	    tree.root.startx = tree.root.centerx;
-	    tree.root.starty = tree.root.centery;
-	    // Set font size for tree and its branches
-	    tree.setFontSize(xstep);
-	    tree.setMaxLabelLength();
-	  }
 	};
 
 	Tree.prototype.redrawGetNodes = function (node, leafIds) {
@@ -1591,7 +1320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType](this);
+	  _renderersPre2['default'][this.treeType].run(this);
 	  this.draw();
 	  this.subtreeDrawn(node.id);
 	};
@@ -1601,7 +1330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.resetTree();
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType](this);
+	  _renderersPre2['default'][this.treeType].run(this);
 	  this.draw();
 
 	  this.subtreeDrawn(this.root.id);
@@ -1611,18 +1340,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!node.id || node.id === '') {
 	    node.id = node.tree.genId();
 	  }
+
 	  if (this.branches[node.id]) {
 	    if (node !== this.branches[node.id]) {
 	      if (!this.leaf) {
 	        node.id = this.genId();
-	        this.branches[node.id] = node;
 	      } else {
-	        throw 'Two nodes on this tree share the id ' + node.id;
+	        throw new Error('Two nodes on this tree share the id ' + node.id);
 	      }
 	    }
-	  } else {
-	    this.branches[node.id] = node;
 	  }
+
+	  this.branches[node.id] = node;
 	};
 
 	Tree.prototype.scroll = function (e) {
@@ -1675,13 +1404,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (nids !== '') {
-	      for (var i = 0; i <  arr.length; i++) {
+	      for (var i = 0; i < arr.length; i++) {
 	        if (this.branches[arr[i]]) {
 	          if (colour) {
 	            this.branches[arr[i]].colour = colour;
 	          }
 	          if (shape) {
-	            this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
+	            this.branches[arr[i]].nodeShape = _utilsConstants.Shapes[shape] ? _utilsConstants.Shapes[shape] : shape;
 	          }
 	          if (size) {
 	            this.branches[arr[i]].radius = size;
@@ -1720,13 +1449,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	Tree.prototype.setFontSize = function (ystep) {
 	  // Setting tree text size
 	  if (this.treeType === 'circular') {
-	    this.textSize = Math.min((ystep * 100) + 5, 40);
+	    this.textSize = Math.min(ystep * 100 + 5, 40);
 	  } else if (this.treeType === 'radial') {
-	    this.textSize = Math.min((ystep * 50) + 5, 20);
+	    this.textSize = Math.min(ystep * 50 + 5, 20);
 	  } else if (this.treeType === 'diagonal') {
-	    this.textSize = Math.min((ystep / 2), 10);
+	    this.textSize = Math.min(ystep / 2, 10);
 	  } else {
-	    this.textSize = Math.min((ystep / 2), 15);
+	    this.textSize = Math.min(ystep / 2, 15);
 	  }
 	  this.canvas.font = this.textSize + 'pt ' + this.font;
 	};
@@ -1758,8 +1487,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var oz = this.zoom;
 	    this.zoom = Math.pow(10, z);
 
-	    this.offsetx = (this.offsetx / oz) * this.zoom;
-	    this.offsety = (this.offsety / oz) * this.zoom;
+	    this.offsetx = this.offsetx / oz * this.zoom;
+	    this.offsety = this.offsety / oz * this.zoom;
 
 	    this.draw();
 	  }
@@ -1768,30 +1497,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Tree.prototype.toggleLabels = function () {
 	  this.showLabels = !this.showLabels;
 	  this.draw();
-	};
-
-	Tree.prototype.translateClickX = function (x) {
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-
-	  x = (x - getX(this.canvas.canvas) + window.pageXOffset);
-	  x *= ratio;
-	  x -= this.canvas.canvas.width / 2;
-	  x -= this.offsetx;
-	  x = x / this.zoom;
-
-	  return x;
-	};
-
-	Tree.prototype.translateClickY = function (y) {
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
-
-	  y = (y - getY(this.canvas.canvas) + window.pageYOffset); // account for positioning and scroll
-	  y *= ratio;
-	  y -= this.canvas.canvas.height / 2;
-	  y -= this.offsety;
-	  y = y / this.zoom;
-
-	  return y;
 	};
 
 	Tree.prototype.viewMetadataColumns = function (metadataColumnArray) {
@@ -1843,29 +1548,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-
 	Tree.prototype.loadCompleted = function () {
-	  fireEvent(this.canvasEl, 'loaded');
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loaded');
 	};
 
 	Tree.prototype.loadStarted = function () {
-	  fireEvent(this.canvasEl, 'loading');
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loading');
 	};
 
 	Tree.prototype.loadError = function (message) {
-	  fireEvent(this.canvasEl, 'error', { message: message });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { message: message });
 	};
 
 	Tree.prototype.subtreeDrawn = function (node) {
-	  fireEvent(this.canvasEl, 'subtree', { node: node });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'subtree', { node: node });
 	};
 
 	Tree.prototype.nodesSelected = function (nids) {
-	  fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'selected', { nodeIds: nids });
 	};
 
 	Tree.prototype.addListener = function (event, listener) {
-	  addEvent(this.canvasEl, event, listener);
+	  (0, _utilsEvents.addEvent)(this.canvasEl, event, listener);
 	};
 
 	Tree.prototype.getBounds = function () {
@@ -1878,19 +1582,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var x = this.leaves[i].centerx;
 	    var y = this.leaves[i].centery;
 	    var theta = this.leaves[i].angle;
-	    var pad = this.leaves[i].getNodeSize()
-	              + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0)
-	              + (this.showMetadata ?  this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+	    var pad = this.leaves[i].getNodeSize() + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0) + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
 
-	    x = x + (pad * Math.cos(theta));
-	    y = y + (pad * Math.sin(theta));
+	    x = x + pad * Math.cos(theta);
+	    y = y + pad * Math.sin(theta);
 
 	    minx = Math.min(minx, x);
 	    maxx = Math.max(maxx, x);
 	    miny = Math.min(miny, y);
 	    maxy = Math.max(maxy, y);
 	  }
-	  return [ [ minx, miny ], [ maxx, maxy ] ];
+	  return [[minx, miny], [maxx, maxy]];
 	};
 
 	Tree.prototype.fitInPanel = function () {
@@ -1900,10 +1602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var miny = bounds[0][1];
 	  var maxy = bounds[1][1];
 	  var padding = 50;
-	  var canvasSize = [
-	    this.canvas.canvas.width - padding,
-	    this.canvas.canvas.height - padding
-	  ];
+	  var canvasSize = [this.canvas.canvas.width - padding, this.canvas.canvas.height - padding];
 
 	  this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
 	  this.offsety = (maxy + miny) * this.zoom / -2;
@@ -1914,7 +1613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.adjustForPixelRatio = function () {
 	  // Adjust canvas size for Retina screen
-	  var ratio = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(this.canvas);
+	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
 
 	  this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
 	  this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
@@ -1926,16 +1625,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.treeTypeChanged = function (oldType, newType) {
-	  fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
+	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
 	};
 
 	Tree.prototype.resetTree = function () {
 	  if (!this.origBranches) return;
 
 	  this.branches = this.origBranches;
-	  for (var n in this.origBL) {
-	    this.branches[n].branchLength = this.origBL[n];
-	    this.branches[n].parent = this.origP[n];
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
+
+	  try {
+	    for (var _iterator2 = Object.keys(this.origBL)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var n = _step2.value;
+
+	      this.branches[n].branchLength = this.origBL[n];
+	      this.branches[n].parent = this.origP[n];
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	        _iterator2['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
+	    }
 	  }
 
 	  this.leaves = this.origLeaves;
@@ -1948,11 +1668,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.buildLeaves = function () {
 	  this.leaves = [];
+	  var _iteratorNormalCompletion3 = true;
+	  var _didIteratorError3 = false;
+	  var _iteratorError3 = undefined;
 
-	  var leafIds = this.root.getChildIds();
+	  try {
+	    for (var _iterator3 = this.root.getChildIds()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	      var leafId = _step3.value;
 
-	  for (var i = 0; i < leafIds.length; i++) {
-	    this.leaves.push(this.branches[leafIds[i]]);
+	      this.leaves.push(this.branches[leafId]);
+	    }
+	  } catch (err) {
+	    _didIteratorError3 = true;
+	    _iteratorError3 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+	        _iterator3['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError3) {
+	        throw _iteratorError3;
+	      }
+	    }
 	  }
 	};
 
@@ -1972,36 +1710,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.exportCurrentTreeView = function () {
-	  var dataUrl = this.getPngUrl();
-	  var anchor = document.createElement('a');
-	  var isDownloadSupported = (typeof anchor.download !== 'undefined');
-	  var event = document.createEvent('Event');
-
-	  anchor.href = dataUrl;
-	  anchor.target = '_blank';
-
-	  if (isDownloadSupported) {
-	    anchor.download = 'phylocanvas.png';
-	  }
-
-	  event.initEvent('click', true, true);
-	  anchor.dispatchEvent(event);
-
-	  if (isDownloadSupported) {
-	    (window.URL || window.webkitURL).revokeObjectURL(anchor.href);
-	  }
+	  (0, _utilsDom.setupDownloadLink)(this.getPngUrl(), 'phylocanvas.png');
 	};
 
 	module.exports = Tree;
 
-
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Angles = __webpack_require__(5).Angles;
-	var Shapes = __webpack_require__(5).Shapes;
-	var setupDownloadLink = __webpack_require__(2).setupDownloadLink;
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
 
 	/**
 	 * Creates a branch
@@ -2097,7 +1825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * the angle that the last child of this brach 'splays' at, used for
 	   * circular and radial trees
 	   */
-	  this.minChildAngle = Angles.FULL;
+	  this.minChildAngle = _utilsConstants.Angles.FULL;
 
 	  /**
 	   * What kind of teminal should be drawn on this node
@@ -2112,7 +1840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * The relative size of the terminal of this node
 	   */
-	  this.radius = 1.0;
+	  this.radius = 1;
 
 	  /**
 	   * true if this branch is currently selected
@@ -2150,8 +1878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (this.dragging) {
 	    return;
 	  }
-	  if ((x < (this.maxx) && x > (this.minx)) &&
-	      (y < (this.maxy) && y > (this.miny))) {
+	  if (x < this.maxx && x > this.minx && (y < this.maxy && y > this.miny)) {
 	    return this;
 	  }
 
@@ -2165,7 +1892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Branch.prototype.drawMetadata = function () {
 	  var padMaxLabelWidth = 0;
-	  if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+	  if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
 	    padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
 	  }
 	  var tx = this.getLabelStartX() + padMaxLabelWidth;
@@ -2178,14 +1905,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (this.tree.nodeAlign) {
 	    if (this.tree.treeType === 'rectangular') {
-	      tx += (this.tree.farthestNodeFromRootX - this.centerx);
+	      tx += this.tree.farthestNodeFromRootX - this.centerx;
 	    } else if (this.tree.treeType === 'hierarchy') {
-	      tx += (this.tree.farthestNodeFromRootY - this.centery);
+	      tx += this.tree.farthestNodeFromRootY - this.centery;
 	    }
 	  }
 
-	  if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign &&
-	    this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
+	  if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
 	    this.drawMetadataHeading(tx, ty);
 	    this.tree.metadataHeadingDrawn = true;
 	  }
@@ -2194,10 +1920,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (Object.keys(this.data).length > 0) {
 	    this.canvas.beginPath();
-	    if (this.angle > Angles.QUARTER &&
-	        this.angle < (Angles.HALF + Angles.QUARTER)) {
-	      this.canvas.rotate(Angles.HALF);
-	      tx = -tx - (padMaxLabelWidth);
+	    if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
+	      this.canvas.rotate(_utilsConstants.Angles.HALF);
+	      tx = -tx - padMaxLabelWidth;
 	      // Changing the xStep for radial and circular tree
 	      metadataXStep = -metadataXStep;
 	    }
@@ -2209,7 +1934,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      metadata = Object.keys(this.data);
 	    }
 
-	    ty = ty - (height / 2);
+	    ty = ty - height / 2;
 
 	    for (i = 0; i < metadata.length; i++) {
 	      columnName = metadata[i];
@@ -2287,16 +2012,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
 	  if (this.tree.nodeAlign) {
 	    if (this.tree.treeType === 'rectangular') {
-	      tx += (this.tree.farthestNodeFromRootX - this.centerx);
+	      tx += this.tree.farthestNodeFromRootX - this.centerx;
 	    } else if (this.tree.treeType === 'hierarchy') {
-	      tx += (this.tree.farthestNodeFromRootY - this.centery);
+	      tx += this.tree.farthestNodeFromRootY - this.centery;
 	    }
 	  }
-	  if (this.angle > Angles.QUARTER &&
-	      this.angle < (Angles.HALF + Angles.QUARTER)) {
-	    this.canvas.rotate(Angles.HALF);
+	  if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
+	    this.canvas.rotate(_utilsConstants.Angles.HALF);
 	    // Angles.Half text position changes
-	    tx = -tx - (dimensions.width * 1);
+	    tx = -tx - dimensions.width * 1;
 	  }
 
 	  this.canvas.beginPath();
@@ -2321,15 +2045,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  var theta = nodeRadius;
 
-	  var centerX = this.leaf ?
-	    (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
-	  var centerY = this.leaf ?
-	    (theta * Math.sin(this.angle)) + this.centery : this.centery;
+	  var centerX = this.leaf ? theta * Math.cos(this.angle) + this.centerx : this.centerx;
+	  var centerY = this.leaf ? theta * Math.sin(this.angle) + this.centery : this.centery;
 
 	  this.canvas.beginPath();
-	  this.canvas.fillStyle = this.selected ?
-	                          this.tree.selectedColour : this.colour;
-	  if ((nodeRadius * this.tree.zoom) < 5 || !this.leaf) {
+	  this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
+	  if (nodeRadius * this.tree.zoom < 5 || !this.leaf) {
 	    this.setNodeDimensions(centerX, centerY, 5 / this.tree.zoom);
 	  } else {
 	    this.setNodeDimensions(centerX, centerY, nodeRadius);
@@ -2351,12 +2072,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.canvas.beginPath();
 
 	    this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-	    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
-	                      this.tree.defaultCollapsedOptions.color : 'purple';
+	    this.canvas.fillStyle = this.tree.defaultCollapsedOptions.color ? this.tree.defaultCollapsedOptions.color : 'purple';
 	    this.canvas.fill();
 	    this.canvas.globalAlpha = 1;
-	  }
-	  else if (this.leaf) {
+	  } else if (this.leaf) {
 	    // Store line width for swapping back after drawing lines for aligning
 	    var origLineWidth = this.canvas.lineWidth;
 	    // Drawing line connectors to nodes and align all the nodes vertically
@@ -2365,7 +2084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.beginPath();
 	      // Draw line till the x position of the right-end node
 	      if (this.tree.treeType === 'rectangular') {
-	        this.canvas.moveTo(this.tree.farthestNodeFromRootX, (this.centery));
+	        this.canvas.moveTo(this.tree.farthestNodeFromRootX, this.centery);
 	      }
 	      if (this.tree.treeType === 'hierarchy') {
 	        this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
@@ -2381,9 +2100,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // rotate canvas (mainly for circular, radial trees etc)
 	    this.canvas.rotate(this.angle);
 	    // Draw node shape as chosen - default is circle
-	    this.tree.nodeRenderers[this.nodeShape](this);
+	    _renderersNode2['default'][this.nodeShape](this);
 
-	    if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+	    if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
 	      this.drawLabel();
 	    }
 
@@ -2403,8 +2122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var l = this.canvas.lineWidth;
 	    this.canvas.strokeStyle = this.tree.highlightColour;
 	    this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-	    this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) +
-	      ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+	    this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, _utilsConstants.Angles.FULL, false);
 	    this.canvas.stroke();
 	    this.canvas.lineWidth = l;
 	    this.canvas.strokeStyle = this.tree.branchColour;
@@ -2419,7 +2137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (this.leaf) {
 	    // Fix for Issue #68
 	    // Returning array, as expected
-	    return [ this.id ];
+	    return [this.id];
 	  } else {
 	    children = [];
 	    for (x = 0; x < this.children.length; x++) {
@@ -2487,7 +2205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.centery = 0;
 	  this.angle = null;
 	  // this.totalBranchLength = 0;
-	  this.minChildAngle = Angles.FULL;
+	  this.minChildAngle = _utilsConstants.Angles.FULL;
 	  this.maxChildAngle = 0;
 	  for (i = 0; i < this.children.length; i++) {
 	    try {
@@ -2496,81 +2214,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return e;
 	    }
 	  }
-	};
-
-	Branch.prototype.parseNwk = function (nwk, idx) {
-	  var idx = this.parseLabel(nwk, idx);
-	  if (nwk[idx] === ':') {
-	    idx = this.parseNodeLength(nwk, idx + 1);
-	  } else {
-	    this.branchLength = 0;
-	  }
-	  if (!this.id || this.id === '') {
-	    this.id = this.tree.genId();
-	  }
-	  return idx;
-	};
-
-
-	Branch.prototype.parseLabel = function (nwk, idx) {
-	  var lbl = '';
-	  var bits;
-	  var b;
-
-	  for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && idx < nwk.length; idx++) {
-	    lbl += nwk[idx];
-	  }
-	  if (!lbl) return idx;
-	  if (lbl.match(/\*/)) {
-	    bits = lbl.split('**');
-	    this.id = bits[0];
-	    if (bits.length === 1) return idx;
-	    bits = bits[1].split('*');
-
-	    for (b = 0; b < bits.length; b += 2) {
-	      // TODO: Define default case
-	      switch (bits[b]) {
-	        case 'nsz' :
-	          this.radius = window.parseInt(bits[b + 1]);
-	          break;
-	        case 'nsh' :
-	          if (Shapes[bits[b + 1]]) {
-	            this.nodeShape = Shapes[bits[b + 1]];
-	          } else if (this.nodeRenderers[bits[b + 1]]) {
-	            this.nodeShape = bits[b + 1];
-	          } else {
-	            this.nodeShape = 'circle';
-	          }
-	          break;
-	        case 'ncol' : this.colour = bits[b + 1];
-	          var hexRed = '0x' + this.colour.substring(0, 2);
-	          var hexGreen = '0x' + this.colour.substring(2, 4);
-	          var hexBlue = '0x' + this.colour.substring(4, 6);
-	          this.colour =
-	            'rgba(' +
-	              parseInt(hexRed, 16).toString() + ',' +
-	              parseInt(hexGreen, 16).toString() + ',' +
-	              parseInt(hexBlue, 16).toString() +
-	            ',1)';
-	          break;
-	      }
-	    }
-	  } else {
-	    this.id = lbl;
-	  }
-	  return idx;
-	};
-
-	Branch.prototype.parseNodeLength = function (nwk, idx) {
-	  var str = '';
-	  for (idx; nwk[idx] !== ')' && nwk[idx] !== ','; idx++) {
-	    str += nwk[idx];
-	  }
-	  this.branchLength = parseFloat(str);
-	  if (this.branchLength < 0) {
-	    this.branchLength = 0;
-	  }
-	  return idx;
 	};
 
 	Branch.prototype.redrawTreeFromBranch = function () {
@@ -2584,6 +2227,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.tree.saveNode(this.children[i]);
 	    this.children[i].saveChildren();
 	  }
+	};
+
+	Branch.prototype.hasCollapsedAncestor = function () {
+	  if (this.parent) {
+	    return this.parent.collapsed || this.parent.hasCollapsedAncestor();
+	  }
+	  return false;
 	};
 
 	Branch.prototype.collapse = function () {
@@ -2723,9 +2373,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.getLabel = function () {
-	  return (
-	    (this.label !== undefined && this.label !== null) ? this.label : this.id
-	  );
+	  return this.label !== undefined && this.label !== null ? this.label : this.id;
 	};
 
 	Branch.prototype.getLabelSize = function () {
@@ -2743,14 +2391,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return CallExpression
 	 */
 	Branch.prototype.getLabelStartX = function () {
-	  return this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2);
+	  return this.getNodeSize() + this.tree.baseNodeSize + this.radius * 2;
 	};
 
 	Branch.prototype.rotate = function (evt) {
 	  var newChildren = [];
 	  var i;
 
-	  for (i = this.children.length; i--; ) {
+	  for (i = this.children.length; i--;) {
 	    newChildren.push(this.children[i]);
 	  }
 
@@ -2767,17 +2415,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.downloadLeafIdsFromBranch = function () {
-	  var downloadData;
-	  var childIds = this.getChildIds();
-	  downloadData = childIds.join('\n');
-	  setupDownloadLink(downloadData, 'pc_leaves.txt');
+	  var downloadData = this.getChildIds().join('\n');
+	  (0, _utilsDom.setupDownloadLink)((0, _utilsDom.createBlobUrl)(downloadData), 'pc_leaves.txt');
 	};
 
 	module.exports = Branch;
 
-
 /***/ },
-/* 5 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2788,6 +2433,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @memberof PhyloCanvas
 	 * @constant
 	 */
+	'use strict';
+
 	module.exports.Angles = {
 	  /**
 	   * @constant
@@ -2815,7 +2462,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  FULL: 2 * Math.PI
 	};
 
-
 	/**
 	 * dictionary to translate annotations in NWK to branch renderer ids
 	 *
@@ -2830,224 +2476,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	  t: 'triangle'
 	};
 
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Tooltip = __webpack_require__(7);
-
-	var createHandler = __webpack_require__(1).createHandler;
-	var preventDefault = __webpack_require__(1).preventDefault;
-
-	var DEFAULT_MENU_ITEMS = [ {
-	    text: 'Redraw Subtree',
-	    handler: 'redrawTreeFromBranch',
-	    nodeType: 'internal'
-	  }, {
-	    text: 'Show Labels',
-	    handler: 'displayLabels'
-	  }, {
-	    text: 'Hide Labels',
-	    handler: 'hideLabels'
-	  }, {
-	    text: 'Collapse/Expand branch',
-	    handler: 'toggleCollapsed',
-	    nodeType: 'internal'
-	  }, {
-	    text: 'Rotate Branch',
-	    handler: 'rotate',
-	    nodeType: 'internal'
-	  }, {
-	    text: 'Export As Image',
-	    handler: 'exportCurrentTreeView'
-	  }, {
-	    text: 'Download All Leaf IDs',
-	    handler: 'downloadAllLeafIds'
-	  }, {
-	    text: 'Download Branch Leaf IDs',
-	    handler: 'downloadLeafIdsFromBranch',
-	    nodeType: 'internal'
-	  }
-	];
-
-
-	/**
-	 * The menu that is shown when the PhyloCanvas widget is right-clicked
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 * @extends Tooltip
-	 */
-	function ContextMenu(tree, menuItems) {
-	  Tooltip.call(this, tree, 'pc-context-menu');
-
-	  if (menuItems && menuItems.length) {
-	    this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
-	      return {
-	        handler: menuItem.handler,
-	        text: menuItem.text || 'New Menu Item',
-	        nodeType: menuItem.nodeType || undefined
-	      };
-	    });
-	  } else {
-	    this.menuItems = DEFAULT_MENU_ITEMS;
-	  }
-
-	  this.fontSize = '8pt';
-	}
-
-	ContextMenu.prototype = Object.create(Tooltip.prototype);
-
-	ContextMenu.prototype.mouseover = function (element) {
-	  element.style.backgroundColor = '#E2E3DF';
-	};
-
-	ContextMenu.prototype.mouseout = function (element) {
-	  element.style.backgroundColor = 'transparent';
-	};
-
-	ContextMenu.prototype.click = function () {
-	  createHandler(this, 'close');
-	};
-
-	function menuItemApplicable(menuItem, node) {
-	  if (!node) {
-	    return !menuItem.nodeType;
-	  }
-
-	  if (node.leaf && menuItem.nodeType !== 'internal') {
-	    return true;
-	  }
-
-	  if (!node.leaf && menuItem.nodeType === 'internal') {
-	    return true;
-	  }
-
-	  return false;
-	}
-
-	ContextMenu.prototype.createContent = function (node) {
-	  var i;
-	  var menuItem;
-	  var listElement;
-	  var list = document.createElement('ul');
-
-	  list.style.margin = '0';
-	  list.style.padding = '0';
-
-	  for (i = 0; i < this.menuItems.length; i++) {
-	    menuItem = this.menuItems[i];
-
-	    if (!menuItemApplicable(menuItem, node)) {
-	      continue;
-	    }
-
-	    listElement = Tooltip.prototype.createElement.call(this, 'li', menuItem.text);
-	    listElement.style.listStyle = 'none outside none';
-
-	    if (menuItem.nodeType) {
-	      listElement.addEventListener(
-	        'click', createHandler(node, menuItem.handler)
-	      );
-	    } else {
-	      listElement.addEventListener(
-	        'click', createHandler(this.tree, menuItem.handler)
-	      );
-	    }
-	    listElement.addEventListener('click', this.click);
-	    listElement.addEventListener('contextmenu', preventDefault);
-	    listElement.addEventListener(
-	      'mouseover', createHandler(listElement, this.mouseover)
-	    );
-	    listElement.addEventListener(
-	      'mouseout', createHandler(listElement, this.mouseout)
-	    );
-
-	    list.appendChild(listElement);
-	  }
-	  document.body.addEventListener('click', createHandler(this, 'close'));
-	  this.element.appendChild(list);
-	};
-
-	module.exports = ContextMenu;
-
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Tooltip
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 */
-	function Tooltip(tree, className, element) {
-	  this.tree = tree;
-	  this.element = element || document.createElement('div');
-	  this.element.style.display = 'none';
-	  this.element.style.position = 'fixed';
-	  this.element.style.border = '1px solid #CCCCCC';
-	  this.element.style.background = '#FFFFFF';
-	  this.element.style.letterSpacing = '0.5px';
-	  this.element.className = className || 'pc-tooltip';
-	  this.closed = true;
-
-	  this.tree.canvasEl.appendChild(this.element);
-	}
-
-	Tooltip.prototype.close = function () {
-	  this.element.style.display = 'none';
-	  this.closed = true;
-	};
-
-	Tooltip.prototype.createElement = function (tagName, textContent) {
-	  var element = document.createElement(tagName || 'div');
-	  element.style.cursor = 'pointer';
-	  element.style.padding = '0.3em 0.5em 0.3em 0.5em';
-	  element.style.fontFamily = this.tree.font;
-	  element.style.fontSize = this.fontSize || '12pt';
-	  element.appendChild(document.createTextNode(textContent));
-	  return element;
-	};
-
-	/**
-	 * Shows number of child nodes by default
-	 */
-	Tooltip.prototype.createContent = function (node) {
-	  this.element.appendChild(
-	    this.createElement('div', node.getChildIds().length)
-	  );
-	};
-
-	Tooltip.prototype.open = function (x, y, node) {
-	  while (this.element.hasChildNodes()) {
-	    this.element.removeChild(this.element.firstChild);
-	  }
-
-	  this.createContent(node);
-
-	  if (x && y) {
-	    this.element.style.top = y + 'px';
-	    this.element.style.left = x + 'px';
-	  } else {
-	    this.element.style.top = '100px';
-	    this.element.style.left = '100px';
-	  }
-
-	  this.element.style.zIndex = 2000;
-	  this.element.style.display = 'block';
-	  this.element.style.backgroundColor = '#FFFFFF';
-
-	  this.closed = false;
-	};
-
-	module.exports = Tooltip;
-
-
 /***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	module.exports = {
+	  circle: function circle(node) {
+	    var r = node.getNodeSize();
+	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  square: function square(node) {
+	    var r = node.getNodeSize();
+	    var x1 = 0;
+	    var x2 = r * 2;
+	    var y1 = -r;
+	    var y2 = r;
+	    node.canvas.moveTo(x1, y1);
+	    node.canvas.lineTo(x1, y2);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x2, y1);
+	    node.canvas.lineTo(x1, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  star: function star(node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var spikes = 8;
+	    var outerRadius = r;
+	    var innerRadius = r * 0.5;
+	    var rot = Math.PI / 2 * 3;
+	    var x = cx;
+	    var y = cy;
+	    var step = Math.PI / spikes;
+	    var i = 0;
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(cx, cy - outerRadius);
+	    for (i = 0; i < spikes; i++) {
+	      x = cx + Math.cos(rot) * outerRadius;
+	      y = cy + Math.sin(rot) * outerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+
+	      x = cx + Math.cos(rot) * innerRadius;
+	      y = cy + Math.sin(rot) * innerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+	    }
+	    node.canvas.lineTo(cx, cy - outerRadius);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	    node.canvas.closePath();
+	  },
+	  triangle: function triangle(node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var x1 = cx - r;
+	    var x2 = cx + r;
+	    var y1 = cy - r;
+	    var y2 = cy + r;
+
+	    node.canvas.moveTo(x2, y1);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x1, (y1 + y2) / 2);
+	    node.canvas.lineTo(x2, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  }
+	};
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -3056,6 +2563,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @constructor
 	 * @memberof PhyloCanvas
 	 */
+	'use strict';
+
 	function Navigator(tree) {
 	  this.tree = tree;
 	  this.cel = document.createElement('canvas');
@@ -3074,7 +2583,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
 	  this.ctx.save();
 	}
-
 
 	Navigator.prototype.drawFrame = function () {
 	  var w = this.cel.width;
@@ -3101,9 +2609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _this = this;
 
 	    this.img.onload = function () {
-	      _this.ctx.drawImage(
-	        _this.img, -hw, -hh, _this.cel.width, _this.cel.height
-	      );
+	      _this.ctx.drawImage(_this.img, -hw, -hh, _this.cel.width, _this.cel.height);
 	    };
 
 	    this.baseOffsetx = this.tree.offsetx;
@@ -3117,8 +2623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.ctx.lineWidth = this.ctx.lineWidth / z;
 
-	  this.ctx.translate((this.baseOffsetx - (this.tree.offsetx * z)) * z,
-	    (this.baseOffsety - (this.tree.offsety * z)) * z);
+	  this.ctx.translate((this.baseOffsetx - this.tree.offsetx * z) * z, (this.baseOffsety - this.tree.offsety * z) * z);
 	  this.ctx.scale(z, z);
 	  this.ctx.strokeRect(-hw, -hh, w, h);
 	};
@@ -3132,10 +2637,478 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = Navigator;
 
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var BranchRenderer = __webpack_require__(12);
+
+	module.exports = {
+	  rectangular: new BranchRenderer(__webpack_require__(13)),
+	  circular: new BranchRenderer(__webpack_require__(14)),
+	  radial: new BranchRenderer(__webpack_require__(11)),
+	  diagonal: new BranchRenderer(__webpack_require__(15)),
+	  hierarchical: new BranchRenderer(__webpack_require__(16))
+	};
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	  draw: function draw(tree, node) {
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  }
+	};
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function BranchRenderer(options) {
+	  if (!options || !options.draw) {
+	    throw new Error('`draw` function is required for branch renderers');
+	  }
+
+	  this.draw = options.draw;
+	  this.prepareChild = options.prepareChild;
+	}
+
+	BranchRenderer.prototype.render = function (tree, branch, collapse) {
+	  var i;
+	  if (collapse || !branch) return;
+
+	  if (branch.selected) {
+	    branch.canvas.fillStyle = tree.selectedColour;
+	  } else {
+	    branch.canvas.fillStyle = branch.colour;
+	  }
+	  branch.canvas.strokeStyle = branch.getColour();
+
+	  this.draw(tree, branch);
+
+	  branch.drawNode();
+
+	  for (i = 0; i < branch.children.length; i++) {
+	    if (this.prepareChild) {
+	      this.prepareChild(branch, branch.children[i]);
+	    }
+	    this.render(tree, branch.children[i], branch.collapsed || collapse);
+	  }
+	};
+
+	module.exports = BranchRenderer;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	  draw: function draw(tree, node) {
+	    var branchLength = node.branchLength * tree.branchScalar;
+
+	    node.angle = 0;
+	    if (node.parent) {
+	      node.centerx = node.startx + branchLength;
+	    }
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.startx, node.centery);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	  draw: function draw(tree, node) {
+	    var strokeStyle = node.getColour();
+	    var branchLength = node.totalBranchLength * tree.branchScalar;
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    if (node.leaf) {
+	      node.canvas.lineTo(node.interx, node.intery);
+	      node.canvas.stroke();
+	      node.canvas.strokeStyle = node.selected ? node.tree.selectedColour : 'rgba(0,0,0,0.5)';
+	      node.canvas.lineTo(node.centerx, node.centery);
+	      node.canvas.stroke();
+	      node.canvas.strokeStyle = strokeStyle;
+	    } else {
+	      node.canvas.lineTo(node.centerx, node.centery);
+	      node.canvas.stroke();
+	    }
+	    node.canvas.closePath();
+
+	    node.canvas.strokeStyle = node.getColour();
+
+	    if (node.children.length > 1 && !node.collapsed) {
+	      node.canvas.beginPath();
+	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
+	      node.canvas.stroke();
+	      node.canvas.closePath();
+	    }
+	  }
+	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	  draw: function draw(tree, node) {
+	    node.angle = 0;
+	    node.canvas.beginPath();
+
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	  draw: function draw(tree, node) {
+	    node.canvas.beginPath();
+
+	    if (node !== node.tree.root) {
+	      node.canvas.moveTo(node.startx, node.starty);
+	      node.canvas.lineTo(node.centerx, node.starty);
+	    }
+
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  }
+	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Prerenderer = __webpack_require__(19);
+
+	module.exports = {
+	  rectangular: new Prerenderer(__webpack_require__(20)),
+	  circular: new Prerenderer(__webpack_require__(21)),
+	  radial: new Prerenderer(__webpack_require__(18)),
+	  diagonal: new Prerenderer(__webpack_require__(22)),
+	  hierarchical: new Prerenderer(__webpack_require__(23))
+	};
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	function prerenderNodes(tree, node) {
+	  if (node.parent) {
+	    node.startx = node.parent.centerx;
+	    node.starty = node.parent.centery;
+	  } else {
+	    node.startx = 0;
+	    node.starty = 0;
+	  }
+	  node.centerx = node.startx + node.branchLength * tree.branchScalar * Math.cos(node.angle);
+	  node.centery = node.starty + node.branchLength * tree.branchScalar * Math.sin(node.angle);
+
+	  for (var i = 0; i < node.children.length; i++) {
+	    prerenderNodes(tree, node.children[i]);
+	  }
+	}
+
+	module.exports = {
+	  step: function step(tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function calculate(tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+
+	    for (var i = 0; i < tree.leaves.length; i += 1) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.angle = 0;
+	        }
+	        nd.parent.angle += nd.angle * nd.getChildCount();
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+
+	    prerenderNodes(tree, tree.root);
+	  }
+	};
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	function Prerenderer(options) {
+	  this.step = options.step;
+	  this.calculate = options.calculate;
+	}
+
+	Prerenderer.prototype.run = function (tree) {
+	  var step = this.step(tree);
+
+	  tree.root.startx = 0;
+	  tree.root.starty = 0;
+	  tree.root.centerx = 0;
+	  tree.root.centery = 0;
+	  tree.farthestNodeFromRootX = 0;
+	  tree.farthestNodeFromRootY = 0;
+
+	  this.calculate(tree, step);
+
+	  // Assign root startx and starty
+	  tree.root.startx = tree.root.centerx;
+	  tree.root.starty = tree.root.centery;
+	  // Set font size for tree and its branches
+	  tree.setFontSize(step);
+	  tree.setMaxLabelLength();
+	};
+
+	module.exports = Prerenderer;
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	  step: function step(tree) {
+	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function calculate(tree, ystep) {
+	    // Calculate branchScalar based on canvas width and total branch length
+	    // This is used to transform the X coordinate based on the canvas width and no. of branches
+	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+
+	    // set initial positons of the branches
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = 0; // for rectangle
+	      // Calculate and assign y coordinate for all the leaves
+	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+
+	      // Calculate and assign y coordinate for all the parent branches
+	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
+	        // Get all the children of a parent
+	        var childrenArray = branch.parent.children;
+	        // Assign parent's y coordinate
+	        // Logic: Total ystep of all the children of this parent / 2
+	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	module.exports = {
+	  step: function step(tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function calculate(tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+	    // work out radius of tree and the make branch scalar proportinal to the
+	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / Angles.FULL;
+	    if (tree.branchScalar * tree.maxBranchLength > r) {
+	      r = tree.branchScalar * tree.maxBranchLength;
+	    } else {
+	      tree.branchScalar = r / tree.maxBranchLength;
+	    }
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].starty = tree.leaves[i].parent.totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].startx = tree.leaves[i].parent.totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].intery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+	      tree.leaves[i].interx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.angle = nd.angle;
+	          nd.parent.minChildAngle = nd.angle;
+	        }
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.maxChildAngle = nd.angle;
+	          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
+	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar * Math.sin(nd.parent.angle);
+	          nd.parent.centerx = nd.parent.totalBranchLength * tree.branchScalar * Math.cos(nd.parent.angle);
+	          nd.parent.starty = (nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar * Math.sin(nd.parent.angle);
+	          nd.parent.startx = (nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar * Math.cos(nd.parent.angle);
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	module.exports = {
+	  step: function step(tree) {
+	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function calculate(tree, ystep) {
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].centerx = 0;
+	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
+	      tree.leaves[i].angle = 0;
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
+	          nd.parent.centerx = nd.parent.children[0].centerx + (nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE);
+	          for (var j = 0; j < nd.parent.children.length; j++) {
+	            nd.parent.children[j].startx = nd.parent.centerx;
+	            nd.parent.children[j].starty = nd.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	module.exports = {
+	  step: function step(tree) {
+	    return Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	  },
+	  calculate: function calculate(tree, xstep) {
+	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = Angles.QUARTER;
+	      tree.leaves[i].centerx = i > 0 ? tree.leaves[i - 1].centerx + xstep : 0;
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
+	        if (nd.getChildNo() === 0) {
+	          nd.parent.centerx = nd.centerx;
+	        }
+
+	        if (nd.getChildNo() === nd.parent.children.length - 1) {
+	          nd.parent.angle = Angles.QUARTER;
+	          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
+	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
+	          for (var j = 0; j < nd.parent.children.length; j++) {
+	            nd.parent.children[j].startx = nd.parent.centerx;
+	            nd.parent.children[j].starty = nd.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+	exports.getPixelRatio = getPixelRatio;
+	exports.translateClick = translateClick;
+
+	var _dom = __webpack_require__(4);
 
 	/**
 	 * Return backing store pixel ratio of context.
@@ -3143,165 +3116,488 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param context - The rendering context of HTMl5 canvas.
 	 *
 	 */
+
 	function getBackingStorePixelRatio(context) {
-	  return (
-	    context.backingStorePixelRatio ||
-	    context.webkitBackingStorePixelRatio ||
-	    context.mozBackingStorePixelRatio ||
-	    context.msBackingStorePixelRatio ||
-	    context.oBackingStorePixelRatio ||
-	    1
-	  );
+	  return context.backingStorePixelRatio || context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || 1;
 	}
 
-	module.exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+	function getPixelRatio(canvas) {
+	  return (window.devicePixelRatio || 1) / getBackingStorePixelRatio(canvas);
+	}
 
+	function translateClickX(x) {
+	  x = x - (0, _dom.getX)(this.canvas.canvas) + window.pageXOffset;
+	  x *= getPixelRatio(this.canvas);
+	  x -= this.canvas.canvas.width / 2;
+	  x -= this.offsetx;
+	  x = x / this.zoom;
+
+	  return x;
+	}
+
+	function translateClickY(y) {
+	  y = y - (0, _dom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
+	  y *= getPixelRatio(this.canvas);
+	  y -= this.canvas.canvas.height / 2;
+	  y -= this.offsety;
+	  y = y / this.zoom;
+
+	  return y;
+	}
+
+	function translateClick(x, y, tree) {
+	  return [translateClickX.call(tree, x), translateClickY.call(tree, y)];
+	}
 
 /***/ },
-/* 10 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * @constructor
-	 * @memberof PhyloCanvas
-	 */
-	function Loader(div) {
-	  this.div = div;
-	  this.cl = document.createElement('canvas');
-	  this.cl.id = div.id + 'Loader';
-	  this.cl.style.position = 'absolute';
-	  this.cl.style.backgroundColor = '#FFFFFF';
-	  this.cl.style.top = (div.offsetHeight / 4) + 'px';
-	  this.cl.style.left = (div.offsetWidth / 4) + 'px';
-	  this.cl.height = div.offsetHeight / 2;
-	  this.cl.width = div.offsetWidth / 2;
-	  this.cl.style.zIndex = '1000';
-	  div.appendChild(this.cl);
+	'use strict';
 
-	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-	  this.drawer = null;
-	  this.loaderRadius = null;
-	  this.loaderStep = (2 * Math.PI) / 360;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	  this.message = 'Loading ...';
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _Parser = __webpack_require__(26);
+
+	var _Parser2 = _interopRequireDefault(_Parser);
+
+	var _newick = __webpack_require__(28);
+
+	var _newick2 = _interopRequireDefault(_newick);
+
+	var _nexus = __webpack_require__(29);
+
+	var _nexus2 = _interopRequireDefault(_nexus);
+
+	exports['default'] = {
+	  nexus: new _Parser2['default'](_nexus2['default']),
+	  newick: new _Parser2['default'](_newick2['default'])
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _utilsHttp = __webpack_require__(27);
+
+	var _utilsHttp2 = _interopRequireDefault(_utilsHttp);
+
+	var Parser = (function () {
+	  function Parser(_ref) {
+	    var format = _ref.format;
+	    var parseFn = _ref.parseFn;
+	    var fileExtension = _ref.fileExtension;
+	    var validator = _ref.validator;
+
+	    _classCallCheck(this, Parser);
+
+	    this.format = format;
+	    this.parseFn = parseFn;
+	    this.fileExtension = fileExtension;
+	    this.validator = validator;
+	  }
+
+	  _createClass(Parser, [{
+	    key: 'parse',
+	    value: function parse(_ref2, callback) {
+	      var _this = this;
+
+	      var inputString = _ref2.inputString;
+	      var root = _ref2.root;
+	      var _ref2$options = _ref2.options;
+	      var options = _ref2$options === undefined ? {} : _ref2$options;
+
+	      var doParse = function doParse(string) {
+	        if (string.match(_this.validator)) {
+	          return _this.parseFn({ string: string, root: root, options: options }, callback);
+	        }
+	        return callback(new Error('Format string does not validate as "' + _this.format + '"'));
+	      };
+
+	      if (inputString.match(this.fileExtension)) {
+	        (0, _utilsHttp2['default'])({ url: inputString, method: 'GET' }, function (response) {
+	          if (response.status >= 400) {
+	            return callback(new Error(response.responseText));
+	          }
+	          doParse(response.responseText);
+	        });
+	      } else {
+	        doParse(inputString);
+	      }
+	    }
+	  }]);
+
+	  return Parser;
+	})();
+
+	exports['default'] = Parser;
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	exports['default'] = function (_ref, callback) {
+	  var url = _ref.url;
+	  var method = _ref.method;
+	  var data = _ref.data;
+
+	  var xhr = new XMLHttpRequest();
+
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState === 4) {
+	      callback(xhr);
+	    }
+	  };
+	  xhr.open(method, url, true);
+	  if (method === 'GET') {
+	    xhr.send();
+	  } else {
+	    xhr.send(data);
+	  }
+	};
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _Branch = __webpack_require__(6);
+
+	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+
+	var format = 'newick';
+	var fileExtension = /\.nwk$/;
+	var validator = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
+
+	function isTerminatingChar(terminatingChar) {
+	  return this === terminatingChar;
 	}
 
-	Loader.prototype.run = function () {
-	  var i = 0;
-	  var _this = this;
-	  this.cl.style.diangle = 'block';
-	  this.initLoader();
-	  this.drawer = setInterval(function () {
-	    _this.drawLoader(i);
-	    i++;
-	  }, 10);
+	var labelTerminatingChars = [':', ',', ')'];
+
+	function parseLabel(string) {
+	  var label = '';
+
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
+
+	  try {
+	    for (var _iterator = string[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var char = _step.value;
+
+	      if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
+	        return label;
+	      }
+	      label += char;
+	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator['return']) {
+	        _iterator['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
+	      }
+	    }
+	  }
+	}
+
+	function parseAnnotations(label, branch) {
+	  var segments = label.split('**');
+	  branch.id = segments[0];
+	  if (segments.length === 1) return;
+	  segments = segments[1].split('*');
+
+	  for (var b = 0; b < segments.length; b += 2) {
+	    var value = segments[b + 1];
+	    switch (segments[b]) {
+	      case 'nsz':
+	        branch.radius = window.parseInt(value);
+	        break;
+	      case 'nsh':
+	        if (_utilsConstants.Shapes[value]) {
+	          branch.nodeShape = _utilsConstants.Shapes[value];
+	        } else if (_renderersNode2['default'][value]) {
+	          branch.nodeShape = value;
+	        } else {
+	          branch.nodeShape = 'circle';
+	        }
+	        break;
+	      case 'ncol':
+	        branch.colour = value;
+	        var hexRed = '0x' + branch.colour.substring(0, 2);
+	        var hexGreen = '0x' + branch.colour.substring(2, 4);
+	        var hexBlue = '0x' + branch.colour.substring(4, 6);
+	        branch.colour = 'rgba(' + parseInt(hexRed, 16).toString() + ',' + parseInt(hexGreen, 16).toString() + ',' + parseInt(hexBlue, 16).toString() + ',1)';
+	        break;
+	      default:
+	        break;
+	    }
+	  }
+	}
+
+	var nodeTerminatingChars = [')', ','];
+
+	function parseBranchLength(string) {
+	  var nodeLength = '';
+
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
+
+	  try {
+	    for (var _iterator2 = string[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var char = _step2.value;
+
+	      if (nodeTerminatingChars.some(isTerminatingChar.bind(char))) {
+	        break;
+	      }
+	      nodeLength += char;
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	        _iterator2['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
+	    }
+	  }
+
+	  return nodeLength;
+	}
+
+	function parseBranch(branch, string, index) {
+	  var label = parseLabel(string.slice(index));
+	  var postLabelIndex = index + label.length;
+	  var branchLengthStr = 0;
+
+	  if (label.match(/\*/)) {
+	    parseAnnotations(label, branch);
+	  }
+
+	  if (string[postLabelIndex] === ':') {
+	    branchLengthStr = parseBranchLength(string.slice(postLabelIndex + 1));
+	    branch.branchLength = Math.max(parseFloat(branchLengthStr), 0);
+	  } else {
+	    branch.branchLength = 0;
+	  }
+
+	  branch.id = label || branch.tree.generateBranchId();
+	  return postLabelIndex + branchLengthStr.length;
+	}
+
+	function parseFn(_ref, callback) {
+	  var string = _ref.string;
+	  var root = _ref.root;
+
+	  var currentNode = root;
+
+	  for (var i = 0; i < string.length; i++) {
+	    var node = undefined;
+	    switch (string[i]) {
+	      case '(':
+	        // new Child
+	        node = new _Branch2['default']();
+	        currentNode.addChild(node);
+	        currentNode = node;
+	        break;
+	      case ')':
+	        // return to parent
+	        currentNode = currentNode.parent;
+	        break;
+	      case ',':
+	        // new sibiling
+	        node = new _Branch2['default']();
+	        currentNode.parent.addChild(node);
+	        currentNode = node;
+	        break;
+	      case ';':
+	        return callback();
+	      default:
+	        try {
+	          i = parseBranch(currentNode, string, i);
+	        } catch (e) {
+	          return callback(e);
+	        }
+	        break;
+	    }
+	  }
+	}
+
+	exports['default'] = {
+	  format: format,
+	  fileExtension: fileExtension,
+	  validator: validator,
+	  parseFn: parseFn
 	};
+	module.exports = exports['default'];
 
-	Loader.prototype.resize = function () {
-	  this.cl.style.top = '2px';
-	  this.cl.style.left = '2px';
-	  this.cl.height = this.div.offsetHeight * 0.75;
-	  this.cl.width = this.div.offsetWidth * 0.75;
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
 
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
+	'use strict';
 
-	  this.ctx.font = '24px sans-serif';
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
+	var _newick = __webpack_require__(28);
+
+	var format = 'nexus';
+	var fileExtension = /\.n(ex|xs)$/;
+	var validator = /^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i;
+
+	function parseFn(_ref, callback) {
+	  var string = _ref.string;
+	  var root = _ref.root;
+	  var options = _ref.options;
+
+	  if (!string.match(/BEGIN TREES/gi)) {
+	    return callback(new Error('The nexus file does not contain a tree block'));
+	  }
+
+	  var name = options.name;
+
+	  // get everything between BEGIN TREES and next END;
+	  var treeSection = string.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
+	  // get translate section
+
+	  var leafNameObject = {};
+	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
+	  if (translateSection && translateSection.length) {
+	    translateSection = translateSection[0];
+	    //remove translate section from tree section
+	    treeSection = treeSection.replace(translateSection, '');
+
+	    //parse translate section into kv pairs
+	    translateSection = translateSection.replace(/translate|;/gi, '');
+
+	    var tIntArr = translateSection.split(',');
+	    for (var i = 0; i < tIntArr.length; i++) {
+	      var ia = tIntArr[i].trim().replace('\n', '').split(' ');
+	      if (ia[0] && ia[1]) {
+	        leafNameObject[ia[0].trim()] = ia[1].trim();
+	      }
+	    }
+	  }
+
+	  // find each line starting with tree.
+	  var tArr = treeSection.split('\n');
+	  var trees = {};
+	  // id name is '' or does not exist, ask user to choose which tree.
+	  for (var i = 0; i < tArr.length; i++) {
+	    if (tArr[i].trim() === '') continue;
+	    var s = tArr[i].replace(/tree\s/i, '');
+	    if (!name) {
+	      name = s.trim().match(/^\w+/)[0];
+	    }
+	    trees[name] = s.trim().match(/[\S]*$/)[0];
+	  }
+	  if (!trees[name]) {
+	    return new Error('tree ' + name + ' does not exist in this NEXUS file');
+	  }
+
+	  (0, _newick.parseFn)({ string: trees[name].trim(), root: root }, function (error) {
+	    if (error) {
+	      return callback(error);
+	    }
+
+	    callback();
+
+	    // translate in accordance with translate block
+	    if (leafNameObject) {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = Object.keys(leafNameObject)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var n = _step.value;
+
+	          var branches = root.tree.branches;
+	          var branch = branches[n];
+	          delete branches[n];
+	          branch.id = leafNameObject[n];
+	          branches[branch.id] = branch;
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      root.tree.draw();
+	    }
+	  });
+	}
+
+	exports['default'] = {
+	  parseFn: parseFn,
+	  format: format,
+	  fileExtension: fileExtension,
+	  validator: validator
 	};
-
-	Loader.prototype.initLoader = function () {
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10.0;
-
-	  this.ctx.font = '24px sans-serif';
-
-	  this.ctx.shadowOffsetX = 2.0;
-	  this.ctx.shadowOffsetY = 2.0;
-	};
-
-	Loader.prototype.drawLoader = function (t) {
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4, this.ctx.canvas.height / 4
-	  );
-
-	  this.ctx.save();
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2
-	  );
-	  this.ctx.stroke();
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(
-	    0, 0,
-	    this.loaderRadius,
-	    this.loaderStep * t + 3,
-	    this.loaderStep * t + 5
-	  );
-	  this.ctx.stroke();
-	  this.ctx.fillText(
-	    this.message,
-	    -(this.ctx.measureText(this.message).width / 2),
-	    this.loaderRadius + 50, this.cl.width
-	  );
-	};
-
-	Loader.prototype.stop = function () {
-	  clearInterval(this.drawer);
-	  this.cl.style.display = 'none';
-	};
-
-	Loader.prototype.fail = function (message) {
-	  clearInterval(this.drawer);
-	  this.loaderRadius = Math.min(
-	    this.ctx.canvas.width / 4,
-	    this.ctx.canvas.height / 4
-	  );
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
-
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
-	  this.ctx.stroke();
-
-	  this.ctx.fillText(
-	    message,
-	    -(this.ctx.measureText(message).width / 2),
-	    this.loaderRadius + 50,
-	    this.loaderRadius * 2
-	  );
-	};
-
-	module.exports = Loader;
-
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

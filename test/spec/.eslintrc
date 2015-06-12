@@ -3,8 +3,7 @@
     "mocha": true
   },
   "globals": {
-    "PhyloCanvas": true,
-    "expect": true
+    "PhyloCanvas": true
   },
   "rules": {
     "padded-blocks": 0

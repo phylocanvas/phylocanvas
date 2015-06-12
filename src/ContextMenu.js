@@ -1,78 +1,36 @@
-var Tooltip = require('./Tooltip');
+import Tooltip from './Tooltip';
+import { createHandler, preventDefault } from './utils/events';
 
-var createHandler = require('./utils/events').createHandler;
-var preventDefault = require('./utils/events').preventDefault;
-
-var DEFAULT_MENU_ITEMS = [ {
-    text: 'Redraw Subtree',
-    handler: 'redrawTreeFromBranch',
-    nodeType: 'internal'
-  }, {
-    text: 'Show Labels',
-    handler: 'displayLabels'
-  }, {
-    text: 'Hide Labels',
-    handler: 'hideLabels'
-  }, {
-    text: 'Collapse/Expand branch',
-    handler: 'toggleCollapsed',
+const DEFAULT_MENU_ITEMS = [
+  { text: 'Collapse/Expand Branch',
+    handler: function (branch) {
+      branch.toggleCollapsed();
+      branch.tree.draw(); // some browsers do not fire mousemove after clicking
+    },
     nodeType: 'internal'
   }, {
     text: 'Rotate Branch',
     handler: 'rotate',
     nodeType: 'internal'
   }, {
+    text: 'Redraw Subtree',
+    handler: 'redrawTreeFromBranch',
+    nodeType: 'internal'
+  }, {
+    text: 'Show/Hide Labels',
+    handler: 'toggleLabels'
+  }, {
     text: 'Export As Image',
     handler: 'exportCurrentTreeView'
   }, {
-    text: 'Download All Leaf IDs',
+    text: 'Export Leaf IDs',
     handler: 'downloadAllLeafIds'
   }, {
-    text: 'Download Branch Leaf IDs',
+    text: 'Export Leaf IDs on Branch',
     handler: 'downloadLeafIdsFromBranch',
     nodeType: 'internal'
   }
 ];
-
-
-/**
- * The menu that is shown when the PhyloCanvas widget is right-clicked
- *
- * @constructor
- * @memberOf PhyloCanvas
- * @extends Tooltip
- */
-function ContextMenu(tree, menuItems) {
-  Tooltip.call(this, tree, 'pc-context-menu');
-
-  if (menuItems && menuItems.length) {
-    this.menuItems = menuItems.map(function transferMenuItem(menuItem) {
-      return {
-        handler: menuItem.handler,
-        text: menuItem.text || 'New Menu Item',
-        nodeType: menuItem.nodeType || undefined
-      };
-    });
-  } else {
-    this.menuItems = DEFAULT_MENU_ITEMS;
-  }
-
-  this.fontSize = '8pt';
-}
-
-ContextMenu.prototype = Object.create(Tooltip.prototype);
-
-ContextMenu.prototype.mouseover = function (element) {
-  element.style.backgroundColor = '#E2E3DF';
-};
-
-ContextMenu.prototype.mouseout = function (element) {
-  element.style.backgroundColor = 'transparent';
-};
-
-ContextMenu.prototype.click = function () {
-  createHandler(this, 'close');
-};
 
 function menuItemApplicable(menuItem, node) {
   if (!node) {
@@ -90,47 +48,74 @@ function menuItemApplicable(menuItem, node) {
   return false;
 }
 
-ContextMenu.prototype.createContent = function (node) {
-  var i;
-  var menuItem;
-  var listElement;
-  var list = document.createElement('ul');
+function mouseover(element) {
+  element.style.backgroundColor = '#E2E3DF';
+}
 
-  list.style.margin = '0';
-  list.style.padding = '0';
+function mouseout(element) {
+  element.style.backgroundColor = 'transparent';
+}
 
-  for (i = 0; i < this.menuItems.length; i++) {
-    menuItem = this.menuItems[i];
+function transferMenuItem({ handler, text = 'New menu Item', nodeType }) {
+  return { handler, text, nodeType };
+}
 
-    if (!menuItemApplicable(menuItem, node)) {
-      continue;
-    }
+/**
+ * The menu that is shown when the PhyloCanvas widget is right-clicked
+ *
+ * @constructor
+ * @memberOf PhyloCanvas
+ * @extends Tooltip
+ */
+export default class ContextMenu extends Tooltip {
 
-    listElement = Tooltip.prototype.createElement.call(this, 'li', menuItem.text);
-    listElement.style.listStyle = 'none outside none';
+  constructor(tree, menuItems = DEFAULT_MENU_ITEMS) {
+    super(tree, 'pc-context-menu');
 
-    if (menuItem.nodeType) {
-      listElement.addEventListener(
-        'click', createHandler(node, menuItem.handler)
-      );
-    } else {
-      listElement.addEventListener(
-        'click', createHandler(this.tree, menuItem.handler)
-      );
-    }
-    listElement.addEventListener('click', this.click);
-    listElement.addEventListener('contextmenu', preventDefault);
-    listElement.addEventListener(
-      'mouseover', createHandler(listElement, this.mouseover)
-    );
-    listElement.addEventListener(
-      'mouseout', createHandler(listElement, this.mouseout)
-    );
-
-    list.appendChild(listElement);
+    this.menuItems = menuItems.map(transferMenuItem);
+    this.fontSize = '8pt';
   }
-  document.body.addEventListener('click', createHandler(this, 'close'));
-  this.element.appendChild(list);
-};
 
-module.exports = ContextMenu;
+  click() {
+    createHandler(this, 'close');
+  }
+
+  createContent(node) {
+    let list = document.createElement('ul');
+
+    list.style.margin = '0';
+    list.style.padding = '0';
+
+    for (let menuItem of this.menuItems) {
+      if (!menuItemApplicable(menuItem, node)) {
+        continue;
+      }
+
+      let listElement = this.createElement('li', menuItem.text);
+      listElement.style.listStyle = 'none outside none';
+
+      if (menuItem.nodeType) {
+        listElement.addEventListener(
+          'click', createHandler(node, menuItem.handler)
+        );
+      } else {
+        listElement.addEventListener(
+          'click', createHandler(this.tree, menuItem.handler)
+        );
+      }
+      listElement.addEventListener('click', this.click);
+      listElement.addEventListener('contextmenu', preventDefault);
+      listElement.addEventListener(
+        'mouseover', createHandler(listElement, mouseover)
+      );
+      listElement.addEventListener(
+        'mouseout', createHandler(listElement, mouseout)
+      );
+
+      list.appendChild(listElement);
+    }
+    document.body.addEventListener('click', createHandler(this, 'close'));
+    this.element.appendChild(list);
+  }
+
+}

@@ -1,6 +1,7 @@
-var Angles = require('./utils/constants').Angles;
-var Shapes = require('./utils/constants').Shapes;
-var setupDownloadLink = require('./utils/dom').setupDownloadLink;
+import { Angles } from './utils/constants';
+import { setupDownloadLink, createBlobUrl } from './utils/dom';
+
+import nodeRenderers from './renderers/node';
 
 /**
  * Creates a branch
@@ -380,7 +381,7 @@ Branch.prototype.drawNode = function () {
     // rotate canvas (mainly for circular, radial trees etc)
     this.canvas.rotate(this.angle);
     // Draw node shape as chosen - default is circle
-    this.tree.nodeRenderers[this.nodeShape](this);
+    nodeRenderers[this.nodeShape](this);
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
       this.drawLabel();
@@ -497,81 +498,6 @@ Branch.prototype.reset = function () {
   }
 };
 
-Branch.prototype.parseNwk = function (nwk, idx) {
-  var idx = this.parseLabel(nwk, idx);
-  if (nwk[idx] === ':') {
-    idx = this.parseNodeLength(nwk, idx + 1);
-  } else {
-    this.branchLength = 0;
-  }
-  if (!this.id || this.id === '') {
-    this.id = this.tree.genId();
-  }
-  return idx;
-};
-
-
-Branch.prototype.parseLabel = function (nwk, idx) {
-  var lbl = '';
-  var bits;
-  var b;
-
-  for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && idx < nwk.length; idx++) {
-    lbl += nwk[idx];
-  }
-  if (!lbl) return idx;
-  if (lbl.match(/\*/)) {
-    bits = lbl.split('**');
-    this.id = bits[0];
-    if (bits.length === 1) return idx;
-    bits = bits[1].split('*');
-
-    for (b = 0; b < bits.length; b += 2) {
-      // TODO: Define default case
-      switch (bits[b]) {
-        case 'nsz' :
-          this.radius = window.parseInt(bits[b + 1]);
-          break;
-        case 'nsh' :
-          if (Shapes[bits[b + 1]]) {
-            this.nodeShape = Shapes[bits[b + 1]];
-          } else if (this.nodeRenderers[bits[b + 1]]) {
-            this.nodeShape = bits[b + 1];
-          } else {
-            this.nodeShape = 'circle';
-          }
-          break;
-        case 'ncol' : this.colour = bits[b + 1];
-          var hexRed = '0x' + this.colour.substring(0, 2);
-          var hexGreen = '0x' + this.colour.substring(2, 4);
-          var hexBlue = '0x' + this.colour.substring(4, 6);
-          this.colour =
-            'rgba(' +
-              parseInt(hexRed, 16).toString() + ',' +
-              parseInt(hexGreen, 16).toString() + ',' +
-              parseInt(hexBlue, 16).toString() +
-            ',1)';
-          break;
-      }
-    }
-  } else {
-    this.id = lbl;
-  }
-  return idx;
-};
-
-Branch.prototype.parseNodeLength = function (nwk, idx) {
-  var str = '';
-  for (idx; nwk[idx] !== ')' && nwk[idx] !== ','; idx++) {
-    str += nwk[idx];
-  }
-  this.branchLength = parseFloat(str);
-  if (this.branchLength < 0) {
-    this.branchLength = 0;
-  }
-  return idx;
-};
-
 Branch.prototype.redrawTreeFromBranch = function () {
   this.tree.redrawFromBranch(this);
 };
@@ -583,6 +509,13 @@ Branch.prototype.saveChildren = function () {
     this.tree.saveNode(this.children[i]);
     this.children[i].saveChildren();
   }
+};
+
+Branch.prototype.hasCollapsedAncestor = function () {
+  if (this.parent) {
+    return this.parent.collapsed || this.parent.hasCollapsedAncestor();
+  }
+  return false;
 };
 
 Branch.prototype.collapse = function () {
@@ -766,10 +699,8 @@ Branch.prototype.getChildNo = function () {
 };
 
 Branch.prototype.downloadLeafIdsFromBranch = function () {
-  var downloadData;
-  var childIds = this.getChildIds();
-  downloadData = childIds.join('\n');
-  setupDownloadLink(downloadData, 'pc_leaves.txt');
+  var downloadData = this.getChildIds().join('\n');
+  setupDownloadLink(createBlobUrl(downloadData), 'pc_leaves.txt');
 };
 
 module.exports = Branch;

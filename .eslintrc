@@ -1,11 +1,15 @@
 {
+  "parser": "babel-eslint",
+
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es6": true
   },
 
   "ecmaFeatures": {
-    "jsx": true
+    "jsx": true,
+    "modules": true
   },
 
   "rules": {
