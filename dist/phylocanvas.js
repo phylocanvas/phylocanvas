@@ -1152,13 +1152,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var cx = r;
 	    var cy = 0;
 	    var spikes = 6;
-	    var outerRadius = 6;
-	    var innerRadius = 2;
+	    var outerRadius = r * 1.6;
+	    var innerRadius = r;
 	    var rot = Math.PI / 2 * 3;
 	    var x = cx;
 	    var y = cy;
 	    var step = Math.PI / spikes;
 	    var i = 0;
+
 	    node.canvas.beginPath();
 	    node.canvas.moveTo(cx, cy - outerRadius);
 	    for (i = 0; i < spikes; i++) {
@@ -1175,9 +1176,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.lineTo(cx, cy - outerRadius);
 	    node.canvas.stroke();
 	    node.canvas.fill();
-	    node.canvas.moveTo(cx, cy);
-	    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-	    node.canvas.stroke();
 	    node.canvas.closePath();
 	  },
 	  triangle: function (node) {
@@ -1188,15 +1186,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var x2 = cx + r;
 	    var y1 = cy - r;
 	    var y2 = cy + r;
-	    node.canvas.moveTo(cx, y1);
+
+	    node.canvas.moveTo(x2, y1);
 	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(cx, y1);
+	    node.canvas.lineTo(x1, (y2+y1)/2);
+	    node.canvas.lineTo(x2, y1);
+
 	    node.canvas.stroke();
 	    node.canvas.fill();
-	    node.canvas.moveTo(x1, (y1 + y2) / 2);
-	    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-	    node.canvas.stroke();
 	  }
 	};
 
@@ -2167,7 +2164,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.drawMetadata = function () {
-	  var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
+	  var padMaxLabelWidth = 0;
+	  if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+	    padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
+	  }
+	  var tx = this.getLabelStartX() + padMaxLabelWidth;
 	  var ty = 0;
 	  var metadata = [];
 	  var height = this.tree.textSize;
@@ -2189,11 +2190,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.tree.metadataHeadingDrawn = true;
 	  }
 
+	  var metadataXStep = this.tree.metadataXStep;
+
 	  if (Object.keys(this.data).length > 0) {
 	    this.canvas.beginPath();
 	    if (this.angle > Angles.QUARTER &&
 	        this.angle < (Angles.HALF + Angles.QUARTER)) {
 	      this.canvas.rotate(Angles.HALF);
+	      tx = -tx - (padMaxLabelWidth);
+	      // Changing the xStep for radial and circular tree
+	      metadataXStep = -metadataXStep;
 	    }
 
 	    // If no columns specified, then draw all columns
@@ -2207,7 +2213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (i = 0; i < metadata.length; i++) {
 	      columnName = metadata[i];
-	      tx += this.tree.metadataXStep;
+	      tx += metadataXStep;
 
 	      if (window.parseInt(this.data[columnName])) {
 	        this.canvas.fillStyle = this.tree.colour1;

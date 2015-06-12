@@ -707,13 +707,14 @@ Tree.prototype.nodeRenderers = {
     var cx = r;
     var cy = 0;
     var spikes = 6;
-    var outerRadius = 6;
-    var innerRadius = 2;
+    var outerRadius = r * 1.6;
+    var innerRadius = r;
     var rot = Math.PI / 2 * 3;
     var x = cx;
     var y = cy;
     var step = Math.PI / spikes;
     var i = 0;
+
     node.canvas.beginPath();
     node.canvas.moveTo(cx, cy - outerRadius);
     for (i = 0; i < spikes; i++) {
@@ -730,9 +731,6 @@ Tree.prototype.nodeRenderers = {
     node.canvas.lineTo(cx, cy - outerRadius);
     node.canvas.stroke();
     node.canvas.fill();
-    node.canvas.moveTo(cx, cy);
-    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-    node.canvas.stroke();
     node.canvas.closePath();
   },
   triangle: function (node) {
@@ -743,15 +741,14 @@ Tree.prototype.nodeRenderers = {
     var x2 = cx + r;
     var y1 = cy - r;
     var y2 = cy + r;
-    node.canvas.moveTo(cx, y1);
+
+    node.canvas.moveTo(x2, y1);
     node.canvas.lineTo(x2, y2);
-    node.canvas.lineTo(x1, y2);
-    node.canvas.lineTo(cx, y1);
+    node.canvas.lineTo(x1, (y2+y1)/2);
+    node.canvas.lineTo(x2, y1);
+
     node.canvas.stroke();
     node.canvas.fill();
-    node.canvas.moveTo(x1, (y1 + y2) / 2);
-    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-    node.canvas.stroke();
   }
 };
 
