@@ -979,15 +979,22 @@
     },
 
     drawMetadata: function () {
-      var fSize = this.tree.textSize;
-      var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
+      var padMaxLabelWidth = 0;
+      if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+        padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
+      }
+      var tx = this.getLabelStartX() + padMaxLabelWidth;
       var ty = 0;
+      var metadata = [];
+      var height = this.tree.textSize;
+      var width = this.tree.metadataXStep / 2;
+      var i;
+      var columnName;
 
       if (this.tree.nodeAlign) {
         if (this.tree.treeType === 'rectangular') {
           tx += (this.tree.farthestNodeFromRootX - this.centerx);
-        }
-        else if (this.tree.treeType === 'hierarchy') {
+        } else if (this.tree.treeType === 'hierarchy') {
           tx += (this.tree.farthestNodeFromRootY - this.centery);
         }
       }
@@ -998,36 +1005,29 @@
         this.tree.metadataHeadingDrawn = true;
       }
 
+      var metadataXStep = this.tree.metadataXStep;
+
       if (Object.keys(this.data).length > 0) {
         this.canvas.beginPath();
-        if (this.angle > Angles.QUARTER && this.angle < (Angles.HALF + Angles.QUARTER)) {
-          this.canvas.rotate(Angles.HALF);
-        }
+        console.log(this.tree.showLabels)
 
-        var metadata = [];
         // If no columns specified, then draw all columns
-
         if (this.tree.selectedMetadataColumns.length > 0) {
           metadata = this.tree.selectedMetadataColumns;
-        }
-        else {
-
+        } else {
           metadata = Object.keys(this.data);
         }
-        var height = this.tree.textSize;
-        var width = this.tree.metadataXStep / 2;
 
         ty = ty - (height / 2);
 
-        for (var i = 0; i < metadata.length; i++) {
+        for (i = 0; i < metadata.length; i++) {
           columnName = metadata[i];
-          tx += this.tree.metadataXStep;
+          tx += metadataXStep;
 
-          if (parseInt(this.data[columnName])) {
+          if (window.parseInt(this.data[columnName])) {
             this.canvas.fillStyle = this.tree.colour1;
             this.canvas.fillRect(tx, ty, width, height);
-          }
-          else if (parseInt(this.data[columnName]) === 0) {
+          } else if (window.parseInt(this.data[columnName]) === 0) {
             this.canvas.fillStyle = this.tree.colour0;
             this.canvas.fillRect(tx, ty, width, height);
           }
@@ -1115,6 +1115,14 @@
         this.canvas.fillStyle = this.getTextColour();
         this.canvas.fillText(lbl, tx, ty);
       }
+
+      // Make canvas rotate back to actual position so that
+      // metadata drawn after that will not be affected
+      if (this.angle > Angles.QUARTER &&
+          this.angle < (Angles.HALF + Angles.QUARTER)) {
+        this.canvas.rotate(Angles.HALF);
+      }
+
       this.canvas.closePath();
     },
     setNodeDimensions: function (centerX, centerY, radius) {
