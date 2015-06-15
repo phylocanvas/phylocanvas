@@ -1009,7 +1009,6 @@
 
       if (Object.keys(this.data).length > 0) {
         this.canvas.beginPath();
-        console.log(this.tree.showLabels)
 
         // If no columns specified, then draw all columns
         if (this.tree.selectedMetadataColumns.length > 0) {
