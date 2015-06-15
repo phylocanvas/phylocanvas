@@ -53,17 +53,18 @@ module.exports = {
   },
   triangle: function (node) {
     var r = node.getNodeSize();
-    var cx = r;
-    var cy = 0;
-    var x1 = cx - r;
-    var x2 = cx + r;
-    var y1 = cy - r;
-    var y2 = cy + r;
+    var lengthOfSide = (2 * r) * Math.cos(30 * Math.PI / 180);
 
-    node.canvas.moveTo(x2, y1);
-    node.canvas.lineTo(x2, y2);
-    node.canvas.lineTo(x1, (y1 + y2) / 2);
-    node.canvas.lineTo(x2, y1);
+    node.canvas.moveTo(0, 0);
+    node.canvas.rotate(30 * Math.PI / 180);
+    node.canvas.lineTo(lengthOfSide, 0);
+
+    node.canvas.rotate(-60 * Math.PI / 180);
+    node.canvas.lineTo(lengthOfSide, 0);
+
+    node.canvas.rotate(30 * Math.PI / 180);
+    node.canvas.lineTo(0, 0);
+
     node.canvas.stroke();
     node.canvas.fill();
   }
