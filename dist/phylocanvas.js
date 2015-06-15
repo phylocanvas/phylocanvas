@@ -63,19 +63,51 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var addClass = __webpack_require__(2).addClass;
-	var hasClass = __webpack_require__(2).hasClass;
-	var removeClass = __webpack_require__(2).removeClass;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.History = History;
 
-	var fireEvent = __webpack_require__(13).fireEvent;
-	var addEvent = __webpack_require__(13).addEvent;
-	var killEvent = __webpack_require__(13).killEvent;
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _utilsEvents = __webpack_require__(3);
 
 	/**
 	 * @namespace PhyloCanvas
 	 */
 
-	var Tree = __webpack_require__(3);
+	var _Tree = __webpack_require__(5);
+
+	var _Tree2 = _interopRequireDefault(_Tree);
+
+	var _Branch = __webpack_require__(6);
+
+	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _ContextMenu = __webpack_require__(1);
+
+	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
+
+	var _renderersBranch = __webpack_require__(10);
+
+	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+
+	var _renderersPre = __webpack_require__(17);
+
+	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+
+	exports.Tree = _Tree2['default'];
+	exports.Branch = _Branch2['default'];
+	exports.ContextMenu = _ContextMenu2['default'];
+	exports.branchRenderers = _renderersBranch2['default'];
+	exports.nodeRenderers = _renderersNode2['default'];
+	exports.prerenderers = _renderersPre2['default'];
 
 	function History(tree) {
 	  this.tree = tree;
@@ -107,19 +139,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	History.prototype.collapse = function () {
-	  addClass(this.div, 'collapsed');
+	  (0, _utilsDom.addClass)(this.div, 'collapsed');
 	  this.toggleDiv.firstChild.data = '>';
 	  this.resizeTree();
 	};
 
 	History.prototype.expand = function () {
-	  removeClass(this.div, 'collapsed');
+	  (0, _utilsDom.removeClass)(this.div, 'collapsed');
 	  this.toggleDiv.firstChild.data = '<';
 	  this.resizeTree();
 	};
 
 	History.prototype.isCollapsed = function () {
-	  return hasClass(this.div, 'collapsed');
+	  return (0, _utilsDom.hasClass)(this.div, 'collapsed');
 	};
 
 	History.prototype.toggle = function () {
@@ -128,14 +160,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else {
 	    this.collapse();
 	  }
-	  fireEvent(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
+	  (0, _utilsEvents.fireEvent)(this.tree.canvasEl, 'historytoggle', { isOpen: !this.isCollapsed() });
 	};
 
 	History.prototype.createDiv = function (parentDiv) {
 	  var div = document.createElement('div');
 	  div.className = 'pc-history';
-	  addEvent(div, 'click', killEvent);
-	  addEvent(div, 'contextmenu', killEvent);
+	  (0, _utilsEvents.addEvent)(div, 'click', _utilsEvents.killEvent);
+	  (0, _utilsEvents.addEvent)(div, 'contextmenu', _utilsEvents.killEvent);
 
 	  var title = document.createElement('div');
 	  title.innerHTML = 'History';
@@ -145,7 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var tabDiv = document.createElement('div');
 	  tabDiv.appendChild(document.createTextNode('<'));
 	  tabDiv.className = 'toggle';
-	  addEvent(tabDiv, 'click', this.toggle.bind(this));
+	  (0, _utilsEvents.addEvent)(tabDiv, 'click', this.toggle.bind(this));
 	  div.appendChild(tabDiv);
 	  this.toggleDiv = tabDiv;
 
@@ -211,7 +243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  listElement.appendChild(thumbnail);
 	  this.snapshotList.appendChild(listElement);
 
-	  addEvent(thumbnail, 'click', this.goBackTo.bind(this));
+	  (0, _utilsEvents.addEvent)(thumbnail, 'click', this.goBackTo.bind(this));
 	};
 
 	History.prototype.clear = function () {
@@ -241,7 +273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  head.appendChild(style);
 	};
 
-	Tree.prototype.initialiseHistory = function (config) {
+	_Tree2['default'].prototype.initialiseHistory = function (config) {
 	  var isCollapsedConfigured;
 
 	  if (config.history || typeof config.history === 'undefined') {
@@ -252,50 +284,403 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	module.exports = {
-	  Tree: Tree,
-	  Branch: __webpack_require__(4),
-	  Loader: __webpack_require__(5),
-	  ContextMenu: __webpack_require__(6),
-	  History: History
-	};
-
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Prerenderer = __webpack_require__(21);
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
-	  rectangular: new Prerenderer(__webpack_require__(22)),
-	  circular: new Prerenderer(__webpack_require__(23)),
-	  radial: new Prerenderer(__webpack_require__(20)),
-	  diagonal: new Prerenderer(__webpack_require__(24)),
-	  hierarchical: new Prerenderer(__webpack_require__(25))
-	};
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _Tooltip2 = __webpack_require__(2);
+
+	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
+
+	var _utilsEvents = __webpack_require__(3);
+
+	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
+	  handler: function handler(branch) {
+	    branch.toggleCollapsed();
+	    branch.tree.draw(); // some browsers do not fire mousemove after clicking
+	  },
+	  nodeType: 'internal'
+	}, {
+	  text: 'Rotate Branch',
+	  handler: 'rotate',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Redraw Subtree',
+	  handler: 'redrawTreeFromBranch',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Show/Hide Labels',
+	  handler: 'toggleLabels'
+	}, {
+	  text: 'Export As Image',
+	  handler: 'exportCurrentTreeView'
+	}, {
+	  text: 'Export Leaf IDs',
+	  handler: 'downloadAllLeafIds'
+	}, {
+	  text: 'Export Leaf IDs on Branch',
+	  handler: 'downloadLeafIdsFromBranch',
+	  nodeType: 'internal'
+	}];
+
+	function menuItemApplicable(menuItem, node) {
+	  if (!node) {
+	    return !menuItem.nodeType;
+	  }
+
+	  if (node.leaf && menuItem.nodeType !== 'internal') {
+	    return true;
+	  }
+
+	  if (!node.leaf && menuItem.nodeType === 'internal') {
+	    return true;
+	  }
+
+	  return false;
+	}
+
+	function mouseover(element) {
+	  element.style.backgroundColor = '#E2E3DF';
+	}
+
+	function mouseout(element) {
+	  element.style.backgroundColor = 'transparent';
+	}
+
+	function transferMenuItem(_ref) {
+	  var handler = _ref.handler;
+	  var _ref$text = _ref.text;
+	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
+	  var nodeType = _ref.nodeType;
+
+	  return { handler: handler, text: text, nodeType: nodeType };
+	}
+
+	/**
+	 * The menu that is shown when the PhyloCanvas widget is right-clicked
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 * @extends Tooltip
+	 */
+
+	var ContextMenu = (function (_Tooltip) {
+	  function ContextMenu(tree) {
+	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
+
+	    _classCallCheck(this, ContextMenu);
+
+	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
+
+	    this.menuItems = menuItems.map(transferMenuItem);
+	    this.fontSize = '8pt';
+	  }
+
+	  _inherits(ContextMenu, _Tooltip);
+
+	  _createClass(ContextMenu, [{
+	    key: 'click',
+	    value: function click() {
+	      (0, _utilsEvents.createHandler)(this, 'close');
+	    }
+	  }, {
+	    key: 'createContent',
+	    value: function createContent(node) {
+	      var list = document.createElement('ul');
+
+	      list.style.margin = '0';
+	      list.style.padding = '0';
+
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var menuItem = _step.value;
+
+	          if (!menuItemApplicable(menuItem, node)) {
+	            continue;
+	          }
+
+	          var listElement = this.createElement('li', menuItem.text);
+	          listElement.style.listStyle = 'none outside none';
+
+	          if (menuItem.nodeType) {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
+	          } else {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
+	          }
+	          listElement.addEventListener('click', this.click);
+	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
+	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
+	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
+
+	          list.appendChild(listElement);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
+	      this.element.appendChild(list);
+	    }
+	  }]);
+
+	  return ContextMenu;
+	})(_Tooltip3['default']);
+
+	exports['default'] = ContextMenu;
+	module.exports = exports['default'];
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/**
+	 * Tooltip
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 */
 	'use strict';
 
-	var fireEvent = __webpack_require__(13).fireEvent;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	function setupDownloadLink(data, filename) {
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Tooltip = (function () {
+	  function Tooltip(tree) {
+	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
+	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
+
+	    _classCallCheck(this, Tooltip);
+
+	    this.tree = tree;
+	    this.element = element;
+	    this.element.className = className;
+	    this.element.style.display = 'none';
+	    this.element.style.position = 'fixed';
+	    this.element.style.border = '1px solid #CCCCCC';
+	    this.element.style.background = '#FFFFFF';
+	    this.element.style.letterSpacing = '0.5px';
+	    this.closed = true;
+
+	    this.tree.canvasEl.appendChild(this.element);
+	  }
+
+	  _createClass(Tooltip, [{
+	    key: 'close',
+	    value: function close() {
+	      this.element.style.display = 'none';
+	      this.closed = true;
+	    }
+	  }, {
+	    key: 'createElement',
+	    value: function createElement(tagName, textContent) {
+	      var element = document.createElement(tagName);
+	      element.style.cursor = 'pointer';
+	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
+	      element.style.fontFamily = this.tree.font;
+	      element.style.fontSize = this.fontSize || '12pt';
+	      element.appendChild(document.createTextNode(textContent));
+	      return element;
+	    }
+	  }, {
+	    key: 'createContent',
+
+	    /**
+	     * Shows number of child nodes by default
+	     */
+	    value: function createContent(node) {
+	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
+	    }
+	  }, {
+	    key: 'open',
+	    value: function open(_x3, _x4, node) {
+	      var x = arguments[0] === undefined ? 100 : arguments[0];
+	      var y = arguments[1] === undefined ? 100 : arguments[1];
+
+	      while (this.element.hasChildNodes()) {
+	        this.element.removeChild(this.element.firstChild);
+	      }
+
+	      this.createContent(node);
+
+	      this.element.style.top = y + 'px';
+	      this.element.style.left = x + 'px';
+
+	      this.element.style.zIndex = 2000;
+	      this.element.style.display = 'block';
+	      this.element.style.backgroundColor = '#FFFFFF';
+
+	      this.closed = false;
+	    }
+	  }]);
+
+	  return Tooltip;
+	})();
+
+	exports['default'] = Tooltip;
+	module.exports = exports['default'];
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function preventDefault(event) {
+	  event.preventDefault();
+	  return false;
+	}
+
+	function fireEvent(element, type) {
+	  var params = arguments[2] === undefined ? {} : arguments[2];
+
+	  var event; // The custom event that will be created
+	  var param;
+
+	  if (document.createEvent) {
+	    event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	  } else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	  }
+
+	  event.eventName = type;
+
+	  for (param in params) {
+	    if (params.hasOwnProperty(param)) {
+	      event[param] = params[param];
+	    }
+	  }
+
+	  if (document.createEvent) {
+	    element.dispatchEvent(event);
+	  } else {
+	    element.fireEvent('on' + event.eventType, event);
+	  }
+	}
+
+	function addEvent(elem, event, fn) {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(event, fn, false);
+	  } else {
+	    elem.attachEvent('on' + event, function () {
+	      // set the this pointer same as addEventListener when fn is called
+	      return fn.call(elem, window.event);
+	    });
+	  }
+	}
+
+	function killEvent(e) {
+	  e.stopPropagation();
+	  e.preventDefault();
+	}
+
+	/**
+	 * Creates a function which can be called from an event handler independent of
+	 * scope.
+	 *
+	 * @param {Object} obj the object the function will be called on
+	 * @param {String} func the name of the function to be called
+	 * @retuns {function}
+	 */
+	function createHandler(obj, func) {
+	  var handler;
+
+	  if (typeof func === typeof 'aaa') {
+	    handler = function (e) {
+	      if (obj[func]) {
+	        return obj[func](e);
+	      }
+	    };
+	  } else {
+	    handler = function () {
+	      return func(obj);
+	    };
+	  }
+	  return handler;
+	}
+
+	module.exports.preventDefault = preventDefault;
+	module.exports.fireEvent = fireEvent;
+	module.exports.addEvent = addEvent;
+	module.exports.killEvent = killEvent;
+	module.exports.createHandler = createHandler;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.createBlobUrl = createBlobUrl;
+	exports.setupDownloadLink = setupDownloadLink;
+	exports.getX = getX;
+	exports.getY = getY;
+	exports.addClass = addClass;
+	exports.removeClass = removeClass;
+	exports.hasClass = hasClass;
+
+	var _events = __webpack_require__(3);
+
+	var windowURL = window.URL || window.webkitURL;
+
+	function createBlobUrl(data) {
 	  var blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
-	  var url = window.URL || window.webkitURL;
+	  return windowURL.createObjectURL(blob);
+	}
+
+	function setupDownloadLink(url, filename) {
 	  var anchor = document.createElement('a');
 	  var isDownloadSupported = typeof anchor.download !== 'undefined';
 
-	  anchor.href = url.createObjectURL(blob);
+	  anchor.href = url;
 	  anchor.target = '_blank';
 	  if (isDownloadSupported) {
-	    anchor.download = filename ? filename : 'pc-download.txt';
+	    anchor.download = filename;
 	  }
-	  fireEvent(anchor, 'click');
+	  (0, _events.fireEvent)(anchor, 'click');
+	  if (isDownloadSupported) {
+	    windowURL.revokeObjectURL(anchor.href);
+	  }
 	}
 
 	/**
@@ -304,9 +689,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param domElement - The element to get the X position of.
 	 *
 	 */
+
 	function getX(domElement) {
 	  var xValue = 0;
-	  while (domElement != null) {
+	  while (domElement) {
 	    xValue += domElement.offsetLeft;
 	    domElement = domElement.offsetParent;
 	  }
@@ -319,6 +705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param domElement - The element to get the Y position of.
 	 *
 	 */
+
 	function getY(domElement) {
 	  var yValue = 0;
 	  while (domElement) {
@@ -353,44 +740,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index !== -1;
 	}
 
-	module.exports.setupDownloadLink = setupDownloadLink;
-	module.exports.getX = getX;
-	module.exports.getY = getY;
-	module.exports.addClass = addClass;
-	module.exports.removeClass = removeClass;
-	module.exports.hasClass = hasClass;
-
 /***/ },
-/* 3 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _Branch = __webpack_require__(4);
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+	var _Branch = __webpack_require__(6);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(6);
+	var _ContextMenu = __webpack_require__(1);
 
 	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
-	var _Tooltip = __webpack_require__(7);
+	var _Tooltip = __webpack_require__(2);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
-	var _Navigator = __webpack_require__(8);
+	var _Navigator = __webpack_require__(9);
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 
-	var _utilsConstants = __webpack_require__(9);
+	var _renderersBranch = __webpack_require__(10);
 
-	var _utilsDom = __webpack_require__(2);
+	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
 
-	var _utilsEvents = __webpack_require__(13);
+	var _renderersPre = __webpack_require__(17);
 
-	var _utilsCanvas = __webpack_require__(10);
+	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _utilsEvents = __webpack_require__(3);
+
+	var _utilsCanvas = __webpack_require__(24);
+
+	var _parsers = __webpack_require__(25);
+
+	var _parsers2 = _interopRequireDefault(_parsers);
 
 	/**
 	 * The instance of a PhyloCanvas Widget
@@ -423,10 +817,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * List of leaves
 	   */
 	  this.leaves = [];
-	  /**
-	   * Loading dialog displayed while waiting for the tree
-	   */
-	  // this.loader = new Loader(element);
 	  /**
 	   * The root node of the tree
 	   * (not neccesarily a root in the Phylogenetic sense)
@@ -585,36 +975,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.metadataHeadingDrawn = false;
 	}
 
-	Tree.prototype.branchRenderers = __webpack_require__(11);
-	Tree.prototype.nodeRenderers = __webpack_require__(12);
-
-	Tree.prototype.AJAX = function (url, method, params, callback, callbackPars, scope, errorCallback) {
-	  var xmlhttp;
-	  if (window.XMLHttpRequest) {
-	    // code for IE7+, Firefox, Chrome, Opera, Safari
-	    xmlhttp = new XMLHttpRequest();
-	  } else {
-	    // code for IE6, IE5
-	    xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
-	  }
-
-	  xmlhttp.onreadystatechange = function () {
-	    if (xmlhttp.readyState === 4) {
-	      if (xmlhttp.status === 200) {
-	        callback(xmlhttp, callbackPars, scope);
-	      } else {
-	        if (errorCallback) errorCallback(xmlhttp, callbackPars, scope);
-	      }
-	    }
-	  };
-	  xmlhttp.open(method, url, true);
-	  if (method === 'GET') {
-	    xmlhttp.send();
-	  } else {
-	    xmlhttp.send(params);
-	  }
-	};
-
 	Tree.prototype.setInitialCollapsedBranches = function () {
 	  var node = arguments[0] === undefined ? this.root : arguments[0];
 
@@ -636,6 +996,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var node;
 	  var nids;
 	  if (e.button === 0) {
+	    var _root;
+
 	    nids = [];
 	    // if this is triggered by the release after a drag then the click
 	    // shouldn't be triggered.
@@ -645,7 +1007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!this.root) return false;
-	    node = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+	    node = (_root = this.root).clicked.apply(_root, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
 
 	    if (node) {
 	      this.root.setSelected(false, true);
@@ -665,8 +1027,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.nodesSelected(nids);
 	  } else if (e.button === 2) {
+	    var _root2;
+
 	    e.preventDefault();
-	    node = this.root.clicked(this.translateClickX(e.clientX), this.translateClickY(e.clientY));
+	    node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
 	    this.contextMenu.open(e.clientX, e.clientY, node);
 	    this.contextMenu.closed = false;
 	    this.tooltip.close();
@@ -674,8 +1038,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.dblclicked = function (e) {
+	  var _root3;
+
 	  if (!this.root) return false;
-	  var nd = this.root.clicked(this.translateClickX(e.clientX * 1), this.translateClickY(e.clientY * 1));
+	  var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
 	  if (nd) {
 	    nd.setSelected(false, true);
 	    nd.toggleCollapsed();
@@ -694,7 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.drag = function (event) {
 	  // get window ratio
-	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
+	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
 
 	  if (!this.drawn) return false;
 
@@ -713,9 +1079,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.setZoom(this.origZoom + this.d);
 	    this.draw();
 	  } else {
+	    var _root4;
+
 	    // hover
 	    var e = event;
-	    var nd = this.root.clicked(this.translateClickX(e.clientX * 1), this.translateClickY(e.clientY * 1));
+	    var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
 
 	    if (nd && (this.internalNodesSelectable || nd.leaf)) {
 	      this.root.setHighlighted(false);
@@ -756,7 +1124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
 
 	  if (!this.drawn || forceRedraw) {
-	    this.prerenderers[this.treeType].run(this);
+	    _renderersPre2['default'][this.treeType].run(this);
 	    if (!forceRedraw) {
 	      this.fitInPanel();
 	    }
@@ -766,7 +1134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.translate(this.offsetx, this.offsety);
 	  this.canvas.scale(this.zoom, this.zoom);
 
-	  this.branchRenderers[this.treeType].render(this, this.root);
+	  _renderersBranch2['default'][this.treeType].render(this, this.root);
 	  // Making default collapsed false so that it will collapse on initial load only
 	  this.defaultCollapsed = false;
 	  this.metadataHeadingDrawn = false;
@@ -794,7 +1162,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.draw();
 	};
 
-	Tree.prototype.genId = function () {
+	Tree.prototype.generateBranchId = function () {
 	  return 'pcn' + this.lastId++;
 	};
 
@@ -807,114 +1175,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.draw();
 	};
 
-	Tree.prototype.dangerouslySetData = function (treeData) {
-	  this.parseNwk(treeData, null);
-	  this.draw();
-	  this.loadCompleted();
-	};
+	Tree.prototype.load = function (inputString) {
+	  var options = arguments[1] === undefined ? {} : arguments[1];
 
-	Tree.prototype.load = function (tree, name, format) {
-	  if (format) {
-	    if (format.match(/nexus/i)) {
-	      if (tree.match(/\.\w+$/)) {
-	        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
-	      } else {
-	        this.parseNexus(tree, name);
-	      }
-	    } else if (format.match(/newick/i)) {
-	      if (tree.match(/\.\w+$/)) {
-	        this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-	      } else {
-	        this.parseNwk(tree, name);
+	  if (options.format) {
+	    this.build(inputString, _parsers2['default'][options.format], options);
+	    return;
+	  }
+
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
+
+	  try {
+	    for (var _iterator = Object.keys(_parsers2['default'])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var parserName = _step.value;
+
+	      var parser = _parsers2['default'][parserName];
+
+	      if (inputString.match(parser.fileExtension) || inputString.match(parser.validator)) {
+	        this.build(inputString, parser, options);
+	        return;
 	      }
 	    }
-	  } else {
-	    if (tree.match(/\.n(ex|xs)$/)) {
-	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'nexus', name: name }, this);
-	    } else if (tree.match(/\.nwk$/)) {
-	      this.AJAX(tree, 'GET', '', this.loadFileCallback, { format: 'newick' }, this);
-	    } else if (tree.match(/^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i)) {
-	      this.parseNexus(tree, name);
-	      this.draw();
-	      this.loadCompleted();
-	    } else if (tree.match(/^[\w\W\.\*\:(\),-\/]+;\s?$/gi)) {
-	      this.parseNwk(tree, name);
-	      this.draw();
-	      this.loadCompleted();
-	    } else {
-	      this.loadError('PhyloCanvas did not recognise the string as a file or a newick or Nexus format string');
-	    }
-	  }
-	};
-
-	Tree.prototype.loadFileCallback = function (response, opts, scope) {
-	  if (opts.format.match(/nexus/i)) {
-	    scope.parseNexus(response.responseText, opts.name);
-	  } else if (opts.format.match(/newick/i)) {
-	    scope.parseNwk(response.responseText);
-	  } else {
-	    throw new Error('file type not recognised by PhyloCanvas');
-	  }
-	  scope.draw();
-	  scope.loadCompleted();
-	};
-
-	Tree.prototype.parseNexus = function (str, name) {
-	  if (!str.match(/BEGIN TREES/gi)) {
-	    throw 'The nexus file does not contain a tree block';
-	  }
-
-	  //Get everything between BEGIN TREES and next END;
-	  var treeSection = str.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
-	  //get translate section
-
-	  var leafNameObject = {};
-	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
-	  if (translateSection && translateSection.length) {
-	    translateSection = translateSection[0];
-	    //remove translate section from tree section
-	    treeSection = treeSection.replace(translateSection, '');
-
-	    //parse translate section into kv pairs
-	    translateSection = translateSection.replace(/translate|;/gi, '');
-
-	    var tIntArr = translateSection.split(',');
-	    var ia;
-	    for (var i = 0; i < tIntArr.length; i++) {
-	      ia = tIntArr[i].trim().replace('\n', '').split(' ');
-	      if (ia[0] && ia[1]) {
-	        leafNameObject[ia[0].trim()] = ia[1].trim();
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator['return']) {
+	        _iterator['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
 	      }
 	    }
 	  }
 
-	  // find each line starting with tree.
-	  var tArr = treeSection.split('\n');
-	  var trees = {};
-	  // id name is '' or does not exist, ask user to choose which tree.
-	  for (var i = 0; i < tArr.length; i++) {
-	    if (tArr[i].trim() === '') continue;
-	    var s = tArr[i].replace(/tree\s/i, '');
-	    if (!name) {
-	      name = s.trim().match(/^\w+/)[0];
-	    }
-	    trees[name] = s.trim().match(/[\S]*$/)[0];
-	  }
-	  if (!trees[name]) throw 'tree ' + name + ' does not exist in this NEXUS file';
-
-	  this.parseNwk(trees[name].trim());
-	  // translate in accordance with translate block
-	  if (leafNameObject) {
-	    for (var n in leafNameObject) {
-	      var b = this.branches[n];
-	      delete this.branches[n];
-	      b.id = leafNameObject[n];
-	      this.branches[b.id] = b;
-	    }
-	  }
+	  this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
 	};
 
-	Tree.prototype.parseNwk = function (nwk) {
+	Tree.prototype.build = function (inputString, parser, options) {
+	  var _this2 = this;
+
 	  this.origBranches = false;
 	  this.origLeaves = false;
 	  this.origRoot = false;
@@ -925,65 +1229,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.leaves = [];
 	  this.branches = {};
 	  this.drawn = false;
-	  var curNode = new _Branch2['default']();
-	  curNode.id = 'root';
-	  this.branches.root = curNode;
-	  this.setRoot(curNode);
 
-	  for (var i = 0; i < nwk.length; i++) {
-	    var node;
-	    switch (nwk[i]) {
-	      case '(':
-	        // new Child
-	        node = new _Branch2['default']();
-	        curNode.addChild(node);
-	        curNode = node;
-	        break;
-	      case ')':
-	        // return to parent
-	        curNode = curNode.parent;
-	        break;
-	      case ',':
-	        // new sibiling
-	        node = new _Branch2['default']();
-	        curNode.parent.addChild(node);
-	        curNode = node;
-	        break;
-	      case ';':
-	        for (var l = 0; l < this.leaves.length; l++) {
-	          if (this.leaves[l].totalBranchLength > this.maxBranchLength) {
-	            this.maxBranchLength = this.leaves[l].totalBranchLength;
-	          }
-	        }
-	        break;
-	      default:
-	        try {
-	          i = curNode.parseNwk(nwk, i);
-	          i--;
-	        } catch (e) {
-	          this.loadError('Error parsing nwk file' + e);
-	          return;
-	        }
-	        break;
+	  var root = new _Branch2['default']();
+	  root.id = 'root';
+	  this.branches.root = root;
+	  this.setRoot(root);
+
+	  parser.parse({ inputString: inputString, root: root, options: options }, function (error) {
+	    if (error) {
+	      _this2.loadError(error);
+	      return;
 	    }
-	  }
 
-	  this.saveNode(this.root);
-	  this.root.saveChildren();
+	    _this2.saveNode(_this2.root);
+	    _this2.root.saveChildren();
 
-	  this.root.branchLength = 0;
-	  this.maxBranchLength = 0;
-	  this.root.setTotalLength();
+	    _this2.root.branchLength = 0;
+	    _this2.maxBranchLength = 0;
+	    _this2.root.setTotalLength();
 
-	  if (this.maxBranchLength === 0) {
-	    this.loadError('All branches in the tree are identical.');
-	    return;
-	  }
+	    if (_this2.maxBranchLength === 0) {
+	      _this2.loadError('All branches in the tree are identical.');
+	      return;
+	    }
 
-	  this.buildLeaves();
-	  this.setInitialCollapsedBranches();
+	    _this2.buildLeaves();
+	    _this2.setInitialCollapsedBranches();
 
-	  this.loadCompleted();
+	    _this2.draw();
+	    _this2.loadCompleted();
+	  });
 	};
 
 	Tree.prototype.pickup = function (event) {
@@ -1004,8 +1279,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.startx = event.clientX;
 	  this.starty = event.clientY;
 	};
-
-	Tree.prototype.prerenderers = __webpack_require__(1);
 
 	Tree.prototype.redrawGetNodes = function (node, leafIds) {
 	  for (var i = 0; i < node.children.length; i++) {
@@ -1047,7 +1320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType].run(this);
+	  _renderersPre2['default'][this.treeType].run(this);
 	  this.draw();
 	  this.subtreeDrawn(node.id);
 	};
@@ -1057,7 +1330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.resetTree();
 
 	  this.root.setTotalLength();
-	  this.prerenderers[this.treeType].run(this);
+	  _renderersPre2['default'][this.treeType].run(this);
 	  this.draw();
 
 	  this.subtreeDrawn(this.root.id);
@@ -1226,30 +1499,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.draw();
 	};
 
-	Tree.prototype.translateClickX = function (x) {
-	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
-
-	  x = x - (0, _utilsDom.getX)(this.canvas.canvas) + window.pageXOffset;
-	  x *= ratio;
-	  x -= this.canvas.canvas.width / 2;
-	  x -= this.offsetx;
-	  x = x / this.zoom;
-
-	  return x;
-	};
-
-	Tree.prototype.translateClickY = function (y) {
-	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
-
-	  y = y - (0, _utilsDom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
-	  y *= ratio;
-	  y -= this.canvas.canvas.height / 2;
-	  y -= this.offsety;
-	  y = y / this.zoom;
-
-	  return y;
-	};
-
 	Tree.prototype.viewMetadataColumns = function (metadataColumnArray) {
 	  this.showMetadata = true;
 	  if (metadataColumnArray === undefined) {
@@ -1364,7 +1613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.adjustForPixelRatio = function () {
 	  // Adjust canvas size for Retina screen
-	  var ratio = (window.devicePixelRatio || 1) / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas);
+	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
 
 	  this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
 	  this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
@@ -1383,9 +1632,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!this.origBranches) return;
 
 	  this.branches = this.origBranches;
-	  for (var n in this.origBL) {
-	    this.branches[n].branchLength = this.origBL[n];
-	    this.branches[n].parent = this.origP[n];
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
+
+	  try {
+	    for (var _iterator2 = Object.keys(this.origBL)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var n = _step2.value;
+
+	      this.branches[n].branchLength = this.origBL[n];
+	      this.branches[n].parent = this.origP[n];
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	        _iterator2['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
+	    }
 	  }
 
 	  this.leaves = this.origLeaves;
@@ -1398,11 +1668,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Tree.prototype.buildLeaves = function () {
 	  this.leaves = [];
+	  var _iteratorNormalCompletion3 = true;
+	  var _didIteratorError3 = false;
+	  var _iteratorError3 = undefined;
 
-	  var leafIds = this.root.getChildIds();
+	  try {
+	    for (var _iterator3 = this.root.getChildIds()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	      var leafId = _step3.value;
 
-	  for (var i = 0; i < leafIds.length; i++) {
-	    this.leaves.push(this.branches[leafIds[i]]);
+	      this.leaves.push(this.branches[leafId]);
+	    }
+	  } catch (err) {
+	    _didIteratorError3 = true;
+	    _iteratorError3 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+	        _iterator3['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError3) {
+	        throw _iteratorError3;
+	      }
+	    }
 	  }
 	};
 
@@ -1422,37 +1710,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Tree.prototype.exportCurrentTreeView = function () {
-	  var dataUrl = this.getPngUrl();
-	  var anchor = document.createElement('a');
-	  var isDownloadSupported = typeof anchor.download !== 'undefined';
-	  var event = document.createEvent('Event');
-
-	  anchor.href = dataUrl;
-	  anchor.target = '_blank';
-
-	  if (isDownloadSupported) {
-	    anchor.download = 'phylocanvas.png';
-	  }
-
-	  event.initEvent('click', true, true);
-	  anchor.dispatchEvent(event);
-
-	  if (isDownloadSupported) {
-	    (window.URL || window.webkitURL).revokeObjectURL(anchor.href);
-	  }
+	  (0, _utilsDom.setupDownloadLink)(this.getPngUrl(), 'phylocanvas.png');
 	};
 
 	module.exports = Tree;
 
 /***/ },
-/* 4 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(9).Angles;
-	var Shapes = __webpack_require__(9).Shapes;
-	var setupDownloadLink = __webpack_require__(2).setupDownloadLink;
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _utilsDom = __webpack_require__(4);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
 
 	/**
 	 * Creates a branch
@@ -1548,7 +1825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * the angle that the last child of this brach 'splays' at, used for
 	   * circular and radial trees
 	   */
-	  this.minChildAngle = Angles.FULL;
+	  this.minChildAngle = _utilsConstants.Angles.FULL;
 
 	  /**
 	   * What kind of teminal should be drawn on this node
@@ -1614,7 +1891,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.drawMetadata = function () {
-	  var tx = this.getLabelStartX() + this.tree.maxLabelLength[this.tree.treeType];
+	  var padMaxLabelWidth = 0;
+	  if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
+	    padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
+	  }
+	  var tx = this.getLabelStartX() + padMaxLabelWidth;
 	  var ty = 0;
 	  var metadata = [];
 	  var height = this.tree.textSize;
@@ -1635,10 +1916,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.tree.metadataHeadingDrawn = true;
 	  }
 
+	  var metadataXStep = this.tree.metadataXStep;
+
 	  if (Object.keys(this.data).length > 0) {
 	    this.canvas.beginPath();
-	    if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
-	      this.canvas.rotate(Angles.HALF);
+	    if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
+	      this.canvas.rotate(_utilsConstants.Angles.HALF);
+	      tx = -tx - padMaxLabelWidth;
+	      // Changing the xStep for radial and circular tree
+	      metadataXStep = -metadataXStep;
 	    }
 
 	    // If no columns specified, then draw all columns
@@ -1652,7 +1938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (i = 0; i < metadata.length; i++) {
 	      columnName = metadata[i];
-	      tx += this.tree.metadataXStep;
+	      tx += metadataXStep;
 
 	      if (window.parseInt(this.data[columnName])) {
 	        this.canvas.fillStyle = this.tree.colour1;
@@ -1731,8 +2017,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      tx += this.tree.farthestNodeFromRootY - this.centery;
 	    }
 	  }
-	  if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
-	    this.canvas.rotate(Angles.HALF);
+	  if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
+	    this.canvas.rotate(_utilsConstants.Angles.HALF);
 	    // Angles.Half text position changes
 	    tx = -tx - dimensions.width * 1;
 	  }
@@ -1814,7 +2100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // rotate canvas (mainly for circular, radial trees etc)
 	    this.canvas.rotate(this.angle);
 	    // Draw node shape as chosen - default is circle
-	    this.tree.nodeRenderers[this.nodeShape](this);
+	    _renderersNode2['default'][this.nodeShape](this);
 
 	    if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
 	      this.drawLabel();
@@ -1836,7 +2122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var l = this.canvas.lineWidth;
 	    this.canvas.strokeStyle = this.tree.highlightColour;
 	    this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-	    this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, Angles.FULL, false);
+	    this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, _utilsConstants.Angles.FULL, false);
 	    this.canvas.stroke();
 	    this.canvas.lineWidth = l;
 	    this.canvas.strokeStyle = this.tree.branchColour;
@@ -1919,7 +2205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.centery = 0;
 	  this.angle = null;
 	  // this.totalBranchLength = 0;
-	  this.minChildAngle = Angles.FULL;
+	  this.minChildAngle = _utilsConstants.Angles.FULL;
 	  this.maxChildAngle = 0;
 	  for (i = 0; i < this.children.length; i++) {
 	    try {
@@ -1928,76 +2214,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return e;
 	    }
 	  }
-	};
-
-	Branch.prototype.parseNwk = function (nwk, idx) {
-	  var idx = this.parseLabel(nwk, idx);
-	  if (nwk[idx] === ':') {
-	    idx = this.parseNodeLength(nwk, idx + 1);
-	  } else {
-	    this.branchLength = 0;
-	  }
-	  if (!this.id || this.id === '') {
-	    this.id = this.tree.genId();
-	  }
-	  return idx;
-	};
-
-	Branch.prototype.parseLabel = function (nwk, idx) {
-	  var lbl = '';
-	  var bits;
-	  var b;
-
-	  for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && idx < nwk.length; idx++) {
-	    lbl += nwk[idx];
-	  }
-	  if (!lbl) return idx;
-	  if (lbl.match(/\*/)) {
-	    bits = lbl.split('**');
-	    this.id = bits[0];
-	    if (bits.length === 1) return idx;
-	    bits = bits[1].split('*');
-
-	    for (b = 0; b < bits.length; b += 2) {
-	      // TODO: Define default case
-	      switch (bits[b]) {
-	        case 'nsz':
-	          this.radius = window.parseInt(bits[b + 1]);
-	          break;
-	        case 'nsh':
-	          if (Shapes[bits[b + 1]]) {
-	            this.nodeShape = Shapes[bits[b + 1]];
-	          } else if (this.nodeRenderers[bits[b + 1]]) {
-	            this.nodeShape = bits[b + 1];
-	          } else {
-	            this.nodeShape = 'circle';
-	          }
-	          break;
-	        case 'ncol':
-	          this.colour = bits[b + 1];
-	          var hexRed = '0x' + this.colour.substring(0, 2);
-	          var hexGreen = '0x' + this.colour.substring(2, 4);
-	          var hexBlue = '0x' + this.colour.substring(4, 6);
-	          this.colour = 'rgba(' + parseInt(hexRed, 16).toString() + ',' + parseInt(hexGreen, 16).toString() + ',' + parseInt(hexBlue, 16).toString() + ',1)';
-	          break;
-	      }
-	    }
-	  } else {
-	    this.id = lbl;
-	  }
-	  return idx;
-	};
-
-	Branch.prototype.parseNodeLength = function (nwk, idx) {
-	  var str = '';
-	  for (idx; nwk[idx] !== ')' && nwk[idx] !== ','; idx++) {
-	    str += nwk[idx];
-	  }
-	  this.branchLength = parseFloat(str);
-	  if (this.branchLength < 0) {
-	    this.branchLength = 0;
-	  }
-	  return idx;
 	};
 
 	Branch.prototype.redrawTreeFromBranch = function () {
@@ -2199,410 +2415,146 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.downloadLeafIdsFromBranch = function () {
-	  var downloadData;
-	  var childIds = this.getChildIds();
-	  downloadData = childIds.join('\n');
-	  setupDownloadLink(downloadData, 'pc_leaves.txt');
+	  var downloadData = this.getChildIds().join('\n');
+	  (0, _utilsDom.setupDownloadLink)((0, _utilsDom.createBlobUrl)(downloadData), 'pc_leaves.txt');
 	};
 
 	module.exports = Branch;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * @constructor
-	 * @memberof PhyloCanvas
-	 */
-	'use strict';
-
-	function Loader(div) {
-	  this.div = div;
-	  this.cl = document.createElement('canvas');
-	  this.cl.id = div.id + 'Loader';
-	  this.cl.style.position = 'absolute';
-	  this.cl.style.backgroundColor = '#FFFFFF';
-	  this.cl.style.top = div.offsetHeight / 4 + 'px';
-	  this.cl.style.left = div.offsetWidth / 4 + 'px';
-	  this.cl.height = div.offsetHeight / 2;
-	  this.cl.width = div.offsetWidth / 2;
-	  this.cl.style.zIndex = '1000';
-	  div.appendChild(this.cl);
-
-	  this.ctx = document.getElementById(div.id + 'Loader').getContext('2d');
-	  this.drawer = null;
-	  this.loaderRadius = null;
-	  this.loaderStep = 2 * Math.PI / 360;
-
-	  this.message = 'Loading ...';
-	}
-
-	Loader.prototype.run = function () {
-	  var i = 0;
-	  var _this = this;
-	  this.cl.style.diangle = 'block';
-	  this.initLoader();
-	  this.drawer = setInterval(function () {
-	    _this.drawLoader(i);
-	    i++;
-	  }, 10);
-	};
-
-	Loader.prototype.resize = function () {
-	  this.cl.style.top = '2px';
-	  this.cl.style.left = '2px';
-	  this.cl.height = this.div.offsetHeight * 0.75;
-	  this.cl.width = this.div.offsetWidth * 0.75;
-
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10;
-
-	  this.ctx.font = '24px sans-serif';
-
-	  this.ctx.shadowOffsetX = 2;
-	  this.ctx.shadowOffsetY = 2;
-	};
-
-	Loader.prototype.initLoader = function () {
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-	  this.ctx.fillStyle = 'rgba(180,180,255,1)';
-	  this.ctx.lineWidth = 10;
-
-	  this.ctx.font = '24px sans-serif';
-
-	  this.ctx.shadowOffsetX = 2;
-	  this.ctx.shadowOffsetY = 2;
-	};
-
-	Loader.prototype.drawLoader = function (t) {
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.loaderRadius = Math.min(this.ctx.canvas.width / 4, this.ctx.canvas.height / 4);
-
-	  this.ctx.save();
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(0, 0, this.loaderRadius, this.loaderStep * t, this.loaderStep * t + 2);
-	  this.ctx.stroke();
-
-	  this.ctx.beginPath();
-	  this.ctx.arc(0, 0, this.loaderRadius, this.loaderStep * t + 3, this.loaderStep * t + 5);
-	  this.ctx.stroke();
-	  this.ctx.fillText(this.message, -(this.ctx.measureText(this.message).width / 2), this.loaderRadius + 50, this.cl.width);
-	};
-
-	Loader.prototype.stop = function () {
-	  clearInterval(this.drawer);
-	  this.cl.style.display = 'none';
-	};
-
-	Loader.prototype.fail = function (message) {
-	  clearInterval(this.drawer);
-	  this.loaderRadius = Math.min(this.ctx.canvas.width / 4, this.ctx.canvas.height / 4);
-	  this.ctx.restore();
-
-	  this.ctx.translate(0, 0);
-	  this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.strokeStyle = 'rgba(255,180,180,1)';
-	  this.ctx.fillStyle = 'rgba(255,180,180,1)';
-
-	  this.ctx.translate(this.ctx.canvas.width / 2, this.ctx.canvas.height / 2);
-
-	  this.ctx.beginPath();
-
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(-this.loaderRadius, -this.loaderRadius);
-	  this.ctx.moveTo(0, 0);
-	  this.ctx.lineTo(this.loaderRadius, -this.loaderRadius);
-	  this.ctx.stroke();
-
-	  this.ctx.fillText(message, -(this.ctx.measureText(message).width / 2), this.loaderRadius + 50, this.loaderRadius * 2);
-	};
-
-	module.exports = Loader;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	var _Tooltip2 = __webpack_require__(7);
-
-	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
-
-	var _utilsEvents = __webpack_require__(13);
-
-	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
-	  handler: 'toggleCollapsed',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Rotate Branch',
-	  handler: 'rotate',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Redraw Subtree',
-	  handler: 'redrawTreeFromBranch',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Show/Hide Labels',
-	  handler: 'toggleLabels'
-	}, {
-	  text: 'Export As Image',
-	  handler: 'exportCurrentTreeView'
-	}, {
-	  text: 'Export Leaf IDs',
-	  handler: 'downloadAllLeafIds'
-	}, {
-	  text: 'Export Leaf IDs on Branch',
-	  handler: 'downloadLeafIdsFromBranch',
-	  nodeType: 'internal'
-	}];
-
-	function menuItemApplicable(menuItem, node) {
-	  if (!node) {
-	    return !menuItem.nodeType;
-	  }
-
-	  if (node.leaf && menuItem.nodeType !== 'internal') {
-	    return true;
-	  }
-
-	  if (!node.leaf && menuItem.nodeType === 'internal') {
-	    return true;
-	  }
-
-	  return false;
-	}
-
-	function mouseover(element) {
-	  element.style.backgroundColor = '#E2E3DF';
-	}
-
-	function mouseout(element) {
-	  element.style.backgroundColor = 'transparent';
-	}
-
-	function transferMenuItem(_ref) {
-	  var handler = _ref.handler;
-	  var _ref$text = _ref.text;
-	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
-	  var nodeType = _ref.nodeType;
-
-	  return { handler: handler, text: text, nodeType: nodeType };
-	}
-
-	/**
-	 * The menu that is shown when the PhyloCanvas widget is right-clicked
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 * @extends Tooltip
-	 */
-
-	var ContextMenu = (function (_Tooltip) {
-	  function ContextMenu(tree) {
-	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
-
-	    _classCallCheck(this, ContextMenu);
-
-	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
-
-	    this.menuItems = menuItems.map(transferMenuItem);
-	    this.fontSize = '8pt';
-	  }
-
-	  _inherits(ContextMenu, _Tooltip);
-
-	  _createClass(ContextMenu, [{
-	    key: 'click',
-	    value: function click() {
-	      (0, _utilsEvents.createHandler)(this, 'close');
-	    }
-	  }, {
-	    key: 'createContent',
-	    value: function createContent(node) {
-	      var list = document.createElement('ul');
-
-	      list.style.margin = '0';
-	      list.style.padding = '0';
-
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var menuItem = _step.value;
-
-	          if (!menuItemApplicable(menuItem, node)) {
-	            continue;
-	          }
-
-	          var listElement = this.createElement('li', menuItem.text);
-	          listElement.style.listStyle = 'none outside none';
-
-	          if (menuItem.nodeType) {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
-	          } else {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
-	          }
-	          listElement.addEventListener('click', this.click);
-	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
-	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
-	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
-
-	          list.appendChild(listElement);
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
-	      this.element.appendChild(list);
-	    }
-	  }]);
-
-	  return ContextMenu;
-	})(_Tooltip3['default']);
-
-	exports['default'] = ContextMenu;
-	module.exports = exports['default'];
 
 /***/ },
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * Tooltip
+	 * An enumeration of certain pre-defined angles to enable faster drawing of
+	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
 	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
 	 */
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
+	module.exports.Angles = {
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 4
+	   */
+	  FORTYFIVE: Math.PI / 4,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 2
+	   */
+	  QUARTER: Math.PI / 2,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI
+	   */
+	  HALF: Math.PI,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI * 2
+	   */
+	  FULL: 2 * Math.PI
+	};
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var Tooltip = (function () {
-	  function Tooltip(tree) {
-	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
-	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
-
-	    _classCallCheck(this, Tooltip);
-
-	    this.tree = tree;
-	    this.element = element;
-	    this.element.className = className;
-	    this.element.style.display = 'none';
-	    this.element.style.position = 'fixed';
-	    this.element.style.border = '1px solid #CCCCCC';
-	    this.element.style.background = '#FFFFFF';
-	    this.element.style.letterSpacing = '0.5px';
-	    this.closed = true;
-
-	    this.tree.canvasEl.appendChild(this.element);
-	  }
-
-	  _createClass(Tooltip, [{
-	    key: 'close',
-	    value: function close() {
-	      this.element.style.display = 'none';
-	      this.closed = true;
-	    }
-	  }, {
-	    key: 'createElement',
-	    value: function createElement(tagName, textContent) {
-	      var element = document.createElement(tagName);
-	      element.style.cursor = 'pointer';
-	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
-	      element.style.fontFamily = this.tree.font;
-	      element.style.fontSize = this.fontSize || '12pt';
-	      element.appendChild(document.createTextNode(textContent));
-	      return element;
-	    }
-	  }, {
-	    key: 'createContent',
-
-	    /**
-	     * Shows number of child nodes by default
-	     */
-	    value: function createContent(node) {
-	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
-	    }
-	  }, {
-	    key: 'open',
-	    value: function open(_x3, _x4, node) {
-	      var x = arguments[0] === undefined ? 100 : arguments[0];
-	      var y = arguments[1] === undefined ? 100 : arguments[1];
-
-	      while (this.element.hasChildNodes()) {
-	        this.element.removeChild(this.element.firstChild);
-	      }
-
-	      this.createContent(node);
-
-	      this.element.style.top = y + 'px';
-	      this.element.style.left = x + 'px';
-
-	      this.element.style.zIndex = 2000;
-	      this.element.style.display = 'block';
-	      this.element.style.backgroundColor = '#FFFFFF';
-
-	      this.closed = false;
-	    }
-	  }]);
-
-	  return Tooltip;
-	})();
-
-	exports['default'] = Tooltip;
-	module.exports = exports['default'];
+	/**
+	 * dictionary to translate annotations in NWK to branch renderer ids
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	module.exports.Shapes = {
+	  x: 'star',
+	  s: 'square',
+	  o: 'circle',
+	  t: 'triangle'
+	};
 
 /***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
+
+	module.exports = {
+	  circle: function circle(node) {
+	    var r = node.getNodeSize();
+	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  square: function square(node) {
+	    var r = node.getNodeSize();
+	    var x1 = 0;
+	    var x2 = r * 2;
+	    var y1 = -r;
+	    var y2 = r;
+	    node.canvas.moveTo(x1, y1);
+	    node.canvas.lineTo(x1, y2);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x2, y1);
+	    node.canvas.lineTo(x1, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  },
+	  star: function star(node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var spikes = 8;
+	    var outerRadius = r;
+	    var innerRadius = r * 0.5;
+	    var rot = Math.PI / 2 * 3;
+	    var x = cx;
+	    var y = cy;
+	    var step = Math.PI / spikes;
+	    var i = 0;
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(cx, cy - outerRadius);
+	    for (i = 0; i < spikes; i++) {
+	      x = cx + Math.cos(rot) * outerRadius;
+	      y = cy + Math.sin(rot) * outerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+
+	      x = cx + Math.cos(rot) * innerRadius;
+	      y = cy + Math.sin(rot) * innerRadius;
+	      node.canvas.lineTo(x, y);
+	      rot += step;
+	    }
+	    node.canvas.lineTo(cx, cy - outerRadius);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	    node.canvas.closePath();
+	  },
+	  triangle: function triangle(node) {
+	    var r = node.getNodeSize();
+	    var cx = r;
+	    var cy = 0;
+	    var x1 = cx - r;
+	    var x2 = cx + r;
+	    var y1 = cy - r;
+	    var y2 = cy + r;
+
+	    node.canvas.moveTo(x2, y1);
+	    node.canvas.lineTo(x2, y2);
+	    node.canvas.lineTo(x1, (y1 + y2) / 2);
+	    node.canvas.lineTo(x2, y1);
+	    node.canvas.stroke();
+	    node.canvas.fill();
+	  }
+	};
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2686,265 +2638,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Navigator;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * An enumeration of certain pre-defined angles to enable faster drawing of
-	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	'use strict';
-
-	module.exports.Angles = {
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 4
-	   */
-	  FORTYFIVE: Math.PI / 4,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 2
-	   */
-	  QUARTER: Math.PI / 2,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI
-	   */
-	  HALF: Math.PI,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI * 2
-	   */
-	  FULL: 2 * Math.PI
-	};
-
-	/**
-	 * dictionary to translate annotations in NWK to branch renderer ids
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	module.exports.Shapes = {
-	  x: 'star',
-	  s: 'square',
-	  o: 'circle',
-	  t: 'triangle'
-	};
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Return backing store pixel ratio of context.
-	 *
-	 * @param context - The rendering context of HTMl5 canvas.
-	 *
-	 */
-	"use strict";
+	'use strict';
 
-	function getBackingStorePixelRatio(context) {
-	  return context.backingStorePixelRatio || context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || 1;
-	}
+	var BranchRenderer = __webpack_require__(12);
 
-	module.exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+	module.exports = {
+	  rectangular: new BranchRenderer(__webpack_require__(13)),
+	  circular: new BranchRenderer(__webpack_require__(14)),
+	  radial: new BranchRenderer(__webpack_require__(11)),
+	  diagonal: new BranchRenderer(__webpack_require__(15)),
+	  hierarchical: new BranchRenderer(__webpack_require__(16))
+	};
 
 /***/ },
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var BranchRenderer = __webpack_require__(15);
-
-	module.exports = {
-	  rectangular: new BranchRenderer(__webpack_require__(16)),
-	  circular: new BranchRenderer(__webpack_require__(17)),
-	  radial: new BranchRenderer(__webpack_require__(14)),
-	  diagonal: new BranchRenderer(__webpack_require__(18)),
-	  hierarchical: new BranchRenderer(__webpack_require__(19))
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Angles = __webpack_require__(9).Angles;
-
-	module.exports = {
-	  circle: function circle(node) {
-	    var r = node.getNodeSize();
-	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  square: function square(node) {
-	    var r = node.getNodeSize();
-	    var x1 = 0;
-	    var x2 = r * 2;
-	    var y1 = -r;
-	    var y2 = r;
-	    node.canvas.moveTo(x1, y1);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x2, y1);
-	    node.canvas.lineTo(x1, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	  },
-	  star: function star(node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var spikes = 6;
-	    var outerRadius = 6;
-	    var innerRadius = 2;
-	    var rot = Math.PI / 2 * 3;
-	    var x = cx;
-	    var y = cy;
-	    var step = Math.PI / spikes;
-	    var i = 0;
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(cx, cy - outerRadius);
-	    for (i = 0; i < spikes; i++) {
-	      x = cx + Math.cos(rot) * outerRadius;
-	      y = cy + Math.sin(rot) * outerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-
-	      x = cx + Math.cos(rot) * innerRadius;
-	      y = cy + Math.sin(rot) * innerRadius;
-	      node.canvas.lineTo(x, y);
-	      rot += step;
-	    }
-	    node.canvas.lineTo(cx, cy - outerRadius);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.moveTo(cx, cy);
-	    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
-	  },
-	  triangle: function triangle(node) {
-	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var x1 = cx - r;
-	    var x2 = cx + r;
-	    var y1 = cy - r;
-	    var y2 = cy + r;
-	    node.canvas.moveTo(cx, y1);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(cx, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.moveTo(x1, (y1 + y2) / 2);
-	    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-	    node.canvas.stroke();
-	  }
-	};
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
-
-	function fireEvent(element, type, params) {
-	  var event; // The custom event that will be created
-	  var param;
-
-	  if (document.createEvent) {
-	    event = document.createEvent('HTMLEvents');
-	    event.initEvent(type, true, true);
-	  } else {
-	    event = document.createEventObject();
-	    event.eventType = type;
-	  }
-
-	  event.eventName = type;
-
-	  if (params) {
-	    for (param in params) {
-	      if (params.hasOwnProperty(param)) {
-	        event[param] = params[param];
-	      }
-	    }
-	  }
-
-	  if (document.createEvent) {
-	    element.dispatchEvent(event);
-	  } else {
-	    element.fireEvent('on' + event.eventType, event);
-	  }
-	}
-
-	function addEvent(elem, event, fn) {
-	  if (elem.addEventListener) {
-	    elem.addEventListener(event, fn, false);
-	  } else {
-	    elem.attachEvent('on' + event, function () {
-	      // set the this pointer same as addEventListener when fn is called
-	      return fn.call(elem, window.event);
-	    });
-	  }
-	}
-
-	function killEvent(e) {
-	  e.stopPropagation();
-	  e.preventDefault();
-	}
-
-	/**
-	 * Creates a function which can be called from an event handler independent of
-	 * scope.
-	 *
-	 * @param {Object} obj the object the function will be called on
-	 * @param {String} func the name of the function to be called
-	 * @retuns {function}
-	 */
-	function createHandler(obj, func) {
-	  var handler;
-
-	  if (typeof func === typeof 'aaa') {
-	    handler = function (e) {
-	      if (obj[func]) {
-	        return obj[func](e);
-	      }
-	    };
-	  } else {
-	    handler = function () {
-	      return func(obj);
-	    };
-	  }
-	  return handler;
-	}
-
-	module.exports.preventDefault = preventDefault;
-	module.exports.fireEvent = fireEvent;
-	module.exports.addEvent = addEvent;
-	module.exports.killEvent = killEvent;
-	module.exports.createHandler = createHandler;
-
-/***/ },
-/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2960,7 +2670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3000,7 +2710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = BranchRenderer;
 
 /***/ },
-/* 16 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3028,7 +2738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3065,7 +2775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3088,7 +2798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3110,12 +2820,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 20 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(9).Angles;
+	var Prerenderer = __webpack_require__(19);
+
+	module.exports = {
+	  rectangular: new Prerenderer(__webpack_require__(20)),
+	  circular: new Prerenderer(__webpack_require__(21)),
+	  radial: new Prerenderer(__webpack_require__(18)),
+	  diagonal: new Prerenderer(__webpack_require__(22)),
+	  hierarchical: new Prerenderer(__webpack_require__(23))
+	};
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Angles = __webpack_require__(7).Angles;
 
 	function prerenderNodes(tree, node) {
 	  if (node.parent) {
@@ -3163,7 +2889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3196,7 +2922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Prerenderer;
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3238,12 +2964,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(9).Angles;
+	var Angles = __webpack_require__(7).Angles;
 
 	module.exports = {
 	  step: function step(tree) {
@@ -3288,12 +3014,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(9).Angles;
+	var Angles = __webpack_require__(7).Angles;
 
 	module.exports = {
 	  step: function step(tree) {
@@ -3322,12 +3048,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(9).Angles;
+	var Angles = __webpack_require__(7).Angles;
 
 	module.exports = {
 	  step: function step(tree) {
@@ -3368,6 +3094,510 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+	exports.getPixelRatio = getPixelRatio;
+	exports.translateClick = translateClick;
+
+	var _dom = __webpack_require__(4);
+
+	/**
+	 * Return backing store pixel ratio of context.
+	 *
+	 * @param context - The rendering context of HTMl5 canvas.
+	 *
+	 */
+
+	function getBackingStorePixelRatio(context) {
+	  return context.backingStorePixelRatio || context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || 1;
+	}
+
+	function getPixelRatio(canvas) {
+	  return (window.devicePixelRatio || 1) / getBackingStorePixelRatio(canvas);
+	}
+
+	function translateClickX(x) {
+	  x = x - (0, _dom.getX)(this.canvas.canvas) + window.pageXOffset;
+	  x *= getPixelRatio(this.canvas);
+	  x -= this.canvas.canvas.width / 2;
+	  x -= this.offsetx;
+	  x = x / this.zoom;
+
+	  return x;
+	}
+
+	function translateClickY(y) {
+	  y = y - (0, _dom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
+	  y *= getPixelRatio(this.canvas);
+	  y -= this.canvas.canvas.height / 2;
+	  y -= this.offsety;
+	  y = y / this.zoom;
+
+	  return y;
+	}
+
+	function translateClick(x, y, tree) {
+	  return [translateClickX.call(tree, x), translateClickY.call(tree, y)];
+	}
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _Parser = __webpack_require__(26);
+
+	var _Parser2 = _interopRequireDefault(_Parser);
+
+	var _newick = __webpack_require__(28);
+
+	var _newick2 = _interopRequireDefault(_newick);
+
+	var _nexus = __webpack_require__(29);
+
+	var _nexus2 = _interopRequireDefault(_nexus);
+
+	exports['default'] = {
+	  nexus: new _Parser2['default'](_nexus2['default']),
+	  newick: new _Parser2['default'](_newick2['default'])
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _utilsHttp = __webpack_require__(27);
+
+	var _utilsHttp2 = _interopRequireDefault(_utilsHttp);
+
+	var Parser = (function () {
+	  function Parser(_ref) {
+	    var format = _ref.format;
+	    var parseFn = _ref.parseFn;
+	    var fileExtension = _ref.fileExtension;
+	    var validator = _ref.validator;
+
+	    _classCallCheck(this, Parser);
+
+	    this.format = format;
+	    this.parseFn = parseFn;
+	    this.fileExtension = fileExtension;
+	    this.validator = validator;
+	  }
+
+	  _createClass(Parser, [{
+	    key: 'parse',
+	    value: function parse(_ref2, callback) {
+	      var _this = this;
+
+	      var inputString = _ref2.inputString;
+	      var root = _ref2.root;
+	      var _ref2$options = _ref2.options;
+	      var options = _ref2$options === undefined ? {} : _ref2$options;
+
+	      var doParse = function doParse(string) {
+	        if (string.match(_this.validator)) {
+	          return _this.parseFn({ string: string, root: root, options: options }, callback);
+	        }
+	        return callback(new Error('Format string does not validate as "' + _this.format + '"'));
+	      };
+
+	      if (inputString.match(this.fileExtension)) {
+	        (0, _utilsHttp2['default'])({ url: inputString, method: 'GET' }, function (response) {
+	          if (response.status >= 400) {
+	            return callback(new Error(response.responseText));
+	          }
+	          doParse(response.responseText);
+	        });
+	      } else {
+	        doParse(inputString);
+	      }
+	    }
+	  }]);
+
+	  return Parser;
+	})();
+
+	exports['default'] = Parser;
+	module.exports = exports['default'];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	exports['default'] = function (_ref, callback) {
+	  var url = _ref.url;
+	  var method = _ref.method;
+	  var data = _ref.data;
+
+	  var xhr = new XMLHttpRequest();
+
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState === 4) {
+	      callback(xhr);
+	    }
+	  };
+	  xhr.open(method, url, true);
+	  if (method === 'GET') {
+	    xhr.send();
+	  } else {
+	    xhr.send(data);
+	  }
+	};
+
+	module.exports = exports['default'];
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _Branch = __webpack_require__(6);
+
+	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _utilsConstants = __webpack_require__(7);
+
+	var _renderersNode = __webpack_require__(8);
+
+	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+
+	var format = 'newick';
+	var fileExtension = /\.nwk$/;
+	var validator = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
+
+	function isTerminatingChar(terminatingChar) {
+	  return this === terminatingChar;
+	}
+
+	var labelTerminatingChars = [':', ',', ')'];
+
+	function parseLabel(string) {
+	  var label = '';
+
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
+
+	  try {
+	    for (var _iterator = string[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var char = _step.value;
+
+	      if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
+	        return label;
+	      }
+	      label += char;
+	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator['return']) {
+	        _iterator['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
+	      }
+	    }
+	  }
+	}
+
+	function parseAnnotations(label, branch) {
+	  var segments = label.split('**');
+	  branch.id = segments[0];
+	  if (segments.length === 1) return;
+	  segments = segments[1].split('*');
+
+	  for (var b = 0; b < segments.length; b += 2) {
+	    var value = segments[b + 1];
+	    switch (segments[b]) {
+	      case 'nsz':
+	        branch.radius = window.parseInt(value);
+	        break;
+	      case 'nsh':
+	        if (_utilsConstants.Shapes[value]) {
+	          branch.nodeShape = _utilsConstants.Shapes[value];
+	        } else if (_renderersNode2['default'][value]) {
+	          branch.nodeShape = value;
+	        } else {
+	          branch.nodeShape = 'circle';
+	        }
+	        break;
+	      case 'ncol':
+	        branch.colour = value;
+	        var hexRed = '0x' + branch.colour.substring(0, 2);
+	        var hexGreen = '0x' + branch.colour.substring(2, 4);
+	        var hexBlue = '0x' + branch.colour.substring(4, 6);
+	        branch.colour = 'rgba(' + parseInt(hexRed, 16).toString() + ',' + parseInt(hexGreen, 16).toString() + ',' + parseInt(hexBlue, 16).toString() + ',1)';
+	        break;
+	      default:
+	        break;
+	    }
+	  }
+	}
+
+	var nodeTerminatingChars = [')', ','];
+
+	function parseBranchLength(string) {
+	  var nodeLength = '';
+
+	  var _iteratorNormalCompletion2 = true;
+	  var _didIteratorError2 = false;
+	  var _iteratorError2 = undefined;
+
+	  try {
+	    for (var _iterator2 = string[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	      var char = _step2.value;
+
+	      if (nodeTerminatingChars.some(isTerminatingChar.bind(char))) {
+	        break;
+	      }
+	      nodeLength += char;
+	    }
+	  } catch (err) {
+	    _didIteratorError2 = true;
+	    _iteratorError2 = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	        _iterator2['return']();
+	      }
+	    } finally {
+	      if (_didIteratorError2) {
+	        throw _iteratorError2;
+	      }
+	    }
+	  }
+
+	  return nodeLength;
+	}
+
+	function parseBranch(branch, string, index) {
+	  var label = parseLabel(string.slice(index));
+	  var postLabelIndex = index + label.length;
+	  var branchLengthStr = 0;
+
+	  if (label.match(/\*/)) {
+	    parseAnnotations(label, branch);
+	  }
+
+	  if (string[postLabelIndex] === ':') {
+	    branchLengthStr = parseBranchLength(string.slice(postLabelIndex + 1));
+	    branch.branchLength = Math.max(parseFloat(branchLengthStr), 0);
+	  } else {
+	    branch.branchLength = 0;
+	  }
+
+	  branch.id = label || branch.tree.generateBranchId();
+	  return postLabelIndex + branchLengthStr.length;
+	}
+
+	function parseFn(_ref, callback) {
+	  var string = _ref.string;
+	  var root = _ref.root;
+
+	  var currentNode = root;
+
+	  for (var i = 0; i < string.length; i++) {
+	    var node = undefined;
+	    switch (string[i]) {
+	      case '(':
+	        // new Child
+	        node = new _Branch2['default']();
+	        currentNode.addChild(node);
+	        currentNode = node;
+	        break;
+	      case ')':
+	        // return to parent
+	        currentNode = currentNode.parent;
+	        break;
+	      case ',':
+	        // new sibiling
+	        node = new _Branch2['default']();
+	        currentNode.parent.addChild(node);
+	        currentNode = node;
+	        break;
+	      case ';':
+	        return callback();
+	      default:
+	        try {
+	          i = parseBranch(currentNode, string, i);
+	        } catch (e) {
+	          return callback(e);
+	        }
+	        break;
+	    }
+	  }
+	}
+
+	exports['default'] = {
+	  format: format,
+	  fileExtension: fileExtension,
+	  validator: validator,
+	  parseFn: parseFn
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _newick = __webpack_require__(28);
+
+	var format = 'nexus';
+	var fileExtension = /\.n(ex|xs)$/;
+	var validator = /^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i;
+
+	function parseFn(_ref, callback) {
+	  var string = _ref.string;
+	  var root = _ref.root;
+	  var options = _ref.options;
+
+	  if (!string.match(/BEGIN TREES/gi)) {
+	    return callback(new Error('The nexus file does not contain a tree block'));
+	  }
+
+	  var name = options.name;
+
+	  // get everything between BEGIN TREES and next END;
+	  var treeSection = string.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
+	  // get translate section
+
+	  var leafNameObject = {};
+	  var translateSection = treeSection.match(/TRANSLATE[^;]+;/i);
+	  if (translateSection && translateSection.length) {
+	    translateSection = translateSection[0];
+	    //remove translate section from tree section
+	    treeSection = treeSection.replace(translateSection, '');
+
+	    //parse translate section into kv pairs
+	    translateSection = translateSection.replace(/translate|;/gi, '');
+
+	    var tIntArr = translateSection.split(',');
+	    for (var i = 0; i < tIntArr.length; i++) {
+	      var ia = tIntArr[i].trim().replace('\n', '').split(' ');
+	      if (ia[0] && ia[1]) {
+	        leafNameObject[ia[0].trim()] = ia[1].trim();
+	      }
+	    }
+	  }
+
+	  // find each line starting with tree.
+	  var tArr = treeSection.split('\n');
+	  var trees = {};
+	  // id name is '' or does not exist, ask user to choose which tree.
+	  for (var i = 0; i < tArr.length; i++) {
+	    if (tArr[i].trim() === '') continue;
+	    var s = tArr[i].replace(/tree\s/i, '');
+	    if (!name) {
+	      name = s.trim().match(/^\w+/)[0];
+	    }
+	    trees[name] = s.trim().match(/[\S]*$/)[0];
+	  }
+	  if (!trees[name]) {
+	    return new Error('tree ' + name + ' does not exist in this NEXUS file');
+	  }
+
+	  (0, _newick.parseFn)({ string: trees[name].trim(), root: root }, function (error) {
+	    if (error) {
+	      return callback(error);
+	    }
+
+	    callback();
+
+	    // translate in accordance with translate block
+	    if (leafNameObject) {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = Object.keys(leafNameObject)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var n = _step.value;
+
+	          var branches = root.tree.branches;
+	          var branch = branches[n];
+	          delete branches[n];
+	          branch.id = leafNameObject[n];
+	          branches[branch.id] = branch;
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      root.tree.draw();
+	    }
+	  });
+	}
+
+	exports['default'] = {
+	  parseFn: parseFn,
+	  format: format,
+	  fileExtension: fileExtension,
+	  validator: validator
+	};
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ])

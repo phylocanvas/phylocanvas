@@ -388,6 +388,7 @@ Tree.prototype.hideLabels = function () {
   this.draw();
 };
 
+
 Tree.prototype.load = function (inputString, options = {}) {
   if (options.format) {
     this.build(inputString, parsers[options.format], options);

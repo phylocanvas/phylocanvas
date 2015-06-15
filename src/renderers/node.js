@@ -25,9 +25,9 @@ module.exports = {
     var r = node.getNodeSize();
     var cx = r;
     var cy = 0;
-    var spikes = 6;
-    var outerRadius = 6;
-    var innerRadius = 2;
+    var spikes = 8;
+    var outerRadius = r;
+    var innerRadius = r * 0.5;
     var rot = Math.PI / 2 * 3;
     var x = cx;
     var y = cy;
@@ -49,27 +49,23 @@ module.exports = {
     node.canvas.lineTo(cx, cy - outerRadius);
     node.canvas.stroke();
     node.canvas.fill();
-    node.canvas.moveTo(cx, cy);
-    node.canvas.lineTo(cx - (outerRadius - 1), cy);
-    node.canvas.stroke();
     node.canvas.closePath();
   },
   triangle: function (node) {
     var r = node.getNodeSize();
-    var cx = r;
-    var cy = 0;
-    var x1 = cx - r;
-    var x2 = cx + r;
-    var y1 = cy - r;
-    var y2 = cy + r;
-    node.canvas.moveTo(cx, y1);
-    node.canvas.lineTo(x2, y2);
-    node.canvas.lineTo(x1, y2);
-    node.canvas.lineTo(cx, y1);
+    var lengthOfSide = (2 * r) * Math.cos(30 * Math.PI / 180);
+
+    node.canvas.moveTo(0, 0);
+    node.canvas.rotate(30 * Math.PI / 180);
+    node.canvas.lineTo(lengthOfSide, 0);
+
+    node.canvas.rotate(-60 * Math.PI / 180);
+    node.canvas.lineTo(lengthOfSide, 0);
+
+    node.canvas.rotate(30 * Math.PI / 180);
+    node.canvas.lineTo(0, 0);
+
     node.canvas.stroke();
     node.canvas.fill();
-    node.canvas.moveTo(x1, (y1 + y2) / 2);
-    node.canvas.lineTo((x1 + x2) / 2, (y1 + y2) / 2);
-    node.canvas.stroke();
   }
 };
