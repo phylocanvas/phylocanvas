@@ -194,13 +194,6 @@ Branch.prototype.drawMetadata = function () {
 
   if (Object.keys(this.data).length > 0) {
     this.canvas.beginPath();
-    if (this.angle > Angles.QUARTER &&
-        this.angle < (Angles.HALF + Angles.QUARTER)) {
-      this.canvas.rotate(Angles.HALF);
-      tx = -tx - (padMaxLabelWidth);
-      // Changing the xStep for radial and circular tree
-      metadataXStep = -metadataXStep;
-    }
 
     // If no columns specified, then draw all columns
     if (this.tree.selectedMetadataColumns.length > 0) {
@@ -303,6 +296,12 @@ Branch.prototype.drawLabel = function () {
   this.canvas.fillStyle = this.getTextColour();
   this.canvas.fillText(lbl, tx, ty);
   this.canvas.closePath();
+  // Make canvas rotate back to actual position so that
+  // metadata drawn after that will not be affected
+  if (this.angle > Angles.QUARTER &&
+      this.angle < (Angles.HALF + Angles.QUARTER)) {
+    this.canvas.rotate(Angles.HALF);
+  }
 };
 
 Branch.prototype.setNodeDimensions = function (centerX, centerY, radius) {

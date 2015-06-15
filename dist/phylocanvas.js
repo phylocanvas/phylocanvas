@@ -528,9 +528,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'open',
-	    value: function open(_x3, _x4, node) {
-	      var x = arguments[0] === undefined ? 100 : arguments[0];
-	      var y = arguments[1] === undefined ? 100 : arguments[1];
+	    value: function open(x, y, node) {
+	      if (x === undefined) x = 100;
+	      if (y === undefined) y = 100;
 
 	      while (this.element.hasChildNodes()) {
 	        this.element.removeChild(this.element.firstChild);
@@ -1920,12 +1920,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (Object.keys(this.data).length > 0) {
 	    this.canvas.beginPath();
-	    if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
-	      this.canvas.rotate(_utilsConstants.Angles.HALF);
-	      tx = -tx - padMaxLabelWidth;
-	      // Changing the xStep for radial and circular tree
-	      metadataXStep = -metadataXStep;
-	    }
 
 	    // If no columns specified, then draw all columns
 	    if (this.tree.selectedMetadataColumns.length > 0) {
@@ -2027,6 +2021,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.canvas.fillStyle = this.getTextColour();
 	  this.canvas.fillText(lbl, tx, ty);
 	  this.canvas.closePath();
+	  // Make canvas rotate back to actual position so that
+	  // metadata drawn after that will not be affected
+	  if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
+	    this.canvas.rotate(_utilsConstants.Angles.HALF);
+	  }
 	};
 
 	Branch.prototype.setNodeDimensions = function (centerX, centerY, radius) {
@@ -2537,17 +2536,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  triangle: function triangle(node) {
 	    var r = node.getNodeSize();
-	    var cx = r;
-	    var cy = 0;
-	    var x1 = cx - r;
-	    var x2 = cx + r;
-	    var y1 = cy - r;
-	    var y2 = cy + r;
+	    var lengthOfSide = 2 * r * Math.cos(30 * Math.PI / 180);
 
-	    node.canvas.moveTo(x2, y1);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x1, (y1 + y2) / 2);
-	    node.canvas.lineTo(x2, y1);
+	    node.canvas.moveTo(0, 0);
+	    node.canvas.rotate(30 * Math.PI / 180);
+	    node.canvas.lineTo(lengthOfSide, 0);
+
+	    node.canvas.rotate(-60 * Math.PI / 180);
+	    node.canvas.lineTo(lengthOfSide, 0);
+
+	    node.canvas.rotate(30 * Math.PI / 180);
+	    node.canvas.lineTo(0, 0);
+
 	    node.canvas.stroke();
 	    node.canvas.fill();
 	  }
