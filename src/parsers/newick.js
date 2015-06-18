@@ -10,11 +10,10 @@ function isTerminatingChar(terminatingChar) {
   return this === terminatingChar;
 }
 
-const labelTerminatingChars = [ ':', ',', ')' ];
+const labelTerminatingChars = [ ':', ',', ')', ';' ];
 
 function parseLabel(string) {
   let label = '';
-
   for (let char of string) {
     if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
       return label;
@@ -65,7 +64,6 @@ const nodeTerminatingChars = [ ')', ',' ];
 
 function parseBranchLength(string) {
   let nodeLength = '';
-
   for (let char of string) {
     if (nodeTerminatingChars.some(isTerminatingChar.bind(char))) {
       break;
@@ -75,12 +73,10 @@ function parseBranchLength(string) {
   return nodeLength;
 }
 
-
 function parseBranch(branch, string, index) {
   let label = parseLabel(string.slice(index));
   let postLabelIndex = index + label.length;
-  let branchLengthStr = 0;
-
+  let branchLengthStr = '';
   if (label.match(/\*/)) {
     parseAnnotations(label, branch);
   }
@@ -92,13 +88,15 @@ function parseBranch(branch, string, index) {
     branch.branchLength = 0;
   }
 
+  if (label) {
+    branch.label = label;
+  }
   branch.id = label || branch.tree.generateBranchId();
   return postLabelIndex + branchLengthStr.length;
 }
 
 function parseFn({ string, root }, callback) {
   let currentNode = root;
-
   for (let i = 0; i < string.length; i++) {
     let node;
     switch (string[i]) {
@@ -116,7 +114,7 @@ function parseFn({ string, root }, callback) {
         currentNode = node;
         break;
       case ';':
-        return callback();
+        break;
       default:
           try {
             i = parseBranch(currentNode, string, i);
@@ -126,6 +124,7 @@ function parseFn({ string, root }, callback) {
         break;
     }
   }
+  callback();
 }
 
 export default {

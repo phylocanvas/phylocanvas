@@ -655,7 +655,7 @@ Branch.prototype.getTextColour = function () {
 
 Branch.prototype.getLabel = function () {
   return (
-    (this.label !== undefined && this.label !== null) ? this.label : this.id
+    (this.label !== undefined && this.label !== null) ? this.label : ''
   );
 };
 
