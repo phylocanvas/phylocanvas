@@ -70,7 +70,7 @@ function parseBranchLength(string) {
     }
     nodeLength += char;
   }
-  return parseFloat(nodeLength)?nodeLength:0.0;
+  return nodeLength;
 }
 
 function parseBranch(branch, string, index) {
