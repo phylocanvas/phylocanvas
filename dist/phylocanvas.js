@@ -2372,7 +2372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.getLabel = function () {
-	  return this.label !== undefined && this.label !== null ? this.label : this.id;
+	  return this.label !== undefined && this.label !== null ? this.label : '';
 	};
 
 	Branch.prototype.getLabelSize = function () {
@@ -3312,11 +3312,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return this === terminatingChar;
 	}
 
-	var labelTerminatingChars = [':', ',', ')'];
+	var labelTerminatingChars = [':', ',', ')', ';'];
 
 	function parseLabel(string) {
 	  var label = '';
-
 	  var _iteratorNormalCompletion = true;
 	  var _didIteratorError = false;
 	  var _iteratorError = undefined;
@@ -3384,7 +3383,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function parseBranchLength(string) {
 	  var nodeLength = '';
-
 	  var _iteratorNormalCompletion2 = true;
 	  var _didIteratorError2 = false;
 	  var _iteratorError2 = undefined;
@@ -3419,8 +3417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function parseBranch(branch, string, index) {
 	  var label = parseLabel(string.slice(index));
 	  var postLabelIndex = index + label.length;
-	  var branchLengthStr = 0;
-
+	  var branchLengthStr = '';
 	  if (label.match(/\*/)) {
 	    parseAnnotations(label, branch);
 	  }
@@ -3432,6 +3429,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    branch.branchLength = 0;
 	  }
 
+	  if (label) {
+	    branch.label = label;
+	  }
 	  branch.id = label || branch.tree.generateBranchId();
 	  return postLabelIndex + branchLengthStr.length;
 	}
@@ -3441,7 +3441,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var root = _ref.root;
 
 	  var currentNode = root;
-
 	  for (var i = 0; i < string.length; i++) {
 	    var node = undefined;
 	    switch (string[i]) {
@@ -3462,7 +3461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        currentNode = node;
 	        break;
 	      case ';':
-	        return callback();
+	        break;
 	      default:
 	        try {
 	          i = parseBranch(currentNode, string, i);
@@ -3472,6 +3471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	    }
 	  }
+	  callback();
 	}
 
 	exports['default'] = {
