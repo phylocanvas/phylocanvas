@@ -1306,7 +1306,7 @@
     },
     parseLabel: function (nwk, idx) {
       var lbl = '';
-      for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && idx < nwk.length; idx++) {
+      for (idx; nwk[idx] !== ':' && nwk[idx] !== ',' && nwk[idx] !== ')' && nwk[idx] !== ';' && idx < nwk.length; idx++) {
         lbl += nwk[idx];
       }
       if (!lbl) return idx;
@@ -1350,7 +1350,7 @@
     },
     parseNodeLength: function (nwk, idx) {
       var str = '';
-      for (idx; nwk[idx] !== ')' && nwk[idx] !== ','; idx++) {
+      for (idx; nwk[idx] !== ')' && nwk[idx] !== ',' && nwk[idx] !== ';'; idx++) {
         str += nwk[idx];
       }
       this.branchLength = parseFloat(str);
@@ -2136,15 +2136,15 @@
       for (var i = 0; i < nwk.length; i++) {
         var node;
         switch (nwk[i]) {
-          case '(': //new Child
+          case '(': // new child
             node = new Branch();
             curNode.addChild(node);
             curNode = node;
             break;
-          case ')': //return to parent
+          case ')': // return to parent
             curNode = curNode.parent;
             break;
-          case ',': //new sibiling
+          case ',': // new sibling
             node = new Branch();
             curNode.parent.addChild(node);
             curNode = node;

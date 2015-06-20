@@ -18,7 +18,8 @@ window.onload = function(){
   phylocanvas.setTreeType('radial');
 
   // load tree via AJAX and render using default params
-  phylocanvas.load('./tree.nwk');
+  // phylocanvas.load('./tree.nwk');
+  phylocanvas.load('((B:0.2,(C:0.3,D:0.4)E:0.5)F:0.1)A;');
 
   // phylocanvas.on('historytoggle', function (e) {
   //   alert(e.isOpen ? 'history is open' : 'history is closed');
