@@ -60,7 +60,7 @@ function parseAnnotations(label, branch) {
   }
 }
 
-const nodeTerminatingChars = [ ')', ',' ];
+const nodeTerminatingChars = [ ')', ',', ';' ];
 
 function parseBranchLength(string) {
   let nodeLength = '';
