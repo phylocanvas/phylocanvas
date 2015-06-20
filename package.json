@@ -17,12 +17,7 @@
     "biojs"
   ],
   "author": "Centre for Genomic Pathogen Surveillance, Wellcome Trust Sanger Institute",
-  "licenses": [
-    {
-      "type": "LGPLv3",
-      "url": "https://www.gnu.org/licenses/lgpl.txt"
-    }
-  ],
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/PhyloCanvas/PhyloCanvas/issues"
   },
