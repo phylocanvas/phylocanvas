@@ -179,7 +179,7 @@ Branch.prototype.drawMetadata = function () {
   if (this.tree.nodeAlign) {
     if (this.tree.treeType === 'rectangular') {
       tx += (this.tree.farthestNodeFromRootX - this.centerx);
-    } else if (this.tree.treeType === 'hierarchy') {
+    } else if (this.tree.treeType === 'hierarchical') {
       tx += (this.tree.farthestNodeFromRootY - this.centery);
     }
   }
@@ -246,7 +246,7 @@ Branch.prototype.drawMetadataHeading = function (tx, ty) {
       // x and y axes changed because of rotate
       // Adding + 6 to adjust the position
       this.canvas.fillText(columnName, 20, tx + 6);
-    } else if (this.tree.treeType === 'hierarchy') {
+    } else if (this.tree.treeType === 'hierarchical') {
       this.canvas.textAlign = 'right';
       this.canvas.fillText(columnName, -20, tx + 8);
     } else if (this.tree.treeType === 'diagonal') {
@@ -277,11 +277,11 @@ Branch.prototype.drawLabel = function () {
 
   tx = this.getLabelStartX();
   ty = fSize / 2;
-  // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
+  // Setting 'tx' for rectangular and hierarchical trees if node align is TRUE
   if (this.tree.nodeAlign) {
     if (this.tree.treeType === 'rectangular') {
       tx += (this.tree.farthestNodeFromRootX - this.centerx);
-    } else if (this.tree.treeType === 'hierarchy') {
+    } else if (this.tree.treeType === 'hierarchical') {
       tx += (this.tree.farthestNodeFromRootY - this.centery);
     }
   }
@@ -305,10 +305,16 @@ Branch.prototype.drawLabel = function () {
 };
 
 Branch.prototype.setNodeDimensions = function (centerX, centerY, radius) {
-  this.minx = centerX - radius;
-  this.maxx = centerX + radius;
-  this.miny = centerY - radius;
-  this.maxy = centerY + radius;
+  let boundedRadius = radius;
+
+  if ((radius * this.tree.zoom) < 5 || !this.leaf) {
+    boundedRadius = 5 / this.tree.zoom;
+  }
+
+  this.minx = centerX - boundedRadius;
+  this.maxx = centerX + boundedRadius;
+  this.miny = centerY - boundedRadius;
+  this.maxy = centerY + boundedRadius;
 };
 
 Branch.prototype.drawNode = function () {
@@ -328,11 +334,8 @@ Branch.prototype.drawNode = function () {
   this.canvas.beginPath();
   this.canvas.fillStyle = this.selected ?
                           this.tree.selectedColour : this.colour;
-  if ((nodeRadius * this.tree.zoom) < 5 || !this.leaf) {
-    this.setNodeDimensions(centerX, centerY, 5 / this.tree.zoom);
-  } else {
-    this.setNodeDimensions(centerX, centerY, nodeRadius);
-  }
+
+  this.setNodeDimensions(centerX, centerY, nodeRadius);
 
   // If branch collapsed
   if (this.collapsed) {
@@ -360,14 +363,17 @@ Branch.prototype.drawNode = function () {
     var origLineWidth = this.canvas.lineWidth;
     // Drawing line connectors to nodes and align all the nodes vertically
     if (this.tree.nodeAlign) {
-      this.canvas.lineWidth = this.canvas.lineWidth / 10;
+      this.canvas.lineWidth = this.canvas.lineWidth / 5;
       this.canvas.beginPath();
       // Draw line till the x position of the right-end node
       if (this.tree.treeType === 'rectangular') {
         this.canvas.moveTo(this.tree.farthestNodeFromRootX, (this.centery));
       }
-      if (this.tree.treeType === 'hierarchy') {
+      if (this.tree.treeType === 'hierarchical') {
         this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
+      }
+      if (this.tree.treeType === 'circular') {
+        this.canvas.moveTo(this.centerx, this.centery);
       }
       this.canvas.closePath();
       this.canvas.fill();
@@ -376,7 +382,7 @@ Branch.prototype.drawNode = function () {
     this.canvas.save();
     // Move to node center position
     // (setting canvas (0,0) position as (this.centerx, this.centery))
-    this.canvas.translate(this.centerx, this.centery);
+    this.canvas.translate(this.interx, this.intery);
     // rotate canvas (mainly for circular, radial trees etc)
     this.canvas.rotate(this.angle);
     // Draw node shape as chosen - default is circle

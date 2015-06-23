@@ -30,21 +30,19 @@ for (let treeType of Object.keys(PhyloCanvas.branchRenderers)) {
   buttonForm.appendChild(button);
 }
 
-tree.on('error', function (e) { throw e.message; });
+tree.on('error', function (e) { throw e; });
 
 tree.on('loaded', function () {
-  // tree.setNodeSize(5);
-  // tree.setNodeColourAndShape([ '3_RF122', '2_JKD6159', '272_AT_1776' ], 'orange', 't');
-  for (let i = 0; i <= 12; i++) {
-    if (tree.leaves[i]) {
-      tree.leaves[i].data = { col: 1, x: 0, a: 1, c: 1 };
-    }
-  }
+  tree.setNodeSize(5);
+  tree.backColour = true;
+  tree.setNodeColourAndShape('B', 'red');
+  tree.setNodeColourAndShape('C', 'blue');
+  tree.setNodeColourAndShape('D', 'green');
   tree.nodeAlign = true;
-  tree.setTreeType('rectangular');
+  tree.setTreeType('circular');
   tree.viewMetadataColumns();
 });
 
 tree.load('((B:0.3,(C:0.3,D:0.3)E:0.1)F:0.1)A:0.1;');
-// tree.load('./data/sample_nexus.nxs', { name: 'basic' });
+// tree.load('./data/tree.nwk');
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');
