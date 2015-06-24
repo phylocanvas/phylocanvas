@@ -6,10 +6,11 @@ import prerendererOptions from './prerenderer';
 
 
 const labelAlign = {
-  moveToPosition(node) {
-    node.canvas.moveTo(
-      node.centerx + node.labelOffsetX, node.centery + node.labelOffsetY
-    );
+  getX(node) {
+    return node.centerx + node.labelOffsetX;
+  },
+  getY(node) {
+    return node.centery + node.labelOffsetY;
   },
   getLabelOffset(node) {
     return node.labelOffsetX / Math.cos(node.angle);

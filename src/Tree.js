@@ -791,8 +791,8 @@ export default class Tree {
 
     for (let i = this.leaves.length; i--; ) {
       let node = this.leaves[i];
-      let x = node.centerx + (this.alignLabels ? node.labelOffsetX || 0 : 0);
-      let y = node.centery + (this.alignLabels ? node.labelOffsetY || 0 : 0);
+      let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
+      let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
       let theta = node.angle;
       let pad = node.getNodeSize()
                 + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0)

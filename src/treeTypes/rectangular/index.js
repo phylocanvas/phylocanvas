@@ -5,8 +5,11 @@ import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
 const labelAlign = {
-  moveToPosition(node) {
-    node.canvas.moveTo(node.tree.farthestNodeFromRootX + node.getNodeSize(), (node.centery));
+  getX(node) {
+    return node.tree.farthestNodeFromRootX + node.getNodeSize();
+  },
+  getY(node) {
+    return node.centery;
   },
   getLabelOffset(node) {
     return (node.tree.farthestNodeFromRootX - node.centerx);

@@ -359,12 +359,13 @@ Branch.prototype.drawNode = function () {
     let originalLineWidth = this.canvas.lineWidth;
     // Drawing line connectors to nodes and align all the nodes vertically
     if (this.tree.alignLabels) {
+      let labelAlign = this.tree.labelAlign;
       this.canvas.lineWidth = this.canvas.lineWidth / 5;
+
       this.canvas.beginPath();
-
-      this.tree.labelAlign.moveToPosition(this);
-
+      this.canvas.moveTo(labelAlign.getX(this), labelAlign.getY(this));
       this.canvas.closePath();
+
       this.canvas.fill();
     }
     // Save canvas
