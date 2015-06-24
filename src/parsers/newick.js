@@ -1,6 +1,6 @@
 import Branch from '../Branch';
 import { Shapes } from '../utils/constants';
-import nodeRenderers from '../renderers/node';
+import nodeRenderers from '../nodeRenderers';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;

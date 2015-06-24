@@ -20,7 +20,7 @@ buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
 });
 
-for (let treeType of Object.keys(PhyloCanvas.branchRenderers)) {
+for (let treeType of Object.keys(PhyloCanvas.treeTypes)) {
   let button = document.createElement('button');
 
   button.innerHTML = treeType;
@@ -39,7 +39,7 @@ tree.on('loaded', function () {
   tree.setNodeColourAndShape('C', 'blue');
   tree.setNodeColourAndShape('D', 'green');
   tree.nodeAlign = true;
-  tree.setTreeType('circular');
+  // tree.setTreeType('rectangular');
   tree.viewMetadataColumns();
 });
 

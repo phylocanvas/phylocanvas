@@ -1,13 +1,15 @@
-var Angles = require('../utils/constants').Angles;
+import { Angles } from './utils/constants';
 
-module.exports = {
-  circle: function (node) {
+export default {
+
+  circle(node) {
     var r = node.getNodeSize();
     node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
     node.canvas.stroke();
     node.canvas.fill();
   },
-  square: function (node) {
+
+  square(node) {
     var r = node.getNodeSize();
     var x1 = 0;
     var x2 = r * 2;
@@ -21,7 +23,8 @@ module.exports = {
     node.canvas.stroke();
     node.canvas.fill();
   },
-  star: function (node) {
+
+  star(node) {
     var r = node.getNodeSize();
     var cx = r;
     var cy = 0;
@@ -51,7 +54,8 @@ module.exports = {
     node.canvas.fill();
     node.canvas.closePath();
   },
-  triangle: function (node) {
+
+  triangle(node) {
     var r = node.getNodeSize();
     var lengthOfSide = (2 * r) * Math.cos(30 * Math.PI / 180);
 
@@ -68,4 +72,5 @@ module.exports = {
     node.canvas.stroke();
     node.canvas.fill();
   }
+
 };

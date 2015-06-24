@@ -16,11 +16,10 @@ import Tree from './Tree';
 import Branch from './Branch';
 import ContextMenu from './ContextMenu';
 
-import branchRenderers from './renderers/branch';
-import nodeRenderers from './renderers/node';
-import prerenderers from './renderers/pre';
+import treeTypes from './treeTypes';
+import nodeRenderers from './nodeRenderers';
 
-export { Tree, Branch, ContextMenu, branchRenderers, nodeRenderers, prerenderers };
+export { Tree, Branch, ContextMenu, treeTypes, nodeRenderers };
 
 export function History(tree) {
   this.tree = tree;

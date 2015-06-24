@@ -1,7 +1,7 @@
 import { Angles } from './utils/constants';
 import { setupDownloadLink, createBlobUrl } from './utils/dom';
 
-import nodeRenderers from './renderers/node';
+import nodeRenderers from './nodeRenderers';
 
 /**
  * Creates a branch
@@ -278,7 +278,9 @@ Branch.prototype.drawLabel = function () {
   tx = this.getLabelStartX();
   ty = fSize / 2;
   // Setting 'tx' for rectangular and hierarchical trees if node align is TRUE
-  if (this.tree.nodeAlign) {
+  if (this.tree.alignLabels) {
+    tx += this.tree.labelAlign.getLabelOffset();
+
     if (this.tree.treeType === 'rectangular') {
       tx += (this.tree.farthestNodeFromRootX - this.centerx);
     } else if (this.tree.treeType === 'hierarchical') {
@@ -359,22 +361,14 @@ Branch.prototype.drawNode = function () {
     this.canvas.globalAlpha = 1;
   }
   else if (this.leaf) {
-    // Store line width for swapping back after drawing lines for aligning
-    var origLineWidth = this.canvas.lineWidth;
+    let originalLineWidth = this.canvas.lineWidth;
     // Drawing line connectors to nodes and align all the nodes vertically
-    if (this.tree.nodeAlign) {
+    if (this.tree.alignLabels) {
       this.canvas.lineWidth = this.canvas.lineWidth / 5;
       this.canvas.beginPath();
-      // Draw line till the x position of the right-end node
-      if (this.tree.treeType === 'rectangular') {
-        this.canvas.moveTo(this.tree.farthestNodeFromRootX, (this.centery));
-      }
-      if (this.tree.treeType === 'hierarchical') {
-        this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
-      }
-      if (this.tree.treeType === 'circular') {
-        this.canvas.moveTo(this.centerx, this.centery);
-      }
+
+      this.tree.labelAlign.moveToPosition(this);
+
       this.canvas.closePath();
       this.canvas.fill();
     }
@@ -382,7 +376,7 @@ Branch.prototype.drawNode = function () {
     this.canvas.save();
     // Move to node center position
     // (setting canvas (0,0) position as (this.centerx, this.centery))
-    this.canvas.translate(this.interx, this.intery);
+    this.canvas.translate(this.centerx, this.centery);
     // rotate canvas (mainly for circular, radial trees etc)
     this.canvas.rotate(this.angle);
     // Draw node shape as chosen - default is circle
@@ -399,7 +393,7 @@ Branch.prototype.drawNode = function () {
     this.canvas.restore();
 
     // Swapping back the line width if it was changed due to nodeAlign
-    this.canvas.lineWidth = origLineWidth;
+    this.canvas.lineWidth = originalLineWidth;
   }
   this.canvas.closePath();
 

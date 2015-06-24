@@ -3,8 +3,7 @@ import ContextMenu from './ContextMenu';
 import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
-import branchRenderers from './renderers/branch';
-import prerenderers from './renderers/pre';
+import treeTypes from './treeTypes';
 
 import { Shapes } from './utils/constants';
 import { addClass, setupDownloadLink } from './utils/dom';
@@ -137,7 +136,7 @@ export default class Tree {
     this.showLabels = true;
     this.showBootstraps = false;
 
-    this.treeType = 'radial';
+    this.setTreeType('radial');
     this.maxBranchLength = 0;
     this.lineWidth = 1.0;
     this.textSize = 7;
@@ -175,12 +174,13 @@ export default class Tree {
     }.bind(this));
 
     /**
-     * Align nodes vertically
+     * Align labels vertically
      */
-    this.nodeAlign = false;
+    this.alignLabels = false;
+
     /**
      * X and Y axes of the node that is farther from the root
-     * Used to align node vertically
+     * Used to align labels vertically
      */
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
@@ -201,6 +201,16 @@ export default class Tree {
     this.metadataHeadingDrawn = false;
   }
 
+  get alignLabels() {
+    return this.labelAlign && this.labelAlign.enabled;
+  }
+
+  set alignLabels(value) {
+    if (this.labelAlign) {
+      this.labelAlign.enabled = value;
+    }
+  }
+
   setInitialCollapsedBranches(node = this.root) {
     var childIds;
     var i;
@@ -215,7 +225,7 @@ export default class Tree {
     for (i = 0; i < node.children.length; i++) {
       this.setInitialCollapsedBranches(node.children[i]);
     }
-  };
+  }
 
   clicked(e) {
     var node;
@@ -342,7 +352,7 @@ export default class Tree {
       (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
 
     if (!this.drawn || forceRedraw) {
-      prerenderers[this.treeType].run(this);
+      this.prerenderer.run(this);
       if (!forceRedraw) { this.fitInPanel(); }
     }
 
@@ -350,7 +360,7 @@ export default class Tree {
     this.canvas.translate(this.offsetx, this.offsety);
     this.canvas.scale(this.zoom, this.zoom);
 
-    branchRenderers[this.treeType].render(this, this.root);
+    this.branchRenderer.render(this, this.root);
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
     this.metadataHeadingDrawn = false;
@@ -390,7 +400,6 @@ export default class Tree {
     this.showLabels = false;
     this.draw();
   }
-
 
   load(inputString, options = {}) {
     if (options.format) {
@@ -513,7 +522,7 @@ export default class Tree {
     }
 
     this.root.setTotalLength();
-    prerenderers[this.treeType].run(this);
+    this.prerenderer.run(this);
     this.draw();
     this.subtreeDrawn(node.id);
   }
@@ -523,7 +532,7 @@ export default class Tree {
     this.resetTree();
 
     this.root.setTotalLength();
-    prerenderers[this.treeType].run(this);
+    this.prerenderer.run(this);
     this.draw();
 
     this.subtreeDrawn(this.root.id);
@@ -654,8 +663,17 @@ export default class Tree {
   }
 
   setTreeType(type) {
-    var oldType = this.treeType;
+    if (!(type in treeTypes)) {
+      return fireEvent(this.canvasEl, 'error', { message: `"${type}" is not a known tree-type.` });
+    }
+
+    let oldType = this.treeType;
     this.treeType = type;
+
+    this.branchRenderer = treeTypes[type].branchRenderer;
+    this.prerenderer = treeTypes[type].prerenderer;
+    this.labelAlign = treeTypes[type].labelAlign;
+
     if (this.drawn) {
       this.drawn = false;
       this.draw();
