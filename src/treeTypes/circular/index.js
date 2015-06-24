@@ -1,3 +1,5 @@
+import { Angles } from '../../utils/constants';
+
 import BranchRenderer from '../../BranchRenderer';
 import Prerenderer from '../../Prerenderer';
 
@@ -12,7 +14,11 @@ const labelAlign = {
     );
   },
   getLabelOffset(node) {
-    return node.labelOffsetX;
+    let trigFn =
+    (node.angle >= Angles.QUARTER &&
+    node.angle <= (Angles.HALF + Angles.QUARTER)) ? Math.tan : Math.cos;
+
+    return trigFn(node.angle) * node.labelOffsetX;
   }
 };
 

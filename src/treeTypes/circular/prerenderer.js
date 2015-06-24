@@ -21,6 +21,9 @@ export default {
       tree.leaves[i].centerx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
       tree.leaves[i].centery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
 
+      tree.leaves[i].labelX = r * Math.cos(tree.leaves[i].angle);
+      tree.leaves[i].labelY = r * Math.sin(tree.leaves[i].angle);
+
       tree.leaves[i].labelOffsetX = (r * Math.cos(tree.leaves[i].angle)) - tree.leaves[i].centerx;
       tree.leaves[i].labelOffsetY = (r * Math.sin(tree.leaves[i].angle)) - tree.leaves[i].centery;
 

@@ -278,15 +278,15 @@ Branch.prototype.drawLabel = function () {
   tx = this.getLabelStartX();
   ty = fSize / 2;
 
+  if (this.tree.alignLabels) {
+    tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
+  }
+
   if (this.angle > Angles.QUARTER &&
       this.angle < (Angles.HALF + Angles.QUARTER)) {
     this.canvas.rotate(Angles.HALF);
     // Angles.Half text position changes
     tx = -tx - (dimensions.width * 1);
-  }
-
-  if (this.tree.alignLabels) {
-    tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
   }
 
   this.canvas.beginPath();
