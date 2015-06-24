@@ -4,12 +4,12 @@ let buttonForm = document.getElementById('buttons');
 let tree = new PhyloCanvas.Tree('phylocanvas', {
   history: {
     collapsed: true
+  },
+  defaultCollapsed: {
+    min: 30,
+    max: 100,
+    color: 'green'
   }
-  // defaultCollapsed: {
-  //   min: 30,
-  //   max: 100,
-  //   color: 'green'
-  // }
 });
 
 tree.showLabels = true;
@@ -39,10 +39,10 @@ tree.on('loaded', function () {
   tree.setNodeColourAndShape('C', 'blue');
   tree.setNodeColourAndShape('D', 'green');
   tree.alignLabels = true;
-  tree.setTreeType('circular');
   tree.viewMetadataColumns();
 });
 
-tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
-// tree.load('./data/tree.nwk');
+tree.setTreeType('circular');
+// tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
+tree.load('./data/tree.nwk');
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');

@@ -676,6 +676,7 @@ export default class Tree {
       this.drawn = false;
       this.draw();
     }
+
     this.treeTypeChanged(oldType, type);
   }
 
@@ -789,11 +790,12 @@ export default class Tree {
     var maxy = this.root.starty;
 
     for (let i = this.leaves.length; i--; ) {
-      let x = this.leaves[i].centerx;
-      let y = this.leaves[i].centery;
-      let theta = this.leaves[i].angle;
-      let pad = this.leaves[i].getNodeSize()
-                + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0)
+      let node = this.leaves[i];
+      let x = node.centerx + (this.alignLabels ? node.labelOffsetX || 0 : 0);
+      let y = node.centery + (this.alignLabels ? node.labelOffsetY || 0 : 0);
+      let theta = node.angle;
+      let pad = node.getNodeSize()
+                + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0)
                 + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
 
       x = x + (pad * Math.cos(theta));

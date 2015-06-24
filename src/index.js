@@ -129,7 +129,7 @@ History.prototype.addSnapshot = function (id) {
   this.tree.historySnapshots.forEach(function (ele) {
     var dataTreeType = ele.getAttribute('data-tree-type');
     ele.style.background = 'transparent';
-    if (ele.id == historyIdPrefix + id && ele.getAttribute('data-tree-type') == treetype) {
+    if (ele.id === historyIdPrefix + id && ele.getAttribute('data-tree-type') === treetype) {
       // History already present
       match = true;
       ele.style.background = 'lightblue';
@@ -160,14 +160,14 @@ History.prototype.addSnapshot = function (id) {
 
 History.prototype.clear = function () {
   var listElements = this.snapshotList.getElementsByTagName('li');
-  for (var i = listElements.length; i-- ;) {
+  for (var i = listElements.length; i--; ) {
     this.snapshotList.removeChild(listElements[0]);
   }
 };
 
 History.prototype.goBackTo = function (evt) {
   var ele = evt.target;
-  this.tree.treeType = ele.getAttribute('data-tree-type');
+  this.tree.setTreeType(ele.getAttribute('data-tree-type'));
   this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
 };
 
