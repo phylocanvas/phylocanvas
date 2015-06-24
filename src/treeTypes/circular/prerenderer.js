@@ -15,19 +15,17 @@ export default {
     }
 
     for (let i = 0; i < tree.leaves.length; i++) {
-      tree.leaves[i].angle = step * i;
-      tree.leaves[i].startx = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].starty = ((tree.leaves[i].parent.totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
-      tree.leaves[i].centerx = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].centery = ((tree.leaves[i].totalBranchLength * tree.branchScalar)) * Math.sin(tree.leaves[i].angle);
+      let node = tree.leaves[i];
 
-      tree.leaves[i].labelX = r * Math.cos(tree.leaves[i].angle);
-      tree.leaves[i].labelY = r * Math.sin(tree.leaves[i].angle);
+      node.angle = step * i;
+      node.startx = ((node.parent.totalBranchLength * tree.branchScalar)) * Math.cos(node.angle);
+      node.starty = ((node.parent.totalBranchLength * tree.branchScalar)) * Math.sin(node.angle);
+      node.centerx = ((node.totalBranchLength * tree.branchScalar)) * Math.cos(node.angle);
+      node.centery = ((node.totalBranchLength * tree.branchScalar)) * Math.sin(node.angle);
+      node.labelOffsetX = ((r + node.getNodeSize() * 2) * Math.cos(node.angle)) - node.centerx;
+      node.labelOffsetY = ((r + node.getNodeSize() * 2) * Math.sin(node.angle)) - node.centery;
 
-      tree.leaves[i].labelOffsetX = (r * Math.cos(tree.leaves[i].angle)) - tree.leaves[i].centerx;
-      tree.leaves[i].labelOffsetY = (r * Math.sin(tree.leaves[i].angle)) - tree.leaves[i].centery;
-
-      for (let node = tree.leaves[i]; node.parent; node = node.parent) {
+      for (; node.parent; node = node.parent) {
         if (node.getChildNo() === 0) {
           node.parent.angle = node.angle;
           node.parent.minChildAngle = node.angle;

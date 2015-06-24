@@ -33,11 +33,11 @@ for (let treeType of Object.keys(PhyloCanvas.treeTypes)) {
 tree.on('error', function (e) { throw e; });
 
 tree.on('loaded', function () {
-  tree.setNodeSize(5);
+  tree.setNodeSize(2);
   tree.backColour = true;
-  tree.setNodeColourAndShape('BBBBB', 'red');
-  tree.setNodeColourAndShape('CCCCC', 'blue');
-  tree.setNodeColourAndShape('DDDDD', 'green');
+  tree.setNodeColourAndShape('B', 'red');
+  tree.setNodeColourAndShape('C', 'blue');
+  tree.setNodeColourAndShape('D', 'green');
   tree.alignLabels = true;
   tree.setTreeType('circular');
   tree.viewMetadataColumns();
