@@ -279,13 +279,7 @@ Branch.prototype.drawLabel = function () {
   ty = fSize / 2;
   // Setting 'tx' for rectangular and hierarchical trees if node align is TRUE
   if (this.tree.alignLabels) {
-    tx += this.tree.labelAlign.getLabelOffset();
-
-    if (this.tree.treeType === 'rectangular') {
-      tx += (this.tree.farthestNodeFromRootX - this.centerx);
-    } else if (this.tree.treeType === 'hierarchical') {
-      tx += (this.tree.farthestNodeFromRootY - this.centery);
-    }
+    tx += this.tree.labelAlign.getLabelOffset(this);
   }
   if (this.angle > Angles.QUARTER &&
       this.angle < (Angles.HALF + Angles.QUARTER)) {

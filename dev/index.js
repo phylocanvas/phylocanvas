@@ -38,8 +38,8 @@ tree.on('loaded', function () {
   tree.setNodeColourAndShape('B', 'red');
   tree.setNodeColourAndShape('C', 'blue');
   tree.setNodeColourAndShape('D', 'green');
-  tree.nodeAlign = true;
-  // tree.setTreeType('rectangular');
+  tree.alignLabels = true;
+  tree.setTreeType('rectangular');
   tree.viewMetadataColumns();
 });
 

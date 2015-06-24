@@ -1,7 +1,7 @@
-var Angles = require('../../utils/constants').Angles;
+import { Angles } from '../../utils/constants';
 
 module.exports = {
-  step: function (tree) {
+  getStep: function (tree) {
     return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
   },
   calculate: function (tree, ystep) {

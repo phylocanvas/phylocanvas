@@ -1,4 +1,4 @@
-var Angles = require('../../utils/constants').Angles;
+import { Angles } from '../../utils/constants';
 
 module.exports = {
   step: function (tree) {

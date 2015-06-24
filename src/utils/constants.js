@@ -6,7 +6,7 @@
  * @memberof PhyloCanvas
  * @constant
  */
-module.exports.Angles = {
+export const Angles = {
   /**
    * @constant
    * @type double
@@ -35,13 +35,13 @@ module.exports.Angles = {
 
 
 /**
- * dictionary to translate annotations in NWK to branch renderer ids
+ * dictionary to translate newick annotations to branch renderer ids
  *
  * @enum
  * @memberof PhyloCanvas
  * @constant
  */
-module.exports.Shapes = {
+export let Shapes = {
   x: 'star',
   s: 'square',
   o: 'circle',
