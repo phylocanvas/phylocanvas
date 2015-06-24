@@ -277,15 +277,16 @@ Branch.prototype.drawLabel = function () {
 
   tx = this.getLabelStartX();
   ty = fSize / 2;
-  // Setting 'tx' for rectangular and hierarchical trees if node align is TRUE
-  if (this.tree.alignLabels) {
-    tx += this.tree.labelAlign.getLabelOffset(this);
-  }
+
   if (this.angle > Angles.QUARTER &&
       this.angle < (Angles.HALF + Angles.QUARTER)) {
     this.canvas.rotate(Angles.HALF);
     // Angles.Half text position changes
     tx = -tx - (dimensions.width * 1);
+  }
+
+  if (this.tree.alignLabels) {
+    tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
   }
 
   this.canvas.beginPath();
@@ -668,7 +669,7 @@ Branch.prototype.getNodeSize = function () {
  * @return CallExpression
  */
 Branch.prototype.getLabelStartX = function () {
-  return this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2);
+  return (this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2));
 };
 
 Branch.prototype.rotate = function (evt) {

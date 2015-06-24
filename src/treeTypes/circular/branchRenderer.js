@@ -1,16 +1,11 @@
-module.exports = {
-  draw: function (tree, node) {
+export default {
+  draw(tree, node) {
     var branchLength = node.totalBranchLength * tree.branchScalar;
 
     node.canvas.beginPath();
     node.canvas.moveTo(node.startx, node.starty);
-    if (node.leaf) {
-      node.canvas.lineTo(node.interx, node.intery);
-      node.canvas.stroke();
-    } else {
-      node.canvas.lineTo(node.centerx, node.centery);
-      node.canvas.stroke();
-    }
+    node.canvas.lineTo(node.centerx, node.centery);
+    node.canvas.stroke();
     node.canvas.closePath();
 
     node.canvas.strokeStyle = node.getColour();

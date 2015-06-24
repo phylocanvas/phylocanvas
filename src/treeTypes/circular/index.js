@@ -1,17 +1,23 @@
-import branchRenderer from './branchRenderer';
-import prerenderer from './prerenderer';
+import BranchRenderer from '../../BranchRenderer';
+import Prerenderer from '../../Prerenderer';
+
+import branchRendererOptions from './branchRenderer';
+import prerendererOptions from './prerenderer';
+
 
 const labelAlign = {
   moveToPosition(node) {
-    node.canvas.moveTo(node.centerx, node.centery);
+    node.canvas.moveTo(
+      node.centerx + node.labelOffsetX, node.centery + node.labelOffsetY
+    );
   },
   getLabelOffset(node) {
-
+    return node.labelOffsetX;
   }
 };
 
 export default {
-  branchRenderer,
-  prerenderer,
+  branchRenderer: new BranchRenderer(branchRendererOptions),
+  prerenderer: new Prerenderer(prerendererOptions),
   labelAlign
 };

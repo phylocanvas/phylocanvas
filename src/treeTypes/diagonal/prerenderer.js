@@ -1,22 +1,22 @@
 import { Angles } from '../../utils/constants';
 
-module.exports = {
-  getStep: function (tree) {
+export default {
+  getStep(tree) {
     return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
   },
-  calculate: function (tree, ystep) {
-    for (var i = 0; i < tree.leaves.length; i++) {
+  calculate(tree, ystep) {
+    for (let i = 0; i < tree.leaves.length; i++) {
       tree.leaves[i].centerx = 0;
       tree.leaves[i].centery = (i > 0 ? tree.leaves[i - 1].centery + ystep : 0);
       tree.leaves[i].angle = 0;
 
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() === nd.parent.children.length - 1) {
-          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-          nd.parent.centerx = nd.parent.children[0].centerx + ((nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE));
-          for (var j = 0; j < nd.parent.children.length; j++) {
-            nd.parent.children[j].startx = nd.parent.centerx;
-            nd.parent.children[j].starty = nd.parent.centery;
+      for (let node = tree.leaves[i]; node.parent; node = node.parent) {
+        if (node.getChildNo() === node.parent.children.length - 1) {
+          node.parent.centery = node.parent.getChildYTotal() / node.parent.getChildCount(); // (node.parent.children.length - 1);
+          node.parent.centerx = node.parent.children[0].centerx + ((node.parent.children[0].centery - node.parent.centery) * Math.tan(Angles.FORTYFIVE));
+          for (let j = 0; j < node.parent.children.length; j++) {
+            node.parent.children[j].startx = node.parent.centerx;
+            node.parent.children[j].starty = node.parent.centery;
           }
         } else {
           break;

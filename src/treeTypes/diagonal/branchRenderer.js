@@ -1,5 +1,5 @@
-module.exports = {
-  draw: function (tree, node) {
+export default {
+  draw(tree, node) {
     node.angle = 0;
     node.canvas.beginPath();
 
@@ -9,7 +9,7 @@ module.exports = {
 
     node.canvas.closePath();
   },
-  prepareChild: function (node, child) {
+  prepareChild(node, child) {
     child.startx = node.centerx;
     child.starty = node.centery;
   }

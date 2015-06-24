@@ -1,5 +1,5 @@
-module.exports = {
-  draw: function (tree, node) {
+export default {
+  draw(tree, node) {
     node.canvas.beginPath();
 
     if (node !== node.tree.root) {
