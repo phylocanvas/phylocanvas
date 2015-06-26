@@ -338,11 +338,9 @@ Branch.prototype.drawNode = function () {
   if (this.collapsed) {
     var childIds = this.getChildIds();
     var radius = childIds.length;
-    if (this.tree.treeType === 'radial') {
-      radius = radius / 7;
-    }
-    if (this.tree.treeType === 'circular') {
-      radius = radius / 3;
+
+    if (this.tree.scaleCollapsedNode) {
+      radius = this.tree.scaleCollapsedNode(radius);
     }
 
     this.canvas.globalAlpha = 0.3;

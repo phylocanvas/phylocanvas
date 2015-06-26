@@ -647,16 +647,7 @@ export default class Tree {
   }
 
   setFontSize(ystep) {
-    // Setting tree text size
-    if (this.treeType === 'circular') {
-      this.textSize = Math.min((ystep * 100) + 5, 40);
-    } else if (this.treeType === 'radial') {
-      this.textSize = Math.min((ystep * 50) + 5, 20);
-    } else if (this.treeType === 'diagonal') {
-      this.textSize = Math.min((ystep / 2), 10);
-    } else {
-      this.textSize = Math.min((ystep / 2), 15);
-    }
+    this.textSize = this.calculateFontSize ? this.calculateFontSize(ystep) : Math.min((ystep / 2), 15);
     this.canvas.font = this.textSize + 'pt ' + this.font;
   }
 
@@ -671,6 +662,8 @@ export default class Tree {
     this.branchRenderer = treeTypes[type].branchRenderer;
     this.prerenderer = treeTypes[type].prerenderer;
     this.labelAlign = treeTypes[type].labelAlign;
+    this.scaleCollapsedNode = treeTypes[type].scaleCollapsedNode;
+    this.calculateFontSize = treeTypes[type].calculateFontSize;
 
     if (this.drawn) {
       this.drawn = false;

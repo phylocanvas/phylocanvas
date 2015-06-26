@@ -4,7 +4,6 @@ import Prerenderer from '../../Prerenderer';
 import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
-
 const labelAlign = {
   getX(node) {
     return node.centerx + node.labelOffsetX;
@@ -20,5 +19,11 @@ const labelAlign = {
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
-  labelAlign
+  labelAlign,
+  scaleCollapsedNode: function (radius) {
+    return radius / 3;
+  },
+  calculateFontSize: function (ystep) {
+    return Math.min(ystep + 4, 40);
+  }
 };

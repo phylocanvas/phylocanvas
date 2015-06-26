@@ -6,5 +6,11 @@ import prerendererOptions from './prerenderer';
 
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
-  prerenderer: new Prerenderer(prerendererOptions)
+  prerenderer: new Prerenderer(prerendererOptions),
+  scaleCollapsedNode: function (radius) {
+    return radius / 7;
+  },
+  calculateFontSize: function (ystep) {
+    return Math.min((ystep * 50) + 5, 20);
+  }
 };
