@@ -332,7 +332,6 @@ export default class Branch {
     var centerY = this.leaf ?
       (theta * Math.sin(this.angle)) + this.centery : this.centery;
 
-    this.canvas.beginPath();
     this.canvas.fillStyle = this.selected ?
                             this.tree.selectedColour : this.colour;
 
@@ -365,11 +364,17 @@ export default class Branch {
       // Drawing line connectors to nodes and align all the nodes vertically
       if (this.tree.alignLabels) {
         let labelAlign = this.tree.labelAlign;
-        this.canvas.lineWidth = this.canvas.lineWidth / 5;
+        this.canvas.lineWidth = this.canvas.lineWidth / 4;
+        this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
 
         this.canvas.beginPath();
-        this.canvas.moveTo(labelAlign.getX(this), labelAlign.getY(this));
+        this.canvas.moveTo(centerX, centerY);
+        this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+        this.canvas.stroke();
         this.canvas.closePath();
+
+        this.canvas.strokeStyle = this.getColour();
+        this.canvas.moveTo(centerX, centerY);
       }
       // Save canvas
       this.canvas.save();
@@ -379,10 +384,8 @@ export default class Branch {
       // rotate canvas (mainly for circular, radial trees etc)
       this.canvas.rotate(this.angle);
 
-      this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
       // Draw node shape as chosen - default is circle
       nodeRenderers[this.nodeShape](this);
-      this.canvas.strokeStyle = this.getColour();
 
       if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
         this.drawLabel();
@@ -397,7 +400,6 @@ export default class Branch {
       // Swapping back the line width if it was changed due to alignLabels
       this.canvas.lineWidth = originalLineWidth;
     }
-    this.canvas.closePath();
 
     if (this.highlighted) {
       this.canvas.beginPath();

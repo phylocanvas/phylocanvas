@@ -4,9 +4,11 @@ export default {
 
   circle(node) {
     var r = node.getNodeSize();
+    node.canvas.beginPath();
     node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
     node.canvas.stroke();
     node.canvas.fill();
+    node.canvas.closePath();
   },
 
   square(node) {
@@ -15,6 +17,7 @@ export default {
     var x2 = r * 2;
     var y1 = -r;
     var y2 = r;
+    node.canvas.beginPath();
     node.canvas.moveTo(x1, y1);
     node.canvas.lineTo(x1, y2);
     node.canvas.lineTo(x2, y2);
@@ -22,6 +25,7 @@ export default {
     node.canvas.lineTo(x1, y1);
     node.canvas.stroke();
     node.canvas.fill();
+    node.canvas.closePath();
   },
 
   star(node) {
@@ -59,6 +63,7 @@ export default {
     var r = node.getNodeSize();
     var lengthOfSide = (2 * r) * Math.cos(30 * Math.PI / 180);
 
+    node.canvas.beginPath();
     node.canvas.moveTo(0, 0);
     node.canvas.rotate(30 * Math.PI / 180);
     node.canvas.lineTo(lengthOfSide, 0);
@@ -71,6 +76,7 @@ export default {
 
     node.canvas.stroke();
     node.canvas.fill();
+    node.canvas.closePath();
   }
 
 };

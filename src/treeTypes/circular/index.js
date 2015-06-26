@@ -12,7 +12,7 @@ const labelAlign = {
     return node.centery + node.labelOffsetY;
   },
   getLabelOffset(node) {
-    return node.labelOffsetX / Math.cos(node.angle);
+    return (node.labelOffsetX / Math.cos(node.angle)) - node.getNodeSize();
   }
 };
 

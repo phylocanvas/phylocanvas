@@ -6,8 +6,8 @@ let tree = new PhyloCanvas.Tree('phylocanvas', {
     collapsed: true
   },
   defaultCollapsed: {
-    min: 30,
-    max: 100,
+    // min: 30,
+    // max: 50,
     color: 'green'
   }
 });
@@ -33,10 +33,10 @@ for (let treeType of Object.keys(PhyloCanvas.treeTypes)) {
 tree.on('error', function (event) { throw event.error; });
 
 tree.on('loaded', function () {
-  tree.setNodeSize(2);
+  tree.setNodeSize(1);
   tree.backColour = true;
-  tree.setNodeDisplay('B', { colour: 'red' });
-  tree.setNodeDisplay('C', { colour: 'blue' });
+  tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
+  tree.setNodeDisplay('C', { colour: 'blue', shape: 'square' });
   tree.setNodeDisplay('D', { colour: 'green' });
   tree.alignLabels = true;
   tree.viewMetadataColumns();
