@@ -38,7 +38,7 @@ tree.on('loaded', function () {
   tree.setNodeColourAndShape('B', 'red');
   tree.setNodeColourAndShape('C', 'blue');
   tree.setNodeColourAndShape('D', 'green');
-  // tree.alignLabels = true;
+  tree.alignLabels = true;
   tree.viewMetadataColumns();
 });
 

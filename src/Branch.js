@@ -176,7 +176,7 @@ Branch.prototype.drawMetadata = function () {
   var i;
   var columnName;
 
-  if (this.tree.nodeAlign) {
+  if (this.tree.alignLabels) {
     if (this.tree.treeType === 'rectangular') {
       tx += (this.tree.farthestNodeFromRootX - this.centerx);
     } else if (this.tree.treeType === 'hierarchical') {
@@ -184,7 +184,7 @@ Branch.prototype.drawMetadata = function () {
     }
   }
 
-  if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign &&
+  if (!this.tree.metadataHeadingDrawn && this.tree.alignLabels &&
     this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
     this.drawMetadataHeading(tx, ty);
     this.tree.metadataHeadingDrawn = true;
@@ -352,9 +352,12 @@ Branch.prototype.drawNode = function () {
                       this.tree.defaultCollapsedOptions.color : 'purple';
     this.canvas.fill();
     this.canvas.globalAlpha = 1;
+
+    this.canvas.closePath();
   }
   else if (this.leaf) {
     let originalLineWidth = this.canvas.lineWidth;
+
     // Drawing line connectors to nodes and align all the nodes vertically
     if (this.tree.alignLabels) {
       let labelAlign = this.tree.labelAlign;
@@ -363,8 +366,6 @@ Branch.prototype.drawNode = function () {
       this.canvas.beginPath();
       this.canvas.moveTo(labelAlign.getX(this), labelAlign.getY(this));
       this.canvas.closePath();
-
-      this.canvas.fill();
     }
     // Save canvas
     this.canvas.save();
@@ -373,8 +374,11 @@ Branch.prototype.drawNode = function () {
     this.canvas.translate(this.centerx, this.centery);
     // rotate canvas (mainly for circular, radial trees etc)
     this.canvas.rotate(this.angle);
+
+    this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
     // Draw node shape as chosen - default is circle
     nodeRenderers[this.nodeShape](this);
+    this.canvas.strokeStyle = this.getColour();
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
       this.drawLabel();
@@ -386,7 +390,7 @@ Branch.prototype.drawNode = function () {
     // Restore the canvas position to original
     this.canvas.restore();
 
-    // Swapping back the line width if it was changed due to nodeAlign
+    // Swapping back the line width if it was changed due to alignLabels
     this.canvas.lineWidth = originalLineWidth;
   }
   this.canvas.closePath();

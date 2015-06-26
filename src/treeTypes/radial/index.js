@@ -11,6 +11,6 @@ export default {
     return radius / 7;
   },
   calculateFontSize: function (ystep) {
-    return Math.min((ystep * 50) + 5, 20);
+    return Math.min((ystep * 50) + 5, 15);
   }
 };

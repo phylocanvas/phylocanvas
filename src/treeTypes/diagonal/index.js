@@ -8,6 +8,6 @@ export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
   calculateFontSize: function (ystep) {
-    return Math.min((ystep / 2), 10);
+    return Math.min((ystep / 2), 7.5);
   }
 };
