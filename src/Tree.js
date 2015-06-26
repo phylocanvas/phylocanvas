@@ -5,7 +5,6 @@ import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
 
-import { Shapes } from './utils/constants';
 import { addClass, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
@@ -333,7 +332,7 @@ export default class Tree {
     this.selectedNodes = [];
 
     if (this.maxBranchLength === 0) {
-      this.loadError('All branches in the tree are identical.');
+      this.loadError(new Error('All branches in the tree are identical.'));
       return;
     }
 
@@ -415,7 +414,7 @@ export default class Tree {
       }
     }
 
-    this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
+    this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
   }
 
   build(inputString, parser, options) {
@@ -449,7 +448,7 @@ export default class Tree {
       this.root.setTotalLength();
 
       if (this.maxBranchLength === 0) {
-        this.loadError('All branches in the tree are identical.');
+        this.loadError(new Error('All branches in the tree are identical.'));
         return;
       }
 
@@ -592,38 +591,31 @@ export default class Tree {
     }
   }
 
-  setNodeColourAndShape(nids, colour, shape, size, waiting) {
-    if (!nids) return;
+  setNodeDisplay(ids, options, waiting) {
+    if (!ids) return;
 
     if (this.drawn) {
-      var arr = [];
-      if (typeof nids === 'string') {
-        arr = nids.split(',');
+      let array = [];
+      if (typeof ids === 'string') {
+        array = ids.split(',');
       } else {
-        arr = nids;
+        array = ids;
       }
 
-      if (nids !== '') {
-        for (var i = 0; i <  arr.length; i++) {
-          if (this.branches[arr[i]]) {
-            if (colour) {
-              this.branches[arr[i]].colour = colour;
-            }
-            if (shape) {
-              this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
-            }
-            if (size) {
-              this.branches[arr[i]].radius = size;
-            }
+      if (array.length) {
+        for (let id of array) {
+          if (!(id in this.branches)) {
+            return;
           }
+          this.branches[id].setDisplay(options);
         }
         this.draw();
       }
     } else if (!waiting) {
-      var _this = this;
-      var timeout = setInterval(function () {
+      let _this = this;
+      let timeout = setInterval(function () {
         if (this.drawn) {
-          _this.setNodeColourAndShape(nids, colour, shape, size, true);
+          _this.setNodeColourAndShape(ids, options, true);
           clearInterval(timeout);
         }
       });
@@ -653,7 +645,7 @@ export default class Tree {
 
   setTreeType(type) {
     if (!(type in treeTypes)) {
-      return fireEvent(this.canvasEl, 'error', { message: `"${type}" is not a known tree-type.` });
+      return fireEvent(this.canvasEl, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
     }
 
     let oldType = this.treeType;
@@ -760,8 +752,8 @@ export default class Tree {
     fireEvent(this.canvasEl, 'loading');
   }
 
-  loadError(message) {
-    fireEvent(this.canvasEl, 'error', { message: message });
+  loadError(error) {
+    fireEvent(this.canvasEl, 'error', { error: error });
   }
 
   subtreeDrawn(node) {

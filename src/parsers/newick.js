@@ -1,6 +1,4 @@
 import Branch from '../Branch';
-import { Shapes } from '../utils/constants';
-import nodeRenderers from '../nodeRenderers';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;
@@ -16,14 +14,16 @@ function parseLabel(string) {
   let label = '';
   for (let char of string) {
     if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
-      return label;
+      break;
     }
     label += char;
   }
+  return label;
 }
 
 function parseAnnotations(label, branch) {
   let segments = label.split('**');
+  let displayOptions = {};
   branch.id = segments[0];
   if (segments.length === 1) return;
   segments = segments[1].split('*');
@@ -32,32 +32,19 @@ function parseAnnotations(label, branch) {
     let value = segments[b + 1];
     switch (segments[b]) {
       case 'nsz' :
-        branch.radius = window.parseInt(value);
+        displayOptions.size = window.parseInt(value);
         break;
       case 'nsh' :
-        if (Shapes[value]) {
-          branch.nodeShape = Shapes[value];
-        } else if (nodeRenderers[value]) {
-          branch.nodeShape = value;
-        } else {
-          branch.nodeShape = 'circle';
-        }
+        displayOptions.shape = value;
         break;
-      case 'ncol' : branch.colour = value;
-        let hexRed = '0x' + branch.colour.substring(0, 2);
-        let hexGreen = '0x' + branch.colour.substring(2, 4);
-        let hexBlue = '0x' + branch.colour.substring(4, 6);
-        branch.colour =
-          'rgba(' +
-            parseInt(hexRed, 16).toString() + ',' +
-            parseInt(hexGreen, 16).toString() + ',' +
-            parseInt(hexBlue, 16).toString() +
-          ',1)';
+      case 'ncol' :
+        displayOptions.colour = value;
         break;
       default:
         break;
     }
   }
+  branch.setDisplay(displayOptions);
 }
 
 const nodeTerminatingChars = [ ')', ',', ';' ];
@@ -96,10 +83,12 @@ function parseBranch(branch, string, index) {
 }
 
 function parseFn({ string, root }, callback) {
+  let cleanString = string.replace(/(\r|\n)/g, '');
   let currentNode = root;
-  for (let i = 0; i < string.length; i++) {
+
+  for (let i = 0; i < cleanString.length; i++) {
     let node;
-    switch (string[i]) {
+    switch (cleanString[i]) {
       case '(': // new Child
         node = new Branch();
         currentNode.addChild(node);
@@ -114,16 +103,17 @@ function parseFn({ string, root }, callback) {
         currentNode = node;
         break;
       case ';':
-        return callback();
+        break;
       default:
           try {
-            i = parseBranch(currentNode, string, i);
+            i = parseBranch(currentNode, cleanString, i);
           } catch (e) {
             return callback(e);
           }
         break;
     }
   }
+  return callback();
 }
 
 export default {
