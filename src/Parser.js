@@ -9,9 +9,9 @@ export default class Parser {
     this.validator = validator;
   }
 
-  parse({ inputString, root, options = {} }, callback) {
+  parse({ inputString, root, options = { validate: true } }, callback) {
     let doParse = (string) => {
-      if (string.match(this.validator)) {
+      if (string.match(this.validator) || options.validate === false) {
         return this.parseFn({ string, root, options }, callback);
       }
       return callback(new Error(`Format string does not validate as "${this.format}"`));

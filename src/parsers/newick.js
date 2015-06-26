@@ -14,10 +14,11 @@ function parseLabel(string) {
   let label = '';
   for (let char of string) {
     if (labelTerminatingChars.some(isTerminatingChar.bind(char))) {
-      return label;
+      break;
     }
     label += char;
   }
+  return label;
 }
 
 function parseAnnotations(label, branch) {
@@ -82,10 +83,12 @@ function parseBranch(branch, string, index) {
 }
 
 function parseFn({ string, root }, callback) {
+  let cleanString = string.replace(/(\r|\n)/g, '');
   let currentNode = root;
-  for (let i = 0; i < string.length; i++) {
+
+  for (let i = 0; i < cleanString.length; i++) {
     let node;
-    switch (string[i]) {
+    switch (cleanString[i]) {
       case '(': // new Child
         node = new Branch();
         currentNode.addChild(node);
@@ -100,16 +103,17 @@ function parseFn({ string, root }, callback) {
         currentNode = node;
         break;
       case ';':
-        return callback();
+        break;
       default:
           try {
-            i = parseBranch(currentNode, string, i);
+            i = parseBranch(currentNode, cleanString, i);
           } catch (e) {
             return callback(e);
           }
         break;
     }
   }
+  return callback();
 }
 
 export default {

@@ -332,7 +332,7 @@ export default class Tree {
     this.selectedNodes = [];
 
     if (this.maxBranchLength === 0) {
-      this.loadError('All branches in the tree are identical.');
+      this.loadError(new Error('All branches in the tree are identical.'));
       return;
     }
 
@@ -414,7 +414,7 @@ export default class Tree {
       }
     }
 
-    this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
+    this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
   }
 
   build(inputString, parser, options) {
@@ -448,7 +448,7 @@ export default class Tree {
       this.root.setTotalLength();
 
       if (this.maxBranchLength === 0) {
-        this.loadError('All branches in the tree are identical.');
+        this.loadError(new Error('All branches in the tree are identical.'));
         return;
       }
 
@@ -645,7 +645,7 @@ export default class Tree {
 
   setTreeType(type) {
     if (!(type in treeTypes)) {
-      return fireEvent(this.canvasEl, 'error', { message: `"${type}" is not a known tree-type.` });
+      return fireEvent(this.canvasEl, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
     }
 
     let oldType = this.treeType;
@@ -752,8 +752,8 @@ export default class Tree {
     fireEvent(this.canvasEl, 'loading');
   }
 
-  loadError(message) {
-    fireEvent(this.canvasEl, 'error', { message: message });
+  loadError(error) {
+    fireEvent(this.canvasEl, 'error', { error: error });
   }
 
   subtreeDrawn(node) {
