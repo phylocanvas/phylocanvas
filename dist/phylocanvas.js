@@ -1894,7 +1894,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var centerX = this.leaf ? theta * Math.cos(this.angle) + this.centerx : this.centerx;
 	      var centerY = this.leaf ? theta * Math.sin(this.angle) + this.centery : this.centery;
 
-	      this.canvas.beginPath();
 	      this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
 
 	      this.setNodeDimensions(centerX, centerY, nodeRadius);
@@ -1924,11 +1923,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Drawing line connectors to nodes and align all the nodes vertically
 	        if (this.tree.alignLabels) {
 	          var labelAlign = this.tree.labelAlign;
-	          this.canvas.lineWidth = this.canvas.lineWidth / 5;
+	          this.canvas.lineWidth = this.canvas.lineWidth / 4;
+	          this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
 
 	          this.canvas.beginPath();
-	          this.canvas.moveTo(labelAlign.getX(this), labelAlign.getY(this));
+	          this.canvas.moveTo(centerX, centerY);
+	          this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+	          this.canvas.stroke();
 	          this.canvas.closePath();
+
+	          this.canvas.strokeStyle = this.getColour();
+	          this.canvas.moveTo(centerX, centerY);
 	        }
 	        // Save canvas
 	        this.canvas.save();
@@ -1938,10 +1943,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // rotate canvas (mainly for circular, radial trees etc)
 	        this.canvas.rotate(this.angle);
 
-	        this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
 	        // Draw node shape as chosen - default is circle
 	        _nodeRenderers2['default'][this.nodeShape](this);
-	        this.canvas.strokeStyle = this.getColour();
 
 	        if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
 	          this.drawLabel();
@@ -1956,7 +1959,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Swapping back the line width if it was changed due to alignLabels
 	        this.canvas.lineWidth = originalLineWidth;
 	      }
-	      this.canvas.closePath();
 
 	      if (this.highlighted) {
 	        this.canvas.beginPath();
@@ -2389,9 +2391,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  circle: function circle(node) {
 	    var r = node.getNodeSize();
+	    node.canvas.beginPath();
 	    node.canvas.arc(r, 0, r, 0, _utilsConstants.Angles.FULL, false);
 	    node.canvas.stroke();
 	    node.canvas.fill();
+	    node.canvas.closePath();
 	  },
 
 	  square: function square(node) {
@@ -2400,6 +2404,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var x2 = r * 2;
 	    var y1 = -r;
 	    var y2 = r;
+	    node.canvas.beginPath();
 	    node.canvas.moveTo(x1, y1);
 	    node.canvas.lineTo(x1, y2);
 	    node.canvas.lineTo(x2, y2);
@@ -2407,6 +2412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.lineTo(x1, y1);
 	    node.canvas.stroke();
 	    node.canvas.fill();
+	    node.canvas.closePath();
 	  },
 
 	  star: function star(node) {
@@ -2444,6 +2450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var r = node.getNodeSize();
 	    var lengthOfSide = 2 * r * Math.cos(30 * Math.PI / 180);
 
+	    node.canvas.beginPath();
 	    node.canvas.moveTo(0, 0);
 	    node.canvas.rotate(30 * Math.PI / 180);
 	    node.canvas.lineTo(lengthOfSide, 0);
@@ -2456,6 +2463,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    node.canvas.stroke();
 	    node.canvas.fill();
+	    node.canvas.closePath();
 	  }
 
 	};
@@ -3109,7 +3117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return node.centery + node.labelOffsetY;
 	  },
 	  getLabelOffset: function getLabelOffset(node) {
-	    return node.labelOffsetX / Math.cos(node.angle);
+	    return node.labelOffsetX / Math.cos(node.angle) - node.getNodeSize();
 	  }
 	};
 
@@ -3191,8 +3199,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      node.starty = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
 	      node.centerx = node.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
 	      node.centery = node.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
-	      node.labelOffsetX = (r + node.getNodeSize() * 2) * Math.cos(node.angle) - node.centerx;
-	      node.labelOffsetY = (r + node.getNodeSize() * 2) * Math.sin(node.angle) - node.centery;
+	      node.labelOffsetX = (r + node.getNodeSize() * 4) * Math.cos(node.angle) - node.centerx;
+	      node.labelOffsetY = (r + node.getNodeSize() * 4) * Math.sin(node.angle) - node.centery;
 
 	      for (; node.parent; node = node.parent) {
 	        if (node.getChildNo() === 0) {

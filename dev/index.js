@@ -36,7 +36,7 @@ tree.on('loaded', function () {
   tree.setNodeSize(1);
   tree.backColour = true;
   tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
-  tree.setNodeDisplay('C', { colour: 'blue', shape: 'square' });
+  tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
   tree.setNodeDisplay('D', { colour: 'green' });
   tree.alignLabels = true;
   tree.viewMetadataColumns();
@@ -44,6 +44,6 @@ tree.on('loaded', function () {
 
 tree.setTreeType('circular');
 
-// tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
-tree.load('./data/tree.nwk');
+tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
+// tree.load('./data/tree.nwk');
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');
