@@ -1,6 +1,6 @@
 import Branch from '../Branch';
 import { Shapes } from '../utils/constants';
-import nodeRenderers from '../renderers/node';
+import nodeRenderers from '../nodeRenderers';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;
@@ -114,7 +114,7 @@ function parseFn({ string, root }, callback) {
         currentNode = node;
         break;
       case ';':
-        break;
+        return callback();
       default:
           try {
             i = parseBranch(currentNode, string, i);
@@ -124,7 +124,6 @@ function parseFn({ string, root }, callback) {
         break;
     }
   }
-  callback();
 }
 
 export default {

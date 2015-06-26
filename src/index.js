@@ -16,11 +16,10 @@ import Tree from './Tree';
 import Branch from './Branch';
 import ContextMenu from './ContextMenu';
 
-import branchRenderers from './renderers/branch';
-import nodeRenderers from './renderers/node';
-import prerenderers from './renderers/pre';
+import treeTypes from './treeTypes';
+import nodeRenderers from './nodeRenderers';
 
-export { Tree, Branch, ContextMenu, branchRenderers, nodeRenderers, prerenderers };
+export { Tree, Branch, ContextMenu, treeTypes, nodeRenderers };
 
 export function History(tree) {
   this.tree = tree;
@@ -130,7 +129,7 @@ History.prototype.addSnapshot = function (id) {
   this.tree.historySnapshots.forEach(function (ele) {
     var dataTreeType = ele.getAttribute('data-tree-type');
     ele.style.background = 'transparent';
-    if (ele.id == historyIdPrefix + id && ele.getAttribute('data-tree-type') == treetype) {
+    if (ele.id === historyIdPrefix + id && ele.getAttribute('data-tree-type') === treetype) {
       // History already present
       match = true;
       ele.style.background = 'lightblue';
@@ -161,14 +160,14 @@ History.prototype.addSnapshot = function (id) {
 
 History.prototype.clear = function () {
   var listElements = this.snapshotList.getElementsByTagName('li');
-  for (var i = listElements.length; i-- ;) {
+  for (var i = listElements.length; i--; ) {
     this.snapshotList.removeChild(listElements[0]);
   }
 };
 
 History.prototype.goBackTo = function (evt) {
   var ele = evt.target;
-  this.tree.treeType = ele.getAttribute('data-tree-type');
+  this.tree.setTreeType(ele.getAttribute('data-tree-type'));
   this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
 };
 

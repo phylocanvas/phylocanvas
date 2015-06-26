@@ -1,4 +1,4 @@
-var Angles = require('../../utils/constants').Angles;
+import { Angles } from '../../utils/constants';
 
 function prerenderNodes(tree, node) {
   if (node.parent) {
@@ -11,30 +11,30 @@ function prerenderNodes(tree, node) {
   node.centerx = node.startx + (node.branchLength * tree.branchScalar * Math.cos(node.angle));
   node.centery = node.starty + (node.branchLength * tree.branchScalar * Math.sin(node.angle));
 
-  for (var i = 0; i < node.children.length; i++) {
+  for (let i = 0; i < node.children.length; i++) {
     prerenderNodes(tree, node.children[i]);
   }
 }
 
-module.exports = {
-  step: function (tree) {
+export default {
+  getStep(tree) {
     return Angles.FULL / tree.leaves.length;
   },
-  calculate: function (tree, step) {
+  calculate(tree, step) {
     tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
 
-    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
+    for (let i = 0.0; i < tree.leaves.length; i += 1.0) {
       tree.leaves[i].angle = step * i;
       tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
       tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
 
-      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-        if (nd.getChildNo() === 0) {
-          nd.parent.angle = 0;
+      for (let node = tree.leaves[i]; node.parent; node = node.parent) {
+        if (node.getChildNo() === 0) {
+          node.parent.angle = 0;
         }
-        nd.parent.angle += (nd.angle * nd.getChildCount());
-        if (nd.getChildNo() === nd.parent.children.length - 1) {
-          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
+        node.parent.angle += (node.angle * node.getChildCount());
+        if (node.getChildNo() === node.parent.children.length - 1) {
+          node.parent.angle = node.parent.angle / node.parent.getChildCount();
         } else {
           break;
         }

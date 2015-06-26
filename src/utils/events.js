@@ -1,9 +1,9 @@
-function preventDefault(event) {
+export function preventDefault(event) {
   event.preventDefault();
   return false;
 }
 
-function fireEvent(element, type, params = {}) {
+export function fireEvent(element, type, params = {}) {
   var event; // The custom event that will be created
   var param;
 
@@ -30,7 +30,7 @@ function fireEvent(element, type, params = {}) {
   }
 }
 
-function addEvent(elem, event, fn) {
+export function addEvent(elem, event, fn) {
   if (elem.addEventListener) {
     elem.addEventListener(event, fn, false);
   } else {
@@ -41,7 +41,7 @@ function addEvent(elem, event, fn) {
   }
 }
 
-function killEvent(e) {
+export function killEvent(e) {
   e.stopPropagation();
   e.preventDefault();
 }
@@ -54,7 +54,7 @@ function killEvent(e) {
  * @param {String} func the name of the function to be called
  * @retuns {function}
  */
-function createHandler(obj, func) {
+export function createHandler(obj, func) {
   var handler;
 
   if (typeof func === typeof 'aaa') {
@@ -68,9 +68,3 @@ function createHandler(obj, func) {
   }
   return handler;
 }
-
-module.exports.preventDefault = preventDefault;
-module.exports.fireEvent = fireEvent;
-module.exports.addEvent = addEvent;
-module.exports.killEvent = killEvent;
-module.exports.createHandler = createHandler;

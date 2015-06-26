@@ -1,5 +1,5 @@
-module.exports = {
-  draw: function (tree, node) {
+export default {
+  draw(tree, node) {
     var branchLength = node.branchLength * tree.branchScalar;
 
     node.angle = 0;
@@ -14,7 +14,7 @@ module.exports = {
     node.canvas.stroke();
     node.canvas.closePath();
   },
-  prepareChild: function (node, child) {
+  prepareChild(node, child) {
     child.startx = node.centerx;
     child.starty = node.centery;
   }
