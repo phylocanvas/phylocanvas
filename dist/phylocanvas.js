@@ -3819,7 +3819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var value = segments[b + 1];
 	    switch (segments[b]) {
 	      case 'nsz':
-	        displayOptions.radius = window.parseInt(value);
+	        displayOptions.size = window.parseInt(value);
 	        break;
 	      case 'nsh':
 	        displayOptions.shape = value;
