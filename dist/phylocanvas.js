@@ -1176,7 +1176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var id = _step2.value;
 
 	              if (!(id in this.branches)) {
-	                return;
+	                continue;
 	              }
 	              this.branches[id].setDisplay(options);
 	            }
