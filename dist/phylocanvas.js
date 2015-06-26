@@ -70,44 +70,39 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utilsDom = __webpack_require__(4);
+	var _utilsDom = __webpack_require__(1);
 
-	var _utilsEvents = __webpack_require__(3);
+	var _utilsEvents = __webpack_require__(2);
 
 	/**
 	 * @namespace PhyloCanvas
 	 */
 
-	var _Tree = __webpack_require__(5);
+	var _Tree = __webpack_require__(3);
 
 	var _Tree2 = _interopRequireDefault(_Tree);
 
-	var _Branch = __webpack_require__(6);
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(1);
+	var _ContextMenu = __webpack_require__(7);
 
 	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
-	var _renderersBranch = __webpack_require__(10);
+	var _treeTypes = __webpack_require__(10);
 
-	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
+	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _renderersNode = __webpack_require__(8);
+	var _nodeRenderers = __webpack_require__(6);
 
-	var _renderersNode2 = _interopRequireDefault(_renderersNode);
-
-	var _renderersPre = __webpack_require__(17);
-
-	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
 	exports.Tree = _Tree2['default'];
 	exports.Branch = _Branch2['default'];
 	exports.ContextMenu = _ContextMenu2['default'];
-	exports.branchRenderers = _renderersBranch2['default'];
-	exports.nodeRenderers = _renderersNode2['default'];
-	exports.prerenderers = _renderersPre2['default'];
+	exports.treeTypes = _treeTypes2['default'];
+	exports.nodeRenderers = _nodeRenderers2['default'];
 
 	function History(tree) {
 	  this.tree = tree;
@@ -217,7 +212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.tree.historySnapshots.forEach(function (ele) {
 	    var dataTreeType = ele.getAttribute('data-tree-type');
 	    ele.style.background = 'transparent';
-	    if (ele.id == historyIdPrefix + id && ele.getAttribute('data-tree-type') == treetype) {
+	    if (ele.id === historyIdPrefix + id && ele.getAttribute('data-tree-type') === treetype) {
 	      // History already present
 	      match = true;
 	      ele.style.background = 'lightblue';
@@ -255,7 +250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	History.prototype.goBackTo = function (evt) {
 	  var ele = evt.target;
-	  this.tree.treeType = ele.getAttribute('data-tree-type');
+	  this.tree.setTreeType(ele.getAttribute('data-tree-type'));
 	  this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
 	};
 
@@ -293,364 +288,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	var _Tooltip2 = __webpack_require__(2);
-
-	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
-
-	var _utilsEvents = __webpack_require__(3);
-
-	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
-	  handler: function handler(branch) {
-	    branch.toggleCollapsed();
-	    branch.tree.draw(); // some browsers do not fire mousemove after clicking
-	  },
-	  nodeType: 'internal'
-	}, {
-	  text: 'Rotate Branch',
-	  handler: 'rotate',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Redraw Subtree',
-	  handler: 'redrawTreeFromBranch',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Show/Hide Labels',
-	  handler: 'toggleLabels'
-	}, {
-	  text: 'Export As Image',
-	  handler: 'exportCurrentTreeView'
-	}, {
-	  text: 'Export Leaf IDs',
-	  handler: 'downloadAllLeafIds'
-	}, {
-	  text: 'Export Leaf IDs on Branch',
-	  handler: 'downloadLeafIdsFromBranch',
-	  nodeType: 'internal'
-	}];
-
-	function menuItemApplicable(menuItem, node) {
-	  if (!node) {
-	    return !menuItem.nodeType;
-	  }
-
-	  if (node.leaf && menuItem.nodeType !== 'internal') {
-	    return true;
-	  }
-
-	  if (!node.leaf && menuItem.nodeType === 'internal') {
-	    return true;
-	  }
-
-	  return false;
-	}
-
-	function mouseover(element) {
-	  element.style.backgroundColor = '#E2E3DF';
-	}
-
-	function mouseout(element) {
-	  element.style.backgroundColor = 'transparent';
-	}
-
-	function transferMenuItem(_ref) {
-	  var handler = _ref.handler;
-	  var _ref$text = _ref.text;
-	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
-	  var nodeType = _ref.nodeType;
-
-	  return { handler: handler, text: text, nodeType: nodeType };
-	}
-
-	/**
-	 * The menu that is shown when the PhyloCanvas widget is right-clicked
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 * @extends Tooltip
-	 */
-
-	var ContextMenu = (function (_Tooltip) {
-	  function ContextMenu(tree) {
-	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
-
-	    _classCallCheck(this, ContextMenu);
-
-	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
-
-	    this.menuItems = menuItems.map(transferMenuItem);
-	    this.fontSize = '8pt';
-	  }
-
-	  _inherits(ContextMenu, _Tooltip);
-
-	  _createClass(ContextMenu, [{
-	    key: 'click',
-	    value: function click() {
-	      (0, _utilsEvents.createHandler)(this, 'close');
-	    }
-	  }, {
-	    key: 'createContent',
-	    value: function createContent(node) {
-	      var list = document.createElement('ul');
-
-	      list.style.margin = '0';
-	      list.style.padding = '0';
-
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var menuItem = _step.value;
-
-	          if (!menuItemApplicable(menuItem, node)) {
-	            continue;
-	          }
-
-	          var listElement = this.createElement('li', menuItem.text);
-	          listElement.style.listStyle = 'none outside none';
-
-	          if (menuItem.nodeType) {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
-	          } else {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
-	          }
-	          listElement.addEventListener('click', this.click);
-	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
-	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
-	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
-
-	          list.appendChild(listElement);
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
-	      this.element.appendChild(list);
-	    }
-	  }]);
-
-	  return ContextMenu;
-	})(_Tooltip3['default']);
-
-	exports['default'] = ContextMenu;
-	module.exports = exports['default'];
-
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Tooltip
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 */
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	var Tooltip = (function () {
-	  function Tooltip(tree) {
-	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
-	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
-
-	    _classCallCheck(this, Tooltip);
-
-	    this.tree = tree;
-	    this.element = element;
-	    this.element.className = className;
-	    this.element.style.display = 'none';
-	    this.element.style.position = 'fixed';
-	    this.element.style.border = '1px solid #CCCCCC';
-	    this.element.style.background = '#FFFFFF';
-	    this.element.style.letterSpacing = '0.5px';
-	    this.closed = true;
-
-	    this.tree.canvasEl.appendChild(this.element);
-	  }
-
-	  _createClass(Tooltip, [{
-	    key: 'close',
-	    value: function close() {
-	      this.element.style.display = 'none';
-	      this.closed = true;
-	    }
-	  }, {
-	    key: 'createElement',
-	    value: function createElement(tagName, textContent) {
-	      var element = document.createElement(tagName);
-	      element.style.cursor = 'pointer';
-	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
-	      element.style.fontFamily = this.tree.font;
-	      element.style.fontSize = this.fontSize || '12pt';
-	      element.appendChild(document.createTextNode(textContent));
-	      return element;
-	    }
-	  }, {
-	    key: 'createContent',
-
-	    /**
-	     * Shows number of child nodes by default
-	     */
-	    value: function createContent(node) {
-	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
-	    }
-	  }, {
-	    key: 'open',
-	    value: function open(x, y, node) {
-	      if (x === undefined) x = 100;
-	      if (y === undefined) y = 100;
-
-	      while (this.element.hasChildNodes()) {
-	        this.element.removeChild(this.element.firstChild);
-	      }
-
-	      this.createContent(node);
-
-	      this.element.style.top = y + 'px';
-	      this.element.style.left = x + 'px';
-
-	      this.element.style.zIndex = 2000;
-	      this.element.style.display = 'block';
-	      this.element.style.backgroundColor = '#FFFFFF';
-
-	      this.closed = false;
-	    }
-	  }]);
-
-	  return Tooltip;
-	})();
-
-	exports['default'] = Tooltip;
-	module.exports = exports['default'];
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
-
-	function fireEvent(element, type) {
-	  var params = arguments[2] === undefined ? {} : arguments[2];
-
-	  var event; // The custom event that will be created
-	  var param;
-
-	  if (document.createEvent) {
-	    event = document.createEvent('HTMLEvents');
-	    event.initEvent(type, true, true);
-	  } else {
-	    event = document.createEventObject();
-	    event.eventType = type;
-	  }
-
-	  event.eventName = type;
-
-	  for (param in params) {
-	    if (params.hasOwnProperty(param)) {
-	      event[param] = params[param];
-	    }
-	  }
-
-	  if (document.createEvent) {
-	    element.dispatchEvent(event);
-	  } else {
-	    element.fireEvent('on' + event.eventType, event);
-	  }
-	}
-
-	function addEvent(elem, event, fn) {
-	  if (elem.addEventListener) {
-	    elem.addEventListener(event, fn, false);
-	  } else {
-	    elem.attachEvent('on' + event, function () {
-	      // set the this pointer same as addEventListener when fn is called
-	      return fn.call(elem, window.event);
-	    });
-	  }
-	}
-
-	function killEvent(e) {
-	  e.stopPropagation();
-	  e.preventDefault();
-	}
-
-	/**
-	 * Creates a function which can be called from an event handler independent of
-	 * scope.
-	 *
-	 * @param {Object} obj the object the function will be called on
-	 * @param {String} func the name of the function to be called
-	 * @retuns {function}
-	 */
-	function createHandler(obj, func) {
-	  var handler;
-
-	  if (typeof func === typeof 'aaa') {
-	    handler = function (e) {
-	      if (obj[func]) {
-	        return obj[func](e);
-	      }
-	    };
-	  } else {
-	    handler = function () {
-	      return func(obj);
-	    };
-	  }
-	  return handler;
-	}
-
-	module.exports.preventDefault = preventDefault;
-	module.exports.fireEvent = fireEvent;
-	module.exports.addEvent = addEvent;
-	module.exports.killEvent = killEvent;
-	module.exports.createHandler = createHandler;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
 	exports.createBlobUrl = createBlobUrl;
 	exports.setupDownloadLink = setupDownloadLink;
 	exports.getX = getX;
@@ -659,7 +296,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.removeClass = removeClass;
 	exports.hasClass = hasClass;
 
-	var _events = __webpack_require__(3);
+	var _events = __webpack_require__(2);
 
 	var windowURL = window.URL || window.webkitURL;
 
@@ -741,24 +378,123 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 5 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports.preventDefault = preventDefault;
+	exports.fireEvent = fireEvent;
+	exports.addEvent = addEvent;
+	exports.killEvent = killEvent;
+	exports.createHandler = createHandler;
+
+	function preventDefault(event) {
+	  event.preventDefault();
+	  return false;
+	}
+
+	function fireEvent(element, type) {
+	  var params = arguments[2] === undefined ? {} : arguments[2];
+
+	  var event; // The custom event that will be created
+	  var param;
+
+	  if (document.createEvent) {
+	    event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	  } else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	  }
+
+	  event.eventName = type;
+
+	  for (param in params) {
+	    if (params.hasOwnProperty(param)) {
+	      event[param] = params[param];
+	    }
+	  }
+
+	  if (document.createEvent) {
+	    element.dispatchEvent(event);
+	  } else {
+	    element.fireEvent('on' + event.eventType, event);
+	  }
+	}
+
+	function addEvent(elem, event, fn) {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(event, fn, false);
+	  } else {
+	    elem.attachEvent('on' + event, function () {
+	      // set the this pointer same as addEventListener when fn is called
+	      return fn.call(elem, window.event);
+	    });
+	  }
+	}
+
+	function killEvent(e) {
+	  e.stopPropagation();
+	  e.preventDefault();
+	}
+
+	/**
+	 * Creates a function which can be called from an event handler independent of
+	 * scope.
+	 *
+	 * @param {Object} obj the object the function will be called on
+	 * @param {String} func the name of the function to be called
+	 * @retuns {function}
+	 */
+
+	function createHandler(obj, func) {
+	  var handler;
+
+	  if (typeof func === typeof 'aaa') {
+	    handler = function (e) {
+	      if (obj[func]) {
+	        return obj[func](e);
+	      }
+	    };
+	  } else {
+	    handler = function () {
+	      return func(obj);
+	    };
+	  }
+	  return handler;
+	}
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
 
-	var _Branch = __webpack_require__(6);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(1);
+	var _ContextMenu = __webpack_require__(7);
 
 	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
-	var _Tooltip = __webpack_require__(2);
+	var _Tooltip = __webpack_require__(8);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
@@ -766,23 +502,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 
-	var _renderersBranch = __webpack_require__(10);
+	var _treeTypes = __webpack_require__(10);
 
-	var _renderersBranch2 = _interopRequireDefault(_renderersBranch);
+	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _renderersPre = __webpack_require__(17);
+	var _utilsConstants = __webpack_require__(4);
 
-	var _renderersPre2 = _interopRequireDefault(_renderersPre);
+	var _utilsDom = __webpack_require__(1);
 
-	var _utilsConstants = __webpack_require__(7);
+	var _utilsEvents = __webpack_require__(2);
 
-	var _utilsDom = __webpack_require__(4);
+	var _utilsCanvas = __webpack_require__(28);
 
-	var _utilsEvents = __webpack_require__(3);
-
-	var _utilsCanvas = __webpack_require__(24);
-
-	var _parsers = __webpack_require__(25);
+	var _parsers = __webpack_require__(29);
 
 	var _parsers2 = _interopRequireDefault(_parsers);
 
@@ -802,934 +534,1070 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @example
 	 *  new PhyloCanvas.Tree(element);
 	 */
-	function Tree(element) {
-	  var conf = arguments[1] === undefined ? {} : arguments[1];
 
-	  this.canvasEl = typeof element === 'string' ? document.getElementById(element) : element;
-	  (0, _utilsDom.addClass)(this.canvasEl, 'pc-container');
-	  /**
-	   *
-	   * Dictionary of all branches indexed by Id
-	   */
-	  this.branches = {};
-	  /**
-	   *
-	   * List of leaves
-	   */
-	  this.leaves = [];
-	  /**
-	   * The root node of the tree
-	   * (not neccesarily a root in the Phylogenetic sense)
-	   */
-	  this.root = false;
+	var Tree = (function () {
+	  function Tree(element) {
+	    var conf = arguments[1] === undefined ? {} : arguments[1];
 
-	  /**
-	   *
-	   * used for auto ids for internal nodes
-	   * @private
-	   */
-	  this.lastId = 0;
+	    _classCallCheck(this, Tree);
 
-	  /**
-	   * backColour colour the branches of the tree based on the colour of the
-	   * tips
-	   */
-	  this.backColour = false;
+	    this.canvasEl = typeof element === 'string' ? document.getElementById(element) : element;
+	    (0, _utilsDom.addClass)(this.canvasEl, 'pc-container');
+	    /**
+	     *
+	     * Dictionary of all branches indexed by Id
+	     */
+	    this.branches = {};
+	    /**
+	     *
+	     * List of leaves
+	     */
+	    this.leaves = [];
+	    /**
+	     * The root node of the tree
+	     * (not neccesarily a root in the Phylogenetic sense)
+	     */
+	    this.root = false;
 
-	  this.origBL = {};
-	  this.origP = {};
+	    /**
+	     *
+	     * used for auto ids for internal nodes
+	     * @private
+	     */
+	    this.lastId = 0;
 
-	  // Set up the element and canvas
-	  if (window.getComputedStyle(this.canvasEl).position === 'static') {
-	    this.canvasEl.style.position = 'relative';
-	  }
-	  this.canvasEl.style.boxSizing = 'border-box';
-	  var canvas = document.createElement('canvas');
-	  canvas.id = element.id + 'pCanvas';
-	  canvas.className = 'phylocanvas';
-	  canvas.style.position = 'relative';
-	  canvas.style.backgroundColor = '#FFFFFF';
-	  canvas.height = element.clientHeight || 400;
-	  canvas.width = element.clientWidth || 400;
-	  canvas.style.zIndex = '1';
-	  this.canvasEl.appendChild(canvas);
+	    /**
+	     * backColour colour the branches of the tree based on the colour of the
+	     * tips
+	     */
+	    this.backColour = false;
 
-	  /***
-	   * Right click menu
-	   * Users could pass options while creating the Tree object
-	   */
-	  this.contextMenu = new _ContextMenu2['default'](this, conf.contextMenu);
+	    this.origBL = {};
+	    this.origP = {};
 
-	  this.defaultCollapsedOptions = {};
-	  this.defaultCollapsed = false;
-	  if (conf.defaultCollapsed !== undefined) {
-	    if (conf.defaultCollapsed.min && conf.defaultCollapsed.max) {
-	      this.defaultCollapsedOptions = conf.defaultCollapsed;
-	      this.defaultCollapsed = true;
+	    // Set up the element and canvas
+	    if (window.getComputedStyle(this.canvasEl).position === 'static') {
+	      this.canvasEl.style.position = 'relative';
 	    }
-	  }
+	    this.canvasEl.style.boxSizing = 'border-box';
 
-	  this.tooltip = new _Tooltip2['default'](this);
+	    var canvas = document.createElement('canvas');
+	    canvas.id = (element.id || '') + '__canvas';
+	    canvas.className = 'phylocanvas';
+	    canvas.style.position = 'relative';
+	    canvas.style.backgroundColor = '#FFFFFF';
+	    canvas.height = element.clientHeight || 400;
+	    canvas.width = element.clientWidth || 400;
+	    canvas.style.zIndex = '1';
+	    this.canvasEl.appendChild(canvas);
 
-	  this.drawn = false;
+	    /***
+	     * Right click menu
+	     * Users could pass options while creating the Tree object
+	     */
+	    this.contextMenu = new _ContextMenu2['default'](this, conf.contextMenu);
 
-	  this.selectedNodes = [];
-
-	  this.zoom = 1;
-	  this.pickedup = false;
-	  this.dragging = false;
-	  this.startx = null;this.starty = null;
-	  this.pickedup = false;
-	  this.baseNodeSize = 1;
-	  this.curx = null;
-	  this.cury = null;
-	  this.origx = null;
-	  this.origy = null;
-
-	  this.canvas = canvas.getContext('2d');
-
-	  this.canvas.canvas.onselectstart = function () {
-	    return false;
-	  };
-	  this.canvas.fillStyle = '#000000';
-	  this.canvas.strokeStyle = '#000000';
-	  this.canvas.save();
-
-	  this.offsetx = this.canvas.canvas.width / 2;
-	  this.offsety = this.canvas.canvas.height / 2;
-	  this.selectedColour = 'rgba(49,151,245,1)';
-	  this.highlightColour = 'rgba(49,151,245,1)';
-	  this.highlightWidth = 5;
-	  this.selectedNodeSizeIncrease = 0;
-	  this.branchColour = 'rgba(0,0,0,1)';
-	  this.branchScalar = 1;
-
-	  this.hoverLabel = false;
-
-	  this.internalNodesSelectable = true;
-
-	  this.showLabels = true;
-	  this.showBootstraps = false;
-
-	  this.treeType = 'radial';
-	  this.maxBranchLength = 0;
-	  this.lineWidth = 1;
-	  this.textSize = 7;
-	  this.font = 'sans-serif';
-
-	  this.unselectOnClickAway = true;
-	  this.rightClickZoom = true;
-
-	  if (this.useNavigator) {
-	    this.navigator = new _Navigator2['default'](this);
-	  }
-
-	  this.adjustForPixelRatio();
-
-	  this.initialiseHistory(conf);
-
-	  this.addListener('contextmenu', this.clicked.bind(this));
-	  this.addListener('click', this.clicked.bind(this));
-
-	  this.addListener('mousedown', this.pickup.bind(this));
-	  this.addListener('mouseup', this.drop.bind(this));
-	  this.addListener('mouseout', this.drop.bind(this));
-
-	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	  (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	  (0, _utilsEvents.addEvent)(window, 'resize', (function () {
-	    this.resizeToContainer();
-	  }).bind(this));
-
-	  this.addListener('loaded', (function () {
-	    this.origBranches = this.branches;
-	    this.origLeaves = this.leaves;
-	    this.origRoot = this.root;
-	  }).bind(this));
-
-	  /**
-	   * Align nodes vertically
-	   */
-	  this.nodeAlign = false;
-	  /**
-	   * X and Y axes of the node that is farther from the root
-	   * Used to align node vertically
-	   */
-	  this.farthestNodeFromRootX = 0;
-	  this.farthestNodeFromRootY = 0;
-	  this.showMetadata = false;
-	  // Takes an array of metadata column headings to overlay on the tree
-	  this.selectedMetadataColumns = [];
-	  // Colour for 1 and 0s. Currently 0s are not drawn
-	  this.colour1 = 'rgba(206,16,16,1)';
-	  this.colour0 = '#ccc';
-	  /**
-	     Maximum length of label for each tree type.
-	     Because label length pixel differes for different tree types for some reason
-	   */
-	  this.maxLabelLength = {};
-	  // x step for metadata
-	  this.metadataXStep = 15;
-	  // Boolean to detect if metadata heading is drawn or not
-	  this.metadataHeadingDrawn = false;
-	}
-
-	Tree.prototype.setInitialCollapsedBranches = function () {
-	  var node = arguments[0] === undefined ? this.root : arguments[0];
-
-	  var childIds;
-	  var i;
-
-	  childIds = node.getChildIds();
-	  if (childIds && childIds.length > this.defaultCollapsedOptions.min && childIds.length < this.defaultCollapsedOptions.max) {
-	    node.collapsed = true;
-	    return;
-	  }
-
-	  for (i = 0; i < node.children.length; i++) {
-	    this.setInitialCollapsedBranches(node.children[i]);
-	  }
-	};
-
-	Tree.prototype.clicked = function (e) {
-	  var node;
-	  var nids;
-	  if (e.button === 0) {
-	    var _root;
-
-	    nids = [];
-	    // if this is triggered by the release after a drag then the click
-	    // shouldn't be triggered.
-	    if (this.dragging) {
-	      this.dragging = false;
-	      return;
-	    }
-
-	    if (!this.root) return false;
-	    node = (_root = this.root).clicked.apply(_root, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
-
-	    if (node) {
-	      this.root.setSelected(false, true);
-	      if (this.internalNodesSelectable || node.leaf) {
-	        node.setSelected(true, true);
-	        nids = node.getChildIds();
+	    this.defaultCollapsedOptions = {};
+	    this.defaultCollapsed = false;
+	    if (conf.defaultCollapsed !== undefined) {
+	      if (conf.defaultCollapsed.min && conf.defaultCollapsed.max) {
+	        this.defaultCollapsedOptions = conf.defaultCollapsed;
+	        this.defaultCollapsed = true;
 	      }
-	      this.draw();
-	    } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-	      this.root.setSelected(false, true);
-	      this.draw();
 	    }
 
-	    if (!this.pickedup) {
-	      this.dragging = false;
-	    }
+	    this.tooltip = new _Tooltip2['default'](this);
 
-	    this.nodesSelected(nids);
-	  } else if (e.button === 2) {
-	    var _root2;
+	    this.drawn = false;
 
-	    e.preventDefault();
-	    node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
-	    this.contextMenu.open(e.clientX, e.clientY, node);
-	    this.contextMenu.closed = false;
-	    this.tooltip.close();
-	  }
-	};
+	    this.selectedNodes = [];
 
-	Tree.prototype.dblclicked = function (e) {
-	  var _root3;
-
-	  if (!this.root) return false;
-	  var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
-	  if (nd) {
-	    nd.setSelected(false, true);
-	    nd.toggleCollapsed();
-	  }
-
-	  if (!this.pickedup) {
+	    this.zoom = 1;
+	    this.pickedup = false;
 	    this.dragging = false;
-	  }
-	  this.draw();
-	};
+	    this.startx = null;this.starty = null;
+	    this.pickedup = false;
+	    this.baseNodeSize = 1;
+	    this.curx = null;
+	    this.cury = null;
+	    this.origx = null;
+	    this.origy = null;
 
-	Tree.prototype.displayLabels = function () {
-	  this.showLabels = true;
-	  this.draw();
-	};
+	    this.canvas = canvas.getContext('2d');
 
-	Tree.prototype.drag = function (event) {
-	  // get window ratio
-	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
+	    this.canvas.canvas.onselectstart = function () {
+	      return false;
+	    };
+	    this.canvas.fillStyle = '#000000';
+	    this.canvas.strokeStyle = '#000000';
+	    this.canvas.save();
 
-	  if (!this.drawn) return false;
+	    this.offsetx = this.canvas.canvas.width / 2;
+	    this.offsety = this.canvas.canvas.height / 2;
+	    this.selectedColour = 'rgba(49,151,245,1)';
+	    this.highlightColour = 'rgba(49,151,245,1)';
+	    this.highlightWidth = 5.0;
+	    this.selectedNodeSizeIncrease = 0;
+	    this.branchColour = 'rgba(0,0,0,1)';
+	    this.branchScalar = 1.0;
 
-	  if (this.pickedup) {
-	    var xmove = (event.clientX - this.startx) * ratio;
-	    var ymove = (event.clientY - this.starty) * ratio;
-	    if (Math.abs(xmove) + Math.abs(ymove) > 5) {
-	      this.dragging = true;
-	      this.offsetx = this.origx + xmove;
-	      this.offsety = this.origy + ymove;
-	      this.draw();
+	    this.hoverLabel = false;
+
+	    this.internalNodesSelectable = true;
+
+	    this.showLabels = true;
+	    this.showBootstraps = false;
+
+	    this.setTreeType('radial');
+	    this.maxBranchLength = 0;
+	    this.lineWidth = 1.0;
+	    this.textSize = 7;
+	    this.font = 'sans-serif';
+
+	    this.unselectOnClickAway = true;
+	    this.rightClickZoom = true;
+
+	    if (this.useNavigator) {
+	      this.navigator = new _Navigator2['default'](this);
 	    }
-	  } else if (this.zoomPickedUp) {
-	    // right click and drag
-	    this.d = (this.starty - event.clientY) / 100;
-	    this.setZoom(this.origZoom + this.d);
-	    this.draw();
-	  } else {
-	    var _root4;
 
-	    // hover
-	    var e = event;
-	    var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1, e.clientY * 1, this)));
+	    this.adjustForPixelRatio();
 
-	    if (nd && (this.internalNodesSelectable || nd.leaf)) {
-	      this.root.setHighlighted(false);
-	      nd.setHighlighted(true);
-	      // For mouseover tooltip to show no. of children on the internal nodes
-	      if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
-	        this.tooltip.open(e.clientX, e.clientY, nd);
-	      }
-	    } else {
-	      this.tooltip.close();
-	      this.contextMenu.close();
-	      this.root.setHighlighted(false);
-	    }
-	    this.draw();
-	  }
-	};
+	    this.initialiseHistory(conf);
 
-	/**
-	 * Draw the frame
-	 */
-	Tree.prototype.draw = function (forceRedraw) {
-	  this.selectedNodes = [];
+	    this.addListener('contextmenu', this.clicked.bind(this));
+	    this.addListener('click', this.clicked.bind(this));
 
-	  if (this.maxBranchLength === 0) {
-	    this.loadError('All branches in the tree are identical.');
-	    return;
-	  }
+	    this.addListener('mousedown', this.pickup.bind(this));
+	    this.addListener('mouseup', this.drop.bind(this));
+	    this.addListener('mouseout', this.drop.bind(this));
 
-	  this.canvas.restore();
+	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	    (0, _utilsEvents.addEvent)(window, 'resize', (function () {
+	      this.resizeToContainer();
+	    }).bind(this));
 
-	  this.canvas.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
-	  this.canvas.lineCap = 'round';
-	  this.canvas.lineJoin = 'round';
+	    this.addListener('loaded', (function () {
+	      this.origBranches = this.branches;
+	      this.origLeaves = this.leaves;
+	      this.origRoot = this.root;
+	    }).bind(this));
 
-	  this.canvas.strokeStyle = this.branchColour;
-	  this.canvas.save();
+	    /**
+	     * Align labels vertically
+	     */
+	    this.alignLabels = false;
 
-	  this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
-
-	  if (!this.drawn || forceRedraw) {
-	    _renderersPre2['default'][this.treeType].run(this);
-	    if (!forceRedraw) {
-	      this.fitInPanel();
-	    }
+	    /**
+	     * X and Y axes of the node that is farther from the root
+	     * Used to align labels vertically
+	     */
+	    this.farthestNodeFromRootX = 0;
+	    this.farthestNodeFromRootY = 0;
+	    this.showMetadata = false;
+	    // Takes an array of metadata column headings to overlay on the tree
+	    this.selectedMetadataColumns = [];
+	    // Colour for 1 and 0s. Currently 0s are not drawn
+	    this.colour1 = 'rgba(206,16,16,1)';
+	    this.colour0 = '#ccc';
+	    /**
+	       Maximum length of label for each tree type.
+	       Because label length pixel differes for different tree types for some reason
+	     */
+	    this.maxLabelLength = {};
+	    // x step for metadata
+	    this.metadataXStep = 15;
+	    // Boolean to detect if metadata heading is drawn or not
+	    this.metadataHeadingDrawn = false;
 	  }
 
-	  this.canvas.lineWidth = this.lineWidth / this.zoom;
-	  this.canvas.translate(this.offsetx, this.offsety);
-	  this.canvas.scale(this.zoom, this.zoom);
+	  _createClass(Tree, [{
+	    key: 'setInitialCollapsedBranches',
+	    value: function setInitialCollapsedBranches() {
+	      var node = arguments[0] === undefined ? this.root : arguments[0];
 
-	  _renderersBranch2['default'][this.treeType].render(this, this.root);
-	  // Making default collapsed false so that it will collapse on initial load only
-	  this.defaultCollapsed = false;
-	  this.metadataHeadingDrawn = false;
-	  this.drawn = true;
-	};
+	      var childIds;
+	      var i;
 
-	Tree.prototype.drop = function () {
-	  if (!this.drawn) return false;
-	  this.pickedup = false;
-	  this.zoomPickedUp = false;
-	};
-
-	Tree.prototype.findBranch = function (patt) {
-	  this.root.setSelected(false, true);
-	  for (var i = 0; i < this.leaves.length; i++) {
-	    if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
-	      this.leaves[i].setSelected(true, true);
-	    }
-	  }
-	  this.draw();
-	};
-
-	Tree.prototype.clearSelect = function () {
-	  this.root.setSelected(false, true);
-	  this.draw();
-	};
-
-	Tree.prototype.generateBranchId = function () {
-	  return 'pcn' + this.lastId++;
-	};
-
-	Tree.prototype.getPngUrl = function () {
-	  return this.canvas.canvas.toDataURL();
-	};
-
-	Tree.prototype.hideLabels = function () {
-	  this.showLabels = false;
-	  this.draw();
-	};
-
-	Tree.prototype.load = function (inputString) {
-	  var options = arguments[1] === undefined ? {} : arguments[1];
-
-	  if (options.format) {
-	    this.build(inputString, _parsers2['default'][options.format], options);
-	    return;
-	  }
-
-	  var _iteratorNormalCompletion = true;
-	  var _didIteratorError = false;
-	  var _iteratorError = undefined;
-
-	  try {
-	    for (var _iterator = Object.keys(_parsers2['default'])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	      var parserName = _step.value;
-
-	      var parser = _parsers2['default'][parserName];
-
-	      if (inputString.match(parser.fileExtension) || inputString.match(parser.validator)) {
-	        this.build(inputString, parser, options);
+	      childIds = node.getChildIds();
+	      if (childIds && childIds.length > this.defaultCollapsedOptions.min && childIds.length < this.defaultCollapsedOptions.max) {
+	        node.collapsed = true;
 	        return;
 	      }
-	    }
-	  } catch (err) {
-	    _didIteratorError = true;
-	    _iteratorError = err;
-	  } finally {
-	    try {
-	      if (!_iteratorNormalCompletion && _iterator['return']) {
-	        _iterator['return']();
-	      }
-	    } finally {
-	      if (_didIteratorError) {
-	        throw _iteratorError;
+
+	      for (i = 0; i < node.children.length; i++) {
+	        this.setInitialCollapsedBranches(node.children[i]);
 	      }
 	    }
-	  }
+	  }, {
+	    key: 'clicked',
+	    value: function clicked(e) {
+	      var node;
+	      var nids;
+	      if (e.button === 0) {
+	        var _root;
 
-	  this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
-	};
+	        nids = [];
+	        // if this is triggered by the release after a drag then the click
+	        // shouldn't be triggered.
+	        if (this.dragging) {
+	          this.dragging = false;
+	          return;
+	        }
 
-	Tree.prototype.build = function (inputString, parser, options) {
-	  var _this2 = this;
+	        if (!this.root) return false;
+	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
 
-	  this.origBranches = false;
-	  this.origLeaves = false;
-	  this.origRoot = false;
-	  this.origBL = {};
-	  this.origP = {};
-
-	  this.root = false;
-	  this.leaves = [];
-	  this.branches = {};
-	  this.drawn = false;
-
-	  var root = new _Branch2['default']();
-	  root.id = 'root';
-	  this.branches.root = root;
-	  this.setRoot(root);
-
-	  parser.parse({ inputString: inputString, root: root, options: options }, function (error) {
-	    if (error) {
-	      _this2.loadError(error);
-	      return;
-	    }
-
-	    _this2.saveNode(_this2.root);
-	    _this2.root.saveChildren();
-
-	    _this2.root.branchLength = 0;
-	    _this2.maxBranchLength = 0;
-	    _this2.root.setTotalLength();
-
-	    if (_this2.maxBranchLength === 0) {
-	      _this2.loadError('All branches in the tree are identical.');
-	      return;
-	    }
-
-	    _this2.buildLeaves();
-	    _this2.setInitialCollapsedBranches();
-
-	    _this2.draw();
-	    _this2.loadCompleted();
-	  });
-	};
-
-	Tree.prototype.pickup = function (event) {
-	  if (!this.drawn) return false;
-	  this.origx = this.offsetx;
-	  this.origy = this.offsety;
-
-	  if (event.button === 0) {
-	    this.pickedup = true;
-	  }
-
-	  if (event.button === 2 && this.rightClickZoom) {
-	    this.zoomPickedUp = true;
-	    this.origZoom = Math.log(this.zoom) / Math.log(10);
-	    this.oz = this.zoom;
-	    // position in the diagram on which you clicked
-	  }
-	  this.startx = event.clientX;
-	  this.starty = event.clientY;
-	};
-
-	Tree.prototype.redrawGetNodes = function (node, leafIds) {
-	  for (var i = 0; i < node.children.length; i++) {
-	    this.branches[node.children[i].id] = node.children[i];
-	    if (node.children[i].leaf) {
-	      leafIds.push(node.children[i].id);
-	      this.leaves.push(node.children[i]);
-	    } else {
-	      this.redrawGetNodes(node.children[i], leafIds);
-	    }
-	  }
-	};
-
-	Tree.prototype.redrawFromBranch = function (node) {
-	  this.drawn = false;
-	  this.totalBranchLength = 0;
-
-	  this.resetTree();
-
-	  this.origBL[node.id] = node.branchLength;
-	  this.origP[node.id] = node.parent;
-
-	  this.root = node;
-	  this.root.branchLength = 0;
-	  this.root.parent = false;
-
-	  this.branches = {};
-	  this.leaves = [];
-	  var leafIds = [];
-
-	  for (var i = 0; i < this.root.children.length; i++) {
-	    this.branches[this.root.children[i].id] = this.root.children[i];
-	    if (this.root.children[i].leaf) {
-	      this.leaves.push(this.root.children[i]);
-	      leafIds.push(this.root.children[i].id);
-	    } else {
-	      this.redrawGetNodes(this.root.children[i], leafIds);
-	    }
-	  }
-
-	  this.root.setTotalLength();
-	  _renderersPre2['default'][this.treeType].run(this);
-	  this.draw();
-	  this.subtreeDrawn(node.id);
-	};
-
-	Tree.prototype.redrawOriginalTree = function () {
-	  this.drawn = false;
-	  this.resetTree();
-
-	  this.root.setTotalLength();
-	  _renderersPre2['default'][this.treeType].run(this);
-	  this.draw();
-
-	  this.subtreeDrawn(this.root.id);
-	};
-
-	Tree.prototype.saveNode = function (node) {
-	  if (!node.id || node.id === '') {
-	    node.id = node.tree.genId();
-	  }
-
-	  if (this.branches[node.id]) {
-	    if (node !== this.branches[node.id]) {
-	      if (!this.leaf) {
-	        node.id = this.genId();
-	      } else {
-	        throw new Error('Two nodes on this tree share the id ' + node.id);
-	      }
-	    }
-	  }
-
-	  this.branches[node.id] = node;
-	};
-
-	Tree.prototype.scroll = function (e) {
-	  var z = Math.log(this.zoom) / Math.log(10);
-	  this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
-	  e.preventDefault();
-	};
-
-	Tree.prototype.selectNodes = function (nIds) {
-	  var ns = nIds;
-	  var node;
-	  var nodeId;
-	  var index;
-
-	  if (this.root) {
-	    this.root.setSelected(false, true);
-	    if (typeof nIds === 'string') {
-	      ns = ns.split(',');
-	    }
-	    for (nodeId in this.branches) {
-	      if (this.branches.hasOwnProperty(nodeId)) {
-	        node = this.branches[nodeId];
-	        for (index = 0; index < ns.length; index++) {
-	          if (ns[index] === node.id) {
+	        if (node) {
+	          this.root.setSelected(false, true);
+	          if (this.internalNodesSelectable || node.leaf) {
 	            node.setSelected(true, true);
+	            nids = node.getChildIds();
 	          }
+	          this.draw();
+	        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
+	          this.root.setSelected(false, true);
+	          this.draw();
+	        }
+
+	        if (!this.pickedup) {
+	          this.dragging = false;
+	        }
+
+	        this.nodesSelected(nids);
+	      } else if (e.button === 2) {
+	        var _root2;
+
+	        e.preventDefault();
+	        node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
+	        this.contextMenu.open(e.clientX, e.clientY, node);
+	        this.contextMenu.closed = false;
+	        this.tooltip.close();
+	      }
+	    }
+	  }, {
+	    key: 'dblclicked',
+	    value: function dblclicked(e) {
+	      var _root3;
+
+	      if (!this.root) return false;
+	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1.0, e.clientY * 1.0, this)));
+	      if (nd) {
+	        nd.setSelected(false, true);
+	        nd.toggleCollapsed();
+	      }
+
+	      if (!this.pickedup) {
+	        this.dragging = false;
+	      }
+	      this.draw();
+	    }
+	  }, {
+	    key: 'displayLabels',
+	    value: function displayLabels() {
+	      this.showLabels = true;
+	      this.draw();
+	    }
+	  }, {
+	    key: 'drag',
+	    value: function drag(event) {
+	      // get window ratio
+	      var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
+
+	      if (!this.drawn) return false;
+
+	      if (this.pickedup) {
+	        var xmove = (event.clientX - this.startx) * ratio;
+	        var ymove = (event.clientY - this.starty) * ratio;
+	        if (Math.abs(xmove) + Math.abs(ymove) > 5) {
+	          this.dragging = true;
+	          this.offsetx = this.origx + xmove;
+	          this.offsety = this.origy + ymove;
+	          this.draw();
+	        }
+	      } else if (this.zoomPickedUp) {
+	        // right click and drag
+	        this.d = (this.starty - event.clientY) / 100;
+	        this.setZoom(this.origZoom + this.d);
+	        this.draw();
+	      } else {
+	        var _root4;
+
+	        // hover
+	        var e = event;
+	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1.0, e.clientY * 1.0, this)));
+
+	        if (nd && (this.internalNodesSelectable || nd.leaf)) {
+	          this.root.setHighlighted(false);
+	          nd.setHighlighted(true);
+	          // For mouseover tooltip to show no. of children on the internal nodes
+	          if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
+	            this.tooltip.open(e.clientX, e.clientY, nd);
+	          }
+	        } else {
+	          this.tooltip.close();
+	          this.contextMenu.close();
+	          this.root.setHighlighted(false);
+	        }
+	        this.draw();
+	      }
+	    }
+	  }, {
+	    key: 'draw',
+
+	    /**
+	     * Draw the frame
+	     */
+	    value: function draw(forceRedraw) {
+	      this.selectedNodes = [];
+
+	      if (this.maxBranchLength === 0) {
+	        this.loadError('All branches in the tree are identical.');
+	        return;
+	      }
+
+	      this.canvas.restore();
+
+	      this.canvas.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
+	      this.canvas.lineCap = 'round';
+	      this.canvas.lineJoin = 'round';
+
+	      this.canvas.strokeStyle = this.branchColour;
+	      this.canvas.save();
+
+	      this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
+
+	      if (!this.drawn || forceRedraw) {
+	        this.prerenderer.run(this);
+	        if (!forceRedraw) {
+	          this.fitInPanel();
 	        }
 	      }
+
+	      this.canvas.lineWidth = this.lineWidth / this.zoom;
+	      this.canvas.translate(this.offsetx, this.offsety);
+	      this.canvas.scale(this.zoom, this.zoom);
+
+	      this.branchRenderer.render(this, this.root);
+	      // Making default collapsed false so that it will collapse on initial load only
+	      this.defaultCollapsed = false;
+	      this.metadataHeadingDrawn = false;
+	      this.drawn = true;
 	    }
-	    this.draw();
-	  }
-	};
-
-	Tree.prototype.setFont = function (font) {
-	  if (isNaN(font)) {
-	    this.font = font;
-	    this.draw();
-	  }
-	};
-
-	Tree.prototype.setNodeColourAndShape = function (nids, colour, shape, size, waiting) {
-	  if (!nids) return;
-
-	  if (this.drawn) {
-	    var arr = [];
-	    if (typeof nids === 'string') {
-	      arr = nids.split(',');
-	    } else {
-	      arr = nids;
+	  }, {
+	    key: 'drop',
+	    value: function drop() {
+	      if (!this.drawn) return false;
+	      this.pickedup = false;
+	      this.zoomPickedUp = false;
 	    }
-
-	    if (nids !== '') {
-	      for (var i = 0; i < arr.length; i++) {
-	        if (this.branches[arr[i]]) {
-	          if (colour) {
-	            this.branches[arr[i]].colour = colour;
-	          }
-	          if (shape) {
-	            this.branches[arr[i]].nodeShape = _utilsConstants.Shapes[shape] ? _utilsConstants.Shapes[shape] : shape;
-	          }
-	          if (size) {
-	            this.branches[arr[i]].radius = size;
-	          }
+	  }, {
+	    key: 'findBranch',
+	    value: function findBranch(patt) {
+	      this.root.setSelected(false, true);
+	      for (var i = 0; i < this.leaves.length; i++) {
+	        if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
+	          this.leaves[i].setSelected(true, true);
 	        }
 	      }
 	      this.draw();
 	    }
-	  } else if (!waiting) {
-	    var _this = this;
-	    var timeout = setInterval(function () {
-	      if (this.drawn) {
-	        _this.setNodeColourAndShape(nids, colour, shape, size, true);
-	        clearInterval(timeout);
+	  }, {
+	    key: 'clearSelect',
+	    value: function clearSelect() {
+	      this.root.setSelected(false, true);
+	      this.draw();
+	    }
+	  }, {
+	    key: 'generateBranchId',
+	    value: function generateBranchId() {
+	      return 'pcn' + this.lastId++;
+	    }
+	  }, {
+	    key: 'getPngUrl',
+	    value: function getPngUrl() {
+	      return this.canvas.canvas.toDataURL();
+	    }
+	  }, {
+	    key: 'hideLabels',
+	    value: function hideLabels() {
+	      this.showLabels = false;
+	      this.draw();
+	    }
+	  }, {
+	    key: 'load',
+	    value: function load(inputString) {
+	      var options = arguments[1] === undefined ? {} : arguments[1];
+
+	      if (options.format) {
+	        this.build(inputString, _parsers2['default'][options.format], options);
+	        return;
 	      }
-	    });
-	  }
-	};
 
-	Tree.prototype.setNodeSize = function (size) {
-	  this.baseNodeSize = Number(size);
-	  this.draw();
-	};
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-	Tree.prototype.setRoot = function (node) {
-	  node.canvas = this.canvas;
-	  node.tree = this;
-	  this.root = node;
-	};
+	      try {
+	        for (var _iterator = Object.keys(_parsers2['default'])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var parserName = _step.value;
 
-	Tree.prototype.setTextSize = function (size) {
-	  this.textSize = Number(size);
-	  this.draw();
-	};
+	          var parser = _parsers2['default'][parserName];
 
-	Tree.prototype.setFontSize = function (ystep) {
-	  // Setting tree text size
-	  if (this.treeType === 'circular') {
-	    this.textSize = Math.min(ystep * 100 + 5, 40);
-	  } else if (this.treeType === 'radial') {
-	    this.textSize = Math.min(ystep * 50 + 5, 20);
-	  } else if (this.treeType === 'diagonal') {
-	    this.textSize = Math.min(ystep / 2, 10);
-	  } else {
-	    this.textSize = Math.min(ystep / 2, 15);
-	  }
-	  this.canvas.font = this.textSize + 'pt ' + this.font;
-	};
+	          if (inputString.match(parser.fileExtension) || inputString.match(parser.validator)) {
+	            this.build(inputString, parser, options);
+	            return;
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
 
-	Tree.prototype.setTreeType = function (type) {
-	  var oldType = this.treeType;
-	  this.treeType = type;
-	  if (this.drawn) {
-	    this.drawn = false;
-	    this.draw();
-	  }
-	  this.treeTypeChanged(oldType, type);
-	};
-
-	Tree.prototype.setSize = function (width, height) {
-	  this.canvas.canvas.width = width;
-	  this.canvas.canvas.height = height;
-	  if (this.navigator) {
-	    this.navigator.resize();
-	  }
-	  this.adjustForPixelRatio();
-	  if (this.drawn) {
-	    this.draw();
-	  }
-	};
-
-	Tree.prototype.setZoom = function (z) {
-	  if (z > -2 && z < 2) {
-	    var oz = this.zoom;
-	    this.zoom = Math.pow(10, z);
-
-	    this.offsetx = this.offsetx / oz * this.zoom;
-	    this.offsety = this.offsety / oz * this.zoom;
-
-	    this.draw();
-	  }
-	};
-
-	Tree.prototype.toggleLabels = function () {
-	  this.showLabels = !this.showLabels;
-	  this.draw();
-	};
-
-	Tree.prototype.viewMetadataColumns = function (metadataColumnArray) {
-	  this.showMetadata = true;
-	  if (metadataColumnArray === undefined) {
-	    // Select all column headings so that it will draw all columns
-	    metadataColumnArray = this.getMetadataColumnHeadings();
-	  }
-	  // If argument missing or no key id matching, then this array would be undefined
-	  if (metadataColumnArray !== undefined) {
-	    this.selectedMetadataColumns = metadataColumnArray;
-	  }
-	  // Fit to canvas window
-	  this.fitInPanel();
-	  this.draw();
-	};
-
-	Tree.prototype.getMetadataColumnHeadings = function () {
-	  var metadataColumnArray = [];
-	  for (var i = 0; i < this.leaves.length; i++) {
-	    if (Object.keys(this.leaves[i].data).length > 0) {
-	      metadataColumnArray = Object.keys(this.leaves[i].data);
-	      break;
+	      this.loadError('PhyloCanvas did not recognise the string as a file or a parseable format string');
 	    }
-	  }
-	  return metadataColumnArray;
-	};
+	  }, {
+	    key: 'build',
+	    value: function build(inputString, parser, options) {
+	      var _this2 = this;
 
-	Tree.prototype.clearMetadata = function () {
-	  for (var i = 0; i < this.leaves.length; i++) {
-	    if (Object.keys(this.leaves[i].data).length > 0) {
-	      this.leaves[i].data = {};
+	      this.origBranches = false;
+	      this.origLeaves = false;
+	      this.origRoot = false;
+	      this.origBL = {};
+	      this.origP = {};
+
+	      this.root = false;
+	      this.leaves = [];
+	      this.branches = {};
+	      this.drawn = false;
+
+	      var root = new _Branch2['default']();
+	      root.id = 'root';
+	      this.branches.root = root;
+	      this.setRoot(root);
+
+	      parser.parse({ inputString: inputString, root: root, options: options }, function (error) {
+	        if (error) {
+	          _this2.loadError(error);
+	          return;
+	        }
+
+	        _this2.saveNode(_this2.root);
+	        _this2.root.saveChildren();
+
+	        _this2.root.branchLength = 0;
+	        _this2.maxBranchLength = 0;
+	        _this2.root.setTotalLength();
+
+	        if (_this2.maxBranchLength === 0) {
+	          _this2.loadError('All branches in the tree are identical.');
+	          return;
+	        }
+
+	        _this2.buildLeaves();
+	        _this2.setInitialCollapsedBranches();
+
+	        _this2.draw();
+	        _this2.loadCompleted();
+	      });
 	    }
-	  }
-	};
+	  }, {
+	    key: 'pickup',
+	    value: function pickup(event) {
+	      if (!this.drawn) return false;
+	      this.origx = this.offsetx;
+	      this.origy = this.offsety;
 
-	Tree.prototype.setMaxLabelLength = function () {
-	  var dimensions;
-	  if (this.maxLabelLength[this.treeType] === undefined) {
-	    this.maxLabelLength[this.treeType] = 0;
-	  }
+	      if (event.button === 0) {
+	        this.pickedup = true;
+	      }
 
-	  for (var i = 0; i < this.leaves.length; i++) {
-	    dimensions = this.canvas.measureText(this.leaves[i].id);
-	    // finding the maximum label length
-	    if (dimensions.width > this.maxLabelLength[this.treeType]) {
-	      this.maxLabelLength[this.treeType] = dimensions.width;
+	      if (event.button === 2 && this.rightClickZoom) {
+	        this.zoomPickedUp = true;
+	        this.origZoom = Math.log(this.zoom) / Math.log(10);
+	        this.oz = this.zoom;
+	        // position in the diagram on which you clicked
+	      }
+	      this.startx = event.clientX;
+	      this.starty = event.clientY;
 	    }
-	  }
-	};
+	  }, {
+	    key: 'redrawGetNodes',
+	    value: function redrawGetNodes(node, leafIds) {
+	      for (var i = 0; i < node.children.length; i++) {
+	        this.branches[node.children[i].id] = node.children[i];
+	        if (node.children[i].leaf) {
+	          leafIds.push(node.children[i].id);
+	          this.leaves.push(node.children[i]);
+	        } else {
+	          this.redrawGetNodes(node.children[i], leafIds);
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'redrawFromBranch',
+	    value: function redrawFromBranch(node) {
+	      this.drawn = false;
+	      this.totalBranchLength = 0;
 
-	Tree.prototype.loadCompleted = function () {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loaded');
-	};
+	      this.resetTree();
 
-	Tree.prototype.loadStarted = function () {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'loading');
-	};
+	      this.origBL[node.id] = node.branchLength;
+	      this.origP[node.id] = node.parent;
 
-	Tree.prototype.loadError = function (message) {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { message: message });
-	};
+	      this.root = node;
+	      this.root.branchLength = 0;
+	      this.root.parent = false;
 
-	Tree.prototype.subtreeDrawn = function (node) {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'subtree', { node: node });
-	};
+	      this.branches = {};
+	      this.leaves = [];
+	      var leafIds = [];
 
-	Tree.prototype.nodesSelected = function (nids) {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'selected', { nodeIds: nids });
-	};
+	      for (var i = 0; i < this.root.children.length; i++) {
+	        this.branches[this.root.children[i].id] = this.root.children[i];
+	        if (this.root.children[i].leaf) {
+	          this.leaves.push(this.root.children[i]);
+	          leafIds.push(this.root.children[i].id);
+	        } else {
+	          this.redrawGetNodes(this.root.children[i], leafIds);
+	        }
+	      }
 
-	Tree.prototype.addListener = function (event, listener) {
-	  (0, _utilsEvents.addEvent)(this.canvasEl, event, listener);
-	};
+	      this.root.setTotalLength();
+	      this.prerenderer.run(this);
+	      this.draw();
+	      this.subtreeDrawn(node.id);
+	    }
+	  }, {
+	    key: 'redrawOriginalTree',
+	    value: function redrawOriginalTree() {
+	      this.drawn = false;
+	      this.resetTree();
 
-	Tree.prototype.getBounds = function () {
-	  var minx = this.root.startx;
-	  var maxx = this.root.startx;
-	  var miny = this.root.starty;
-	  var maxy = this.root.starty;
+	      this.root.setTotalLength();
+	      this.prerenderer.run(this);
+	      this.draw();
 
-	  for (var i = this.leaves.length; i--;) {
-	    var x = this.leaves[i].centerx;
-	    var y = this.leaves[i].centery;
-	    var theta = this.leaves[i].angle;
-	    var pad = this.leaves[i].getNodeSize() + (this.showLabels ? this.maxLabelLength[this.treeType] + this.leaves[i].getLabelSize() : 0) + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+	      this.subtreeDrawn(this.root.id);
+	    }
+	  }, {
+	    key: 'saveNode',
+	    value: function saveNode(node) {
+	      if (!node.id || node.id === '') {
+	        node.id = node.tree.genId();
+	      }
 
-	    x = x + pad * Math.cos(theta);
-	    y = y + pad * Math.sin(theta);
+	      if (this.branches[node.id]) {
+	        if (node !== this.branches[node.id]) {
+	          if (!this.leaf) {
+	            node.id = this.genId();
+	          } else {
+	            throw new Error('Two nodes on this tree share the id ' + node.id);
+	          }
+	        }
+	      }
 
-	    minx = Math.min(minx, x);
-	    maxx = Math.max(maxx, x);
-	    miny = Math.min(miny, y);
-	    maxy = Math.max(maxy, y);
-	  }
-	  return [[minx, miny], [maxx, maxy]];
-	};
+	      this.branches[node.id] = node;
+	    }
+	  }, {
+	    key: 'scroll',
+	    value: function scroll(e) {
+	      var z = Math.log(this.zoom) / Math.log(10);
+	      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
+	      e.preventDefault();
+	    }
+	  }, {
+	    key: 'selectNodes',
+	    value: function selectNodes(nIds) {
+	      var ns = nIds;
+	      var node;
+	      var nodeId;
+	      var index;
 
-	Tree.prototype.fitInPanel = function () {
-	  var bounds = this.getBounds();
-	  var minx = bounds[0][0];
-	  var maxx = bounds[1][0];
-	  var miny = bounds[0][1];
-	  var maxy = bounds[1][1];
-	  var padding = 50;
-	  var canvasSize = [this.canvas.canvas.width - padding, this.canvas.canvas.height - padding];
+	      if (this.root) {
+	        this.root.setSelected(false, true);
+	        if (typeof nIds === 'string') {
+	          ns = ns.split(',');
+	        }
+	        for (nodeId in this.branches) {
+	          if (this.branches.hasOwnProperty(nodeId)) {
+	            node = this.branches[nodeId];
+	            for (index = 0; index < ns.length; index++) {
+	              if (ns[index] === node.id) {
+	                node.setSelected(true, true);
+	              }
+	            }
+	          }
+	        }
+	        this.draw();
+	      }
+	    }
+	  }, {
+	    key: 'setFont',
+	    value: function setFont(font) {
+	      if (isNaN(font)) {
+	        this.font = font;
+	        this.draw();
+	      }
+	    }
+	  }, {
+	    key: 'setNodeColourAndShape',
+	    value: function setNodeColourAndShape(nids, colour, shape, size, waiting) {
+	      if (!nids) return;
 
-	  this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
-	  this.offsety = (maxy + miny) * this.zoom / -2;
-	  this.offsetx = (maxx + minx) * this.zoom / -2;
-	};
+	      if (this.drawn) {
+	        var arr = [];
+	        if (typeof nids === 'string') {
+	          arr = nids.split(',');
+	        } else {
+	          arr = nids;
+	        }
+
+	        if (nids !== '') {
+	          for (var i = 0; i < arr.length; i++) {
+	            if (this.branches[arr[i]]) {
+	              if (colour) {
+	                this.branches[arr[i]].colour = colour;
+	              }
+	              if (shape) {
+	                this.branches[arr[i]].nodeShape = _utilsConstants.Shapes[shape] ? _utilsConstants.Shapes[shape] : shape;
+	              }
+	              if (size) {
+	                this.branches[arr[i]].radius = size;
+	              }
+	            }
+	          }
+	          this.draw();
+	        }
+	      } else if (!waiting) {
+	        var _this = this;
+	        var timeout = setInterval(function () {
+	          if (this.drawn) {
+	            _this.setNodeColourAndShape(nids, colour, shape, size, true);
+	            clearInterval(timeout);
+	          }
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'setNodeSize',
+	    value: function setNodeSize(size) {
+	      this.baseNodeSize = Number(size);
+	      this.draw();
+	    }
+	  }, {
+	    key: 'setRoot',
+	    value: function setRoot(node) {
+	      node.canvas = this.canvas;
+	      node.tree = this;
+	      this.root = node;
+	    }
+	  }, {
+	    key: 'setTextSize',
+	    value: function setTextSize(size) {
+	      this.textSize = Number(size);
+	      this.draw();
+	    }
+	  }, {
+	    key: 'setFontSize',
+	    value: function setFontSize(ystep) {
+	      this.textSize = this.calculateFontSize ? this.calculateFontSize(ystep) : Math.min(ystep / 2, 15);
+	      this.canvas.font = this.textSize + 'pt ' + this.font;
+	    }
+	  }, {
+	    key: 'setTreeType',
+	    value: function setTreeType(type) {
+	      if (!(type in _treeTypes2['default'])) {
+	        return (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { message: '"' + type + '" is not a known tree-type.' });
+	      }
+
+	      var oldType = this.treeType;
+	      this.treeType = type;
+
+	      this.branchRenderer = _treeTypes2['default'][type].branchRenderer;
+	      this.prerenderer = _treeTypes2['default'][type].prerenderer;
+	      this.labelAlign = _treeTypes2['default'][type].labelAlign;
+	      this.scaleCollapsedNode = _treeTypes2['default'][type].scaleCollapsedNode;
+	      this.calculateFontSize = _treeTypes2['default'][type].calculateFontSize;
+
+	      if (this.drawn) {
+	        this.drawn = false;
+	        this.draw();
+	      }
+
+	      this.treeTypeChanged(oldType, type);
+	    }
+	  }, {
+	    key: 'setSize',
+	    value: function setSize(width, height) {
+	      this.canvas.canvas.width = width;
+	      this.canvas.canvas.height = height;
+	      if (this.navigator) {
+	        this.navigator.resize();
+	      }
+	      this.adjustForPixelRatio();
+	      if (this.drawn) {
+	        this.draw();
+	      }
+	    }
+	  }, {
+	    key: 'setZoom',
+	    value: function setZoom(z) {
+	      if (z > -2 && z < 2) {
+	        var oz = this.zoom;
+	        this.zoom = Math.pow(10, z);
+
+	        this.offsetx = this.offsetx / oz * this.zoom;
+	        this.offsety = this.offsety / oz * this.zoom;
+
+	        this.draw();
+	      }
+	    }
+	  }, {
+	    key: 'toggleLabels',
+	    value: function toggleLabels() {
+	      this.showLabels = !this.showLabels;
+	      this.draw();
+	    }
+	  }, {
+	    key: 'viewMetadataColumns',
+	    value: function viewMetadataColumns(metadataColumnArray) {
+	      this.showMetadata = true;
+	      if (metadataColumnArray === undefined) {
+	        // Select all column headings so that it will draw all columns
+	        metadataColumnArray = this.getMetadataColumnHeadings();
+	      }
+	      // If argument missing or no key id matching, then this array would be undefined
+	      if (metadataColumnArray !== undefined) {
+	        this.selectedMetadataColumns = metadataColumnArray;
+	      }
+	      // Fit to canvas window
+	      this.fitInPanel();
+	      this.draw();
+	    }
+	  }, {
+	    key: 'getMetadataColumnHeadings',
+	    value: function getMetadataColumnHeadings() {
+	      var metadataColumnArray = [];
+	      for (var i = 0; i < this.leaves.length; i++) {
+	        if (Object.keys(this.leaves[i].data).length > 0) {
+	          metadataColumnArray = Object.keys(this.leaves[i].data);
+	          break;
+	        }
+	      }
+	      return metadataColumnArray;
+	    }
+	  }, {
+	    key: 'clearMetadata',
+	    value: function clearMetadata() {
+	      for (var i = 0; i < this.leaves.length; i++) {
+	        if (Object.keys(this.leaves[i].data).length > 0) {
+	          this.leaves[i].data = {};
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'setMaxLabelLength',
+	    value: function setMaxLabelLength() {
+	      var dimensions;
+	      if (this.maxLabelLength[this.treeType] === undefined) {
+	        this.maxLabelLength[this.treeType] = 0;
+	      }
+
+	      for (var i = 0; i < this.leaves.length; i++) {
+	        dimensions = this.canvas.measureText(this.leaves[i].id);
+	        // finding the maximum label length
+	        if (dimensions.width > this.maxLabelLength[this.treeType]) {
+	          this.maxLabelLength[this.treeType] = dimensions.width;
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'loadCompleted',
+	    value: function loadCompleted() {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'loaded');
+	    }
+	  }, {
+	    key: 'loadStarted',
+	    value: function loadStarted() {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'loading');
+	    }
+	  }, {
+	    key: 'loadError',
+	    value: function loadError(message) {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { message: message });
+	    }
+	  }, {
+	    key: 'subtreeDrawn',
+	    value: function subtreeDrawn(node) {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'subtree', { node: node });
+	    }
+	  }, {
+	    key: 'nodesSelected',
+	    value: function nodesSelected(nids) {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'selected', { nodeIds: nids });
+	    }
+	  }, {
+	    key: 'addListener',
+	    value: function addListener(event, listener) {
+	      (0, _utilsEvents.addEvent)(this.canvasEl, event, listener);
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds() {
+	      var minx = this.root.startx;
+	      var maxx = this.root.startx;
+	      var miny = this.root.starty;
+	      var maxy = this.root.starty;
+
+	      for (var i = this.leaves.length; i--;) {
+	        var node = this.leaves[i];
+	        var x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
+	        var y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
+	        var theta = node.angle;
+	        var pad = node.getNodeSize() + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0) + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+
+	        x = x + pad * Math.cos(theta);
+	        y = y + pad * Math.sin(theta);
+
+	        minx = Math.min(minx, x);
+	        maxx = Math.max(maxx, x);
+	        miny = Math.min(miny, y);
+	        maxy = Math.max(maxy, y);
+	      }
+	      return [[minx, miny], [maxx, maxy]];
+	    }
+	  }, {
+	    key: 'fitInPanel',
+	    value: function fitInPanel() {
+	      var bounds = this.getBounds();
+	      var minx = bounds[0][0];
+	      var maxx = bounds[1][0];
+	      var miny = bounds[0][1];
+	      var maxy = bounds[1][1];
+	      var padding = 50;
+	      var canvasSize = [this.canvas.canvas.width - padding, this.canvas.canvas.height - padding];
+
+	      this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
+	      this.offsety = (maxy + miny) * this.zoom / -2;
+	      this.offsetx = (maxx + minx) * this.zoom / -2;
+	    }
+	  }, {
+	    key: 'adjustForPixelRatio',
+	    value: function adjustForPixelRatio() {
+	      var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
+
+	      this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
+	      this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
+
+	      if (ratio > 1) {
+	        this.canvas.canvas.width *= ratio;
+	        this.canvas.canvas.height *= ratio;
+	      }
+	    }
+	  }, {
+	    key: 'treeTypeChanged',
+	    value: function treeTypeChanged(oldType, newType) {
+	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
+	    }
+	  }, {
+	    key: 'resetTree',
+	    value: function resetTree() {
+	      if (!this.origBranches) return;
+
+	      this.branches = this.origBranches;
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+
+	      try {
+	        for (var _iterator2 = Object.keys(this.origBL)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var n = _step2.value;
+
+	          this.branches[n].branchLength = this.origBL[n];
+	          this.branches[n].parent = this.origP[n];
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	            _iterator2['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+
+	      this.leaves = this.origLeaves;
+	      this.root = this.origRoot;
+	    }
+	  }, {
+	    key: 'rotateBranch',
+	    value: function rotateBranch(branch) {
+	      this.branches[branch.id].rotate();
+	    }
+	  }, {
+	    key: 'buildLeaves',
+	    value: function buildLeaves() {
+	      this.leaves = [];
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
+
+	      try {
+	        for (var _iterator3 = this.root.getChildIds()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var leafId = _step3.value;
+
+	          this.leaves.push(this.branches[leafId]);
+	        }
+	      } catch (err) {
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+	            _iterator3['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
+	          }
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'exportNwk',
+	    value: function exportNwk() {
+	      var nwk = this.root.getNwk();
+	      return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
+	    }
+	  }, {
+	    key: 'resizeToContainer',
+	    value: function resizeToContainer() {
+	      this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
+	      this.draw();
+	      this.history.resizeTree();
+	    }
+	  }, {
+	    key: 'downloadAllLeafIds',
+	    value: function downloadAllLeafIds() {
+	      this.root.downloadLeafIdsFromBranch();
+	    }
+	  }, {
+	    key: 'exportCurrentTreeView',
+	    value: function exportCurrentTreeView() {
+	      (0, _utilsDom.setupDownloadLink)(this.getPngUrl(), 'phylocanvas.png');
+	    }
+	  }, {
+	    key: 'alignLabels',
+	    get: function get() {
+	      return this.labelAlign && this.labelAlignEnabled;
+	    },
+	    set: function set(value) {
+	      this.labelAlignEnabled = value;
+	    }
+	  }]);
+
+	  return Tree;
+	})();
+
+	exports['default'] = Tree;
 
 	Tree.prototype.on = Tree.prototype.addListener;
-
-	Tree.prototype.adjustForPixelRatio = function () {
-	  // Adjust canvas size for Retina screen
-	  var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
-
-	  this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
-	  this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
-
-	  if (ratio > 1) {
-	    this.canvas.canvas.width *= ratio;
-	    this.canvas.canvas.height *= ratio;
-	  }
-	};
-
-	Tree.prototype.treeTypeChanged = function (oldType, newType) {
-	  (0, _utilsEvents.fireEvent)(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
-	};
-
-	Tree.prototype.resetTree = function () {
-	  if (!this.origBranches) return;
-
-	  this.branches = this.origBranches;
-	  var _iteratorNormalCompletion2 = true;
-	  var _didIteratorError2 = false;
-	  var _iteratorError2 = undefined;
-
-	  try {
-	    for (var _iterator2 = Object.keys(this.origBL)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	      var n = _step2.value;
-
-	      this.branches[n].branchLength = this.origBL[n];
-	      this.branches[n].parent = this.origP[n];
-	    }
-	  } catch (err) {
-	    _didIteratorError2 = true;
-	    _iteratorError2 = err;
-	  } finally {
-	    try {
-	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	        _iterator2['return']();
-	      }
-	    } finally {
-	      if (_didIteratorError2) {
-	        throw _iteratorError2;
-	      }
-	    }
-	  }
-
-	  this.leaves = this.origLeaves;
-	  this.root = this.origRoot;
-	};
-
-	Tree.prototype.rotateBranch = function (branch) {
-	  this.branches[branch.id].rotate();
-	};
-
-	Tree.prototype.buildLeaves = function () {
-	  this.leaves = [];
-	  var _iteratorNormalCompletion3 = true;
-	  var _didIteratorError3 = false;
-	  var _iteratorError3 = undefined;
-
-	  try {
-	    for (var _iterator3 = this.root.getChildIds()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	      var leafId = _step3.value;
-
-	      this.leaves.push(this.branches[leafId]);
-	    }
-	  } catch (err) {
-	    _didIteratorError3 = true;
-	    _iteratorError3 = err;
-	  } finally {
-	    try {
-	      if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-	        _iterator3['return']();
-	      }
-	    } finally {
-	      if (_didIteratorError3) {
-	        throw _iteratorError3;
-	      }
-	    }
-	  }
-	};
-
-	Tree.prototype.exportNwk = function () {
-	  var nwk = this.root.getNwk();
-	  return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
-	};
-
-	Tree.prototype.resizeToContainer = function () {
-	  this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
-	  this.draw();
-	  this.history.resizeTree();
-	};
-
-	Tree.prototype.downloadAllLeafIds = function () {
-	  this.root.downloadLeafIdsFromBranch();
-	};
-
-	Tree.prototype.exportCurrentTreeView = function () {
-	  (0, _utilsDom.setupDownloadLink)(this.getPngUrl(), 'phylocanvas.png');
-	};
-
-	module.exports = Tree;
+	module.exports = exports['default'];
 
 /***/ },
-/* 6 */
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * An enumeration of certain pre-defined angles to enable faster drawing of
+	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var Angles = {
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 4
+	   */
+	  FORTYFIVE: Math.PI / 4,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 2
+	   */
+	  QUARTER: Math.PI / 2,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI
+	   */
+	  HALF: Math.PI,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI * 2
+	   */
+	  FULL: 2 * Math.PI
+	};
+
+	exports.Angles = Angles;
+	/**
+	 * dictionary to translate newick annotations to branch renderer ids
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	var Shapes = {
+	  x: 'star',
+	  s: 'square',
+	  o: 'circle',
+	  t: 'triangle'
+	};
+	exports.Shapes = Shapes;
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _utilsConstants = __webpack_require__(7);
+	var _utilsConstants = __webpack_require__(4);
 
-	var _utilsDom = __webpack_require__(4);
+	var _utilsDom = __webpack_require__(1);
 
-	var _renderersNode = __webpack_require__(8);
+	var _nodeRenderers = __webpack_require__(6);
 
-	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
 	/**
 	 * Creates a branch
@@ -1840,7 +1708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * The relative size of the terminal of this node
 	   */
-	  this.radius = 1;
+	  this.radius = 1.0;
 
 	  /**
 	   * true if this branch is currently selected
@@ -1903,15 +1771,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var i;
 	  var columnName;
 
-	  if (this.tree.nodeAlign) {
+	  if (this.tree.alignLabels) {
 	    if (this.tree.treeType === 'rectangular') {
 	      tx += this.tree.farthestNodeFromRootX - this.centerx;
-	    } else if (this.tree.treeType === 'hierarchy') {
+	    } else if (this.tree.treeType === 'hierarchical') {
 	      tx += this.tree.farthestNodeFromRootY - this.centery;
 	    }
 	  }
 
-	  if (!this.tree.metadataHeadingDrawn && this.tree.nodeAlign && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
+	  if (!this.tree.metadataHeadingDrawn && this.tree.alignLabels && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
 	    this.drawMetadataHeading(tx, ty);
 	    this.tree.metadataHeadingDrawn = true;
 	  }
@@ -1972,7 +1840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // x and y axes changed because of rotate
 	      // Adding + 6 to adjust the position
 	      this.canvas.fillText(columnName, 20, tx + 6);
-	    } else if (this.tree.treeType === 'hierarchy') {
+	    } else if (this.tree.treeType === 'hierarchical') {
 	      this.canvas.textAlign = 'right';
 	      this.canvas.fillText(columnName, -20, tx + 8);
 	    } else if (this.tree.treeType === 'diagonal') {
@@ -2003,14 +1871,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  tx = this.getLabelStartX();
 	  ty = fSize / 2;
-	  // Setting 'tx' for rectangular and hierarchy trees if node align is TRUE
-	  if (this.tree.nodeAlign) {
-	    if (this.tree.treeType === 'rectangular') {
-	      tx += this.tree.farthestNodeFromRootX - this.centerx;
-	    } else if (this.tree.treeType === 'hierarchy') {
-	      tx += this.tree.farthestNodeFromRootY - this.centery;
-	    }
+
+	  if (this.tree.alignLabels) {
+	    tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
 	  }
+
 	  if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
 	    this.canvas.rotate(_utilsConstants.Angles.HALF);
 	    // Angles.Half text position changes
@@ -2029,10 +1894,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Branch.prototype.setNodeDimensions = function (centerX, centerY, radius) {
-	  this.minx = centerX - radius;
-	  this.maxx = centerX + radius;
-	  this.miny = centerY - radius;
-	  this.maxy = centerY + radius;
+	  var boundedRadius = radius;
+
+	  if (radius * this.tree.zoom < 5 || !this.leaf) {
+	    boundedRadius = 5 / this.tree.zoom;
+	  }
+
+	  this.minx = centerX - boundedRadius;
+	  this.maxx = centerX + boundedRadius;
+	  this.miny = centerY - boundedRadius;
+	  this.maxy = centerY + boundedRadius;
 	};
 
 	Branch.prototype.drawNode = function () {
@@ -2049,21 +1920,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.canvas.beginPath();
 	  this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
-	  if (nodeRadius * this.tree.zoom < 5 || !this.leaf) {
-	    this.setNodeDimensions(centerX, centerY, 5 / this.tree.zoom);
-	  } else {
-	    this.setNodeDimensions(centerX, centerY, nodeRadius);
-	  }
+
+	  this.setNodeDimensions(centerX, centerY, nodeRadius);
 
 	  // If branch collapsed
 	  if (this.collapsed) {
 	    var childIds = this.getChildIds();
 	    var radius = childIds.length;
-	    if (this.tree.treeType === 'radial') {
-	      radius = radius / 7;
-	    }
-	    if (this.tree.treeType === 'circular') {
-	      radius = radius / 3;
+
+	    if (this.tree.scaleCollapsedNode) {
+	      radius = this.tree.scaleCollapsedNode(radius);
 	    }
 
 	    this.canvas.globalAlpha = 0.3;
@@ -2074,22 +1940,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.canvas.fillStyle = this.tree.defaultCollapsedOptions.color ? this.tree.defaultCollapsedOptions.color : 'purple';
 	    this.canvas.fill();
 	    this.canvas.globalAlpha = 1;
+
+	    this.canvas.closePath();
 	  } else if (this.leaf) {
-	    // Store line width for swapping back after drawing lines for aligning
-	    var origLineWidth = this.canvas.lineWidth;
+	    var originalLineWidth = this.canvas.lineWidth;
+
 	    // Drawing line connectors to nodes and align all the nodes vertically
-	    if (this.tree.nodeAlign) {
-	      this.canvas.lineWidth = this.canvas.lineWidth / 10;
+	    if (this.tree.alignLabels) {
+	      var labelAlign = this.tree.labelAlign;
+	      this.canvas.lineWidth = this.canvas.lineWidth / 5;
+
 	      this.canvas.beginPath();
-	      // Draw line till the x position of the right-end node
-	      if (this.tree.treeType === 'rectangular') {
-	        this.canvas.moveTo(this.tree.farthestNodeFromRootX, this.centery);
-	      }
-	      if (this.tree.treeType === 'hierarchy') {
-	        this.canvas.moveTo(this.centerx, this.tree.farthestNodeFromRootY);
-	      }
+	      this.canvas.moveTo(labelAlign.getX(this), labelAlign.getY(this));
 	      this.canvas.closePath();
-	      this.canvas.fill();
 	    }
 	    // Save canvas
 	    this.canvas.save();
@@ -2098,8 +1961,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.canvas.translate(this.centerx, this.centery);
 	    // rotate canvas (mainly for circular, radial trees etc)
 	    this.canvas.rotate(this.angle);
+
+	    this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
 	    // Draw node shape as chosen - default is circle
-	    _renderersNode2['default'][this.nodeShape](this);
+	    _nodeRenderers2['default'][this.nodeShape](this);
+	    this.canvas.strokeStyle = this.getColour();
 
 	    if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
 	      this.drawLabel();
@@ -2111,8 +1977,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Restore the canvas position to original
 	    this.canvas.restore();
 
-	    // Swapping back the line width if it was changed due to nodeAlign
-	    this.canvas.lineWidth = origLineWidth;
+	    // Swapping back the line width if it was changed due to alignLabels
+	    this.canvas.lineWidth = originalLineWidth;
 	  }
 	  this.canvas.closePath();
 
@@ -2421,75 +2287,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Branch;
 
 /***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * An enumeration of certain pre-defined angles to enable faster drawing of
-	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	'use strict';
-
-	module.exports.Angles = {
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 4
-	   */
-	  FORTYFIVE: Math.PI / 4,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 2
-	   */
-	  QUARTER: Math.PI / 2,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI
-	   */
-	  HALF: Math.PI,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI * 2
-	   */
-	  FULL: 2 * Math.PI
-	};
-
-	/**
-	 * dictionary to translate annotations in NWK to branch renderer ids
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	module.exports.Shapes = {
-	  x: 'star',
-	  s: 'square',
-	  o: 'circle',
-	  t: 'triangle'
-	};
-
-/***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(7).Angles;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
+	var _utilsConstants = __webpack_require__(4);
+
+	exports['default'] = {
+
 	  circle: function circle(node) {
 	    var r = node.getNodeSize();
-	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
+	    node.canvas.arc(r, 0, r, 0, _utilsConstants.Angles.FULL, false);
 	    node.canvas.stroke();
 	    node.canvas.fill();
 	  },
+
 	  square: function square(node) {
 	    var r = node.getNodeSize();
 	    var x1 = 0;
@@ -2504,6 +2321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.stroke();
 	    node.canvas.fill();
 	  },
+
 	  star: function star(node) {
 	    var r = node.getNodeSize();
 	    var cx = r;
@@ -2534,6 +2352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.fill();
 	    node.canvas.closePath();
 	  },
+
 	  triangle: function triangle(node) {
 	    var r = node.getNodeSize();
 	    var lengthOfSide = 2 * r * Math.cos(30 * Math.PI / 180);
@@ -2551,7 +2370,280 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.stroke();
 	    node.canvas.fill();
 	  }
+
 	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+	var _Tooltip2 = __webpack_require__(8);
+
+	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
+
+	var _utilsEvents = __webpack_require__(2);
+
+	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
+	  handler: function handler(branch) {
+	    branch.toggleCollapsed();
+	    branch.tree.draw(); // some browsers do not fire mousemove after clicking
+	  },
+	  nodeType: 'internal'
+	}, {
+	  text: 'Rotate Branch',
+	  handler: 'rotate',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Redraw Subtree',
+	  handler: 'redrawTreeFromBranch',
+	  nodeType: 'internal'
+	}, {
+	  text: 'Show/Hide Labels',
+	  handler: 'toggleLabels'
+	}, {
+	  text: 'Export As Image',
+	  handler: 'exportCurrentTreeView'
+	}, {
+	  text: 'Export Leaf IDs',
+	  handler: 'downloadAllLeafIds'
+	}, {
+	  text: 'Export Leaf IDs on Branch',
+	  handler: 'downloadLeafIdsFromBranch',
+	  nodeType: 'internal'
+	}];
+
+	function menuItemApplicable(menuItem, node) {
+	  if (!node) {
+	    return !menuItem.nodeType;
+	  }
+
+	  if (node.leaf && menuItem.nodeType !== 'internal') {
+	    return true;
+	  }
+
+	  if (!node.leaf && menuItem.nodeType === 'internal') {
+	    return true;
+	  }
+
+	  return false;
+	}
+
+	function mouseover(element) {
+	  element.style.backgroundColor = '#E2E3DF';
+	}
+
+	function mouseout(element) {
+	  element.style.backgroundColor = 'transparent';
+	}
+
+	function transferMenuItem(_ref) {
+	  var handler = _ref.handler;
+	  var _ref$text = _ref.text;
+	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
+	  var nodeType = _ref.nodeType;
+
+	  return { handler: handler, text: text, nodeType: nodeType };
+	}
+
+	/**
+	 * The menu that is shown when the PhyloCanvas widget is right-clicked
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 * @extends Tooltip
+	 */
+
+	var ContextMenu = (function (_Tooltip) {
+	  function ContextMenu(tree) {
+	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
+
+	    _classCallCheck(this, ContextMenu);
+
+	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
+
+	    this.menuItems = menuItems.map(transferMenuItem);
+	    this.fontSize = '8pt';
+	  }
+
+	  _inherits(ContextMenu, _Tooltip);
+
+	  _createClass(ContextMenu, [{
+	    key: 'click',
+	    value: function click() {
+	      (0, _utilsEvents.createHandler)(this, 'close');
+	    }
+	  }, {
+	    key: 'createContent',
+	    value: function createContent(node) {
+	      var list = document.createElement('ul');
+
+	      list.style.margin = '0';
+	      list.style.padding = '0';
+
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var menuItem = _step.value;
+
+	          if (!menuItemApplicable(menuItem, node)) {
+	            continue;
+	          }
+
+	          var listElement = this.createElement('li', menuItem.text);
+	          listElement.style.listStyle = 'none outside none';
+
+	          if (menuItem.nodeType) {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
+	          } else {
+	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
+	          }
+	          listElement.addEventListener('click', this.click);
+	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
+	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
+	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
+
+	          list.appendChild(listElement);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+
+	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
+	      this.element.appendChild(list);
+	    }
+	  }]);
+
+	  return ContextMenu;
+	})(_Tooltip3['default']);
+
+	exports['default'] = ContextMenu;
+	module.exports = exports['default'];
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Tooltip
+	 *
+	 * @constructor
+	 * @memberOf PhyloCanvas
+	 */
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	var Tooltip = (function () {
+	  function Tooltip(tree) {
+	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
+	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
+
+	    _classCallCheck(this, Tooltip);
+
+	    this.tree = tree;
+	    this.element = element;
+	    this.element.className = className;
+	    this.element.style.display = 'none';
+	    this.element.style.position = 'fixed';
+	    this.element.style.border = '1px solid #CCCCCC';
+	    this.element.style.background = '#FFFFFF';
+	    this.element.style.letterSpacing = '0.5px';
+	    this.closed = true;
+
+	    this.tree.canvasEl.appendChild(this.element);
+	  }
+
+	  _createClass(Tooltip, [{
+	    key: 'close',
+	    value: function close() {
+	      this.element.style.display = 'none';
+	      this.closed = true;
+	    }
+	  }, {
+	    key: 'createElement',
+	    value: function createElement(tagName, textContent) {
+	      var element = document.createElement(tagName);
+	      element.style.cursor = 'pointer';
+	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
+	      element.style.fontFamily = this.tree.font;
+	      element.style.fontSize = this.fontSize || '12pt';
+	      element.appendChild(document.createTextNode(textContent));
+	      return element;
+	    }
+	  }, {
+	    key: 'createContent',
+
+	    /**
+	     * Shows number of child nodes by default
+	     */
+	    value: function createContent(node) {
+	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
+	    }
+	  }, {
+	    key: 'open',
+	    value: function open(x, y, node) {
+	      if (x === undefined) x = 100;
+	      if (y === undefined) y = 100;
+
+	      while (this.element.hasChildNodes()) {
+	        this.element.removeChild(this.element.firstChild);
+	      }
+
+	      this.createContent(node);
+
+	      this.element.style.top = y + 'px';
+	      this.element.style.left = x + 'px';
+
+	      this.element.style.zIndex = 2000;
+	      this.element.style.display = 'block';
+	      this.element.style.backgroundColor = '#FFFFFF';
+
+	      this.closed = false;
+	    }
+	  }]);
+
+	  return Tooltip;
+	})();
+
+	exports['default'] = Tooltip;
+	module.exports = exports['default'];
 
 /***/ },
 /* 9 */
@@ -2643,31 +2735,87 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var BranchRenderer = __webpack_require__(12);
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
-	  rectangular: new BranchRenderer(__webpack_require__(13)),
-	  circular: new BranchRenderer(__webpack_require__(14)),
-	  radial: new BranchRenderer(__webpack_require__(11)),
-	  diagonal: new BranchRenderer(__webpack_require__(15)),
-	  hierarchical: new BranchRenderer(__webpack_require__(16))
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _rectangular = __webpack_require__(11);
+
+	var _rectangular2 = _interopRequireDefault(_rectangular);
+
+	var _circular = __webpack_require__(16);
+
+	var _circular2 = _interopRequireDefault(_circular);
+
+	var _radial = __webpack_require__(19);
+
+	var _radial2 = _interopRequireDefault(_radial);
+
+	var _diagonal = __webpack_require__(22);
+
+	var _diagonal2 = _interopRequireDefault(_diagonal);
+
+	var _hierarchical = __webpack_require__(25);
+
+	var _hierarchical2 = _interopRequireDefault(_hierarchical);
+
+	exports['default'] = {
+	  rectangular: _rectangular2['default'],
+	  circular: _circular2['default'],
+	  radial: _radial2['default'],
+	  diagonal: _diagonal2['default'],
+	  hierarchical: _hierarchical2['default']
 	};
+	module.exports = exports['default'];
 
 /***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	module.exports = {
-	  draw: function draw(tree, node) {
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _BranchRenderer = __webpack_require__(12);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(13);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(14);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(15);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.tree.farthestNodeFromRootX + node.getNodeSize();
+	  },
+	  getY: function getY(node) {
+	    return node.centery;
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.tree.farthestNodeFromRootX - node.centerx;
 	  }
 	};
+
+	exports['default'] = {
+	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
+	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	  labelAlign: labelAlign
+	};
+	module.exports = exports['default'];
 
 /***/ },
 /* 12 */
@@ -2715,7 +2863,61 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	module.exports = {
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Prerenderer = (function () {
+	  function Prerenderer(options) {
+	    _classCallCheck(this, Prerenderer);
+
+	    this.getStep = options.getStep;
+	    this.calculate = options.calculate;
+	  }
+
+	  _createClass(Prerenderer, [{
+	    key: "run",
+	    value: function run(tree) {
+	      var step = this.getStep(tree);
+
+	      tree.root.startx = 0;
+	      tree.root.starty = 0;
+	      tree.root.centerx = 0;
+	      tree.root.centery = 0;
+	      tree.farthestNodeFromRootX = 0;
+	      tree.farthestNodeFromRootY = 0;
+
+	      this.calculate(tree, step);
+
+	      // Assign root startx and starty
+	      tree.root.startx = tree.root.centerx;
+	      tree.root.starty = tree.root.centery;
+	      // Set font size for tree and its branches
+	      tree.setFontSize(step);
+	      tree.setMaxLabelLength();
+	    }
+	  }]);
+
+	  return Prerenderer;
+	})();
+
+	exports["default"] = Prerenderer;
+	module.exports = exports["default"];
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
 	  draw: function draw(tree, node) {
 	    var branchLength = node.branchLength * tree.branchScalar;
 
@@ -2736,43 +2938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.starty = node.centery;
 	  }
 	};
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = {
-	  draw: function draw(tree, node) {
-	    var strokeStyle = node.getColour();
-	    var branchLength = node.totalBranchLength * tree.branchScalar;
-
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(node.startx, node.starty);
-	    if (node.leaf) {
-	      node.canvas.lineTo(node.interx, node.intery);
-	      node.canvas.stroke();
-	      node.canvas.strokeStyle = node.selected ? node.tree.selectedColour : 'rgba(0,0,0,0.5)';
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	      node.canvas.strokeStyle = strokeStyle;
-	    } else {
-	      node.canvas.lineTo(node.centerx, node.centery);
-	      node.canvas.stroke();
-	    }
-	    node.canvas.closePath();
-
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.children.length > 1 && !node.collapsed) {
-	      node.canvas.beginPath();
-	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-	    }
-	  }
-	};
+	module.exports = exports["default"];
 
 /***/ },
 /* 15 */
@@ -2780,155 +2946,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	module.exports = {
-	  draw: function draw(tree, node) {
-	    node.angle = 0;
-	    node.canvas.beginPath();
-
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-
-	    node.canvas.closePath();
-	  },
-	  prepareChild: function prepareChild(node, child) {
-	    child.startx = node.centerx;
-	    child.starty = node.centery;
-	  }
-	};
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	module.exports = {
-	  draw: function draw(tree, node) {
-	    node.canvas.beginPath();
-
-	    if (node !== node.tree.root) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.starty);
-	    }
-
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-
-	    node.canvas.closePath();
-	  }
-	};
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Prerenderer = __webpack_require__(19);
-
-	module.exports = {
-	  rectangular: new Prerenderer(__webpack_require__(20)),
-	  circular: new Prerenderer(__webpack_require__(21)),
-	  radial: new Prerenderer(__webpack_require__(18)),
-	  diagonal: new Prerenderer(__webpack_require__(22)),
-	  hierarchical: new Prerenderer(__webpack_require__(23))
-	};
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var Angles = __webpack_require__(7).Angles;
-
-	function prerenderNodes(tree, node) {
-	  if (node.parent) {
-	    node.startx = node.parent.centerx;
-	    node.starty = node.parent.centery;
-	  } else {
-	    node.startx = 0;
-	    node.starty = 0;
-	  }
-	  node.centerx = node.startx + node.branchLength * tree.branchScalar * Math.cos(node.angle);
-	  node.centery = node.starty + node.branchLength * tree.branchScalar * Math.sin(node.angle);
-
-	  for (var i = 0; i < node.children.length; i++) {
-	    prerenderNodes(tree, node.children[i]);
-	  }
-	}
-
-	module.exports = {
-	  step: function step(tree) {
-	    return Angles.FULL / tree.leaves.length;
-	  },
-	  calculate: function calculate(tree, step) {
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-
-	    for (var i = 0; i < tree.leaves.length; i += 1) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() === 0) {
-	          nd.parent.angle = 0;
-	        }
-	        nd.parent.angle += nd.angle * nd.getChildCount();
-	        if (nd.getChildNo() === nd.parent.children.length - 1) {
-	          nd.parent.angle = nd.parent.angle / nd.parent.getChildCount();
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-
-	    prerenderNodes(tree, tree.root);
-	  }
-	};
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	function Prerenderer(options) {
-	  this.step = options.step;
-	  this.calculate = options.calculate;
-	}
-
-	Prerenderer.prototype.run = function (tree) {
-	  var step = this.step(tree);
-
-	  tree.root.startx = 0;
-	  tree.root.starty = 0;
-	  tree.root.centerx = 0;
-	  tree.root.centery = 0;
-	  tree.farthestNodeFromRootX = 0;
-	  tree.farthestNodeFromRootY = 0;
-
-	  this.calculate(tree, step);
-
-	  // Assign root startx and starty
-	  tree.root.startx = tree.root.centerx;
-	  tree.root.starty = tree.root.centery;
-	  // Set font size for tree and its branches
-	  tree.setFontSize(step);
-	  tree.setMaxLabelLength();
-	};
-
-	module.exports = Prerenderer;
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	module.exports = {
-	  step: function step(tree) {
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 	  },
 	  calculate: function calculate(tree, ystep) {
@@ -2962,23 +2984,112 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
+	module.exports = exports["default"];
 
 /***/ },
-/* 21 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(7).Angles;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
-	  step: function step(tree) {
-	    return Angles.FULL / tree.leaves.length;
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _BranchRenderer = __webpack_require__(12);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(13);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(17);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(18);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.centerx + node.labelOffsetX;
+	  },
+	  getY: function getY(node) {
+	    return node.centery + node.labelOffsetY;
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.labelOffsetX / Math.cos(node.angle);
+	  }
+	};
+
+	exports['default'] = {
+	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
+	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	  labelAlign: labelAlign,
+	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
+	    return radius / 3;
+	  },
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep * 10 + 4, 40);
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  draw: function draw(tree, node) {
+	    var branchLength = node.totalBranchLength * tree.branchScalar;
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+
+	    node.canvas.strokeStyle = node.getColour();
+
+	    if (node.children.length > 1 && !node.collapsed) {
+	      node.canvas.beginPath();
+	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
+	      node.canvas.stroke();
+	      node.canvas.closePath();
+	    }
+	  }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _utilsConstants = __webpack_require__(4);
+
+	exports['default'] = {
+	  getStep: function getStep(tree) {
+	    return _utilsConstants.Angles.FULL / tree.leaves.length;
 	  },
 	  calculate: function calculate(tree, step) {
 	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
 	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / Angles.FULL;
+	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / _utilsConstants.Angles.FULL;
 	    if (tree.branchScalar * tree.maxBranchLength > r) {
 	      r = tree.branchScalar * tree.maxBranchLength;
 	    } else {
@@ -2986,25 +3097,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centery = r * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].centerx = r * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].starty = tree.leaves[i].parent.totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].startx = tree.leaves[i].parent.totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].intery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-	      tree.leaves[i].interx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() === 0) {
-	          nd.parent.angle = nd.angle;
-	          nd.parent.minChildAngle = nd.angle;
+	      var node = tree.leaves[i];
+
+	      node.angle = step * i;
+	      node.startx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
+	      node.starty = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
+	      node.centerx = node.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
+	      node.centery = node.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
+	      node.labelOffsetX = (r + node.getNodeSize() * 2) * Math.cos(node.angle) - node.centerx;
+	      node.labelOffsetY = (r + node.getNodeSize() * 2) * Math.sin(node.angle) - node.centery;
+
+	      for (; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.angle = node.angle;
+	          node.parent.minChildAngle = node.angle;
 	        }
-	        if (nd.getChildNo() === nd.parent.children.length - 1) {
-	          nd.parent.maxChildAngle = nd.angle;
-	          nd.parent.angle = (nd.parent.minChildAngle + nd.parent.maxChildAngle) / 2;
-	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar * Math.sin(nd.parent.angle);
-	          nd.parent.centerx = nd.parent.totalBranchLength * tree.branchScalar * Math.cos(nd.parent.angle);
-	          nd.parent.starty = (nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar * Math.sin(nd.parent.angle);
-	          nd.parent.startx = (nd.parent.totalBranchLength - nd.parent.branchLength) * tree.branchScalar * Math.cos(nd.parent.angle);
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.maxChildAngle = node.angle;
+	          node.parent.angle = (node.parent.minChildAngle + node.parent.maxChildAngle) / 2;
+	          node.parent.startx = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.cos(node.parent.angle);
+	          node.parent.starty = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.sin(node.parent.angle);
+	          node.parent.centerx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.parent.angle);
+	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.parent.angle);
 	        } else {
 	          break;
 	        }
@@ -3012,6 +3126,125 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _BranchRenderer = __webpack_require__(12);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(13);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(20);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(21);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	exports['default'] = {
+	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
+	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
+	    return radius / 7;
+	  },
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep * 50 + 5, 15);
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  draw: function draw(tree, node) {
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _utilsConstants = __webpack_require__(4);
+
+	function prerenderNodes(tree, node) {
+	  if (node.parent) {
+	    node.startx = node.parent.centerx;
+	    node.starty = node.parent.centery;
+	  } else {
+	    node.startx = 0;
+	    node.starty = 0;
+	  }
+	  node.centerx = node.startx + node.branchLength * tree.branchScalar * Math.cos(node.angle);
+	  node.centery = node.starty + node.branchLength * tree.branchScalar * Math.sin(node.angle);
+
+	  for (var i = 0; i < node.children.length; i++) {
+	    prerenderNodes(tree, node.children[i]);
+	  }
+	}
+
+	exports['default'] = {
+	  getStep: function getStep(tree) {
+	    return _utilsConstants.Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function calculate(tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+
+	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.angle = 0;
+	        }
+	        node.parent.angle += node.angle * node.getChildCount();
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.angle = node.parent.angle / node.parent.getChildCount();
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+
+	    prerenderNodes(tree, tree.root);
+	  }
+	};
+	module.exports = exports['default'];
 
 /***/ },
 /* 22 */
@@ -3019,10 +3252,78 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var Angles = __webpack_require__(7).Angles;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
-	  step: function step(tree) {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _BranchRenderer = __webpack_require__(12);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(13);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(23);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(24);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	exports['default'] = {
+	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
+	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep / 2, 7.5);
+	  }
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  draw: function draw(tree, node) {
+	    node.angle = 0;
+	    node.canvas.beginPath();
+
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _utilsConstants = __webpack_require__(4);
+
+	exports['default'] = {
+	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 	  },
 	  calculate: function calculate(tree, ystep) {
@@ -3031,13 +3332,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
 	      tree.leaves[i].angle = 0;
 
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() === nd.parent.children.length - 1) {
-	          nd.parent.centery = nd.parent.getChildYTotal() / nd.parent.getChildCount(); // (nd.parent.children.length - 1);
-	          nd.parent.centerx = nd.parent.children[0].centerx + (nd.parent.children[0].centery - nd.parent.centery) * Math.tan(Angles.FORTYFIVE);
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.centery = node.parent.getChildYTotal() / node.parent.getChildCount(); // (node.parent.children.length - 1);
+	          node.parent.centerx = node.parent.children[0].centerx + (node.parent.children[0].centery - node.parent.centery) * Math.tan(_utilsConstants.Angles.FORTYFIVE);
+	          for (var j = 0; j < node.parent.children.length; j++) {
+	            node.parent.children[j].startx = node.parent.centerx;
+	            node.parent.children[j].starty = node.parent.centery;
 	          }
 	        } else {
 	          break;
@@ -3046,39 +3347,117 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
+	module.exports = exports['default'];
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Angles = __webpack_require__(7).Angles;
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
 
-	module.exports = {
-	  step: function step(tree) {
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _BranchRenderer = __webpack_require__(12);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(13);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(26);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(27);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.centerx;
+	  },
+	  getY: function getY(node) {
+	    return node.tree.farthestNodeFromRootY + node.getNodeSize();
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.tree.farthestNodeFromRootY - node.centery;
+	  }
+	};
+
+	exports['default'] = {
+	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
+	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	  labelAlign: labelAlign
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  draw: function draw(tree, node) {
+	    node.canvas.beginPath();
+
+	    if (node !== node.tree.root) {
+	      node.canvas.moveTo(node.startx, node.starty);
+	      node.canvas.lineTo(node.centerx, node.starty);
+	    }
+
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  }
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _utilsConstants = __webpack_require__(4);
+
+	exports['default'] = {
+	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
 	  },
 	  calculate: function calculate(tree, xstep) {
 	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
 
 	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = Angles.QUARTER;
+	      tree.leaves[i].angle = _utilsConstants.Angles.QUARTER;
 	      tree.leaves[i].centerx = i > 0 ? tree.leaves[i - 1].centerx + xstep : 0;
 	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
 
-	      for (var nd = tree.leaves[i]; nd.parent; nd = nd.parent) {
-	        if (nd.getChildNo() === 0) {
-	          nd.parent.centerx = nd.centerx;
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.centerx = node.centerx;
 	        }
 
-	        if (nd.getChildNo() === nd.parent.children.length - 1) {
-	          nd.parent.angle = Angles.QUARTER;
-	          nd.parent.centerx = (nd.parent.centerx + nd.centerx) / 2;
-	          nd.parent.centery = nd.parent.totalBranchLength * tree.branchScalar;
-	          for (var j = 0; j < nd.parent.children.length; j++) {
-	            nd.parent.children[j].startx = nd.parent.centerx;
-	            nd.parent.children[j].starty = nd.parent.centery;
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.angle = _utilsConstants.Angles.QUARTER;
+	          node.parent.centerx = (node.parent.centerx + node.centerx) / 2;
+	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar;
+	          for (var j = 0; j < node.parent.children.length; j++) {
+	            node.parent.children[j].startx = node.parent.centerx;
+	            node.parent.children[j].starty = node.parent.centery;
 	          }
 	        } else {
 	          break;
@@ -3094,9 +3473,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
+	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3108,7 +3488,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getPixelRatio = getPixelRatio;
 	exports.translateClick = translateClick;
 
-	var _dom = __webpack_require__(4);
+	var _dom = __webpack_require__(1);
 
 	/**
 	 * Return backing store pixel ratio of context.
@@ -3150,7 +3530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 25 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3161,15 +3541,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _Parser = __webpack_require__(26);
+	var _Parser = __webpack_require__(30);
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _newick = __webpack_require__(28);
+	var _newick = __webpack_require__(32);
 
 	var _newick2 = _interopRequireDefault(_newick);
 
-	var _nexus = __webpack_require__(29);
+	var _nexus = __webpack_require__(33);
 
 	var _nexus2 = _interopRequireDefault(_nexus);
 
@@ -3180,7 +3560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3195,7 +3575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _utilsHttp = __webpack_require__(27);
+	var _utilsHttp = __webpack_require__(31);
 
 	var _utilsHttp2 = _interopRequireDefault(_utilsHttp);
 
@@ -3251,7 +3631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3283,7 +3663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3294,15 +3674,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _Branch = __webpack_require__(6);
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _utilsConstants = __webpack_require__(7);
+	var _utilsConstants = __webpack_require__(4);
 
-	var _renderersNode = __webpack_require__(8);
+	var _nodeRenderers = __webpack_require__(6);
 
-	var _renderersNode2 = _interopRequireDefault(_renderersNode);
+	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
 	var format = 'newick';
 	var fileExtension = /\.nwk$/;
@@ -3360,7 +3740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case 'nsh':
 	        if (_utilsConstants.Shapes[value]) {
 	          branch.nodeShape = _utilsConstants.Shapes[value];
-	        } else if (_renderersNode2['default'][value]) {
+	        } else if (_nodeRenderers2['default'][value]) {
 	          branch.nodeShape = value;
 	        } else {
 	          branch.nodeShape = 'circle';
@@ -3379,7 +3759,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	var nodeTerminatingChars = [')', ','];
+	var nodeTerminatingChars = [')', ',', ';'];
 
 	function parseBranchLength(string) {
 	  var nodeLength = '';
@@ -3461,7 +3841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        currentNode = node;
 	        break;
 	      case ';':
-	        break;
+	        return callback();
 	      default:
 	        try {
 	          i = parseBranch(currentNode, string, i);
@@ -3471,7 +3851,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	    }
 	  }
-	  callback();
 	}
 
 	exports['default'] = {
@@ -3483,7 +3862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3492,7 +3871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _newick = __webpack_require__(28);
+	var _newick = __webpack_require__(32);
 
 	var format = 'nexus';
 	var fileExtension = /\.n(ex|xs)$/;
