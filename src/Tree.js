@@ -5,7 +5,6 @@ import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
 
-import { Shapes } from './utils/constants';
 import { addClass, setupDownloadLink } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
@@ -592,38 +591,31 @@ export default class Tree {
     }
   }
 
-  setNodeColourAndShape(nids, colour, shape, size, waiting) {
-    if (!nids) return;
+  setNodeDisplay(ids, options, waiting) {
+    if (!ids) return;
 
     if (this.drawn) {
-      var arr = [];
-      if (typeof nids === 'string') {
-        arr = nids.split(',');
+      let array = [];
+      if (typeof ids === 'string') {
+        array = ids.split(',');
       } else {
-        arr = nids;
+        array = ids;
       }
 
-      if (nids !== '') {
-        for (var i = 0; i <  arr.length; i++) {
-          if (this.branches[arr[i]]) {
-            if (colour) {
-              this.branches[arr[i]].colour = colour;
-            }
-            if (shape) {
-              this.branches[arr[i]].nodeShape = Shapes[shape] ? Shapes[shape] : shape;
-            }
-            if (size) {
-              this.branches[arr[i]].radius = size;
-            }
+      if (array.length) {
+        for (let id of array) {
+          if (!(id in this.branches)) {
+            return;
           }
+          this.branches[id].setDisplay(options);
         }
         this.draw();
       }
     } else if (!waiting) {
-      var _this = this;
-      var timeout = setInterval(function () {
+      let _this = this;
+      let timeout = setInterval(function () {
         if (this.drawn) {
-          _this.setNodeColourAndShape(nids, colour, shape, size, true);
+          _this.setNodeColourAndShape(ids, options, true);
           clearInterval(timeout);
         }
       });
