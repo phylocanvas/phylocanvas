@@ -605,7 +605,7 @@ export default class Tree {
       if (array.length) {
         for (let id of array) {
           if (!(id in this.branches)) {
-            return;
+            continue;
           }
           this.branches[id].setDisplay(options);
         }
