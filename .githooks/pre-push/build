@@ -2,6 +2,5 @@
 
 npm run build
 if [[ `git status --porcelain` ]]; then
-  git add dist
-  git commit -m '[pre-push] build'
+  git add dist && git commit -m '[pre-push] build';
 fi
