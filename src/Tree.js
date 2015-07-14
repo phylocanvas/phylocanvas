@@ -428,8 +428,7 @@ export default class Tree {
   }
 
   saveState() {
-    this.saveNode(this.root);
-    this.root.saveChildren();
+    this.extractNestedBranches();
 
     this.root.branchLength = 0;
     this.maxBranchLength = 0;
@@ -439,8 +438,6 @@ export default class Tree {
       this.loadError(new Error('All branches in the tree are identical.'));
       return;
     }
-
-    this.buildLeaves();
   }
 
   build(inputString, parser, options) {
@@ -506,14 +503,14 @@ export default class Tree {
     this.load(this.stringRepresentation, { quiet: true });
   }
 
-  saveNode(node) {
+  storeNode(node) {
     if (!node.id || node.id === '') {
       node.id = node.tree.genId();
     }
 
     if (this.branches[node.id]) {
       if (node !== this.branches[node.id]) {
-        if (!this.leaf) {
+        if (!node.leaf) {
           node.id = this.genId();
         } else {
           throw new Error('Two nodes on this tree share the id ' + node.id);
@@ -522,6 +519,10 @@ export default class Tree {
     }
 
     this.branches[node.id] = node;
+
+    if (node.leaf) {
+      this.leaves.push(node);
+    }
   }
 
   scroll(e) {
@@ -817,11 +818,12 @@ export default class Tree {
     this.branches[branch.id].rotate();
   }
 
-  buildLeaves() {
+  extractNestedBranches() {
+    this.branches = {};
     this.leaves = [];
-    for (let leafId of this.root.getChildIds()) {
-      this.leaves.push(this.branches[leafId]);
-    }
+
+    this.storeNode(this.root);
+    this.root.extractChildren();
   }
 
   exportNwk() {
