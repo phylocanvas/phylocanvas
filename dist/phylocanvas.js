@@ -248,10 +248,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	History.prototype.goBackTo = function (evt) {
-	  var ele = evt.target;
-	  this.tree.setTreeType(ele.getAttribute('data-tree-type'));
-	  this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
+	History.prototype.goBackTo = function (event) {
+	  var element = event.target;
+	  this.tree.setTreeType(element.getAttribute('data-tree-type'), true);
+	  this.tree.redrawFromBranch(this.tree.originalTree.branches[element.id.replace('phylocanvas-history-', '')]);
 	};
 
 	History.prototype.injectCss = function () {
@@ -557,6 +557,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    this.root = false;
 
+	    this.stringRepresentation = '';
+
 	    /**
 	     *
 	     * used for auto ids for internal nodes
@@ -570,8 +572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    this.backColour = false;
 
-	    this.origBL = {};
-	    this.origP = {};
+	    this.originalTree = {};
 
 	    // Set up the element and canvas
 	    if (window.getComputedStyle(this.canvasEl).position === 'static') {
@@ -675,12 +676,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
 	    (0, _utilsEvents.addEvent)(window, 'resize', (function () {
 	      this.resizeToContainer();
-	    }).bind(this));
-
-	    this.addListener('loaded', (function () {
-	      this.origBranches = this.branches;
-	      this.origLeaves = this.leaves;
-	      this.origRoot = this.root;
 	    }).bind(this));
 
 	    /**
@@ -967,20 +962,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
 	    }
 	  }, {
-	    key: 'build',
-	    value: function build(inputString, parser, options) {
-	      var _this2 = this;
-
-	      this.origBranches = false;
-	      this.origLeaves = false;
-	      this.origRoot = false;
-	      this.origBL = {};
-	      this.origP = {};
-
+	    key: 'saveOriginalTree',
+	    value: function saveOriginalTree() {
+	      this.originalTree.branches = this.branches;
+	      this.originalTree.leaves = this.leaves;
+	      this.originalTree.root = this.root;
+	      this.originalTree.branchLengths = {};
+	      this.originalTree.parents = {};
+	    }
+	  }, {
+	    key: 'clearState',
+	    value: function clearState() {
 	      this.root = false;
 	      this.leaves = [];
 	      this.branches = {};
 	      this.drawn = false;
+	    }
+	  }, {
+	    key: 'saveState',
+	    value: function saveState() {
+	      this.extractNestedBranches();
+
+	      this.root.branchLength = 0;
+	      this.maxBranchLength = 0;
+	      this.root.setTotalLength();
+
+	      if (this.maxBranchLength === 0) {
+	        this.loadError(new Error('All branches in the tree are identical.'));
+	        return;
+	      }
+	    }
+	  }, {
+	    key: 'build',
+	    value: function build(inputString, parser, options) {
+	      var _this2 = this;
+
+	      this.originalTree = {};
+	      this.clearState();
 
 	      var root = new _Branch2['default']();
 	      root.id = 'root';
@@ -992,24 +1010,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _this2.loadError(error);
 	          return;
 	        }
-
-	        _this2.saveNode(_this2.root);
-	        _this2.root.saveChildren();
-
-	        _this2.root.branchLength = 0;
-	        _this2.maxBranchLength = 0;
-	        _this2.root.setTotalLength();
-
-	        if (_this2.maxBranchLength === 0) {
-	          _this2.loadError(new Error('All branches in the tree are identical.'));
-	          return;
-	        }
-
-	        _this2.buildLeaves();
+	        _this2.saveState();
 	        _this2.setInitialCollapsedBranches();
-
 	        _this2.draw();
-	        _this2.loadCompleted();
+	        _this2.saveOriginalTree();
+	        if (!options.quiet) {
+	          _this2.loadCompleted();
+	        }
 	      });
 	    }
 	  }, {
@@ -1033,74 +1040,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.starty = event.clientY;
 	    }
 	  }, {
-	    key: 'redrawGetNodes',
-	    value: function redrawGetNodes(node, leafIds) {
-	      for (var i = 0; i < node.children.length; i++) {
-	        this.branches[node.children[i].id] = node.children[i];
-	        if (node.children[i].leaf) {
-	          leafIds.push(node.children[i].id);
-	          this.leaves.push(node.children[i]);
-	        } else {
-	          this.redrawGetNodes(node.children[i], leafIds);
-	        }
-	      }
-	    }
-	  }, {
 	    key: 'redrawFromBranch',
 	    value: function redrawFromBranch(node) {
-	      this.drawn = false;
-	      this.totalBranchLength = 0;
-
+	      this.clearState();
 	      this.resetTree();
 
-	      this.origBL[node.id] = node.branchLength;
-	      this.origP[node.id] = node.parent;
+	      this.originalTree.branchLengths[node.id] = node.branchLength;
+	      this.originalTree.parents[node.id] = node.parent;
 
 	      this.root = node;
-	      this.root.branchLength = 0;
 	      this.root.parent = false;
 
-	      this.branches = {};
-	      this.leaves = [];
-	      var leafIds = [];
+	      this.saveState();
 
-	      for (var i = 0; i < this.root.children.length; i++) {
-	        this.branches[this.root.children[i].id] = this.root.children[i];
-	        if (this.root.children[i].leaf) {
-	          this.leaves.push(this.root.children[i]);
-	          leafIds.push(this.root.children[i].id);
-	        } else {
-	          this.redrawGetNodes(this.root.children[i], leafIds);
-	        }
-	      }
-
-	      this.root.setTotalLength();
-	      this.prerenderer.run(this);
 	      this.draw();
 	      this.subtreeDrawn(node.id);
 	    }
 	  }, {
 	    key: 'redrawOriginalTree',
 	    value: function redrawOriginalTree() {
-	      this.drawn = false;
-	      this.resetTree();
-
-	      this.root.setTotalLength();
-	      this.prerenderer.run(this);
-	      this.draw();
-
-	      this.subtreeDrawn(this.root.id);
+	      this.load(this.stringRepresentation, { quiet: true });
 	    }
 	  }, {
-	    key: 'saveNode',
-	    value: function saveNode(node) {
+	    key: 'storeNode',
+	    value: function storeNode(node) {
 	      if (!node.id || node.id === '') {
 	        node.id = node.tree.genId();
 	      }
 
 	      if (this.branches[node.id]) {
 	        if (node !== this.branches[node.id]) {
-	          if (!this.leaf) {
+	          if (!node.leaf) {
 	            node.id = this.genId();
 	          } else {
 	            throw new Error('Two nodes on this tree share the id ' + node.id);
@@ -1109,6 +1079,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      this.branches[node.id] = node;
+
+	      if (node.leaf) {
+	        this.leaves.push(node);
+	      }
 	    }
 	  }, {
 	    key: 'scroll',
@@ -1236,7 +1210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'setTreeType',
-	    value: function setTreeType(type) {
+	    value: function setTreeType(type, quiet) {
 	      if (!(type in _treeTypes2['default'])) {
 	        return (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { error: new Error('"' + type + '" is not a known tree-type.') });
 	      }
@@ -1255,7 +1229,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.draw();
 	      }
 
-	      this.treeTypeChanged(oldType, type);
+	      if (!quiet) {
+	        this.treeTypeChanged(oldType, type);
+	      }
 	    }
 	  }, {
 	    key: 'setSize',
@@ -1433,19 +1409,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'resetTree',
 	    value: function resetTree() {
-	      if (!this.origBranches) return;
+	      if (!this.originalTree.branches) return;
 
-	      this.branches = this.origBranches;
+	      this.branches = this.originalTree.branches;
 	      var _iteratorNormalCompletion3 = true;
 	      var _didIteratorError3 = false;
 	      var _iteratorError3 = undefined;
 
 	      try {
-	        for (var _iterator3 = Object.keys(this.origBL)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	        for (var _iterator3 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 	          var n = _step3.value;
 
-	          this.branches[n].branchLength = this.origBL[n];
-	          this.branches[n].parent = this.origP[n];
+	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
+	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
 	        _didIteratorError3 = true;
@@ -1462,8 +1438,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      this.leaves = this.origLeaves;
-	      this.root = this.origRoot;
+	      this.leaves = this.originalTree.leaves;
+	      this.root = this.originalTree.root;
 	    }
 	  }, {
 	    key: 'rotateBranch',
@@ -1471,33 +1447,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.branches[branch.id].rotate();
 	    }
 	  }, {
-	    key: 'buildLeaves',
-	    value: function buildLeaves() {
+	    key: 'extractNestedBranches',
+	    value: function extractNestedBranches() {
+	      this.branches = {};
 	      this.leaves = [];
-	      var _iteratorNormalCompletion4 = true;
-	      var _didIteratorError4 = false;
-	      var _iteratorError4 = undefined;
 
-	      try {
-	        for (var _iterator4 = this.root.getChildIds()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-	          var leafId = _step4.value;
-
-	          this.leaves.push(this.branches[leafId]);
-	        }
-	      } catch (err) {
-	        _didIteratorError4 = true;
-	        _iteratorError4 = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-	            _iterator4['return']();
-	          }
-	        } finally {
-	          if (_didIteratorError4) {
-	            throw _iteratorError4;
-	          }
-	        }
-	      }
+	      this.storeNode(this.root);
+	      this.root.extractChildren();
 	    }
 	  }, {
 	    key: 'exportNwk',
@@ -2070,13 +2026,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.tree.redrawFromBranch(this);
 	    }
 	  }, {
-	    key: 'saveChildren',
-	    value: function saveChildren() {
-	      var i;
+	    key: 'extractChildren',
+	    value: function extractChildren() {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-	      for (i = 0; i < this.children.length; i++) {
-	        this.tree.saveNode(this.children[i]);
-	        this.children[i].saveChildren();
+	      try {
+	        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var child = _step.value;
+
+	          this.tree.storeNode(child);
+	          child.extractChildren();
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
 	      }
 	    }
 	  }, {
@@ -2275,7 +2250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.children = newChildren;
 
 	      if (!evt.preventredraw) {
-	        this.tree.buildLeaves();
+	        this.tree.extractNestedBranches();
 	        this.tree.draw(true);
 	      }
 	    }
@@ -3701,6 +3676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var doParse = function doParse(string) {
 	        if (string.match(_this.validator) || options.validate === false) {
+	          root.tree.stringRepresentation = string;
 	          return _this.parseFn({ string: string, root: root, options: options }, callback);
 	        }
 	        return callback(new Error('Format string does not validate as "' + _this.format + '"'));
