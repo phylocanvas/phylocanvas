@@ -6,7 +6,7 @@ import Navigator from './Navigator';
 import treeTypes from './treeTypes';
 
 import { addClass, setupDownloadLink } from './utils/dom';
-import { fireEvent, addEvent } from './utils/events';
+import { fireEvent, addEvent, debounce } from './utils/events';
 import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
 import parsers from './parsers';
 
@@ -161,8 +161,8 @@ export default class Tree {
     this.addListener('mouseout', this.drop.bind(this));
 
     addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    addEvent(this.canvas.canvas, 'mousewheel', debounce(this.scroll.bind(this), 50, true));
+    addEvent(this.canvas.canvas, 'DOMMouseScroll', debounce(this.scroll.bind(this), 50, true));
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
     }.bind(this));

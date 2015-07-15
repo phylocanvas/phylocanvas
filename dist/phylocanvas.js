@@ -391,6 +391,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.addEvent = addEvent;
 	exports.killEvent = killEvent;
 	exports.createHandler = createHandler;
+	exports.debounce = debounce;
 
 	function preventDefault(event) {
 	  event.preventDefault();
@@ -466,6 +467,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 	  return handler;
+	}
+
+	/**
+	 * Returns a function, that, as long as it continues to be invoked, will not
+	 * be triggered. The function will be called after it stops being called for
+	 * N milliseconds. If `immediate` is passed, trigger the function on the
+	 * leading edge, instead of the trailing.
+	 */
+
+	function debounce(func, wait, immediate) {
+	  var timeout;
+	  return function () {
+	    var _this = this;
+	    var args = arguments;
+	    var later = function later() {
+	      timeout = null;
+	      if (!immediate) func.apply(_this, args);
+	    };
+	    var callNow = immediate && !timeout;
+	    clearTimeout(timeout);
+	    timeout = setTimeout(later, wait);
+	    if (callNow) func.apply(_this, args);
+	  };
 	}
 
 /***/ },
@@ -672,8 +696,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addListener('mouseout', this.drop.bind(this));
 
 	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', (0, _utilsEvents.debounce)(this.scroll.bind(this), 50, true));
+	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', (0, _utilsEvents.debounce)(this.scroll.bind(this), 50, true));
 	    (0, _utilsEvents.addEvent)(window, 'resize', (function () {
 	      this.resizeToContainer();
 	    }).bind(this));
