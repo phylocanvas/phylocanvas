@@ -165,10 +165,10 @@ History.prototype.clear = function () {
   }
 };
 
-History.prototype.goBackTo = function (evt) {
-  var ele = evt.target;
-  this.tree.setTreeType(ele.getAttribute('data-tree-type'));
-  this.tree.redrawFromBranch(this.tree.origBranches[ele.id.replace('phylocanvas-history-', '')]);
+History.prototype.goBackTo = function (event) {
+  var element = event.target;
+  this.tree.setTreeType(element.getAttribute('data-tree-type'), true);
+  this.tree.redrawFromBranch(this.tree.originalTree.branches[element.id.replace('phylocanvas-history-', '')]);
 };
 
 History.prototype.injectCss = function () {

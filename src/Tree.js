@@ -48,6 +48,8 @@ export default class Tree {
      */
     this.root = false;
 
+    this.stringRepresentation = '';
+
     /**
      *
      * used for auto ids for internal nodes
@@ -61,8 +63,7 @@ export default class Tree {
      */
     this.backColour = false;
 
-    this.origBL = {};
-    this.origP = {};
+    this.originalTree = {};
 
     // Set up the element and canvas
     if (window.getComputedStyle(this.canvasEl).position === 'static') {
@@ -164,12 +165,6 @@ export default class Tree {
     addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
-    }.bind(this));
-
-    this.addListener('loaded', function () {
-      this.origBranches = this.branches;
-      this.origLeaves = this.leaves;
-      this.origRoot = this.root;
     }.bind(this));
 
     /**
@@ -417,17 +412,37 @@ export default class Tree {
     this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
   }
 
-  build(inputString, parser, options) {
-    this.origBranches = false;
-    this.origLeaves = false;
-    this.origRoot = false;
-    this.origBL = {};
-    this.origP = {};
+  saveOriginalTree() {
+    this.originalTree.branches = this.branches;
+    this.originalTree.leaves = this.leaves;
+    this.originalTree.root = this.root;
+    this.originalTree.branchLengths = {};
+    this.originalTree.parents = {};
+  }
 
+  clearState() {
     this.root = false;
     this.leaves = [];
     this.branches = {};
     this.drawn = false;
+  }
+
+  saveState() {
+    this.extractNestedBranches();
+
+    this.root.branchLength = 0;
+    this.maxBranchLength = 0;
+    this.root.setTotalLength();
+
+    if (this.maxBranchLength === 0) {
+      this.loadError(new Error('All branches in the tree are identical.'));
+      return;
+    }
+  }
+
+  build(inputString, parser, options) {
+    this.originalTree = {};
+    this.clearState();
 
     let root = new Branch();
     root.id = 'root';
@@ -439,24 +454,13 @@ export default class Tree {
         this.loadError(error);
         return;
       }
-
-      this.saveNode(this.root);
-      this.root.saveChildren();
-
-      this.root.branchLength = 0;
-      this.maxBranchLength = 0;
-      this.root.setTotalLength();
-
-      if (this.maxBranchLength === 0) {
-        this.loadError(new Error('All branches in the tree are identical.'));
-        return;
-      }
-
-      this.buildLeaves();
+      this.saveState();
       this.setInitialCollapsedBranches();
-
       this.draw();
-      this.loadCompleted();
+      this.saveOriginalTree();
+      if (!options.quiet) {
+        this.loadCompleted();
+      }
     });
   }
 
@@ -479,70 +483,34 @@ export default class Tree {
     this.starty = event.clientY;
   }
 
-  redrawGetNodes(node, leafIds) {
-    for (var i = 0; i < node.children.length; i++) {
-      this.branches[node.children[i].id] = node.children[i];
-      if (node.children[i].leaf) {
-        leafIds.push(node.children[i].id);
-        this.leaves.push(node.children[i]);
-      } else {
-        this.redrawGetNodes(node.children[i], leafIds);
-      }
-    }
-  }
-
   redrawFromBranch(node) {
-    this.drawn = false;
-    this.totalBranchLength = 0;
-
+    this.clearState();
     this.resetTree();
 
-    this.origBL[node.id] = node.branchLength;
-    this.origP[node.id] = node.parent;
+    this.originalTree.branchLengths[node.id] = node.branchLength;
+    this.originalTree.parents[node.id] = node.parent;
 
     this.root = node;
-    this.root.branchLength = 0;
     this.root.parent = false;
 
-    this.branches = {};
-    this.leaves = [];
-    var leafIds = [];
+    this.saveState();
 
-    for (var i = 0; i < this.root.children.length; i++) {
-      this.branches[this.root.children[i].id] = this.root.children[i];
-      if (this.root.children[i].leaf) {
-        this.leaves.push(this.root.children[i]);
-        leafIds.push(this.root.children[i].id);
-      } else {
-        this.redrawGetNodes(this.root.children[i], leafIds);
-      }
-    }
-
-    this.root.setTotalLength();
-    this.prerenderer.run(this);
     this.draw();
     this.subtreeDrawn(node.id);
   }
 
   redrawOriginalTree() {
-    this.drawn = false;
-    this.resetTree();
-
-    this.root.setTotalLength();
-    this.prerenderer.run(this);
-    this.draw();
-
-    this.subtreeDrawn(this.root.id);
+    this.load(this.stringRepresentation, { quiet: true });
   }
 
-  saveNode(node) {
+  storeNode(node) {
     if (!node.id || node.id === '') {
       node.id = node.tree.genId();
     }
 
     if (this.branches[node.id]) {
       if (node !== this.branches[node.id]) {
-        if (!this.leaf) {
+        if (!node.leaf) {
           node.id = this.genId();
         } else {
           throw new Error('Two nodes on this tree share the id ' + node.id);
@@ -551,6 +519,10 @@ export default class Tree {
     }
 
     this.branches[node.id] = node;
+
+    if (node.leaf) {
+      this.leaves.push(node);
+    }
   }
 
   scroll(e) {
@@ -643,7 +615,7 @@ export default class Tree {
     this.canvas.font = this.textSize + 'pt ' + this.font;
   }
 
-  setTreeType(type) {
+  setTreeType(type, quiet) {
     if (!(type in treeTypes)) {
       return fireEvent(this.canvasEl, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
     }
@@ -662,7 +634,9 @@ export default class Tree {
       this.draw();
     }
 
-    this.treeTypeChanged(oldType, type);
+    if (!quiet) {
+      this.treeTypeChanged(oldType, type);
+    }
   }
 
   setSize(width, height) {
@@ -828,27 +802,28 @@ export default class Tree {
   }
 
   resetTree() {
-    if (!this.origBranches) return;
+    if (!this.originalTree.branches) return;
 
-    this.branches = this.origBranches;
-    for (let n of Object.keys(this.origBL)) {
-      this.branches[n].branchLength = this.origBL[n];
-      this.branches[n].parent = this.origP[n];
+    this.branches = this.originalTree.branches;
+    for (let n of Object.keys(this.originalTree.branchLengths)) {
+      this.branches[n].branchLength = this.originalTree.branchLengths[n];
+      this.branches[n].parent = this.originalTree.parents[n];
     }
 
-    this.leaves = this.origLeaves;
-    this.root = this.origRoot;
+    this.leaves = this.originalTree.leaves;
+    this.root = this.originalTree.root;
   }
 
   rotateBranch(branch) {
     this.branches[branch.id].rotate();
   }
 
-  buildLeaves() {
+  extractNestedBranches() {
+    this.branches = {};
     this.leaves = [];
-    for (let leafId of this.root.getChildIds()) {
-      this.leaves.push(this.branches[leafId]);
-    }
+
+    this.storeNode(this.root);
+    this.root.extractChildren();
   }
 
   exportNwk() {

@@ -505,12 +505,10 @@ export default class Branch {
     this.tree.redrawFromBranch(this);
   }
 
-  saveChildren() {
-    var i;
-
-    for (i = 0; i < this.children.length; i++) {
-      this.tree.saveNode(this.children[i]);
-      this.children[i].saveChildren();
+  extractChildren() {
+    for (let child of this.children) {
+      this.tree.storeNode(child);
+      child.extractChildren();
     }
   }
 
@@ -692,7 +690,7 @@ export default class Branch {
     this.children = newChildren;
 
     if (!evt.preventredraw) {
-      this.tree.buildLeaves();
+      this.tree.extractNestedBranches();
       this.tree.draw(true);
     }
   }
