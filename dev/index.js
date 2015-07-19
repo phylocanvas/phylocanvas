@@ -1,7 +1,10 @@
 import * as PhyloCanvas from '../src/index';
+import historyPlugin from '../src/History';
+
+PhyloCanvas.plugin(historyPlugin);
 
 let buttonForm = document.getElementById('buttons');
-let tree = new PhyloCanvas.Tree('phylocanvas', {
+let tree = PhyloCanvas.createTree('phylocanvas', {
   history: {
     collapsed: true
   },
@@ -47,4 +50,5 @@ tree.setTreeType('circular');
 // tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
 tree.load('./data/tree.nwk');
 window.tree = tree;
+window.PhyloCanvas = PhyloCanvas;
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');

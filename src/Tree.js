@@ -151,8 +151,6 @@ export default class Tree {
 
     this.adjustForPixelRatio();
 
-    this.initialiseHistory(conf);
-
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
 
