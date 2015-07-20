@@ -23,10 +23,11 @@ export function createTree(element, conf = {}) {
 }
 
 function decorate(object, fnName, fn) {
-  let originalFn = fnName ? object[fnName] : object;
+  let target = object[fnName] ? object : object.prototype;
+  let originalFn = target[fnName];
 
-  object[fnName] = function (...args) {
-    return fn.call(object, originalFn, args);
+  target[fnName] = function (...args) {
+    return fn.call(this, originalFn, args);
   };
 }
 
