@@ -76,8 +76,8 @@ export default class Tree {
     canvas.className = 'phylocanvas';
     canvas.style.position = 'relative';
     canvas.style.backgroundColor = '#FFFFFF';
-    canvas.height = element.clientHeight || 400;
-    canvas.width = element.clientWidth || 400;
+    canvas.height = element.offsetHeight || 400;
+    canvas.width = element.offsetWidth || 400;
     canvas.style.zIndex = '1';
     this.canvasEl.appendChild(canvas);
 
@@ -149,7 +149,7 @@ export default class Tree {
       this.navigator = new Navigator(this);
     }
 
-    this.adjustForPixelRatio();
+    this.resizeToContainer();
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -163,6 +163,7 @@ export default class Tree {
     addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
+      this.draw();
     }.bind(this));
 
     /**
@@ -644,9 +645,6 @@ export default class Tree {
       this.navigator.resize();
     }
     this.adjustForPixelRatio();
-    if (this.drawn) {
-      this.draw();
-    }
   }
 
   setZoom(z) {
@@ -831,8 +829,6 @@ export default class Tree {
 
   resizeToContainer() {
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
-    this.draw();
-    this.history.resizeTree();
   }
 
   downloadAllLeafIds() {

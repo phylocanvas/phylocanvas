@@ -1,6 +1,8 @@
 import { addClass, hasClass, removeClass } from '../utils/dom';
 import { fireEvent, addEvent, killEvent } from '../utils/events';
 
+import { Tree } from '../index';
+
 class History {
 
   constructor(tree) {
@@ -36,12 +38,14 @@ class History {
     addClass(this.div, 'collapsed');
     this.toggleDiv.firstChild.data = '>';
     this.resizeTree();
+    this.tree.draw();
   }
 
   expand() {
     removeClass(this.div, 'collapsed');
     this.toggleDiv.firstChild.data = '<';
     this.resizeTree();
+    this.tree.draw();
   }
 
   isCollapsed() {
@@ -181,6 +185,10 @@ export default function historyPlugin(decorate) {
       tree.history = new History(tree);
     }
     return tree;
+  });
+
+  decorate(Tree, 'setSize', function () {
+    this.history.resizeTree();
   });
 
   this.History = History;
