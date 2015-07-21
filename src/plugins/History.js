@@ -86,10 +86,10 @@ class History {
     return div;
   }
 
-  resizeTree(resizeFn = Tree.prototype.setSize) {
+  resizeTree() {
     var tree = this.tree;
     this.width = this.div.offsetWidth;
-    resizeFn.call(tree, tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
+    tree.setSize(tree.canvasEl.offsetWidth - this.width, tree.canvasEl.offsetHeight);
     if (this.isCollapsed()) {
       tree.canvasEl.getElementsByTagName('canvas')[0].style.marginLeft = this.width + 'px';
     } else {
@@ -185,11 +185,11 @@ export default function historyPlugin(decorate) {
     return tree;
   });
 
-  decorate(Tree, 'setSize', function (delegate, args) {
+  decorate(Tree, 'resizeToContainer', function (delegate) {
     if (!this.history) {
-      return delegate.apply(this, args);
+      return delegate.apply(this);
     }
-    this.history.resizeTree(delegate);
+    this.history.resizeTree();
   });
 
   this.History = History;
