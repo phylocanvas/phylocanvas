@@ -1,7 +1,7 @@
 import * as PhyloCanvas from '../src/index';
 import historyPlugin from '../src/plugins/History';
 
-PhyloCanvas.plugin(historyPlugin);
+// PhyloCanvas.plugin(historyPlugin);
 
 let buttonForm = document.getElementById('buttons');
 let tree = PhyloCanvas.createTree('phylocanvas', {
