@@ -1,5 +1,3 @@
-import http from './utils/http';
-
 export default class Parser {
 
   constructor({ format, parseFn, fileExtension, validator }) {
@@ -9,28 +7,11 @@ export default class Parser {
     this.validator = validator;
   }
 
-  parse({ inputString, root, options = { validate: true } }, callback) {
-    let doParse = (string) => {
-      if (string.match(this.validator) || options.validate === false) {
-        root.tree.stringRepresentation = string;
-        return this.parseFn({ string, root, options }, callback);
-      }
-      return callback(new Error(`Format string does not validate as "${this.format}"`));
-    };
-
-    if (inputString.match(this.fileExtension)) {
-      http(
-        { url: inputString, method: 'GET' },
-        (response) => {
-          if (response.status >= 400) {
-            return callback(new Error(response.responseText));
-          }
-          doParse(response.responseText);
-        }
-      );
-    } else {
-      doParse(inputString);
+  parse({ formatString, root, options = { validate: true } }, callback) {
+    if (formatString.match(this.validator) || options.validate === false) {
+      return this.parseFn({ string: formatString, root, options }, callback);
     }
+    return callback(new Error(`Format string does not validate as "${this.format}"`));
   }
 
 }

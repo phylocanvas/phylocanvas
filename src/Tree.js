@@ -408,7 +408,7 @@ export default class Tree {
       }
     }
 
-    this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
+    this.loadError(new Error('String not recognised as a file or a parseable format string'));
   }
 
   saveOriginalTree() {
@@ -439,7 +439,7 @@ export default class Tree {
     }
   }
 
-  build(inputString, parser, options) {
+  build(formatString, parser, options) {
     this.originalTree = {};
     this.clearState();
 
@@ -448,11 +448,12 @@ export default class Tree {
     this.branches.root = root;
     this.setRoot(root);
 
-    parser.parse({ inputString, root, options }, (error) => {
+    parser.parse({ formatString, root, options }, (error) => {
       if (error) {
         this.loadError(error);
         return;
       }
+      this.stringRepresentation = formatString;
       this.saveState();
       this.setInitialCollapsedBranches();
       this.draw();
