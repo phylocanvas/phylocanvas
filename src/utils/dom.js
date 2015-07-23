@@ -14,7 +14,7 @@ export function setupDownloadLink(url, filename) {
   anchor.href = url;
   anchor.target = '_blank';
   if (isDownloadSupported) {
-    anchor.download = filename;
+    anchor.download = (filename)?filename:'pc_download';
   }
 
   // dispatch for firefox + others
@@ -24,7 +24,11 @@ export function setupDownloadLink(url, filename) {
 
   // fireEvent(anchor, 'click');
   if (isDownloadSupported) {
-    windowURL.revokeObjectURL(anchor.href);
+    setTimeout(function(){
+      document.body.removeChild(anchor);
+      windowURL.revokeObjectURL(anchor.href);
+    }, 100);
+
   }
 }
 

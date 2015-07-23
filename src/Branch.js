@@ -701,7 +701,15 @@ export default class Branch {
 
   downloadLeafIdsFromBranch() {
     var downloadData = this.getChildIds().join('\n');
-    setupDownloadLink(createBlobUrl(downloadData), 'pc_leaves.txt');
+    var filename = "pc_leaf_ids";
+    if (!this.parent) {
+      // If root
+      filename += "_all.txt";
+    }
+    else {
+      filename += "_" + this.id + ".txt";
+    }
+    setupDownloadLink(createBlobUrl(downloadData), filename);
   }
 
   setDisplay({ colour, shape, size }) {
