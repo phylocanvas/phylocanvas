@@ -16,7 +16,13 @@ export function setupDownloadLink(url, filename) {
   if (isDownloadSupported) {
     anchor.download = filename;
   }
-  fireEvent(anchor, 'click');
+
+  // dispatch for firefox + others
+  var evObj = document.createEvent('MouseEvent');
+  evObj.initEvent('click', true, true);
+  anchor.dispatchEvent(evObj);
+
+  // fireEvent(anchor, 'click');
   if (isDownloadSupported) {
     windowURL.revokeObjectURL(anchor.href);
   }
