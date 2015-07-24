@@ -12,11 +12,12 @@
 import Tree from './Tree';
 import Branch from './Branch';
 import ContextMenu from './ContextMenu';
+import Parser from './Parser';
 
 import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 
-export { Tree, Branch, ContextMenu, treeTypes, nodeRenderers };
+export { Tree, Branch, ContextMenu, Parser, treeTypes, nodeRenderers };
 
 export function createTree(element, conf = {}) {
   return new Tree(element, conf);

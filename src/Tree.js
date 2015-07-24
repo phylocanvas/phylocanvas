@@ -392,9 +392,22 @@ export default class Tree {
     this.draw();
   }
 
-  load(inputString, options = {}) {
-    if (options.format) {
-      this.build(inputString, parsers[options.format], options);
+  load(inputString, options = {}, callback) {
+    let buildOptions = options;
+    let buildCallback = callback;
+
+    // allows passing callback as second param
+    if (typeof options === 'function') {
+      buildCallback = options;
+      buildOptions = {};
+    }
+
+    if (buildCallback) {
+      buildOptions.callback = buildCallback;
+    }
+
+    if (buildOptions.format) {
+      this.build(inputString, parsers[buildOptions.format], buildOptions);
       return;
     }
 
@@ -403,12 +416,16 @@ export default class Tree {
 
       if (inputString.match(parser.fileExtension) ||
           inputString.match(parser.validator)) {
-        this.build(inputString, parser, options);
+        this.build(inputString, parser, buildOptions);
         return;
       }
     }
 
-    this.loadError(new Error('String not recognised as a file or a parseable format string'));
+    let error = new Error('String not recognised as a file or a parseable format string');
+    if (buildCallback) {
+      buildCallback(error);
+    }
+    this.loadError(error);
   }
 
   saveOriginalTree() {
@@ -450,6 +467,9 @@ export default class Tree {
 
     parser.parse({ formatString, root, options }, (error) => {
       if (error) {
+        if (options.callback) {
+          options.callback(error);
+        }
         this.loadError(error);
         return;
       }
@@ -458,6 +478,9 @@ export default class Tree {
       this.setInitialCollapsedBranches();
       this.draw();
       this.saveOriginalTree();
+      if (options.callback) {
+        options.callback();
+      }
       if (!options.quiet) {
         this.loadCompleted();
       }

@@ -38,19 +38,21 @@ for (let treeType of Object.keys(PhyloCanvas.treeTypes)) {
 tree.on('error', function (event) { throw event.error; });
 
 tree.on('loaded', function () {
-  tree.backColour = true;
-  tree.setNodeSize(1);
-  tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
-  tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
-  tree.setNodeDisplay('D', { colour: 'green' });
+  console.log('loaded');
   // tree.viewMetadataColumns();
 });
 
 tree.alignLabels = true;
 tree.setTreeType('circular');
 
-// tree.load('((B:0.1,(C:0.2,D:0.3)E:0.1)F:0.1)A:0.1;');
-tree.load('./data/tree.nwk');
+tree.load('./data/tree.nwk', function () {
+  tree.backColour = true;
+  tree.setNodeSize(5);
+  tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
+  tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
+  tree.setNodeDisplay('D', { colour: 'green' });
+});
+// tree.load('./data/tree.nwk', {}, () => { console.log('callback!'); });
 window.tree = tree;
 window.PhyloCanvas = PhyloCanvas;
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');

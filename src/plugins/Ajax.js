@@ -1,4 +1,4 @@
-import Tree from '../Tree';
+import { Tree } from '../index';
 
 function http({ url, method, data }, callback) {
   var xhr = new XMLHttpRequest();
@@ -25,7 +25,11 @@ export default function ajaxPlugin(decorate) {
         { url: inputString, method: 'GET' },
         (response) => {
           if (response.status >= 400) {
-            return this.loadError(new Error(response.responseText));
+            let error = new Error(response.responseText);
+            if (options.callback) {
+              options.callback(error);
+            }
+            return this.loadError(error);
           }
           delegate.call(this, response.responseText, parser, options);
         }
