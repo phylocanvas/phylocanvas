@@ -19,10 +19,6 @@ import nodeRenderers from './nodeRenderers';
 
 export { Tree, Branch, ContextMenu, Parser, treeTypes, nodeRenderers };
 
-export function createTree(element, conf = {}) {
-  return new Tree(element, conf);
-}
-
 function decorate(object, fnName, fn) {
   let target = object[fnName] ? object : object.prototype;
   let originalFn = target[fnName];
@@ -32,6 +28,12 @@ function decorate(object, fnName, fn) {
   };
 }
 
-export function plugin(pluginFn) {
+function plugin(pluginFn) {
   pluginFn.call(this, decorate);
 }
+
+function createTree(element, conf = {}) {
+  return new Tree(element, conf);
+}
+
+export default { plugin, createTree };

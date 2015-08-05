@@ -1,4 +1,4 @@
-import * as PhyloCanvas from '../src/index';
+import PhyloCanvas, * as phyloComponents from '../src/index';
 import historyPlugin from '../src/plugins/History';
 import ajaxPlugin from '../src/plugins/Ajax';
 
@@ -25,7 +25,7 @@ buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
 });
 
-for (let treeType of Object.keys(PhyloCanvas.treeTypes)) {
+for (let treeType of Object.keys(phyloComponents.treeTypes)) {
   let button = document.createElement('button');
 
   button.innerHTML = treeType;
@@ -53,6 +53,4 @@ tree.load('./data/tree.nwk', function () {
   tree.setNodeDisplay('D', { colour: 'green' });
 });
 // tree.load('./data/tree.nwk', {}, () => { console.log('callback!'); });
-window.tree = tree;
-window.PhyloCanvas = PhyloCanvas;
 // tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);');
