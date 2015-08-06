@@ -23,8 +23,8 @@
   },
   "homepage": "http://www.phylocanvas.net",
   "scripts": {
-    "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --port 8000",
-    "test": "webpack-dev-server --config webpack-test-server.config.js --port 8001",
+    "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline",
+    "test": "webpack-dev-server --config webpack-test-server.config.js --port 8081",
     "build": "webpack"
   },
   "dependencies": {},

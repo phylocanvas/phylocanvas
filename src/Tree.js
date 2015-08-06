@@ -177,9 +177,7 @@ export default class Tree {
      */
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
-    this.showMetadata = false;
-    // Takes an array of metadata column headings to overlay on the tree
-    this.selectedMetadataColumns = [];
+
     // Colour for 1 and 0s. Currently 0s are not drawn
     this.colour1 = 'rgba(206,16,16,1)';
     this.colour0 = '#ccc';
@@ -188,10 +186,6 @@ export default class Tree {
        Because label length pixel differes for different tree types for some reason
      */
     this.maxLabelLength = {};
-    // x step for metadata
-    this.metadataXStep = 15;
-    // Boolean to detect if metadata heading is drawn or not
-    this.metadataHeadingDrawn = false;
   }
 
   get alignLabels() {
@@ -352,9 +346,10 @@ export default class Tree {
     this.canvas.scale(this.zoom, this.zoom);
 
     this.branchRenderer.render(this, this.root);
+
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
-    this.metadataHeadingDrawn = false;
+
     this.drawn = true;
   }
 
@@ -688,40 +683,6 @@ export default class Tree {
     this.draw();
   }
 
-  viewMetadataColumns(metadataColumnArray) {
-    this.showMetadata = true;
-    if (metadataColumnArray === undefined) {
-      // Select all column headings so that it will draw all columns
-      metadataColumnArray = this.getMetadataColumnHeadings();
-    }
-    // If argument missing or no key id matching, then this array would be undefined
-    if (metadataColumnArray !== undefined) {
-      this.selectedMetadataColumns = metadataColumnArray;
-    }
-    // Fit to canvas window
-    this.fitInPanel();
-    this.draw();
-  }
-
-  getMetadataColumnHeadings() {
-    var metadataColumnArray = [];
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        metadataColumnArray = Object.keys(this.leaves[i].data);
-        break;
-      }
-    }
-    return metadataColumnArray;
-  }
-
-  clearMetadata() {
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        this.leaves[i].data = {};
-      }
-    }
-  }
-
   setMaxLabelLength() {
     var dimensions;
     if (this.maxLabelLength[this.treeType] === undefined) {
@@ -773,9 +734,7 @@ export default class Tree {
       let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
       let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
       let theta = node.angle;
-      let pad = node.getNodeSize()
-                + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0)
-                + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+      let pad = node.getTotalSize();
 
       x = x + (pad * Math.cos(theta));
       y = y + (pad * Math.sin(theta));
