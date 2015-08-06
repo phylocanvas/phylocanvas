@@ -1,5 +1,3 @@
-import { fireEvent } from './events';
-
 let windowURL = window.URL || window.webkitURL;
 
 export function createBlobUrl(data) {
@@ -7,28 +5,27 @@ export function createBlobUrl(data) {
   return windowURL.createObjectURL(blob);
 }
 
-export function setupDownloadLink(url, filename) {
+export function setupDownloadLink(url, filename = 'pc_download') {
   var anchor = document.createElement('a');
   var isDownloadSupported = (typeof anchor.download !== 'undefined');
 
   anchor.href = url;
   anchor.target = '_blank';
   if (isDownloadSupported) {
-    anchor.download = (filename)?filename:'pc_download';
+    anchor.download = filename;
   }
 
   // dispatch for firefox + others
-  var evObj = document.createEvent('MouseEvent');
+  const evObj = document.createEvent('MouseEvent');
   evObj.initEvent('click', true, true);
   anchor.dispatchEvent(evObj);
 
   // fireEvent(anchor, 'click');
   if (isDownloadSupported) {
-    setTimeout(function(){
+    setTimeout(function () {
       document.body.removeChild(anchor);
       windowURL.revokeObjectURL(anchor.href);
     }, 100);
-
   }
 }
 

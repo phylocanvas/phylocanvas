@@ -1,3 +1,4 @@
+
 import Tooltip from './Tooltip';
 import { createHandler, preventDefault } from './utils/events';
 
@@ -16,13 +17,13 @@ function createImageLink(contextMenu) {
 }
 
 function createLeafIdsLink(contextMenu) {
-  let leafdata = contextMenu.tree.root.downloadLeafIdsFromBranch()
-  let anchorElement = createAnchorElement(contextMenu, { text: this.text , filename: 'pc-leaf-ids-root.txt', href: leafdata });
+  let leafdata = contextMenu.tree.root.downloadLeafIdsFromBranch();
+  let anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-root.txt', href: leafdata });
   return anchorElement;
 }
 
 function createBranchLeafIdsLink(contextMenu, node) {
-  let leafdata = node.downloadLeafIdsFromBranch()
+  let leafdata = node.downloadLeafIdsFromBranch();
   let anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: `pc-leaf-ids-${node.id}.txt`, href: leafdata });
   return anchorElement;
 }
@@ -84,7 +85,7 @@ function mouseout(element) {
 }
 
 function transferMenuItem({ handler, text = 'New menu Item', nodeType, element }) {
-  return { handler, text, nodeType, element};
+  return { handler, text, nodeType, element };
 }
 
 /**
@@ -118,17 +119,16 @@ export default class ContextMenu extends Tooltip {
         continue;
       }
 
-      if(menuItem.element) {
+      if (menuItem.element) {
         let anchorElement = menuItem.element(this, node);
         listElement = this.createElement('li', anchorElement);
-      }
-      else {
+      } else {
         listElement = this.createElement('li', menuItem.text);
       }
 
       listElement.style.listStyle = 'none outside none';
 
-      if(!menuItem.element) {
+      if (!menuItem.element) {
         if (menuItem.nodeType) {
           listElement.addEventListener(
             'click', createHandler(node, menuItem.handler)
@@ -154,6 +154,3 @@ export default class ContextMenu extends Tooltip {
     this.element.appendChild(list);
   }
 }
-
-
-

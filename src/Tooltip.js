@@ -34,8 +34,7 @@ export default class Tooltip {
     element.style.color = 'black';
     if (typeof textContent === 'object') {
       element.appendChild(textContent);
-    }
-    else {
+    } else {
       element.appendChild(document.createTextNode(textContent));
     }
     return element;

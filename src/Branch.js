@@ -701,13 +701,11 @@ export default class Branch {
 
   downloadLeafIdsFromBranch() {
     var downloadData = this.getChildIds().join('\n');
-    var filename = "pc_leaf_ids";
+    var filename = 'pc_leaf_ids';
     if (!this.parent) {
-      // If root
-      filename += "_all.txt";
-    }
-    else {
-      filename += "_" + this.id + ".txt";
+      filename += '_all.txt';
+    } else {
+      filename += '_' + this.id + '.txt';
     }
     return createBlobUrl(downloadData);
   }
