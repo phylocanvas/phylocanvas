@@ -31,7 +31,12 @@ export default class Tooltip {
     element.style.padding = '0.3em 0.5em 0.3em 0.5em';
     element.style.fontFamily = this.tree.font;
     element.style.fontSize = this.fontSize || '12pt';
-    element.appendChild(document.createTextNode(textContent));
+    element.style.color = 'black';
+    if (typeof textContent === 'object') {
+      element.appendChild(textContent);
+    } else {
+      element.appendChild(document.createTextNode(textContent));
+    }
     return element;
   }
 
@@ -56,7 +61,6 @@ export default class Tooltip {
 
     this.element.style.zIndex = 2000;
     this.element.style.display = 'block';
-    this.element.style.backgroundColor = '#FFFFFF';
 
     this.closed = false;
   }

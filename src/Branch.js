@@ -1,5 +1,5 @@
 import { Angles } from './utils/constants';
-import { setupDownloadLink, createBlobUrl } from './utils/dom';
+import { createBlobUrl } from './utils/dom';
 
 import nodeRenderers from './nodeRenderers';
 
@@ -701,7 +701,13 @@ export default class Branch {
 
   downloadLeafIdsFromBranch() {
     var downloadData = this.getChildIds().join('\n');
-    setupDownloadLink(createBlobUrl(downloadData), 'pc_leaves.txt');
+    var filename = 'pc_leaf_ids';
+    if (!this.parent) {
+      filename += '_all.txt';
+    } else {
+      filename += '_' + this.id + '.txt';
+    }
+    return createBlobUrl(downloadData);
   }
 
   setDisplay({ colour, shape, size }) {

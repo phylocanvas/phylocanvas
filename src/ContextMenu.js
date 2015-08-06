@@ -1,5 +1,32 @@
+
 import Tooltip from './Tooltip';
 import { createHandler, preventDefault } from './utils/events';
+
+function createAnchorElement(contextMenu, { text='link', filename='file', href }) {
+  let anchorElement = contextMenu.createElement('a', text);
+  anchorElement.style.padding = '0px';
+  anchorElement.href = href;
+  anchorElement.style.textDecoration = 'none';
+  anchorElement.download = filename;
+  return anchorElement;
+}
+
+function createImageLink(contextMenu) {
+  let anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'phylocanvas_tree.png', href: contextMenu.tree.getPngUrl() });
+  return anchorElement;
+}
+
+function createLeafIdsLink(contextMenu) {
+  let leafdata = contextMenu.tree.root.downloadLeafIdsFromBranch();
+  let anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-root.txt', href: leafdata });
+  return anchorElement;
+}
+
+function createBranchLeafIdsLink(contextMenu, node) {
+  let leafdata = node.downloadLeafIdsFromBranch();
+  let anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: `pc-leaf-ids-${node.id}.txt`, href: leafdata });
+  return anchorElement;
+}
 
 const DEFAULT_MENU_ITEMS = [
   { text: 'Collapse/Expand Branch',
@@ -21,16 +48,17 @@ const DEFAULT_MENU_ITEMS = [
     handler: 'toggleLabels'
   }, {
     text: 'Export As Image',
-    handler: 'exportCurrentTreeView'
+    element: createImageLink
   }, {
     text: 'Export Leaf IDs',
-    handler: 'downloadAllLeafIds'
+    element: createLeafIdsLink
   }, {
     text: 'Export Leaf IDs on Branch',
-    handler: 'downloadLeafIdsFromBranch',
+    element: createBranchLeafIdsLink,
     nodeType: 'internal'
   }
 ];
+
 
 function menuItemApplicable(menuItem, node) {
   if (!node) {
@@ -49,15 +77,15 @@ function menuItemApplicable(menuItem, node) {
 }
 
 function mouseover(element) {
-  element.style.backgroundColor = '#E2E3DF';
+  element.style.backgroundColor = '#d2d2c4';
 }
 
 function mouseout(element) {
   element.style.backgroundColor = 'transparent';
 }
 
-function transferMenuItem({ handler, text = 'New menu Item', nodeType }) {
-  return { handler, text, nodeType };
+function transferMenuItem({ handler, text = 'New menu Item', nodeType, element }) {
+  return { handler, text, nodeType, element };
 }
 
 /**
@@ -82,7 +110,7 @@ export default class ContextMenu extends Tooltip {
 
   createContent(node) {
     let list = document.createElement('ul');
-
+    let listElement;
     list.style.margin = '0';
     list.style.padding = '0';
 
@@ -91,17 +119,25 @@ export default class ContextMenu extends Tooltip {
         continue;
       }
 
-      let listElement = this.createElement('li', menuItem.text);
+      if (menuItem.element) {
+        let anchorElement = menuItem.element(this, node);
+        listElement = this.createElement('li', anchorElement);
+      } else {
+        listElement = this.createElement('li', menuItem.text);
+      }
+
       listElement.style.listStyle = 'none outside none';
 
-      if (menuItem.nodeType) {
-        listElement.addEventListener(
-          'click', createHandler(node, menuItem.handler)
-        );
-      } else {
-        listElement.addEventListener(
-          'click', createHandler(this.tree, menuItem.handler)
-        );
+      if (!menuItem.element) {
+        if (menuItem.nodeType) {
+          listElement.addEventListener(
+            'click', createHandler(node, menuItem.handler)
+          );
+        } else {
+          listElement.addEventListener(
+            'click', createHandler(this.tree, menuItem.handler)
+          );
+        }
       }
       listElement.addEventListener('click', this.click);
       listElement.addEventListener('contextmenu', preventDefault);
@@ -117,5 +153,4 @@ export default class ContextMenu extends Tooltip {
     document.body.addEventListener('click', createHandler(this, 'close'));
     this.element.appendChild(list);
   }
-
 }
