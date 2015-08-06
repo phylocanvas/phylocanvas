@@ -5,7 +5,7 @@ import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
 
-import { addClass, setupDownloadLink } from './utils/dom';
+import { addClass } from './utils/dom';
 import { fireEvent, addEvent } from './utils/events';
 import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
 import parsers from './parsers';
@@ -836,15 +836,6 @@ export default class Tree {
     this.draw();
     this.history.resizeTree();
   }
-
-  downloadAllLeafIds() {
-    this.root.downloadLeafIdsFromBranch();
-  }
-
-  exportCurrentTreeView() {
-    setupDownloadLink(this.getPngUrl(), 'phylocanvas.png');
-  }
-
 }
 
 Tree.prototype.on = Tree.prototype.addListener;

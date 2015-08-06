@@ -1,5 +1,5 @@
 import { Angles } from './utils/constants';
-import { setupDownloadLink, createBlobUrl } from './utils/dom';
+import { createBlobUrl } from './utils/dom';
 
 import nodeRenderers from './nodeRenderers';
 
@@ -709,7 +709,7 @@ export default class Branch {
     else {
       filename += "_" + this.id + ".txt";
     }
-    setupDownloadLink(createBlobUrl(downloadData), filename);
+    return createBlobUrl(downloadData);
   }
 
   setDisplay({ colour, shape, size }) {
