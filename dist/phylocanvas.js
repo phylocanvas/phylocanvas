@@ -399,9 +399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    this.farthestNodeFromRootX = 0;
 	    this.farthestNodeFromRootY = 0;
-	    this.showMetadata = false;
-	    // Takes an array of metadata column headings to overlay on the tree
-	    this.selectedMetadataColumns = [];
+
 	    // Colour for 1 and 0s. Currently 0s are not drawn
 	    this.colour1 = 'rgba(206,16,16,1)';
 	    this.colour0 = '#ccc';
@@ -410,10 +408,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	       Because label length pixel differes for different tree types for some reason
 	     */
 	    this.maxLabelLength = {};
-	    // x step for metadata
-	    this.metadataXStep = 15;
-	    // Boolean to detect if metadata heading is drawn or not
-	    this.metadataHeadingDrawn = false;
 	  }
 
 	  _createClass(Tree, [{
@@ -584,9 +578,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.scale(this.zoom, this.zoom);
 
 	      this.branchRenderer.render(this, this.root);
+
 	      // Making default collapsed false so that it will collapse on initial load only
 	      this.defaultCollapsed = false;
-	      this.metadataHeadingDrawn = false;
+
 	      this.drawn = true;
 	    }
 	  }, {
@@ -997,43 +992,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.draw();
 	    }
 	  }, {
-	    key: 'viewMetadataColumns',
-	    value: function viewMetadataColumns(metadataColumnArray) {
-	      this.showMetadata = true;
-	      if (metadataColumnArray === undefined) {
-	        // Select all column headings so that it will draw all columns
-	        metadataColumnArray = this.getMetadataColumnHeadings();
-	      }
-	      // If argument missing or no key id matching, then this array would be undefined
-	      if (metadataColumnArray !== undefined) {
-	        this.selectedMetadataColumns = metadataColumnArray;
-	      }
-	      // Fit to canvas window
-	      this.fitInPanel();
-	      this.draw();
-	    }
-	  }, {
-	    key: 'getMetadataColumnHeadings',
-	    value: function getMetadataColumnHeadings() {
-	      var metadataColumnArray = [];
-	      for (var i = 0; i < this.leaves.length; i++) {
-	        if (Object.keys(this.leaves[i].data).length > 0) {
-	          metadataColumnArray = Object.keys(this.leaves[i].data);
-	          break;
-	        }
-	      }
-	      return metadataColumnArray;
-	    }
-	  }, {
-	    key: 'clearMetadata',
-	    value: function clearMetadata() {
-	      for (var i = 0; i < this.leaves.length; i++) {
-	        if (Object.keys(this.leaves[i].data).length > 0) {
-	          this.leaves[i].data = {};
-	        }
-	      }
-	    }
-	  }, {
 	    key: 'setMaxLabelLength',
 	    value: function setMaxLabelLength() {
 	      var dimensions;
@@ -1092,7 +1050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
 	        var y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
 	        var theta = node.angle;
-	        var pad = node.getNodeSize() + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0) + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+	        var pad = node.getTotalSize();
 
 	        x = x + pad * Math.cos(theta);
 	        y = y + pad * Math.sin(theta);
@@ -1414,102 +1372,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
-	    key: 'drawMetadata',
-	    value: function drawMetadata() {
-	      var padMaxLabelWidth = 0;
-	      if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
-	        padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
-	      }
-	      var tx = this.getLabelStartX() + padMaxLabelWidth;
-	      var ty = 0;
-	      var metadata = [];
-	      var height = this.tree.textSize;
-	      var width = this.tree.metadataXStep / 2;
-	      var i;
-	      var columnName;
-
-	      if (this.tree.alignLabels) {
-	        if (this.tree.treeType === 'rectangular') {
-	          tx += this.tree.farthestNodeFromRootX - this.centerx;
-	        } else if (this.tree.treeType === 'hierarchical') {
-	          tx += this.tree.farthestNodeFromRootY - this.centery;
-	        }
-	      }
-
-	      if (!this.tree.metadataHeadingDrawn && this.tree.alignLabels && this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
-	        this.drawMetadataHeading(tx, ty);
-	        this.tree.metadataHeadingDrawn = true;
-	      }
-
-	      var metadataXStep = this.tree.metadataXStep;
-
-	      if (Object.keys(this.data).length > 0) {
-	        this.canvas.beginPath();
-
-	        // If no columns specified, then draw all columns
-	        if (this.tree.selectedMetadataColumns.length > 0) {
-	          metadata = this.tree.selectedMetadataColumns;
-	        } else {
-	          metadata = Object.keys(this.data);
-	        }
-
-	        ty = ty - height / 2;
-
-	        for (i = 0; i < metadata.length; i++) {
-	          columnName = metadata[i];
-	          tx += metadataXStep;
-
-	          if (window.parseInt(this.data[columnName])) {
-	            this.canvas.fillStyle = this.tree.colour1;
-	            this.canvas.fillRect(tx, ty, width, height);
-	          } else if (window.parseInt(this.data[columnName]) === 0) {
-	            this.canvas.fillStyle = this.tree.colour0;
-	            this.canvas.fillRect(tx, ty, width, height);
-	          }
-	        }
-	        this.canvas.stroke();
-	        this.canvas.closePath();
-	      }
-	    }
-	  }, {
-	    key: 'drawMetadataHeading',
-	    value: function drawMetadataHeading(tx, ty) {
-	      var metadata;
-	      var columnName;
-	      var i;
-
-	      if (this.tree.selectedMetadataColumns.length > 0) {
-	        metadata = this.tree.selectedMetadataColumns;
-	      } else {
-	        metadata = Object.keys(this.data);
-	      }
-
-	      // Drawing Column headings
-	      this.canvas.font = '12px Sans-serif';
-	      this.canvas.fillStyle = 'black';
-
-	      for (i = 0; i < metadata.length; i++) {
-	        columnName = metadata[i];
-	        tx += this.tree.metadataXStep;
-	        // Rotate canvas to write column headings
-	        this.canvas.rotate(-Math.PI / 2);
-	        if (this.tree.treeType === 'rectangular') {
-	          this.canvas.textAlign = 'left';
-	          // x and y axes changed because of rotate
-	          // Adding + 6 to adjust the position
-	          this.canvas.fillText(columnName, 20, tx + 6);
-	        } else if (this.tree.treeType === 'hierarchical') {
-	          this.canvas.textAlign = 'right';
-	          this.canvas.fillText(columnName, -20, tx + 8);
-	        } else if (this.tree.treeType === 'diagonal') {
-	          this.canvas.textAlign = 'left';
-	          this.canvas.fillText(columnName, 20, tx + 6);
-	        }
-	        // Rotate canvas back to normal position
-	        this.canvas.rotate(Math.PI / 2);
-	      }
-	    }
-	  }, {
 	    key: 'drawLabel',
 	    value: function drawLabel() {
 	      var fSize = this.tree.textSize;
@@ -1545,8 +1407,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.fillStyle = this.getTextColour();
 	      this.canvas.fillText(lbl, tx, ty);
 	      this.canvas.closePath();
-	      // Make canvas rotate back to actual position so that
-	      // metadata drawn after that will not be affected
+
+	      // Rotate canvas back to original position
 	      if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
 	        this.canvas.rotate(_utilsConstants.Angles.HALF);
 	      }
@@ -1566,6 +1428,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.maxy = centerY + boundedRadius;
 	    }
 	  }, {
+	    key: 'drawCollapsed',
+	    value: function drawCollapsed(centerX, centerY) {
+	      var childIds = this.getChildIds();
+	      var radius = childIds.length;
+
+	      if (this.tree.scaleCollapsedNode) {
+	        radius = this.tree.scaleCollapsedNode(radius);
+	      }
+
+	      this.canvas.globalAlpha = 0.3;
+
+	      this.canvas.beginPath();
+
+	      this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+	      this.canvas.fillStyle = this.tree.defaultCollapsedOptions.color ? this.tree.defaultCollapsedOptions.color : 'purple';
+	      this.canvas.fill();
+	      this.canvas.globalAlpha = 1;
+
+	      this.canvas.closePath();
+	    }
+	  }, {
+	    key: 'drawLabelConnector',
+	    value: function drawLabelConnector(centerX, centerY) {
+	      var originalLineWidth = this.canvas.lineWidth;
+	      var labelAlign = this.tree.labelAlign;
+
+	      this.canvas.lineWidth = this.canvas.lineWidth / 4;
+	      this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
+
+	      this.canvas.beginPath();
+	      this.canvas.moveTo(centerX, centerY);
+	      this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+	      this.canvas.stroke();
+	      this.canvas.closePath();
+
+	      this.canvas.strokeStyle = this.getColour();
+	      this.canvas.lineWidth = originalLineWidth;
+	      this.canvas.moveTo(centerX, centerY);
+	    }
+	  }, {
+	    key: 'drawLeaf',
+	    value: function drawLeaf() {
+	      _nodeRenderers2['default'][this.nodeShape](this);
+
+	      if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
+	        this.drawLabel();
+	      }
+	    }
+	  }, {
+	    key: 'drawHighlight',
+	    value: function drawHighlight(centerX, centerY) {
+	      this.canvas.beginPath();
+	      var l = this.canvas.lineWidth;
+	      this.canvas.strokeStyle = this.tree.highlightColour;
+	      this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
+	      this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, _utilsConstants.Angles.FULL, false);
+	      this.canvas.stroke();
+	      this.canvas.lineWidth = l;
+	      this.canvas.strokeStyle = this.tree.branchColour;
+	      this.canvas.closePath();
+	    }
+	  }, {
 	    key: 'drawNode',
 	    value: function drawNode() {
 	      var nodeRadius = this.getNodeSize();
@@ -1583,78 +1507,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.setNodeDimensions(centerX, centerY, nodeRadius);
 
-	      // If branch collapsed
 	      if (this.collapsed) {
-	        var childIds = this.getChildIds();
-	        var radius = childIds.length;
-
-	        if (this.tree.scaleCollapsedNode) {
-	          radius = this.tree.scaleCollapsedNode(radius);
-	        }
-
-	        this.canvas.globalAlpha = 0.3;
-
-	        this.canvas.beginPath();
-
-	        this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-	        this.canvas.fillStyle = this.tree.defaultCollapsedOptions.color ? this.tree.defaultCollapsedOptions.color : 'purple';
-	        this.canvas.fill();
-	        this.canvas.globalAlpha = 1;
-
-	        this.canvas.closePath();
+	        this.drawCollapsed(centerX, centerY);
 	      } else if (this.leaf) {
-	        var originalLineWidth = this.canvas.lineWidth;
-
-	        // Drawing line connectors to nodes and align all the nodes vertically
 	        if (this.tree.alignLabels) {
-	          var labelAlign = this.tree.labelAlign;
-	          this.canvas.lineWidth = this.canvas.lineWidth / 4;
-	          this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
-
-	          this.canvas.beginPath();
-	          this.canvas.moveTo(centerX, centerY);
-	          this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
-	          this.canvas.stroke();
-	          this.canvas.closePath();
-
-	          this.canvas.strokeStyle = this.getColour();
-	          this.canvas.moveTo(centerX, centerY);
+	          this.drawLabelConnector(centerX, centerY);
 	        }
-	        // Save canvas
+
 	        this.canvas.save();
-	        // Move to node center position
-	        // (setting canvas (0,0) position as (this.centerx, this.centery))
 	        this.canvas.translate(this.centerx, this.centery);
-	        // rotate canvas (mainly for circular, radial trees etc)
 	        this.canvas.rotate(this.angle);
 
-	        // Draw node shape as chosen - default is circle
-	        _nodeRenderers2['default'][this.nodeShape](this);
+	        this.drawLeaf();
 
-	        if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
-	          this.drawLabel();
-	        }
-
-	        if (this.tree.showMetadata) {
-	          this.drawMetadata();
-	        }
-	        // Restore the canvas position to original
 	        this.canvas.restore();
-
-	        // Swapping back the line width if it was changed due to alignLabels
-	        this.canvas.lineWidth = originalLineWidth;
 	      }
 
 	      if (this.highlighted) {
-	        this.canvas.beginPath();
-	        var l = this.canvas.lineWidth;
-	        this.canvas.strokeStyle = this.tree.highlightColour;
-	        this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-	        this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, _utilsConstants.Angles.FULL, false);
-	        this.canvas.stroke();
-	        this.canvas.lineWidth = l;
-	        this.canvas.strokeStyle = this.tree.branchColour;
-	        this.canvas.closePath();
+	        this.drawHighlight(centerX, centerY);
 	      }
 	    }
 	  }, {
@@ -2010,6 +1880,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (size) {
 	        this.radius = size;
 	      }
+	    }
+	  }, {
+	    key: 'getTotalSize',
+	    value: function getTotalSize() {
+	      var totalSize = this.getNodeSize();
+
+	      if (this.tree.showLabels) {
+	        totalSize += this.getLabelSize() + this.tree.maxLabelLength[this.tree.treeType];
+	      }
+
+	      return totalSize;
 	    }
 	  }]);
 
