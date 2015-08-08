@@ -39,6 +39,7 @@
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",
+    "phylocanvas-utils": "phylocanvas/phylocanvas-utils",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
   }

@@ -1,14 +1,17 @@
+import { dom, events, canvas } from 'phylocanvas-utils';
+
 import Branch from './Branch';
 import ContextMenu from './ContextMenu';
 import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
-
-import { addClass } from './utils/dom';
-import { fireEvent, addEvent } from './utils/events';
-import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
 import parsers from './parsers';
+
+const { addClass } = dom;
+const { fireEvent, addEvent } = events;
+const { getBackingStorePixelRatio, getPixelRatio, translateClick } = canvas;
+
 
 /**
  * The instance of a PhyloCanvas Widget

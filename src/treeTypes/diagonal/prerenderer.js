@@ -1,4 +1,6 @@
-import { Angles } from '../../utils/constants';
+import { constants } from 'phylocanvas-utils';
+
+const { Angles } = constants;
 
 export default {
   getStep(tree) {

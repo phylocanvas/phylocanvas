@@ -1,6 +1,8 @@
+import { events } from 'phylocanvas-utils';
 
 import Tooltip from './Tooltip';
-import { createHandler, preventDefault } from './utils/events';
+
+const { createHandler, preventDefault } = events;
 
 function createAnchorElement(contextMenu, { text='link', filename='file', href }) {
   let anchorElement = contextMenu.createElement('a', text);

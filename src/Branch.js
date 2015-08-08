@@ -1,9 +1,9 @@
-import { Angles } from './utils/constants';
-import { createBlobUrl } from './utils/dom';
+import { constants, dom } from 'phylocanvas-utils';
 
 import nodeRenderers from './nodeRenderers';
 
-import { Shapes } from './utils/constants';
+const { Angles, Shapes } = constants;
+const { createBlobUrl } = dom;
 
 /**
  * Creates a branch
