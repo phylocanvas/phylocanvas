@@ -47,6 +47,9 @@ const DEFAULT_MENU_ITEMS = [
     text: 'Show/Hide Labels',
     handler: 'toggleLabels'
   }, {
+    text: 'Redraw Original Tree',
+    handler: 'redrawOriginalTree'
+  }, {
     text: 'Export As Image',
     element: createImageLink
   }, {

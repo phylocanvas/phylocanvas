@@ -1,15 +1,15 @@
 #PhyloCanvas
 
-A canvas-based phylogenetic tree viewer, no plugins and no extra libraries.
+A canvas-based phylogenetic tree viewer, no browser plugins or extra libraries required.
 
-Please see **www.phylocanvas.net** for full documentation.
+Please see **www.phylocanvas.org** for full documentation.
 
 ## Development
 ```
 npm install
 npm run dev-server
 ```
-Test using http://localhost:8000/dev
+Go to http://localhost:8000/dev
 
 ## Building
 ```

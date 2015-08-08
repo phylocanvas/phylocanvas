@@ -76,8 +76,8 @@ export default class Tree {
     canvas.className = 'phylocanvas';
     canvas.style.position = 'relative';
     canvas.style.backgroundColor = '#FFFFFF';
-    canvas.height = element.clientHeight || 400;
-    canvas.width = element.clientWidth || 400;
+    canvas.height = element.offsetHeight || 400;
+    canvas.width = element.offsetWidth || 400;
     canvas.style.zIndex = '1';
     this.canvasEl.appendChild(canvas);
 
@@ -149,9 +149,7 @@ export default class Tree {
       this.navigator = new Navigator(this);
     }
 
-    this.adjustForPixelRatio();
-
-    this.initialiseHistory(conf);
+    this.resizeToContainer();
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -165,6 +163,7 @@ export default class Tree {
     addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
+      this.draw();
     }.bind(this));
 
     /**
@@ -178,9 +177,7 @@ export default class Tree {
      */
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
-    this.showMetadata = false;
-    // Takes an array of metadata column headings to overlay on the tree
-    this.selectedMetadataColumns = [];
+
     // Colour for 1 and 0s. Currently 0s are not drawn
     this.colour1 = 'rgba(206,16,16,1)';
     this.colour0 = '#ccc';
@@ -189,10 +186,6 @@ export default class Tree {
        Because label length pixel differes for different tree types for some reason
      */
     this.maxLabelLength = {};
-    // x step for metadata
-    this.metadataXStep = 15;
-    // Boolean to detect if metadata heading is drawn or not
-    this.metadataHeadingDrawn = false;
   }
 
   get alignLabels() {
@@ -353,9 +346,10 @@ export default class Tree {
     this.canvas.scale(this.zoom, this.zoom);
 
     this.branchRenderer.render(this, this.root);
+
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
-    this.metadataHeadingDrawn = false;
+
     this.drawn = true;
   }
 
@@ -393,9 +387,22 @@ export default class Tree {
     this.draw();
   }
 
-  load(inputString, options = {}) {
-    if (options.format) {
-      this.build(inputString, parsers[options.format], options);
+  load(inputString, options = {}, callback) {
+    let buildOptions = options;
+    let buildCallback = callback;
+
+    // allows passing callback as second param
+    if (typeof options === 'function') {
+      buildCallback = options;
+      buildOptions = {};
+    }
+
+    if (buildCallback) {
+      buildOptions.callback = buildCallback;
+    }
+
+    if (buildOptions.format) {
+      this.build(inputString, parsers[buildOptions.format], buildOptions);
       return;
     }
 
@@ -404,12 +411,16 @@ export default class Tree {
 
       if (inputString.match(parser.fileExtension) ||
           inputString.match(parser.validator)) {
-        this.build(inputString, parser, options);
+        this.build(inputString, parser, buildOptions);
         return;
       }
     }
 
-    this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
+    let error = new Error('String not recognised as a file or a parseable format string');
+    if (buildCallback) {
+      buildCallback(error);
+    }
+    this.loadError(error);
   }
 
   saveOriginalTree() {
@@ -440,7 +451,7 @@ export default class Tree {
     }
   }
 
-  build(inputString, parser, options) {
+  build(formatString, parser, options) {
     this.originalTree = {};
     this.clearState();
 
@@ -449,15 +460,22 @@ export default class Tree {
     this.branches.root = root;
     this.setRoot(root);
 
-    parser.parse({ inputString, root, options }, (error) => {
+    parser.parse({ formatString, root, options }, (error) => {
       if (error) {
+        if (options.callback) {
+          options.callback(error);
+        }
         this.loadError(error);
         return;
       }
+      this.stringRepresentation = formatString;
       this.saveState();
       this.setInitialCollapsedBranches();
       this.draw();
       this.saveOriginalTree();
+      if (options.callback) {
+        options.callback();
+      }
       if (!options.quiet) {
         this.loadCompleted();
       }
@@ -646,9 +664,6 @@ export default class Tree {
       this.navigator.resize();
     }
     this.adjustForPixelRatio();
-    if (this.drawn) {
-      this.draw();
-    }
   }
 
   setZoom(z) {
@@ -666,40 +681,6 @@ export default class Tree {
   toggleLabels() {
     this.showLabels = !this.showLabels;
     this.draw();
-  }
-
-  viewMetadataColumns(metadataColumnArray) {
-    this.showMetadata = true;
-    if (metadataColumnArray === undefined) {
-      // Select all column headings so that it will draw all columns
-      metadataColumnArray = this.getMetadataColumnHeadings();
-    }
-    // If argument missing or no key id matching, then this array would be undefined
-    if (metadataColumnArray !== undefined) {
-      this.selectedMetadataColumns = metadataColumnArray;
-    }
-    // Fit to canvas window
-    this.fitInPanel();
-    this.draw();
-  }
-
-  getMetadataColumnHeadings() {
-    var metadataColumnArray = [];
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        metadataColumnArray = Object.keys(this.leaves[i].data);
-        break;
-      }
-    }
-    return metadataColumnArray;
-  }
-
-  clearMetadata() {
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        this.leaves[i].data = {};
-      }
-    }
   }
 
   setMaxLabelLength() {
@@ -753,9 +734,7 @@ export default class Tree {
       let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
       let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
       let theta = node.angle;
-      let pad = node.getNodeSize()
-                + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0)
-                + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+      let pad = node.getTotalSize();
 
       x = x + (pad * Math.cos(theta));
       y = y + (pad * Math.sin(theta));
@@ -833,8 +812,6 @@ export default class Tree {
 
   resizeToContainer() {
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
-    this.draw();
-    this.history.resizeTree();
   }
 }
 
