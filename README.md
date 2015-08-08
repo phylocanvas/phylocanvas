@@ -7,7 +7,7 @@ Please see **www.phylocanvas.org** for full documentation.
 ## Development
 ```
 npm install
-npm run dev-server
+npm start
 ```
 Go to http://localhost:8000/dev
 
