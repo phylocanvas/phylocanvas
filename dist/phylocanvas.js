@@ -77,11 +77,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Tree2 = _interopRequireDefault(_Tree);
 
-	var _Branch = __webpack_require__(3);
+	var _Branch = __webpack_require__(4);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(8);
+	var _ContextMenu = __webpack_require__(6);
 
 	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
@@ -89,11 +89,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _treeTypes = __webpack_require__(11);
+	var _treeTypes = __webpack_require__(9);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _nodeRenderers = __webpack_require__(7);
+	var _nodeRenderers = __webpack_require__(5);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
@@ -197,35 +197,38 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _Branch = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(3);
+
+	var _Branch = __webpack_require__(4);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(8);
+	var _ContextMenu = __webpack_require__(6);
 
 	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
-	var _Tooltip = __webpack_require__(9);
+	var _Tooltip = __webpack_require__(7);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
-	var _Navigator = __webpack_require__(10);
+	var _Navigator = __webpack_require__(8);
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 
-	var _treeTypes = __webpack_require__(11);
+	var _treeTypes = __webpack_require__(9);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _utilsDom = __webpack_require__(5);
-
-	var _utilsEvents = __webpack_require__(6);
-
-	var _utilsCanvas = __webpack_require__(29);
-
-	var _parsers = __webpack_require__(30);
+	var _parsers = __webpack_require__(27);
 
 	var _parsers2 = _interopRequireDefault(_parsers);
+
+	var addClass = _phylocanvasUtils.dom.addClass;
+	var fireEvent = _phylocanvasUtils.events.fireEvent;
+	var addEvent = _phylocanvasUtils.events.addEvent;
+	var getBackingStorePixelRatio = _phylocanvasUtils.canvas.getBackingStorePixelRatio;
+	var getPixelRatio = _phylocanvasUtils.canvas.getPixelRatio;
+	var translateClick = _phylocanvasUtils.canvas.translateClick;
 
 	/**
 	 * The instance of a PhyloCanvas Widget
@@ -251,7 +254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, Tree);
 
 	    this.canvasEl = typeof element === 'string' ? document.getElementById(element) : element;
-	    (0, _utilsDom.addClass)(this.canvasEl, 'pc-container');
+	    addClass(this.canvasEl, 'pc-container');
 	    /**
 	     *
 	     * Dictionary of all branches indexed by Id
@@ -380,10 +383,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addListener('mouseup', this.drop.bind(this));
 	    this.addListener('mouseout', this.drop.bind(this));
 
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	    (0, _utilsEvents.addEvent)(window, 'resize', (function () {
+	    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+	    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	    addEvent(window, 'resize', (function () {
 	      this.resizeToContainer();
 	      this.draw();
 	    }).bind(this));
@@ -445,7 +448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (!this.root) return false;
-	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
+	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 
 	        if (node) {
 	          this.root.setSelected(false, true);
@@ -468,7 +471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _root2;
 
 	        e.preventDefault();
-	        node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX, e.clientY, this)));
+	        node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 	        this.contextMenu.open(e.clientX, e.clientY, node);
 	        this.contextMenu.closed = false;
 	        this.tooltip.close();
@@ -480,7 +483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _root3;
 
 	      if (!this.root) return false;
-	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1.0, e.clientY * 1.0, this)));
+	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 	      if (nd) {
 	        nd.setSelected(false, true);
 	        nd.toggleCollapsed();
@@ -501,7 +504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'drag',
 	    value: function drag(event) {
 	      // get window ratio
-	      var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
+	      var ratio = getPixelRatio(this.canvas);
 
 	      if (!this.drawn) return false;
 
@@ -524,7 +527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // hover
 	        var e = event;
-	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray((0, _utilsCanvas.translateClick)(e.clientX * 1.0, e.clientY * 1.0, this)));
+	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 
 	        if (nd && (this.internalNodesSelectable || nd.leaf)) {
 	          this.root.setHighlighted(false);
@@ -564,7 +567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.strokeStyle = this.branchColour;
 	      this.canvas.save();
 
-	      this.canvas.translate(this.canvas.canvas.width / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas), this.canvas.canvas.height / 2 / (0, _utilsCanvas.getBackingStorePixelRatio)(this.canvas));
+	      this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
 
 	      if (!this.drawn || forceRedraw) {
 	        this.prerenderer.run(this);
@@ -593,13 +596,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'findBranch',
-	    value: function findBranch(patt) {
+	    value: function findBranch(pattern) {
+	      var property = arguments[1] === undefined ? 'id' : arguments[1];
+
+	      var selectedNodeIds = [];
+
 	      this.root.setSelected(false, true);
-	      for (var i = 0; i < this.leaves.length; i++) {
-	        if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
-	          this.leaves[i].setSelected(true, true);
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = this.leaves[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var leaf = _step.value;
+
+	          if (leaf[property].match(pattern)) {
+	            leaf.setSelected(true, true);
+	            selectedNodeIds.push(leaf.id);
+	          }
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
 	        }
 	      }
+
+	      this.nodesSelected(selectedNodeIds);
 	      this.draw();
 	    }
 	  }, {
@@ -647,13 +678,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
 
 	      try {
-	        for (var _iterator = Object.keys(_parsers2['default'])[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var parserName = _step.value;
+	        for (var _iterator2 = Object.keys(_parsers2['default'])[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var parserName = _step2.value;
 
 	          var parser = _parsers2['default'][parserName];
 
@@ -663,16 +694,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
+	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	            _iterator2['return']();
 	          }
 	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
 	          }
 	        }
 	      }
@@ -870,13 +901,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (array.length) {
-	          var _iteratorNormalCompletion2 = true;
-	          var _didIteratorError2 = false;
-	          var _iteratorError2 = undefined;
+	          var _iteratorNormalCompletion3 = true;
+	          var _didIteratorError3 = false;
+	          var _iteratorError3 = undefined;
 
 	          try {
-	            for (var _iterator2 = array[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	              var id = _step2.value;
+	            for (var _iterator3 = array[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	              var id = _step3.value;
 
 	              if (!(id in this.branches)) {
 	                continue;
@@ -884,16 +915,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	              this.branches[id].setDisplay(options);
 	            }
 	          } catch (err) {
-	            _didIteratorError2 = true;
-	            _iteratorError2 = err;
+	            _didIteratorError3 = true;
+	            _iteratorError3 = err;
 	          } finally {
 	            try {
-	              if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	                _iterator2['return']();
+	              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+	                _iterator3['return']();
 	              }
 	            } finally {
-	              if (_didIteratorError2) {
-	                throw _iteratorError2;
+	              if (_didIteratorError3) {
+	                throw _iteratorError3;
 	              }
 	            }
 	          }
@@ -941,7 +972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'setTreeType',
 	    value: function setTreeType(type, quiet) {
 	      if (!(type in _treeTypes2['default'])) {
-	        return (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { error: new Error('"' + type + '" is not a known tree-type.') });
+	        return fireEvent(this.canvasEl, 'error', { error: new Error('"' + type + '" is not a known tree-type.') });
 	      }
 
 	      var oldType = this.treeType;
@@ -1010,32 +1041,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'loadCompleted',
 	    value: function loadCompleted() {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'loaded');
+	      fireEvent(this.canvasEl, 'loaded');
 	    }
 	  }, {
 	    key: 'loadStarted',
 	    value: function loadStarted() {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'loading');
+	      fireEvent(this.canvasEl, 'loading');
 	    }
 	  }, {
 	    key: 'loadError',
 	    value: function loadError(error) {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'error', { error: error });
+	      fireEvent(this.canvasEl, 'error', { error: error });
 	    }
 	  }, {
 	    key: 'subtreeDrawn',
 	    value: function subtreeDrawn(node) {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'subtree', { node: node });
+	      fireEvent(this.canvasEl, 'subtree', { node: node });
 	    }
 	  }, {
 	    key: 'nodesSelected',
 	    value: function nodesSelected(nids) {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'selected', { nodeIds: nids });
+	      fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
 	    }
 	  }, {
 	    key: 'addListener',
 	    value: function addListener(event, listener) {
-	      (0, _utilsEvents.addEvent)(this.canvasEl, event, listener);
+	      addEvent(this.canvasEl, event, listener);
 	    }
 	  }, {
 	    key: 'getBounds',
@@ -1080,7 +1111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'adjustForPixelRatio',
 	    value: function adjustForPixelRatio() {
-	      var ratio = (0, _utilsCanvas.getPixelRatio)(this.canvas);
+	      var ratio = getPixelRatio(this.canvas);
 
 	      this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
 	      this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
@@ -1093,7 +1124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'treeTypeChanged',
 	    value: function treeTypeChanged(oldType, newType) {
-	      (0, _utilsEvents.fireEvent)(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
+	      fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
 	    }
 	  }, {
 	    key: 'resetTree',
@@ -1101,28 +1132,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.originalTree.branches) return;
 
 	      this.branches = this.originalTree.branches;
-	      var _iteratorNormalCompletion3 = true;
-	      var _didIteratorError3 = false;
-	      var _iteratorError3 = undefined;
+	      var _iteratorNormalCompletion4 = true;
+	      var _didIteratorError4 = false;
+	      var _iteratorError4 = undefined;
 
 	      try {
-	        for (var _iterator3 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	          var n = _step3.value;
+	        for (var _iterator4 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	          var n = _step4.value;
 
 	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
 	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
-	        _didIteratorError3 = true;
-	        _iteratorError3 = err;
+	        _didIteratorError4 = true;
+	        _iteratorError4 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-	            _iterator3['return']();
+	          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+	            _iterator4['return']();
 	          }
 	        } finally {
-	          if (_didIteratorError3) {
-	            throw _iteratorError3;
+	          if (_didIteratorError4) {
+	            throw _iteratorError4;
 	          }
 	        }
 	      }
@@ -1156,16 +1187,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
 	    }
 	  }, {
-	    key: 'downloadAllLeafIds',
-	    value: function downloadAllLeafIds() {
-	      this.root.downloadLeafIdsFromBranch();
-	    }
-	  }, {
-	    key: 'exportCurrentTreeView',
-	    value: function exportCurrentTreeView() {
-	      (0, _utilsDom.setupDownloadLink)(this.getPngUrl(), 'phylocanvas.png');
-	    }
-	  }, {
 	    key: 'alignLabels',
 	    get: function get() {
 	      return this.labelAlign && this.labelAlignEnabled;
@@ -1187,6 +1208,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define(t);else{var n=t();for(var r in n)("object"==typeof exports?exports:e)[r]=n[r]}}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var a=n[r]={exports:{},id:r,loaded:!1};return e[r].call(a.exports,a,a.exports,t),a.loaded=!0,a.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0});var a=n(1),o=r(a),i=n(4),s=r(i),c=n(2),u=r(c),f=n(3),l=r(f);t["default"]={canvas:o,constants:s,dom:u,events:l},e.exports=t["default"]},function(e,t,n){"use strict";function r(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function a(e){return(window.devicePixelRatio||1)/r(e)}function o(e){return e=e-c.getX(this.canvas.canvas)+window.pageXOffset,e*=a(this.canvas),e-=this.canvas.canvas.width/2,e-=this.offsetx,e/=this.zoom}function i(e){return e=e-c.getY(this.canvas.canvas)+window.pageYOffset,e*=a(this.canvas),e-=this.canvas.canvas.height/2,e-=this.offsety,e/=this.zoom}function s(e,t,n){return[o.call(n,e),i.call(n,t)]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=r,t.getPixelRatio=a,t.translateClick=s;var c=n(2)},function(e,t,n){"use strict";function r(e){var t=new Blob([e],{type:"text/csv;charset=utf-8"});return l.createObjectURL(t)}function a(e,t){var n=document.createElement("a"),r="undefined"!=typeof n.download;n.href=e,n.target="_blank",r&&(n.download=t),f.fireEvent(n,"click"),r&&l.revokeObjectURL(n.href)}function o(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function s(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function c(e,t){var n=e.className.split(" "),r=n.indexOf(t);-1!==r&&(n.splice(r,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),r=n.indexOf(t);return-1!==r}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=r,t.setupDownloadLink=a,t.getX=o,t.getY=i,t.addClass=s,t.removeClass=c,t.hasClass=u;var f=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function r(e,t){var n,r,a=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(r in a)a.hasOwnProperty(r)&&(n[r]=a[r]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function a(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function o(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n="string"==typeof t?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=r,t.addEvent=a,t.killEvent=o,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI};t.Angles=n;var r={x:"star",s:"square",o:"circle",t:"triangle"};t.Shapes=r}])});
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -1199,13 +1226,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _utilsConstants = __webpack_require__(4);
+	var _phylocanvasUtils = __webpack_require__(3);
 
-	var _utilsDom = __webpack_require__(5);
-
-	var _nodeRenderers = __webpack_require__(7);
+	var _nodeRenderers = __webpack_require__(5);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
+
+	var Angles = _phylocanvasUtils.constants.Angles;
+	var Shapes = _phylocanvasUtils.constants.Shapes;
+	var createBlobUrl = _phylocanvasUtils.dom.createBlobUrl;
 
 	/**
 	 * Creates a branch
@@ -1305,7 +1334,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * the angle that the last child of this brach 'splays' at, used for
 	     * circular and radial trees
 	     */
-	    this.minChildAngle = _utilsConstants.Angles.FULL;
+	    this.minChildAngle = Angles.FULL;
 
 	    /**
 	     * What kind of teminal should be drawn on this node
@@ -1397,8 +1426,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
 	      }
 
-	      if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
-	        this.canvas.rotate(_utilsConstants.Angles.HALF);
+	      if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
+	        this.canvas.rotate(Angles.HALF);
 	        // Angles.Half text position changes
 	        tx = -tx - dimensions.width * 1;
 	      }
@@ -1409,8 +1438,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.closePath();
 
 	      // Rotate canvas back to original position
-	      if (this.angle > _utilsConstants.Angles.QUARTER && this.angle < _utilsConstants.Angles.HALF + _utilsConstants.Angles.QUARTER) {
-	        this.canvas.rotate(_utilsConstants.Angles.HALF);
+	      if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
+	        this.canvas.rotate(Angles.HALF);
 	      }
 	    }
 	  }, {
@@ -1483,7 +1512,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var l = this.canvas.lineWidth;
 	      this.canvas.strokeStyle = this.tree.highlightColour;
 	      this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-	      this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, _utilsConstants.Angles.FULL, false);
+	      this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) + (5 + this.tree.highlightWidth / 2) / this.tree.zoom, 0, Angles.FULL, false);
 	      this.canvas.stroke();
 	      this.canvas.lineWidth = l;
 	      this.canvas.strokeStyle = this.tree.branchColour;
@@ -1609,7 +1638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.centery = 0;
 	      this.angle = null;
 	      // this.totalBranchLength = 0;
-	      this.minChildAngle = _utilsConstants.Angles.FULL;
+	      this.minChildAngle = Angles.FULL;
 	      this.maxChildAngle = 0;
 	      for (i = 0; i < this.children.length; i++) {
 	        try {
@@ -1862,7 +1891,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'downloadLeafIdsFromBranch',
 	    value: function downloadLeafIdsFromBranch() {
 	      var downloadData = this.getChildIds().join('\n');
-	      (0, _utilsDom.setupDownloadLink)((0, _utilsDom.createBlobUrl)(downloadData), 'pc_leaves.txt');
+	      var filename = 'pc_leaf_ids';
+	      if (!this.parent) {
+	        filename += '_all.txt';
+	      } else {
+	        filename += '_' + this.id + '.txt';
+	      }
+	      return createBlobUrl(downloadData);
 	    }
 	  }, {
 	    key: 'setDisplay',
@@ -1875,7 +1910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.colour = colour;
 	      }
 	      if (shape) {
-	        this.nodeShape = _utilsConstants.Shapes[shape] ? _utilsConstants.Shapes[shape] : shape;
+	        this.nodeShape = Shapes[shape] ? Shapes[shape] : shape;
 	      }
 	      if (size) {
 	        this.radius = size;
@@ -1901,66 +1936,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * An enumeration of certain pre-defined angles to enable faster drawing of
-	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	var Angles = {
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 4
-	   */
-	  FORTYFIVE: Math.PI / 4,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI / 2
-	   */
-	  QUARTER: Math.PI / 2,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI
-	   */
-	  HALF: Math.PI,
-	  /**
-	   * @constant
-	   * @type double
-	   * @description PI * 2
-	   */
-	  FULL: 2 * Math.PI
-	};
-
-	exports.Angles = Angles;
-	/**
-	 * dictionary to translate newick annotations to branch renderer ids
-	 *
-	 * @enum
-	 * @memberof PhyloCanvas
-	 * @constant
-	 */
-	var Shapes = {
-	  x: 'star',
-	  s: 'square',
-	  o: 'circle',
-	  t: 'triangle'
-	};
-	exports.Shapes = Shapes;
-
-/***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1969,204 +1944,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	exports.createBlobUrl = createBlobUrl;
-	exports.setupDownloadLink = setupDownloadLink;
-	exports.getX = getX;
-	exports.getY = getY;
-	exports.addClass = addClass;
-	exports.removeClass = removeClass;
-	exports.hasClass = hasClass;
 
-	var _events = __webpack_require__(6);
+	var _phylocanvasUtils = __webpack_require__(3);
 
-	var windowURL = window.URL || window.webkitURL;
-
-	function createBlobUrl(data) {
-	  var blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
-	  return windowURL.createObjectURL(blob);
-	}
-
-	function setupDownloadLink(url, filename) {
-	  var anchor = document.createElement('a');
-	  var isDownloadSupported = typeof anchor.download !== 'undefined';
-
-	  anchor.href = url;
-	  anchor.target = '_blank';
-	  if (isDownloadSupported) {
-	    anchor.download = filename;
-	  }
-	  (0, _events.fireEvent)(anchor, 'click');
-	  if (isDownloadSupported) {
-	    windowURL.revokeObjectURL(anchor.href);
-	  }
-	}
-
-	/**
-	 * Get the x coordinate of oElement
-	 *
-	 * @param domElement - The element to get the X position of.
-	 *
-	 */
-
-	function getX(domElement) {
-	  var xValue = 0;
-	  while (domElement) {
-	    xValue += domElement.offsetLeft;
-	    domElement = domElement.offsetParent;
-	  }
-	  return xValue;
-	}
-
-	/**
-	 * Get the y coordinate of oElement
-	 *
-	 * @param domElement - The element to get the Y position of.
-	 *
-	 */
-
-	function getY(domElement) {
-	  var yValue = 0;
-	  while (domElement) {
-	    yValue += domElement.offsetTop;
-	    domElement = domElement.offsetParent;
-	  }
-	  return yValue;
-	}
-
-	function addClass(element, className) {
-	  var classes = element.className.split(' ');
-	  if (classes.indexOf(className) === -1) {
-	    classes.push(className);
-	    element.className = classes.join(' ');
-	  }
-	}
-
-	function removeClass(element, className) {
-	  var classes = element.className.split(' ');
-	  var index = classes.indexOf(className);
-
-	  if (index !== -1) {
-	    classes.splice(index, 1);
-	    element.className = classes.join(' ');
-	  }
-	}
-
-	function hasClass(element, className) {
-	  var classes = element.className.split(' ');
-	  var index = classes.indexOf(className);
-
-	  return index !== -1;
-	}
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	exports.preventDefault = preventDefault;
-	exports.fireEvent = fireEvent;
-	exports.addEvent = addEvent;
-	exports.killEvent = killEvent;
-	exports.createHandler = createHandler;
-
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
-
-	function fireEvent(element, type) {
-	  var params = arguments[2] === undefined ? {} : arguments[2];
-
-	  var event; // The custom event that will be created
-	  var param;
-
-	  if (document.createEvent) {
-	    event = document.createEvent('HTMLEvents');
-	    event.initEvent(type, true, true);
-	  } else {
-	    event = document.createEventObject();
-	    event.eventType = type;
-	  }
-
-	  event.eventName = type;
-
-	  for (param in params) {
-	    if (params.hasOwnProperty(param)) {
-	      event[param] = params[param];
-	    }
-	  }
-
-	  if (document.createEvent) {
-	    element.dispatchEvent(event);
-	  } else {
-	    element.fireEvent('on' + event.eventType, event);
-	  }
-	}
-
-	function addEvent(elem, event, fn) {
-	  if (elem.addEventListener) {
-	    elem.addEventListener(event, fn, false);
-	  } else {
-	    elem.attachEvent('on' + event, function () {
-	      // set the this pointer same as addEventListener when fn is called
-	      return fn.call(elem, window.event);
-	    });
-	  }
-	}
-
-	function killEvent(e) {
-	  e.stopPropagation();
-	  e.preventDefault();
-	}
-
-	/**
-	 * Creates a function which can be called from an event handler independent of
-	 * scope.
-	 *
-	 * @param {Object} obj the object the function will be called on
-	 * @param {String} func the name of the function to be called
-	 * @retuns {function}
-	 */
-
-	function createHandler(obj, func) {
-	  var handler;
-
-	  if (typeof func === typeof 'aaa') {
-	    handler = function (e) {
-	      if (obj[func]) {
-	        return obj[func](e);
-	      }
-	    };
-	  } else {
-	    handler = function () {
-	      return func(obj);
-	    };
-	  }
-	  return handler;
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _utilsConstants = __webpack_require__(4);
-
+	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 
 	  circle: function circle(node) {
 	    var r = node.getNodeSize();
 	    node.canvas.beginPath();
-	    node.canvas.arc(r, 0, r, 0, _utilsConstants.Angles.FULL, false);
+	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
 	    node.canvas.stroke();
 	    node.canvas.fill();
 	    node.canvas.closePath();
@@ -2244,7 +2031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2263,11 +2050,46 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-	var _Tooltip2 = __webpack_require__(9);
+	var _phylocanvasUtils = __webpack_require__(3);
+
+	var _Tooltip2 = __webpack_require__(7);
 
 	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
 
-	var _utilsEvents = __webpack_require__(6);
+	var createHandler = _phylocanvasUtils.events.createHandler;
+	var preventDefault = _phylocanvasUtils.events.preventDefault;
+
+	function createAnchorElement(contextMenu, _ref) {
+	  var _ref$text = _ref.text;
+	  var text = _ref$text === undefined ? 'link' : _ref$text;
+	  var _ref$filename = _ref.filename;
+	  var filename = _ref$filename === undefined ? 'file' : _ref$filename;
+	  var href = _ref.href;
+
+	  var anchorElement = contextMenu.createElement('a', text);
+	  anchorElement.style.padding = '0px';
+	  anchorElement.href = href;
+	  anchorElement.style.textDecoration = 'none';
+	  anchorElement.download = filename;
+	  return anchorElement;
+	}
+
+	function createImageLink(contextMenu) {
+	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'phylocanvas_tree.png', href: contextMenu.tree.getPngUrl() });
+	  return anchorElement;
+	}
+
+	function createLeafIdsLink(contextMenu) {
+	  var leafdata = contextMenu.tree.root.downloadLeafIdsFromBranch();
+	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-root.txt', href: leafdata });
+	  return anchorElement;
+	}
+
+	function createBranchLeafIdsLink(contextMenu, node) {
+	  var leafdata = node.downloadLeafIdsFromBranch();
+	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-' + node.id + '.txt', href: leafdata });
+	  return anchorElement;
+	}
 
 	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
 	  handler: function handler(branch) {
@@ -2291,13 +2113,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  handler: 'redrawOriginalTree'
 	}, {
 	  text: 'Export As Image',
-	  handler: 'exportCurrentTreeView'
+	  element: createImageLink
 	}, {
 	  text: 'Export Leaf IDs',
-	  handler: 'downloadAllLeafIds'
+	  element: createLeafIdsLink
 	}, {
 	  text: 'Export Leaf IDs on Branch',
-	  handler: 'downloadLeafIdsFromBranch',
+	  element: createBranchLeafIdsLink,
 	  nodeType: 'internal'
 	}];
 
@@ -2318,20 +2140,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function mouseover(element) {
-	  element.style.backgroundColor = '#E2E3DF';
+	  element.style.backgroundColor = '#d2d2c4';
 	}
 
 	function mouseout(element) {
 	  element.style.backgroundColor = 'transparent';
 	}
 
-	function transferMenuItem(_ref) {
-	  var handler = _ref.handler;
-	  var _ref$text = _ref.text;
-	  var text = _ref$text === undefined ? 'New menu Item' : _ref$text;
-	  var nodeType = _ref.nodeType;
+	function transferMenuItem(_ref2) {
+	  var handler = _ref2.handler;
+	  var _ref2$text = _ref2.text;
+	  var text = _ref2$text === undefined ? 'New menu Item' : _ref2$text;
+	  var nodeType = _ref2.nodeType;
+	  var element = _ref2.element;
 
-	  return { handler: handler, text: text, nodeType: nodeType };
+	  return { handler: handler, text: text, nodeType: nodeType, element: element };
 	}
 
 	/**
@@ -2359,13 +2182,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(ContextMenu, [{
 	    key: 'click',
 	    value: function click() {
-	      (0, _utilsEvents.createHandler)(this, 'close');
+	      createHandler(this, 'close');
 	    }
 	  }, {
 	    key: 'createContent',
 	    value: function createContent(node) {
 	      var list = document.createElement('ul');
-
+	      var listElement = undefined;
 	      list.style.margin = '0';
 	      list.style.padding = '0';
 
@@ -2381,18 +2204,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            continue;
 	          }
 
-	          var listElement = this.createElement('li', menuItem.text);
+	          if (menuItem.element) {
+	            var anchorElement = menuItem.element(this, node);
+	            listElement = this.createElement('li', anchorElement);
+	          } else {
+	            listElement = this.createElement('li', menuItem.text);
+	          }
+
 	          listElement.style.listStyle = 'none outside none';
 
-	          if (menuItem.nodeType) {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(node, menuItem.handler));
-	          } else {
-	            listElement.addEventListener('click', (0, _utilsEvents.createHandler)(this.tree, menuItem.handler));
+	          if (!menuItem.element) {
+	            if (menuItem.nodeType) {
+	              listElement.addEventListener('click', createHandler(node, menuItem.handler));
+	            } else {
+	              listElement.addEventListener('click', createHandler(this.tree, menuItem.handler));
+	            }
 	          }
 	          listElement.addEventListener('click', this.click);
-	          listElement.addEventListener('contextmenu', _utilsEvents.preventDefault);
-	          listElement.addEventListener('mouseover', (0, _utilsEvents.createHandler)(listElement, mouseover));
-	          listElement.addEventListener('mouseout', (0, _utilsEvents.createHandler)(listElement, mouseout));
+	          listElement.addEventListener('contextmenu', preventDefault);
+	          listElement.addEventListener('mouseover', createHandler(listElement, mouseover));
+	          listElement.addEventListener('mouseout', createHandler(listElement, mouseout));
 
 	          list.appendChild(listElement);
 	        }
@@ -2411,7 +2242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      document.body.addEventListener('click', (0, _utilsEvents.createHandler)(this, 'close'));
+	      document.body.addEventListener('click', createHandler(this, 'close'));
 	      this.element.appendChild(list);
 	    }
 	  }]);
@@ -2423,7 +2254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 9 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2476,7 +2307,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      element.style.padding = '0.3em 0.5em 0.3em 0.5em';
 	      element.style.fontFamily = this.tree.font;
 	      element.style.fontSize = this.fontSize || '12pt';
-	      element.appendChild(document.createTextNode(textContent));
+	      element.style.color = 'black';
+	      if (typeof textContent === 'object') {
+	        element.appendChild(textContent);
+	      } else {
+	        element.appendChild(document.createTextNode(textContent));
+	      }
 	      return element;
 	    }
 	  }, {
@@ -2505,7 +2341,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.element.style.zIndex = 2000;
 	      this.element.style.display = 'block';
-	      this.element.style.backgroundColor = '#FFFFFF';
 
 	      this.closed = false;
 	    }
@@ -2518,7 +2353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -2602,7 +2437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Navigator;
 
 /***/ },
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2613,23 +2448,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _rectangular = __webpack_require__(12);
+	var _rectangular = __webpack_require__(10);
 
 	var _rectangular2 = _interopRequireDefault(_rectangular);
 
-	var _circular = __webpack_require__(17);
+	var _circular = __webpack_require__(15);
 
 	var _circular2 = _interopRequireDefault(_circular);
 
-	var _radial = __webpack_require__(20);
+	var _radial = __webpack_require__(18);
 
 	var _radial2 = _interopRequireDefault(_radial);
 
-	var _diagonal = __webpack_require__(23);
+	var _diagonal = __webpack_require__(21);
 
 	var _diagonal2 = _interopRequireDefault(_diagonal);
 
-	var _hierarchical = __webpack_require__(26);
+	var _hierarchical = __webpack_require__(24);
 
 	var _hierarchical2 = _interopRequireDefault(_hierarchical);
 
@@ -2643,7 +2478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2654,19 +2489,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(13);
+	var _BranchRenderer = __webpack_require__(11);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(14);
+	var _Prerenderer = __webpack_require__(12);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(15);
+	var _branchRenderer = __webpack_require__(13);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(16);
+	var _prerenderer = __webpack_require__(14);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2690,7 +2525,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2730,7 +2565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = BranchRenderer;
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2781,7 +2616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2813,7 +2648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2859,7 +2694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2870,19 +2705,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(13);
+	var _BranchRenderer = __webpack_require__(11);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(14);
+	var _Prerenderer = __webpack_require__(12);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(18);
+	var _branchRenderer = __webpack_require__(16);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(19);
+	var _prerenderer = __webpack_require__(17);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2912,7 +2747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2943,7 +2778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2952,16 +2787,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _utilsConstants = __webpack_require__(4);
+	var _phylocanvasUtils = __webpack_require__(3);
 
+	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 	  getStep: function getStep(tree) {
-	    return _utilsConstants.Angles.FULL / tree.leaves.length;
+	    return Angles.FULL / tree.leaves.length;
 	  },
 	  calculate: function calculate(tree, step) {
 	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
 	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / _utilsConstants.Angles.FULL;
+	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / Angles.FULL;
 	    if (tree.branchScalar * tree.maxBranchLength > r) {
 	      r = tree.branchScalar * tree.maxBranchLength;
 	    } else {
@@ -3001,7 +2837,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3012,19 +2848,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(13);
+	var _BranchRenderer = __webpack_require__(11);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(14);
+	var _Prerenderer = __webpack_require__(12);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(21);
+	var _branchRenderer = __webpack_require__(19);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(22);
+	var _prerenderer = __webpack_require__(20);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3041,7 +2877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3061,7 +2897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3070,7 +2906,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _utilsConstants = __webpack_require__(4);
+	var _phylocanvasUtils = __webpack_require__(3);
+
+	var Angles = _phylocanvasUtils.constants.Angles;
 
 	function prerenderNodes(tree, node) {
 	  if (node.parent) {
@@ -3090,7 +2928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['default'] = {
 	  getStep: function getStep(tree) {
-	    return _utilsConstants.Angles.FULL / tree.leaves.length;
+	    return Angles.FULL / tree.leaves.length;
 	  },
 	  calculate: function calculate(tree, step) {
 	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
@@ -3119,7 +2957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3130,19 +2968,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(13);
+	var _BranchRenderer = __webpack_require__(11);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(14);
+	var _Prerenderer = __webpack_require__(12);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(24);
+	var _branchRenderer = __webpack_require__(22);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(25);
+	var _prerenderer = __webpack_require__(23);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3156,7 +2994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3183,7 +3021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3192,8 +3030,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _utilsConstants = __webpack_require__(4);
+	var _phylocanvasUtils = __webpack_require__(3);
 
+	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
@@ -3207,7 +3046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
 	        if (node.getChildNo() === node.parent.children.length - 1) {
 	          node.parent.centery = node.parent.getChildYTotal() / node.parent.getChildCount(); // (node.parent.children.length - 1);
-	          node.parent.centerx = node.parent.children[0].centerx + (node.parent.children[0].centery - node.parent.centery) * Math.tan(_utilsConstants.Angles.FORTYFIVE);
+	          node.parent.centerx = node.parent.children[0].centerx + (node.parent.children[0].centery - node.parent.centery) * Math.tan(Angles.FORTYFIVE);
 	          for (var j = 0; j < node.parent.children.length; j++) {
 	            node.parent.children[j].startx = node.parent.centerx;
 	            node.parent.children[j].starty = node.parent.centery;
@@ -3222,7 +3061,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3233,19 +3072,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(13);
+	var _BranchRenderer = __webpack_require__(11);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(14);
+	var _Prerenderer = __webpack_require__(12);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(27);
+	var _branchRenderer = __webpack_require__(25);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(28);
+	var _prerenderer = __webpack_require__(26);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3269,7 +3108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3295,7 +3134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3304,8 +3143,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _utilsConstants = __webpack_require__(4);
+	var _phylocanvasUtils = __webpack_require__(3);
 
+	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
@@ -3314,7 +3154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
 
 	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = _utilsConstants.Angles.QUARTER;
+	      tree.leaves[i].angle = Angles.QUARTER;
 	      tree.leaves[i].centerx = i > 0 ? tree.leaves[i - 1].centerx + xstep : 0;
 	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
 
@@ -3324,7 +3164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (node.getChildNo() === node.parent.children.length - 1) {
-	          node.parent.angle = _utilsConstants.Angles.QUARTER;
+	          node.parent.angle = Angles.QUARTER;
 	          node.parent.centerx = (node.parent.centerx + node.centerx) / 2;
 	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar;
 	          for (var j = 0; j < node.parent.children.length; j++) {
@@ -3348,61 +3188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
-	exports.getPixelRatio = getPixelRatio;
-	exports.translateClick = translateClick;
-
-	var _dom = __webpack_require__(5);
-
-	/**
-	 * Return backing store pixel ratio of context.
-	 *
-	 * @param context - The rendering context of HTMl5 canvas.
-	 *
-	 */
-
-	function getBackingStorePixelRatio(context) {
-	  return context.backingStorePixelRatio || context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || 1;
-	}
-
-	function getPixelRatio(canvas) {
-	  return (window.devicePixelRatio || 1) / getBackingStorePixelRatio(canvas);
-	}
-
-	function translateClickX(x) {
-	  x = x - (0, _dom.getX)(this.canvas.canvas) + window.pageXOffset;
-	  x *= getPixelRatio(this.canvas);
-	  x -= this.canvas.canvas.width / 2;
-	  x -= this.offsetx;
-	  x = x / this.zoom;
-
-	  return x;
-	}
-
-	function translateClickY(y) {
-	  y = y - (0, _dom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
-	  y *= getPixelRatio(this.canvas);
-	  y -= this.canvas.canvas.height / 2;
-	  y -= this.offsety;
-	  y = y / this.zoom;
-
-	  return y;
-	}
-
-	function translateClick(x, y, tree) {
-	  return [translateClickX.call(tree, x), translateClickY.call(tree, y)];
-	}
-
-/***/ },
-/* 30 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3417,11 +3203,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _newick = __webpack_require__(31);
+	var _newick = __webpack_require__(28);
 
 	var _newick2 = _interopRequireDefault(_newick);
 
-	var _nexus = __webpack_require__(32);
+	var _nexus = __webpack_require__(29);
 
 	var _nexus2 = _interopRequireDefault(_nexus);
 
@@ -3432,7 +3218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 31 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3443,7 +3229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _Branch = __webpack_require__(3);
+	var _Branch = __webpack_require__(4);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
@@ -3622,7 +3408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 32 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3631,7 +3417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _newick = __webpack_require__(31);
+	var _newick = __webpack_require__(28);
 
 	var format = 'nexus';
 	var fileExtension = /\.n(ex|xs)$/;
