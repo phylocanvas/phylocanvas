@@ -362,13 +362,18 @@ export default class Tree {
     this.zoomPickedUp = false;
   }
 
-  findBranch(patt) {
+  findBranch(pattern, property = 'id') {
+    let selectedNodeIds = [];
+
     this.root.setSelected(false, true);
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
-        this.leaves[i].setSelected(true, true);
+    for (let leaf of this.leaves) {
+      if (leaf[property].match(pattern)) {
+        leaf.setSelected(true, true);
+        selectedNodeIds.push(leaf.id);
       }
     }
+
+    this.nodesSelected(selectedNodeIds);
     this.draw();
   }
 
