@@ -66,6 +66,11 @@ export default class Branch {
     this.data = {};
 
     /**
+     * This node's highlight status
+     */
+    this.highlighted = false;
+
+    /**
      * This node's unique ID
      */
     this.id = '';
@@ -145,6 +150,11 @@ export default class Branch {
      * @type Tree
      */
     this.tree = {};
+
+    /**
+     * If true, the leaf and label are not rendered.
+     */
+    this.prune = false;
   }
 
   clicked(x, y) {
@@ -365,26 +375,14 @@ export default class Branch {
     return y;
   }
 
-  setSelected(selected, applyToChildren) {
-    var ids = this.id;
-    var i = 0;
-
-    this.selected = selected;
-    if (applyToChildren) {
-      for (i = 0; i < this.children.length; i++) {
-        ids = ids + ',' + this.children[i].setSelected(selected, applyToChildren);
-      }
+  set(property, value, applyToChildren = false) {
+    if (typeof this[property] === 'undefined') {
+      throw new Error(`Unknown property: ${property}`);
     }
-    return ids;
-  }
-
-  setHighlighted(highlighted) {
-    var i;
-
-    this.highlighted = highlighted;
-    if (!highlighted) {
-      for (i = 0; i < this.children.length; i++) {
-        this.children[i].setHighlighted(highlighted);
+    this[property] = value;
+    if (applyToChildren) {
+      for (let child of this.children) {
+        child.set(property, value, applyToChildren);
       }
     }
   }
