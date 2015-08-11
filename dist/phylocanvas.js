@@ -451,14 +451,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 
 	        if (node) {
-	          this.root.set('selected', false, true);
+	          this.root.cascadeFlag('selected', false);
 	          if (this.internalNodesSelectable || node.leaf) {
-	            node.set('selected', true, true);
+	            node.cascadeFlag('selected', true);
 	            nids = node.getChildIds();
 	          }
 	          this.draw();
 	        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-	          this.root.set('selected', false, true);
+	          this.root.cascadeFlag('selected', false);
 	          this.draw();
 	        }
 
@@ -485,7 +485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.root) return false;
 	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 	      if (nd) {
-	        nd.set('selected', false, true);
+	        nd.cascadeFlag('selected', false);
 	        nd.toggleCollapsed();
 	      }
 
@@ -530,8 +530,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 
 	        if (nd && (this.internalNodesSelectable || nd.leaf)) {
-	          this.root.set('highlighted', false, true);
-	          nd.set('highlighted', true, false);
+	          this.root.cascadeFlag('hovered', false);
+	          nd.hovered = true;
 	          // For mouseover tooltip to show no. of children on the internal nodes
 	          if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
 	            this.tooltip.open(e.clientX, e.clientY, nd);
@@ -539,7 +539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          this.tooltip.close();
 	          this.contextMenu.close();
-	          this.root.set('highlighted', false, true);
+	          this.root.cascadeFlag('hovered', false);
 	        }
 	        this.draw();
 	      }
@@ -641,7 +641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var _iterator2 = this.leaves[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 	          var leaf = _step2.value;
 
-	          leaf.set(property, !value, true);
+	          leaf[property] = !value;
 	        }
 	      } catch (err) {
 	        _didIteratorError2 = true;
@@ -666,7 +666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var _iterator3 = leaves[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 	          var leaf = _step3.value;
 
-	          leaf.set(property, value);
+	          leaf[property] = value;
 	        }
 	      } catch (err) {
 	        _didIteratorError3 = true;
@@ -683,14 +683,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      this.nodesUpdated(leaves.map(function (l) {
-	        return l.id;
+	      this.nodesUpdated(leaves.map(function (_) {
+	        return _.id;
 	      }), property);
 	    }
 	  }, {
 	    key: 'clearSelect',
 	    value: function clearSelect() {
-	      this.root.set('selected', false, true);
+	      this.root.cascadeFlag('selected', false);
 	      this.draw();
 	    }
 	  }, {
@@ -914,7 +914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var index;
 
 	      if (this.root) {
-	        this.root.set('selected', false, true);
+	        this.root.cascadeFlag('selected', false);
 	        if (typeof nIds === 'string') {
 	          ns = ns.split(',');
 	        }
@@ -923,7 +923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            node = this.branches[nodeId];
 	            for (index = 0; index < ns.length; index++) {
 	              if (ns[index] === node.id) {
-	                node.set('selected', true, true);
+	                node.cascadeFlag('selected', true);
 	              }
 	            }
 	          }
@@ -1329,8 +1329,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * The center of the end of the node on the y axis
 	     */
-
 	    this.centery = 0;
+
 	    /**
 	     * the branches that stem from this branch
 	     */
@@ -1356,6 +1356,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * This node's highlight status
 	     */
 	    this.highlighted = false;
+
+	    /**
+	     * Whether the user is hovering over the node
+	     */
+	    this.hovered = false;
 
 	    /**
 	     * This node's unique ID
@@ -1441,7 +1446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * If true, the leaf and label are not rendered.
 	     */
-	    this.prune = false;
+	    this.pruned = false;
 	  }
 
 	  _createClass(Branch, [{
@@ -1548,7 +1553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var labelAlign = this.tree.labelAlign;
 
 	      this.canvas.lineWidth = this.canvas.lineWidth / 4;
-	      this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
+	      this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
 
 	      this.canvas.beginPath();
 	      this.canvas.moveTo(centerX, centerY);
@@ -1565,7 +1570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function drawLeaf() {
 	      _nodeRenderers2['default'][this.nodeShape](this);
 
-	      if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
+	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
 	        this.drawLabel();
 	      }
 	    }
@@ -1616,7 +1621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.canvas.restore();
 	      }
 
-	      if (this.highlighted) {
+	      if (this.isHighlighted) {
 	        this.drawHighlight(centerX, centerY);
 	      }
 	    }
@@ -1665,37 +1670,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return y;
 	    }
 	  }, {
-	    key: 'set',
-	    value: function set(property, value) {
-	      var applyToChildren = arguments[2] === undefined ? false : arguments[2];
-
+	    key: 'cascadeFlag',
+	    value: function cascadeFlag(property, value) {
 	      if (typeof this[property] === 'undefined') {
 	        throw new Error('Unknown property: ' + property);
 	      }
 	      this[property] = value;
-	      if (applyToChildren) {
-	        var _iteratorNormalCompletion = true;
-	        var _didIteratorError = false;
-	        var _iteratorError = undefined;
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
+	      try {
+	        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var child = _step.value;
+
+	          child.cascadeFlag(property, value);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
 	        try {
-	          for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	            var child = _step.value;
-
-	            child.set(property, value, applyToChildren);
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
 	          }
-	        } catch (err) {
-	          _didIteratorError = true;
-	          _iteratorError = err;
 	        } finally {
-	          try {
-	            if (!_iteratorNormalCompletion && _iterator['return']) {
-	              _iterator['return']();
-	            }
-	          } finally {
-	            if (_didIteratorError) {
-	              throw _iteratorError;
-	            }
+	          if (_didIteratorError) {
+	            throw _iteratorError;
 	          }
 	        }
 	      }
@@ -1892,7 +1893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.tree.selectedColour;
 	      }
 
-	      if (this.highlighted) {
+	      if (this.isHighlighted) {
 	        textColour = this.tree.highlightColour;
 	      } else if (this.tree.backColour) {
 	        if (this.children.length) {
@@ -2000,6 +2001,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      return totalSize;
+	    }
+	  }, {
+	    key: 'isHighlighted',
+	    get: function get() {
+	      return this.highlighted || this.hovered;
 	    }
 	  }]);
 
@@ -2626,7 +2632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.draw(tree, branch);
 
-	  if (branch.prune) {
+	  if (branch.pruned) {
 	    return;
 	  }
 

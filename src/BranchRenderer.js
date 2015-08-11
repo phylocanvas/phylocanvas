@@ -20,7 +20,7 @@ BranchRenderer.prototype.render = function (tree, branch, collapse) {
 
   this.draw(tree, branch);
 
-  if (branch.prune) {
+  if (branch.pruned) {
     return;
   }
 

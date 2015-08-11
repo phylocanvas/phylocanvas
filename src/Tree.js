@@ -231,14 +231,14 @@ export default class Tree {
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
 
       if (node) {
-        this.root.set('selected', false, true);
+        this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
-          node.set('selected', true, true);
+          node.cascadeFlag('selected', true);
           nids = node.getChildIds();
         }
         this.draw();
       } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-        this.root.set('selected', false, true);
+        this.root.cascadeFlag('selected', false);
         this.draw();
       }
 
@@ -260,7 +260,7 @@ export default class Tree {
     if (!this.root) return false;
     var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
     if (nd) {
-      nd.set('selected', false, true);
+      nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();
     }
 
@@ -301,8 +301,8 @@ export default class Tree {
       var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
       if (nd && (this.internalNodesSelectable || nd.leaf)) {
-        this.root.set('highlighted', false, true);
-        nd.set('highlighted', true, false);
+        this.root.cascadeFlag('hovered', false);
+        nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
         if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
           this.tooltip.open(e.clientX, e.clientY, nd);
@@ -310,7 +310,7 @@ export default class Tree {
       } else {
         this.tooltip.close();
         this.contextMenu.close();
-        this.root.set('highlighted', false, true);
+        this.root.cascadeFlag('hovered', false);
       }
       this.draw();
     }
@@ -376,17 +376,17 @@ export default class Tree {
 
   updateLeaves(leaves, property, value) {
     for (let leaf of this.leaves) {
-      leaf.set(property, !value);
+      leaf[property] = !value;
     }
 
     for (let leaf of leaves) {
-      leaf.set(property, value);
+      leaf[property] = value;
     }
     this.nodesUpdated(leaves.map(_ => _.id), property);
   }
 
   clearSelect() {
-    this.root.set('selected', false, true);
+    this.root.cascadeFlag('selected', false);
     this.draw();
   }
 
@@ -572,7 +572,7 @@ export default class Tree {
     var index;
 
     if (this.root) {
-      this.root.set('selected', false, true);
+      this.root.cascadeFlag('selected', false);
       if (typeof nIds === 'string') {
         ns = ns.split(',');
       }
@@ -581,7 +581,7 @@ export default class Tree {
           node = this.branches[nodeId];
           for (index = 0; index < ns.length; index++) {
             if (ns[index] === node.id) {
-              node.set('selected', true, true);
+              node.cascadeFlag('selected', true);
             }
           }
         }
