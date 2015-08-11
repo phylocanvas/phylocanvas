@@ -366,7 +366,7 @@ export default class Tree {
     let foundLeaves = [];
 
     for (let leaf of this.leaves) {
-      if (leaf[searchProperty].match(pattern)) {
+      if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
         foundLeaves.push(leaf);
       }
     }
