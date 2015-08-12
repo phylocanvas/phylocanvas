@@ -1,4 +1,4 @@
-require('../polyfill');
+require('../src/polyfill');
 
 import PhyloCanvas, * as phyloComponents from '../src/index';
 
