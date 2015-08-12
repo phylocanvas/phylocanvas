@@ -1,3 +1,5 @@
+require('../src/polyfill');
+
 import PhyloCanvas, * as phyloComponents from '../src/index';
 
 let buttonForm = document.getElementById('buttons');

@@ -122,7 +122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function createTree(element) {
-	  var conf = arguments[1] === undefined ? {} : arguments[1];
+	  var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	  return new _Tree2['default'](element, conf);
 	}
@@ -249,7 +249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Tree = (function () {
 	  function Tree(element) {
-	    var conf = arguments[1] === undefined ? {} : arguments[1];
+	    var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	    _classCallCheck(this, Tree);
 
@@ -416,7 +416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Tree, [{
 	    key: 'setInitialCollapsedBranches',
 	    value: function setInitialCollapsedBranches() {
-	      var node = arguments[0] === undefined ? this.root : arguments[0];
+	      var node = arguments.length <= 0 || arguments[0] === undefined ? this.root : arguments[0];
 
 	      var childIds;
 	      var i;
@@ -597,7 +597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'findLeaves',
 	    value: function findLeaves(pattern) {
-	      var searchProperty = arguments[1] === undefined ? 'id' : arguments[1];
+	      var searchProperty = arguments.length <= 1 || arguments[1] === undefined ? 'id' : arguments[1];
 
 	      var foundLeaves = [];
 
@@ -2246,8 +2246,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	var ContextMenu = (function (_Tooltip) {
+	  _inherits(ContextMenu, _Tooltip);
+
 	  function ContextMenu(tree) {
-	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
+	    var menuItems = arguments.length <= 1 || arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
 
 	    _classCallCheck(this, ContextMenu);
 
@@ -2256,8 +2258,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.menuItems = menuItems.map(transferMenuItem);
 	    this.fontSize = '8pt';
 	  }
-
-	  _inherits(ContextMenu, _Tooltip);
 
 	  _createClass(ContextMenu, [{
 	    key: 'click',
@@ -2355,8 +2355,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Tooltip = (function () {
 	  function Tooltip(tree) {
-	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
-	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
+	    var className = arguments.length <= 1 || arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
+	    var element = arguments.length <= 2 || arguments[2] === undefined ? document.createElement('div') : arguments[2];
 
 	    _classCallCheck(this, Tooltip);
 
