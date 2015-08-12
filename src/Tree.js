@@ -231,14 +231,14 @@ export default class Tree {
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
 
       if (node) {
-        this.root.setSelected(false, true);
+        this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
-          node.setSelected(true, true);
+          node.cascadeFlag('selected', true);
           nids = node.getChildIds();
         }
         this.draw();
       } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-        this.root.setSelected(false, true);
+        this.root.cascadeFlag('selected', false);
         this.draw();
       }
 
@@ -246,7 +246,7 @@ export default class Tree {
         this.dragging = false;
       }
 
-      this.nodesSelected(nids);
+      this.nodesUpdated(nids, 'selected');
     } else if (e.button === 2) {
       e.preventDefault();
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
@@ -260,7 +260,7 @@ export default class Tree {
     if (!this.root) return false;
     var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
     if (nd) {
-      nd.setSelected(false, true);
+      nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();
     }
 
@@ -301,8 +301,8 @@ export default class Tree {
       var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
       if (nd && (this.internalNodesSelectable || nd.leaf)) {
-        this.root.setHighlighted(false);
-        nd.setHighlighted(true);
+        this.root.cascadeFlag('hovered', false);
+        nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
         if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
           this.tooltip.open(e.clientX, e.clientY, nd);
@@ -310,7 +310,7 @@ export default class Tree {
       } else {
         this.tooltip.close();
         this.contextMenu.close();
-        this.root.setHighlighted(false);
+        this.root.cascadeFlag('hovered', false);
       }
       this.draw();
     }
@@ -362,23 +362,31 @@ export default class Tree {
     this.zoomPickedUp = false;
   }
 
-  findBranch(pattern, property = 'id') {
-    let selectedNodeIds = [];
+  findLeaves(pattern, searchProperty = 'id') {
+    let foundLeaves = [];
 
-    this.root.setSelected(false, true);
     for (let leaf of this.leaves) {
-      if (leaf[property].match(pattern)) {
-        leaf.setSelected(true, true);
-        selectedNodeIds.push(leaf.id);
+      if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
+        foundLeaves.push(leaf);
       }
     }
 
-    this.nodesSelected(selectedNodeIds);
-    this.draw();
+    return foundLeaves;
+  }
+
+  updateLeaves(leaves, property, value) {
+    for (let leaf of this.leaves) {
+      leaf[property] = !value;
+    }
+
+    for (let leaf of leaves) {
+      leaf[property] = value;
+    }
+    this.nodesUpdated(leaves.map(_ => _.id), property);
   }
 
   clearSelect() {
-    this.root.setSelected(false, true);
+    this.root.cascadeFlag('selected', false);
     this.draw();
   }
 
@@ -564,7 +572,7 @@ export default class Tree {
     var index;
 
     if (this.root) {
-      this.root.setSelected(false, true);
+      this.root.cascadeFlag('selected', false);
       if (typeof nIds === 'string') {
         ns = ns.split(',');
       }
@@ -573,7 +581,7 @@ export default class Tree {
           node = this.branches[nodeId];
           for (index = 0; index < ns.length; index++) {
             if (ns[index] === node.id) {
-              node.setSelected(true, true);
+              node.cascadeFlag('selected', true);
             }
           }
         }
@@ -716,15 +724,15 @@ export default class Tree {
   }
 
   loadError(error) {
-    fireEvent(this.canvasEl, 'error', { error: error });
+    fireEvent(this.canvasEl, 'error', { error });
   }
 
   subtreeDrawn(node) {
-    fireEvent(this.canvasEl, 'subtree', { node: node });
+    fireEvent(this.canvasEl, 'subtree', { node });
   }
 
-  nodesSelected(nids) {
-    fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+  nodesUpdated(nodeIds, property) {
+    fireEvent(this.canvasEl, 'updated', { nodeIds, property });
   }
 
   addListener(event, listener) {

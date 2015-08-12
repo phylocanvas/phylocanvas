@@ -451,14 +451,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 
 	        if (node) {
-	          this.root.setSelected(false, true);
+	          this.root.cascadeFlag('selected', false);
 	          if (this.internalNodesSelectable || node.leaf) {
-	            node.setSelected(true, true);
+	            node.cascadeFlag('selected', true);
 	            nids = node.getChildIds();
 	          }
 	          this.draw();
 	        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-	          this.root.setSelected(false, true);
+	          this.root.cascadeFlag('selected', false);
 	          this.draw();
 	        }
 
@@ -466,7 +466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.dragging = false;
 	        }
 
-	        this.nodesSelected(nids);
+	        this.nodesUpdated(nids, 'selected');
 	      } else if (e.button === 2) {
 	        var _root2;
 
@@ -485,7 +485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.root) return false;
 	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 	      if (nd) {
-	        nd.setSelected(false, true);
+	        nd.cascadeFlag('selected', false);
 	        nd.toggleCollapsed();
 	      }
 
@@ -530,8 +530,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 
 	        if (nd && (this.internalNodesSelectable || nd.leaf)) {
-	          this.root.setHighlighted(false);
-	          nd.setHighlighted(true);
+	          this.root.cascadeFlag('hovered', false);
+	          nd.hovered = true;
 	          // For mouseover tooltip to show no. of children on the internal nodes
 	          if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
 	            this.tooltip.open(e.clientX, e.clientY, nd);
@@ -539,7 +539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          this.tooltip.close();
 	          this.contextMenu.close();
-	          this.root.setHighlighted(false);
+	          this.root.cascadeFlag('hovered', false);
 	        }
 	        this.draw();
 	      }
@@ -595,13 +595,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.zoomPickedUp = false;
 	    }
 	  }, {
-	    key: 'findBranch',
-	    value: function findBranch(pattern) {
-	      var property = arguments[1] === undefined ? 'id' : arguments[1];
+	    key: 'findLeaves',
+	    value: function findLeaves(pattern) {
+	      var searchProperty = arguments[1] === undefined ? 'id' : arguments[1];
 
-	      var selectedNodeIds = [];
+	      var foundLeaves = [];
 
-	      this.root.setSelected(false, true);
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
 	      var _iteratorError = undefined;
@@ -610,9 +609,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var _iterator = this.leaves[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	          var leaf = _step.value;
 
-	          if (leaf[property].match(pattern)) {
-	            leaf.setSelected(true, true);
-	            selectedNodeIds.push(leaf.id);
+	          if (leaf[searchProperty].match(pattern)) {
+	            foundLeaves.push(leaf);
 	          }
 	        }
 	      } catch (err) {
@@ -630,13 +628,69 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      this.nodesSelected(selectedNodeIds);
-	      this.draw();
+	      return foundLeaves;
+	    }
+	  }, {
+	    key: 'updateLeaves',
+	    value: function updateLeaves(leaves, property, value) {
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+
+	      try {
+	        for (var _iterator2 = this.leaves[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var leaf = _step2.value;
+
+	          leaf[property] = !value;
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	            _iterator2['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
+
+	      try {
+	        for (var _iterator3 = leaves[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var leaf = _step3.value;
+
+	          leaf[property] = value;
+	        }
+	      } catch (err) {
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+	            _iterator3['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
+	          }
+	        }
+	      }
+
+	      this.nodesUpdated(leaves.map(function (_) {
+	        return _.id;
+	      }), property);
 	    }
 	  }, {
 	    key: 'clearSelect',
 	    value: function clearSelect() {
-	      this.root.setSelected(false, true);
+	      this.root.cascadeFlag('selected', false);
 	      this.draw();
 	    }
 	  }, {
@@ -678,13 +732,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var _iteratorNormalCompletion2 = true;
-	      var _didIteratorError2 = false;
-	      var _iteratorError2 = undefined;
+	      var _iteratorNormalCompletion4 = true;
+	      var _didIteratorError4 = false;
+	      var _iteratorError4 = undefined;
 
 	      try {
-	        for (var _iterator2 = Object.keys(_parsers2['default'])[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	          var parserName = _step2.value;
+	        for (var _iterator4 = Object.keys(_parsers2['default'])[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	          var parserName = _step4.value;
 
 	          var parser = _parsers2['default'][parserName];
 
@@ -694,16 +748,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError2 = true;
-	        _iteratorError2 = err;
+	        _didIteratorError4 = true;
+	        _iteratorError4 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	            _iterator2['return']();
+	          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
+	            _iterator4['return']();
 	          }
 	        } finally {
-	          if (_didIteratorError2) {
-	            throw _iteratorError2;
+	          if (_didIteratorError4) {
+	            throw _iteratorError4;
 	          }
 	        }
 	      }
@@ -860,7 +914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var index;
 
 	      if (this.root) {
-	        this.root.setSelected(false, true);
+	        this.root.cascadeFlag('selected', false);
 	        if (typeof nIds === 'string') {
 	          ns = ns.split(',');
 	        }
@@ -869,7 +923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            node = this.branches[nodeId];
 	            for (index = 0; index < ns.length; index++) {
 	              if (ns[index] === node.id) {
-	                node.setSelected(true, true);
+	                node.cascadeFlag('selected', true);
 	              }
 	            }
 	          }
@@ -901,13 +955,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (array.length) {
-	          var _iteratorNormalCompletion3 = true;
-	          var _didIteratorError3 = false;
-	          var _iteratorError3 = undefined;
+	          var _iteratorNormalCompletion5 = true;
+	          var _didIteratorError5 = false;
+	          var _iteratorError5 = undefined;
 
 	          try {
-	            for (var _iterator3 = array[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	              var id = _step3.value;
+	            for (var _iterator5 = array[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+	              var id = _step5.value;
 
 	              if (!(id in this.branches)) {
 	                continue;
@@ -915,16 +969,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	              this.branches[id].setDisplay(options);
 	            }
 	          } catch (err) {
-	            _didIteratorError3 = true;
-	            _iteratorError3 = err;
+	            _didIteratorError5 = true;
+	            _iteratorError5 = err;
 	          } finally {
 	            try {
-	              if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-	                _iterator3['return']();
+	              if (!_iteratorNormalCompletion5 && _iterator5['return']) {
+	                _iterator5['return']();
 	              }
 	            } finally {
-	              if (_didIteratorError3) {
-	                throw _iteratorError3;
+	              if (_didIteratorError5) {
+	                throw _iteratorError5;
 	              }
 	            }
 	          }
@@ -1059,9 +1113,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      fireEvent(this.canvasEl, 'subtree', { node: node });
 	    }
 	  }, {
-	    key: 'nodesSelected',
-	    value: function nodesSelected(nids) {
-	      fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+	    key: 'nodesUpdated',
+	    value: function nodesUpdated(nodeIds, property) {
+	      fireEvent(this.canvasEl, 'updated', { nodeIds: nodeIds, property: property });
 	    }
 	  }, {
 	    key: 'addListener',
@@ -1132,28 +1186,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.originalTree.branches) return;
 
 	      this.branches = this.originalTree.branches;
-	      var _iteratorNormalCompletion4 = true;
-	      var _didIteratorError4 = false;
-	      var _iteratorError4 = undefined;
+	      var _iteratorNormalCompletion6 = true;
+	      var _didIteratorError6 = false;
+	      var _iteratorError6 = undefined;
 
 	      try {
-	        for (var _iterator4 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-	          var n = _step4.value;
+	        for (var _iterator6 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+	          var n = _step6.value;
 
 	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
 	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
-	        _didIteratorError4 = true;
-	        _iteratorError4 = err;
+	        _didIteratorError6 = true;
+	        _iteratorError6 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-	            _iterator4['return']();
+	          if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+	            _iterator6['return']();
 	          }
 	        } finally {
-	          if (_didIteratorError4) {
-	            throw _iteratorError4;
+	          if (_didIteratorError6) {
+	            throw _iteratorError6;
 	          }
 	        }
 	      }
@@ -1275,8 +1329,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * The center of the end of the node on the y axis
 	     */
-
 	    this.centery = 0;
+
 	    /**
 	     * the branches that stem from this branch
 	     */
@@ -1297,6 +1351,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * an object to hold custom data for this node
 	     */
 	    this.data = {};
+
+	    /**
+	     * This node's highlight status
+	     */
+	    this.highlighted = false;
+
+	    /**
+	     * Whether the user is hovering over the node
+	     */
+	    this.hovered = false;
 
 	    /**
 	     * This node's unique ID
@@ -1378,6 +1442,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @type Tree
 	     */
 	    this.tree = {};
+
+	    /**
+	     * If true, the leaf and label are not rendered.
+	     */
+	    this.pruned = false;
 	  }
 
 	  _createClass(Branch, [{
@@ -1484,7 +1553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var labelAlign = this.tree.labelAlign;
 
 	      this.canvas.lineWidth = this.canvas.lineWidth / 4;
-	      this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
+	      this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
 
 	      this.canvas.beginPath();
 	      this.canvas.moveTo(centerX, centerY);
@@ -1501,7 +1570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function drawLeaf() {
 	      _nodeRenderers2['default'][this.nodeShape](this);
 
-	      if (this.tree.showLabels || this.tree.hoverLabel && this.highlighted) {
+	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
 	        this.drawLabel();
 	      }
 	    }
@@ -1552,7 +1621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.canvas.restore();
 	      }
 
-	      if (this.highlighted) {
+	      if (this.isHighlighted) {
 	        this.drawHighlight(centerX, centerY);
 	      }
 	    }
@@ -1601,28 +1670,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return y;
 	    }
 	  }, {
-	    key: 'setSelected',
-	    value: function setSelected(selected, applyToChildren) {
-	      var ids = this.id;
-	      var i = 0;
-
-	      this.selected = selected;
-	      if (applyToChildren) {
-	        for (i = 0; i < this.children.length; i++) {
-	          ids = ids + ',' + this.children[i].setSelected(selected, applyToChildren);
-	        }
+	    key: 'cascadeFlag',
+	    value: function cascadeFlag(property, value) {
+	      if (typeof this[property] === 'undefined') {
+	        throw new Error('Unknown property: ' + property);
 	      }
-	      return ids;
-	    }
-	  }, {
-	    key: 'setHighlighted',
-	    value: function setHighlighted(highlighted) {
-	      var i;
+	      this[property] = value;
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
 
-	      this.highlighted = highlighted;
-	      if (!highlighted) {
-	        for (i = 0; i < this.children.length; i++) {
-	          this.children[i].setHighlighted(highlighted);
+	      try {
+	        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var child = _step.value;
+
+	          child.cascadeFlag(property, value);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator['return']) {
+	            _iterator['return']();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
 	        }
 	      }
 	    }
@@ -1656,28 +1731,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'extractChildren',
 	    value: function extractChildren() {
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
 
 	      try {
-	        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var child = _step.value;
+	        for (var _iterator2 = this.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var child = _step2.value;
 
 	          this.tree.storeNode(child);
 	          child.extractChildren();
 	        }
 	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
+	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+	            _iterator2['return']();
 	          }
 	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
 	          }
 	        }
 	      }
@@ -1818,7 +1893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.tree.selectedColour;
 	      }
 
-	      if (this.highlighted) {
+	      if (this.isHighlighted) {
 	        textColour = this.tree.highlightColour;
 	      } else if (this.tree.backColour) {
 	        if (this.children.length) {
@@ -1926,6 +2001,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      return totalSize;
+	    }
+	  }, {
+	    key: 'isHighlighted',
+	    get: function get() {
+	      return this.highlighted || this.hovered;
 	    }
 	  }]);
 
@@ -2551,6 +2631,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  branch.canvas.strokeStyle = branch.getColour();
 
 	  this.draw(tree, branch);
+
+	  if (branch.pruned) {
+	    return;
+	  }
 
 	  branch.drawNode();
 

@@ -47,4 +47,6 @@ tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);', function () {
   tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
   tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
   tree.setNodeDisplay('D', { colour: 'green' });
+  tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
+  tree.draw();
 });

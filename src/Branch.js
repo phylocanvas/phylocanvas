@@ -42,8 +42,8 @@ export default class Branch {
     /**
      * The center of the end of the node on the y axis
      */
-
     this.centery = 0;
+
     /**
      * the branches that stem from this branch
      */
@@ -64,6 +64,16 @@ export default class Branch {
      * an object to hold custom data for this node
      */
     this.data = {};
+
+    /**
+     * This node's highlight status
+     */
+    this.highlighted = false;
+
+    /**
+     * Whether the user is hovering over the node
+     */
+    this.hovered = false;
 
     /**
      * This node's unique ID
@@ -145,6 +155,15 @@ export default class Branch {
      * @type Tree
      */
     this.tree = {};
+
+    /**
+     * If true, the leaf and label are not rendered.
+     */
+    this.pruned = false;
+  }
+
+  get isHighlighted() {
+    return this.highlighted || this.hovered;
   }
 
   clicked(x, y) {
@@ -249,7 +268,7 @@ export default class Branch {
     let labelAlign = this.tree.labelAlign;
 
     this.canvas.lineWidth = this.canvas.lineWidth / 4;
-    this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
+    this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
 
     this.canvas.beginPath();
     this.canvas.moveTo(centerX, centerY);
@@ -265,7 +284,7 @@ export default class Branch {
   drawLeaf() {
     nodeRenderers[this.nodeShape](this);
 
-    if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
+    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
       this.drawLabel();
     }
   }
@@ -319,7 +338,7 @@ export default class Branch {
       this.canvas.restore();
     }
 
-    if (this.highlighted) {
+    if (this.isHighlighted) {
       this.drawHighlight(centerX, centerY);
     }
   }
@@ -365,27 +384,13 @@ export default class Branch {
     return y;
   }
 
-  setSelected(selected, applyToChildren) {
-    var ids = this.id;
-    var i = 0;
-
-    this.selected = selected;
-    if (applyToChildren) {
-      for (i = 0; i < this.children.length; i++) {
-        ids = ids + ',' + this.children[i].setSelected(selected, applyToChildren);
-      }
+  cascadeFlag(property, value) {
+    if (typeof this[property] === 'undefined') {
+      throw new Error(`Unknown property: ${property}`);
     }
-    return ids;
-  }
-
-  setHighlighted(highlighted) {
-    var i;
-
-    this.highlighted = highlighted;
-    if (!highlighted) {
-      for (i = 0; i < this.children.length; i++) {
-        this.children[i].setHighlighted(highlighted);
-      }
+    this[property] = value;
+    for (let child of this.children) {
+      child.cascadeFlag(property, value);
     }
   }
 
@@ -543,7 +548,7 @@ export default class Branch {
       return this.tree.selectedColour;
     }
 
-    if (this.highlighted) {
+    if (this.isHighlighted) {
       textColour = this.tree.highlightColour;
     } else if (this.tree.backColour) {
       if (this.children.length) {

@@ -20,6 +20,10 @@ BranchRenderer.prototype.render = function (tree, branch, collapse) {
 
   this.draw(tree, branch);
 
+  if (branch.pruned) {
+    return;
+  }
+
   branch.drawNode();
 
   for (i = 0; i < branch.children.length; i++) {
