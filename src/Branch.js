@@ -640,8 +640,7 @@ export default class Branch {
     let totalSize = this.getNodeSize();
 
     if (this.tree.showLabels) {
-      totalSize +=
-        this.getLabelSize() + this.tree.maxLabelLength[this.tree.treeType];
+      totalSize += this.getLabelStartX() + this.getLabelSize();
     }
 
     return totalSize;

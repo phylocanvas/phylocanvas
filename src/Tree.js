@@ -131,6 +131,7 @@ export default class Tree {
     this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
+    this.padding = conf.padding || 50;
 
     this.hoverLabel = false;
 
@@ -185,8 +186,7 @@ export default class Tree {
     this.colour1 = 'rgba(206,16,16,1)';
     this.colour0 = '#ccc';
     /**
-       Maximum length of label for each tree type.
-       Because label length pixel differes for different tree types for some reason
+     * Maximum length of label for each tree type.
      */
     this.maxLabelLength = {};
   }
@@ -769,7 +769,7 @@ export default class Tree {
     var maxx = bounds[1][0];
     var miny = bounds[0][1];
     var maxy = bounds[1][1];
-    var padding = 50;
+    var padding = this.padding;
     var canvasSize = [
       this.canvas.canvas.width - padding,
       this.canvas.canvas.height - padding
