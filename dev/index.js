@@ -14,9 +14,6 @@ let tree = PhyloCanvas.createTree('phylocanvas', {
   }
 });
 
-tree.showLabels = true;
-tree.hoverLabel = true;
-
 // create buttons
 buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -38,6 +35,8 @@ tree.on('loaded', function () {
   console.log('loaded');
 });
 
+tree.showLabels = true;
+tree.hoverLabel = true;
 tree.alignLabels = true;
 tree.setTreeType('circular');
 
@@ -45,10 +44,23 @@ tree.setTreeType('circular');
 // (A:0.1,B:0.1,(C:0.1,D:0.1):0.1);
 tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);', function () {
   tree.backColour = true;
-  tree.setNodeSize(5);
+  tree.setNodeSize(10);
+  tree.textSize = 20;
   tree.setNodeDisplay('B', { colour: 'red', shape: 'triangle' });
   tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
   tree.setNodeDisplay('D', { colour: 'green' });
   tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
+
+  let branch = tree.branches.C;
+  branch.label = 'Charlie';
+  branch.labelStyle = {
+    textSize: 50,
+    font: 'ubuntu',
+    format: 'italic',
+    colour: 'purple'
+  };
+  branch.radius = 2;
+
+  tree.fitInPanel();
   tree.draw();
 });

@@ -127,7 +127,7 @@ export default class Tree {
     this.offsety = this.canvas.canvas.height / 2;
     this.selectedColour = 'rgba(49,151,245,1)';
     this.highlightColour = 'rgba(49,151,245,1)';
-    this.highlightWidth = 5.0;
+    this.highlightWidth = 5;
     this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
@@ -749,16 +749,12 @@ export default class Tree {
       let node = this.leaves[i];
       let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
       let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
-      let theta = node.angle;
       let pad = node.getTotalSize();
 
-      x = x + (pad * Math.cos(theta));
-      y = y + (pad * Math.sin(theta));
-
-      minx = Math.min(minx, x);
-      maxx = Math.max(maxx, x);
-      miny = Math.min(miny, y);
-      maxy = Math.max(maxy, y);
+      minx = Math.min(minx, x - pad);
+      maxx = Math.max(maxx, x + pad);
+      miny = Math.min(miny, y - pad);
+      maxy = Math.max(maxy, y + pad);
     }
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
