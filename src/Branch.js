@@ -326,7 +326,6 @@ export default class Branch {
 
     this.setNodeDimensions(centerX, centerY, nodeRadius);
 
-
     if (this.collapsed) {
       this.drawCollapsed(centerX, centerY);
     } else if (this.leaf) {
@@ -344,7 +343,7 @@ export default class Branch {
     }
 
     if (this.isHighlighted) {
-      this.drawHighlight(centerX, centerY);
+      this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
     }
   }
 

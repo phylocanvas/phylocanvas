@@ -103,7 +103,7 @@ export default class Tree {
 
     this.drawn = false;
 
-    this.selectedNodes = [];
+    this.highlighters = [];
 
     this.zoom = 1;
     this.pickedup = false;
@@ -128,7 +128,6 @@ export default class Tree {
     this.selectedColour = 'rgba(49,151,245,1)';
     this.highlightColour = 'rgba(49,151,245,1)';
     this.highlightWidth = 5.0;
-    this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
     this.padding = conf.padding || 50;
@@ -320,7 +319,7 @@ export default class Tree {
    * Draw the frame
    */
   draw(forceRedraw) {
-    this.selectedNodes = [];
+    this.highlighters.length = 0;
 
     if (this.maxBranchLength === 0) {
       this.loadError(new Error('All branches in the tree are identical.'));
@@ -349,6 +348,8 @@ export default class Tree {
     this.canvas.scale(this.zoom, this.zoom);
 
     this.branchRenderer.render(this, this.root);
+
+    this.highlighters.forEach(render => render());
 
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
