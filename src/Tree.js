@@ -752,15 +752,12 @@ export default class Tree {
     var maxy = this.root.starty;
 
     for (let i = this.leaves.length; i--; ) {
-      let node = this.leaves[i];
-      let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
-      let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
-      let pad = node.getTotalSize();
+      const bounds = this.leaves[i].getBounds();
 
-      minx = Math.min(minx, x - pad);
-      maxx = Math.max(maxx, x + pad);
-      miny = Math.min(miny, y - pad);
-      maxy = Math.max(maxy, y + pad);
+      minx = Math.min(minx, bounds.minx);
+      maxx = Math.max(maxx, bounds.maxx);
+      miny = Math.min(miny, bounds.miny);
+      maxy = Math.max(maxy, bounds.maxy);
     }
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }

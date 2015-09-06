@@ -5,6 +5,13 @@ import nodeRenderers from './nodeRenderers';
 const { Angles, Shapes } = constants;
 const { createBlobUrl } = dom;
 
+const bounds = {
+  minx: 0,
+  maxx: 0,
+  miny: 0,
+  maxy: 0
+};
+
 /**
  * Creates a branch
  *
@@ -612,7 +619,7 @@ export default class Branch {
     let offset;
 
     if (this.isHighlighted && !this.hasLabelConnector()) {
-      offset = this.getNodeSize() + this.getHighlightRadius() + this.getHighlightLineWidth();
+      offset = this.getNodeSize() + this.getHighlightSize();
     } else {
       offset = (this.getNodeSize() * 2);
     }
@@ -627,6 +634,10 @@ export default class Branch {
   getHighlightRadius() {
     const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
     return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
+  }
+
+  getHighlightSize() {
+    return this.getHighlightRadius() + this.getHighlightLineWidth();
   }
 
   rotate(evt) {
@@ -672,14 +683,46 @@ export default class Branch {
     }
   }
 
-  getTotalSize() {
-    let totalSize = this.getNodeSize();
+  getTotalLength() {
+    let length = this.getNodeSize();
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
-      totalSize += this.getLabelStartX() + this.getLabelSize();
+      length += this.getLabelStartX() + this.getLabelSize();
     }
 
-    return totalSize;
+    return length;
+  }
+
+  getBounds() {
+    const { tree } = this;
+    const x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
+    const y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
+    const nodeSize = this.getNodeSize();
+    const totalLength = this.getTotalLength();
+
+    let minx;
+    let maxx;
+    let miny;
+    let maxy;
+    if (this.angle > Angles.QUARTER &&
+        this.angle < (Angles.HALF + Angles.QUARTER)) {
+      minx = x + (totalLength * Math.cos(this.angle));
+      miny = y + (totalLength * Math.sin(this.angle));
+      maxx = x - nodeSize;
+      maxy = y - nodeSize;
+    } else {
+      minx = x - nodeSize;
+      miny = y - nodeSize;
+      maxx = x + (totalLength * Math.cos(this.angle));
+      maxy = y + (totalLength * Math.sin(this.angle));
+    }
+
+    bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
+    bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
+    bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
+    bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+
+    return bounds;
   }
 
 }
