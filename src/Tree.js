@@ -309,10 +309,12 @@ export default class Tree {
         if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
+        this.canvasEl.style.cursor = 'pointer';
       } else {
         this.tooltip.close();
         this.contextMenu.close();
         this.root.cascadeFlag('hovered', false);
+        this.canvasEl.style.cursor = 'auto';
       }
       this.draw();
     }
