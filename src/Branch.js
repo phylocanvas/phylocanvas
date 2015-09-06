@@ -608,7 +608,7 @@ export default class Branch {
     let offset;
 
     if (this.isHighlighted && !this.hasLabelConnector()) {
-      offset = this.getNodeSize() + this.getHighlightRadius();
+      offset = this.getNodeSize() + this.getHighlightRadius() + this.getHighlightLineWidth();
     } else {
       offset = (this.getNodeSize() * 2);
     }
@@ -621,11 +621,8 @@ export default class Branch {
   }
 
   getHighlightRadius() {
-    const offset = this.getHighlightLineWidth() * 1.5;
-    return Math.max(
-      this.getNodeSize() / this.tree.zoom + offset,
-      this.getNodeSize() + offset
-    );
+    const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+    return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
   }
 
   rotate(evt) {

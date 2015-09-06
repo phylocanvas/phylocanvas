@@ -127,7 +127,8 @@ export default class Tree {
     this.offsety = this.canvas.canvas.height / 2;
     this.selectedColour = 'rgba(49,151,245,1)';
     this.highlightColour = 'rgba(49,151,245,1)';
-    this.highlightWidth = 5;
+    this.highlightWidth = 4;
+    this.highlightSize = 2;
     this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
