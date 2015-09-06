@@ -160,6 +160,11 @@ export default class Branch {
      * If true, the leaf and label are not rendered.
      */
     this.pruned = false;
+
+    /**
+     * If false, branch does not respond to mouse events
+     */
+    this.interactive = true;
   }
 
   get isHighlighted() {

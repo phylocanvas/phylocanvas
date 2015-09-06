@@ -230,7 +230,7 @@ export default class Tree {
       if (!this.root) return false;
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
 
-      if (node) {
+      if (node && node.interactive) {
         this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
           node.cascadeFlag('selected', true);
@@ -300,7 +300,7 @@ export default class Tree {
       var e = event;
       var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
-      if (nd && (this.internalNodesSelectable || nd.leaf)) {
+      if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
         this.root.cascadeFlag('hovered', false);
         nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
