@@ -1139,15 +1139,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var maxy = this.root.starty;
 
 	      for (var i = this.leaves.length; i--;) {
-	        var node = this.leaves[i];
-	        var x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
-	        var y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
-	        var pad = node.getTotalSize();
+	        var bounds = this.leaves[i].getBounds();
 
-	        minx = Math.min(minx, x - pad);
-	        maxx = Math.max(maxx, x + pad);
-	        miny = Math.min(miny, y - pad);
-	        maxy = Math.max(maxy, y + pad);
+	        minx = Math.min(minx, bounds.minx);
+	        maxx = Math.max(maxx, bounds.maxx);
+	        miny = Math.min(miny, bounds.miny);
+	        maxy = Math.max(maxy, bounds.maxy);
 	      }
 	      return [[minx, miny], [maxx, maxy]];
 	    }
@@ -1293,6 +1290,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Angles = _phylocanvasUtils.constants.Angles;
 	var Shapes = _phylocanvasUtils.constants.Shapes;
 	var createBlobUrl = _phylocanvasUtils.dom.createBlobUrl;
+
+	var bounds = {
+	  minx: 0,
+	  maxx: 0,
+	  miny: 0,
+	  maxy: 0
+	};
 
 	/**
 	 * Creates a branch
@@ -1967,7 +1971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var offset = undefined;
 
 	      if (this.isHighlighted && !this.hasLabelConnector()) {
-	        offset = this.getNodeSize() + this.getHighlightRadius() + this.getHighlightLineWidth();
+	        offset = this.getNodeSize() + this.getHighlightSize();
 	      } else {
 	        offset = this.getNodeSize() * 2;
 	      }
@@ -1984,6 +1988,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getHighlightRadius() {
 	      var offset = this.getHighlightLineWidth() * this.tree.highlightSize;
 	      return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
+	    }
+	  }, {
+	    key: 'getHighlightSize',
+	    value: function getHighlightSize() {
+	      return this.getHighlightRadius() + this.getHighlightLineWidth();
 	    }
 	  }, {
 	    key: 'rotate',
@@ -2037,15 +2046,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
-	    key: 'getTotalSize',
-	    value: function getTotalSize() {
-	      var totalSize = this.getNodeSize();
+	    key: 'getTotalLength',
+	    value: function getTotalLength() {
+	      var length = this.getNodeSize();
 
 	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
-	        totalSize += this.getLabelStartX() + this.getLabelSize();
+	        length += this.getLabelStartX() + this.getLabelSize();
 	      }
 
-	      return totalSize;
+	      return length;
+	    }
+	  }, {
+	    key: 'getBounds',
+	    value: function getBounds() {
+	      var tree = this.tree;
+
+	      var x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
+	      var y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
+	      var nodeSize = this.getNodeSize();
+	      var totalLength = this.getTotalLength();
+
+	      var minx = undefined;
+	      var maxx = undefined;
+	      var miny = undefined;
+	      var maxy = undefined;
+	      if (this.angle > Angles.QUARTER && this.angle < Angles.HALF + Angles.QUARTER) {
+	        minx = x + totalLength * Math.cos(this.angle);
+	        miny = y + totalLength * Math.sin(this.angle);
+	        maxx = x - nodeSize;
+	        maxy = y - nodeSize;
+	      } else {
+	        minx = x - nodeSize;
+	        miny = y - nodeSize;
+	        maxx = x + totalLength * Math.cos(this.angle);
+	        maxy = y + totalLength * Math.sin(this.angle);
+	      }
+
+	      bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
+	      bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
+	      bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
+	      bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+
+	      return bounds;
 	    }
 	  }, {
 	    key: 'isHighlighted',
