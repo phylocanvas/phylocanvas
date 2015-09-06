@@ -585,7 +585,9 @@ export default class Branch {
   }
 
   getNodeSize() {
-    return Math.max(0, this.tree.baseNodeSize * this.radius);
+    return this.leaf ?
+      this.tree.baseNodeSize * this.radius :
+      this.tree.baseNodeSize / this.radius;
   }
 
   hasLabelConnector() {
@@ -598,29 +600,31 @@ export default class Branch {
 
   /**
    * Calculates label start position
-   * Diameter of the node + extra width(baseNodeSize)
+   * offset + aesthetic padding
    * @method getNodeSize
    * @return CallExpression
    */
   getLabelStartX() {
+    let offset;
+
     if (this.isHighlighted && !this.hasLabelConnector()) {
-      return this.getNodeSize() + this.getHighlightRadius() + this.tree.baseNodeSize;
+      offset = this.getNodeSize() + this.getHighlightRadius();
+    } else {
+      offset = (this.getNodeSize() * 2);
     }
 
-    return (this.getNodeSize() * 2) + this.tree.baseNodeSize;
+    return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
   }
 
   getHighlightLineWidth() {
-    return Math.min(
-      this.tree.highlightWidth,
-      this.tree.highlightWidth / this.tree.zoom
-    );
+    return this.tree.highlightWidth / this.tree.zoom;
   }
 
   getHighlightRadius() {
+    const offset = this.getHighlightLineWidth() * 1.5;
     return Math.max(
-      this.getNodeSize() * 2,
-      this.getNodeSize() + (this.getHighlightLineWidth() * 2)
+      this.getNodeSize() / this.tree.zoom + offset,
+      this.getNodeSize() + offset
     );
   }
 

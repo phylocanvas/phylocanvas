@@ -132,6 +132,7 @@ export default class Tree {
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
     this.padding = conf.padding || 50;
+    this.labelPadding = 5;
 
     this.hoverLabel = false;
 
