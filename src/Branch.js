@@ -162,6 +162,11 @@ export default class Branch {
     this.pruned = false;
 
     /**
+     * Allows label to be individually styled
+     */
+    this.labelStyle = {};
+
+    /**
      * If false, branch does not respond to mouse events
      */
     this.interactive = true;
@@ -192,24 +197,21 @@ export default class Branch {
   }
 
   drawLabel() {
-    var fSize = this.tree.textSize;
-    var lbl = this.getLabel();
-    var dimensions;
-    var tx;
-    var ty;
+    var fSize = this.getTextSize();
+    var label = this.getLabel();
 
-    this.canvas.font = fSize + 'pt ' + this.tree.font;
-    dimensions = this.canvas.measureText(lbl);
+    this.canvas.font = this.getFontString();
+    this.labelWidth = this.canvas.measureText(label).width;
+
     // finding the maximum label length
     if (this.tree.maxLabelLength[this.tree.treeType] === undefined) {
       this.tree.maxLabelLength[this.tree.treeType] = 0;
     }
-    if (dimensions.width > this.tree.maxLabelLength[this.tree.treeType]) {
-      this.tree.maxLabelLength[this.tree.treeType] = dimensions.width;
+    if (this.labelWidth > this.tree.maxLabelLength[this.tree.treeType]) {
+      this.tree.maxLabelLength[this.tree.treeType] = this.labelWidth;
     }
 
-    tx = this.getLabelStartX();
-    ty = fSize / 2;
+    let tx = this.getLabelStartX();
 
     if (this.tree.alignLabels) {
       tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
@@ -219,12 +221,12 @@ export default class Branch {
         this.angle < (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
       // Angles.Half text position changes
-      tx = -tx - (dimensions.width * 1);
+      tx = -tx - (this.labelWidth * 1);
     }
 
     this.canvas.beginPath();
     this.canvas.fillStyle = this.getTextColour();
-    this.canvas.fillText(lbl, tx, ty);
+    this.canvas.fillText(label, tx, (fSize / 2) );
     this.canvas.closePath();
 
     // Rotate canvas back to original position
@@ -270,7 +272,7 @@ export default class Branch {
 
   drawLabelConnector(centerX, centerY) {
     const originalLineWidth = this.canvas.lineWidth;
-    let labelAlign = this.tree.labelAlign;
+    const labelAlign = this.tree.labelAlign;
 
     this.canvas.lineWidth = this.canvas.lineWidth / 4;
     this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
@@ -297,11 +299,14 @@ export default class Branch {
   drawHighlight(centerX, centerY) {
     this.canvas.beginPath();
     const l = this.canvas.lineWidth;
+
     this.canvas.strokeStyle = this.tree.highlightColour;
-    this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-    this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) +
-      ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
+    this.canvas.lineWidth = this.getHighlightLineWidth();
+    const radius = this.getHighlightRadius();
+    this.canvas.arc(centerX, centerY, radius, 0, Angles.FULL, false);
+
     this.canvas.stroke();
+
     this.canvas.lineWidth = l;
     this.canvas.strokeStyle = this.tree.branchColour;
     this.canvas.closePath();
@@ -545,32 +550,22 @@ export default class Branch {
   }
 
   getTextColour() {
-    var textColour;
-    var childColours;
-
     if (this.selected) {
       return this.tree.selectedColour;
     }
 
     if (this.isHighlighted) {
-      textColour = this.tree.highlightColour;
-    } else if (this.tree.backColour) {
-      if (this.children.length) {
-        childColours = this.getChildColours();
-
-        if (childColours.length === 1) {
-          textColour = childColours[0];
-        } else {
-          textColour = this.tree.branchColour;
-        }
-      } else {
-        textColour = this.colour;
-      }
-    } else {
-      textColour = this.tree.branchColour;
+      return this.tree.highlightColour;
     }
 
-    return textColour;
+    if (this.tree.backColour && this.children.length) {
+      const childColours = this.getChildColours();
+      if (childColours.length === 1) {
+        return childColours[0];
+      }
+    }
+
+    return this.labelStyle.colour || this.colour || this.tree.branchColour;
   }
 
   getLabel() {
@@ -579,22 +574,59 @@ export default class Branch {
     );
   }
 
+  getTextSize() {
+    return this.labelStyle.textSize || this.tree.textSize;
+  }
+
+  getFontString() {
+    const font = this.labelStyle.font || this.tree.font;
+    return `${this.labelStyle.format || ''} ${this.getTextSize()}pt ${font}`;
+  }
+
   getLabelSize() {
-    return this.tree.canvas.measureText(this.getLabel()).width;
+    this.canvas.font = this.getFontString();
+    return this.canvas.measureText(this.getLabel()).width;
   }
 
   getNodeSize() {
-    return Math.max(0, this.tree.baseNodeSize * this.radius);
+    return this.leaf ?
+      this.tree.baseNodeSize * this.radius :
+      this.tree.baseNodeSize / this.radius;
+  }
+
+  hasLabelConnector() {
+    if (!this.tree.alignLabels) {
+      return false;
+    }
+
+    return (this.tree.labelAlign.getLabelOffset(this) >= 1);
   }
 
   /**
    * Calculates label start position
-   * Diameter of the node + actual node size + extra width(baseNodeSize)
+   * offset + aesthetic padding
    * @method getNodeSize
    * @return CallExpression
    */
   getLabelStartX() {
-    return (this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2));
+    let offset;
+
+    if (this.isHighlighted && !this.hasLabelConnector()) {
+      offset = this.getNodeSize() + this.getHighlightRadius() + this.getHighlightLineWidth();
+    } else {
+      offset = (this.getNodeSize() * 2);
+    }
+
+    return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
+  }
+
+  getHighlightLineWidth() {
+    return this.tree.highlightWidth / this.tree.zoom;
+  }
+
+  getHighlightRadius() {
+    const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+    return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
   }
 
   rotate(evt) {
@@ -643,7 +675,7 @@ export default class Branch {
   getTotalSize() {
     let totalSize = this.getNodeSize();
 
-    if (this.tree.showLabels) {
+    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
       totalSize += this.getLabelStartX() + this.getLabelSize();
     }
 
