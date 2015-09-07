@@ -1627,7 +1627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.collapsed) {
 	        this.drawCollapsed(centerX, centerY);
 	      } else if (this.leaf) {
-	        if (this.tree.alignLabels) {
+	        if (this.tree.alignLabels && this.tree.showLabels) {
 	          this.drawLabelConnector(centerX, centerY);
 	        }
 
