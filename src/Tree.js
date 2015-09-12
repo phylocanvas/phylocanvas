@@ -194,7 +194,7 @@ export default class Tree {
   }
 
   get alignLabels() {
-    return this.labelAlign && this.labelAlignEnabled;
+    return this.showLabels && this.labelAlign && this.labelAlignEnabled;
   }
 
   set alignLabels(value) {
@@ -219,9 +219,8 @@ export default class Tree {
 
   clicked(e) {
     var node;
-    var nids;
     if (e.button === 0) {
-      nids = [];
+      let nodeIds = [];
       // if this is triggered by the release after a drag then the click
       // shouldn't be triggered.
       if (this.dragging) {
@@ -236,7 +235,7 @@ export default class Tree {
         this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
           node.cascadeFlag('selected', true);
-          nids = node.getChildIds();
+          nodeIds = node.getChildIds();
         }
         this.draw();
       } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
@@ -248,11 +247,11 @@ export default class Tree {
         this.dragging = false;
       }
 
-      this.nodesUpdated(nids, 'selected');
+      this.nodesUpdated(nodeIds, 'selected');
     } else if (e.button === 2) {
       e.preventDefault();
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
-      this.contextMenu.open(e.clientX, e.clientY, node);
+      this.contextMenu.open(e.clientX, e.clientY, node && node.interactive ? node : null);
       this.contextMenu.closed = false;
       this.tooltip.close();
     }
@@ -260,7 +259,7 @@ export default class Tree {
 
   dblclicked(e) {
     if (!this.root) return false;
-    var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
+    var nd = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
     if (nd) {
       nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();

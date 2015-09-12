@@ -341,7 +341,7 @@ export default class Branch {
     if (this.collapsed) {
       this.drawCollapsed(centerX, centerY);
     } else if (this.leaf) {
-      if (this.tree.alignLabels && this.tree.showLabels) {
+      if (this.tree.alignLabels) {
         this.drawLabelConnector(centerX, centerY);
       }
 
