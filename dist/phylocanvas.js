@@ -437,11 +437,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'clicked',
 	    value: function clicked(e) {
 	      var node;
-	      var nids;
 	      if (e.button === 0) {
 	        var _root;
 
-	        nids = [];
+	        var nodeIds = [];
 	        // if this is triggered by the release after a drag then the click
 	        // shouldn't be triggered.
 	        if (this.dragging) {
@@ -456,7 +455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.root.cascadeFlag('selected', false);
 	          if (this.internalNodesSelectable || node.leaf) {
 	            node.cascadeFlag('selected', true);
-	            nids = node.getChildIds();
+	            nodeIds = node.getChildIds();
 	          }
 	          this.draw();
 	        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
@@ -468,13 +467,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.dragging = false;
 	        }
 
-	        this.nodesUpdated(nids, 'selected');
+	        this.nodesUpdated(nodeIds, 'selected');
 	      } else if (e.button === 2) {
 	        var _root2;
 
 	        e.preventDefault();
 	        node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
-	        this.contextMenu.open(e.clientX, e.clientY, node);
+	        this.contextMenu.open(e.clientX, e.clientY, node && node.interactive ? node : null);
 	        this.contextMenu.closed = false;
 	        this.tooltip.close();
 	      }
@@ -485,7 +484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _root3;
 
 	      if (!this.root) return false;
-	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
+	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 	      if (nd) {
 	        nd.cascadeFlag('selected', false);
 	        nd.toggleCollapsed();
@@ -1244,7 +1243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'alignLabels',
 	    get: function get() {
-	      return this.labelAlign && this.labelAlignEnabled;
+	      return this.showLabels && this.labelAlign && this.labelAlignEnabled;
 	    },
 	    set: function set(value) {
 	      this.labelAlignEnabled = value;
@@ -1627,7 +1626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.collapsed) {
 	        this.drawCollapsed(centerX, centerY);
 	      } else if (this.leaf) {
-	        if (this.tree.alignLabels && this.tree.showLabels) {
+	        if (this.tree.alignLabels) {
 	          this.drawLabelConnector(centerX, centerY);
 	        }
 

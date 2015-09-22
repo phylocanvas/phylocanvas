@@ -51,7 +51,9 @@ tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);', function () {
   tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
   tree.setNodeDisplay('D', { colour: 'green' });
   tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
-  tree.updateLeaves(tree.findLeaves('C'), 'interactive', false);
+
+  tree.root.cascadeFlag('interactive', false);
+  tree.updateLeaves(tree.findLeaves('C'), 'interactive', true);
 
   // let branch = tree.branches.C;
   // branch.label = 'Charlie';
