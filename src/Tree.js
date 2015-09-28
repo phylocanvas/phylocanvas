@@ -544,13 +544,13 @@ export default class Tree {
 
   storeNode(node) {
     if (!node.id || node.id === '') {
-      node.id = node.tree.genId();
+      node.id = this.generateBranchId();
     }
 
     if (this.branches[node.id]) {
       if (node !== this.branches[node.id]) {
         if (!node.leaf) {
-          node.id = this.genId();
+          node.id = this.generateBranchId();
         } else {
           throw new Error('Two nodes on this tree share the id ' + node.id);
         }
