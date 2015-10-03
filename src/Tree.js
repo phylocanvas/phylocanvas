@@ -1,14 +1,17 @@
+import { dom, events, canvas } from 'phylocanvas-utils';
+
 import Branch from './Branch';
 import ContextMenu from './ContextMenu';
 import Tooltip from './Tooltip';
 import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
-
-import { addClass, setupDownloadLink } from './utils/dom';
-import { fireEvent, addEvent, debounce } from './utils/events';
-import { getBackingStorePixelRatio, getPixelRatio, translateClick } from './utils/canvas';
 import parsers from './parsers';
+
+const { addClass } = dom;
+const { fireEvent, addEvent } = events;
+const { getBackingStorePixelRatio, getPixelRatio, translateClick } = canvas;
+
 
 /**
  * The instance of a PhyloCanvas Widget
@@ -76,8 +79,8 @@ export default class Tree {
     canvas.className = 'phylocanvas';
     canvas.style.position = 'relative';
     canvas.style.backgroundColor = '#FFFFFF';
-    canvas.height = element.clientHeight || 400;
-    canvas.width = element.clientWidth || 400;
+    canvas.height = element.offsetHeight || 400;
+    canvas.width = element.offsetWidth || 400;
     canvas.style.zIndex = '1';
     this.canvasEl.appendChild(canvas);
 
@@ -100,7 +103,7 @@ export default class Tree {
 
     this.drawn = false;
 
-    this.selectedNodes = [];
+    this.highlighters = [];
 
     this.zoom = 1;
     this.pickedup = false;
@@ -124,10 +127,13 @@ export default class Tree {
     this.offsety = this.canvas.canvas.height / 2;
     this.selectedColour = 'rgba(49,151,245,1)';
     this.highlightColour = 'rgba(49,151,245,1)';
-    this.highlightWidth = 5.0;
+    this.highlightWidth = 4;
+    this.highlightSize = 2;
     this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
+    this.padding = conf.padding || 50;
+    this.labelPadding = 5;
 
     this.hoverLabel = false;
 
@@ -149,9 +155,7 @@ export default class Tree {
       this.navigator = new Navigator(this);
     }
 
-    this.adjustForPixelRatio();
-
-    this.initialiseHistory(conf);
+    this.resizeToContainer();
 
     this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
@@ -161,10 +165,11 @@ export default class Tree {
     this.addListener('mouseout', this.drop.bind(this));
 
     addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    addEvent(this.canvas.canvas, 'mousewheel', debounce(this.scroll.bind(this), 50, true));
-    addEvent(this.canvas.canvas, 'DOMMouseScroll', debounce(this.scroll.bind(this), 50, true));
+    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
+      this.draw();
     }.bind(this));
 
     /**
@@ -178,25 +183,18 @@ export default class Tree {
      */
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
-    this.showMetadata = false;
-    // Takes an array of metadata column headings to overlay on the tree
-    this.selectedMetadataColumns = [];
+
     // Colour for 1 and 0s. Currently 0s are not drawn
     this.colour1 = 'rgba(206,16,16,1)';
     this.colour0 = '#ccc';
     /**
-       Maximum length of label for each tree type.
-       Because label length pixel differes for different tree types for some reason
+     * Maximum length of label for each tree type.
      */
     this.maxLabelLength = {};
-    // x step for metadata
-    this.metadataXStep = 15;
-    // Boolean to detect if metadata heading is drawn or not
-    this.metadataHeadingDrawn = false;
   }
 
   get alignLabels() {
-    return this.labelAlign && this.labelAlignEnabled;
+    return this.showLabels && this.labelAlign && this.labelAlignEnabled;
   }
 
   set alignLabels(value) {
@@ -221,9 +219,8 @@ export default class Tree {
 
   clicked(e) {
     var node;
-    var nids;
     if (e.button === 0) {
-      nids = [];
+      let nodeIds = [];
       // if this is triggered by the release after a drag then the click
       // shouldn't be triggered.
       if (this.dragging) {
@@ -234,15 +231,15 @@ export default class Tree {
       if (!this.root) return false;
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
 
-      if (node) {
-        this.root.setSelected(false, true);
+      if (node && node.interactive) {
+        this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
-          node.setSelected(true, true);
-          nids = node.getChildIds();
+          node.cascadeFlag('selected', true);
+          nodeIds = node.getChildIds();
         }
         this.draw();
       } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
-        this.root.setSelected(false, true);
+        this.root.cascadeFlag('selected', false);
         this.draw();
       }
 
@@ -250,11 +247,11 @@ export default class Tree {
         this.dragging = false;
       }
 
-      this.nodesSelected(nids);
+      this.nodesUpdated(nodeIds, 'selected');
     } else if (e.button === 2) {
       e.preventDefault();
       node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
-      this.contextMenu.open(e.clientX, e.clientY, node);
+      this.contextMenu.open(e.clientX, e.clientY, node && node.interactive ? node : null);
       this.contextMenu.closed = false;
       this.tooltip.close();
     }
@@ -262,9 +259,9 @@ export default class Tree {
 
   dblclicked(e) {
     if (!this.root) return false;
-    var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
+    var nd = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
     if (nd) {
-      nd.setSelected(false, true);
+      nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();
     }
 
@@ -304,17 +301,19 @@ export default class Tree {
       var e = event;
       var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
-      if (nd && (this.internalNodesSelectable || nd.leaf)) {
-        this.root.setHighlighted(false);
-        nd.setHighlighted(true);
+      if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
+        this.root.cascadeFlag('hovered', false);
+        nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
         if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
+        this.canvasEl.style.cursor = 'pointer';
       } else {
         this.tooltip.close();
         this.contextMenu.close();
-        this.root.setHighlighted(false);
+        this.root.cascadeFlag('hovered', false);
+        this.canvasEl.style.cursor = 'auto';
       }
       this.draw();
     }
@@ -324,7 +323,7 @@ export default class Tree {
    * Draw the frame
    */
   draw(forceRedraw) {
-    this.selectedNodes = [];
+    this.highlighters.length = 0;
 
     if (this.maxBranchLength === 0) {
       this.loadError(new Error('All branches in the tree are identical.'));
@@ -353,9 +352,12 @@ export default class Tree {
     this.canvas.scale(this.zoom, this.zoom);
 
     this.branchRenderer.render(this, this.root);
+
+    this.highlighters.forEach(render => render());
+
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
-    this.metadataHeadingDrawn = false;
+
     this.drawn = true;
   }
 
@@ -365,18 +367,31 @@ export default class Tree {
     this.zoomPickedUp = false;
   }
 
-  findBranch(patt) {
-    this.root.setSelected(false, true);
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (this.leaves[i].id.match(new RegExp(patt, 'i'))) {
-        this.leaves[i].setSelected(true, true);
+  findLeaves(pattern, searchProperty = 'id') {
+    let foundLeaves = [];
+
+    for (let leaf of this.leaves) {
+      if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
+        foundLeaves.push(leaf);
       }
     }
-    this.draw();
+
+    return foundLeaves;
+  }
+
+  updateLeaves(leaves, property, value) {
+    for (let leaf of this.leaves) {
+      leaf[property] = !value;
+    }
+
+    for (let leaf of leaves) {
+      leaf[property] = value;
+    }
+    this.nodesUpdated(leaves.map(_ => _.id), property);
   }
 
   clearSelect() {
-    this.root.setSelected(false, true);
+    this.root.cascadeFlag('selected', false);
     this.draw();
   }
 
@@ -393,9 +408,22 @@ export default class Tree {
     this.draw();
   }
 
-  load(inputString, options = {}) {
-    if (options.format) {
-      this.build(inputString, parsers[options.format], options);
+  load(inputString, options = {}, callback) {
+    let buildOptions = options;
+    let buildCallback = callback;
+
+    // allows passing callback as second param
+    if (typeof options === 'function') {
+      buildCallback = options;
+      buildOptions = {};
+    }
+
+    if (buildCallback) {
+      buildOptions.callback = buildCallback;
+    }
+
+    if (buildOptions.format) {
+      this.build(inputString, parsers[buildOptions.format], buildOptions);
       return;
     }
 
@@ -404,12 +432,16 @@ export default class Tree {
 
       if (inputString.match(parser.fileExtension) ||
           inputString.match(parser.validator)) {
-        this.build(inputString, parser, options);
+        this.build(inputString, parser, buildOptions);
         return;
       }
     }
 
-    this.loadError(new Error('PhyloCanvas did not recognise the string as a file or a parseable format string'));
+    let error = new Error('String not recognised as a file or a parseable format string');
+    if (buildCallback) {
+      buildCallback(error);
+    }
+    this.loadError(error);
   }
 
   saveOriginalTree() {
@@ -440,7 +472,7 @@ export default class Tree {
     }
   }
 
-  build(inputString, parser, options) {
+  build(formatString, parser, options) {
     this.originalTree = {};
     this.clearState();
 
@@ -449,15 +481,22 @@ export default class Tree {
     this.branches.root = root;
     this.setRoot(root);
 
-    parser.parse({ inputString, root, options }, (error) => {
+    parser.parse({ formatString, root, options }, (error) => {
       if (error) {
+        if (options.callback) {
+          options.callback(error);
+        }
         this.loadError(error);
         return;
       }
+      this.stringRepresentation = formatString;
       this.saveState();
       this.setInitialCollapsedBranches();
       this.draw();
       this.saveOriginalTree();
+      if (options.callback) {
+        options.callback();
+      }
       if (!options.quiet) {
         this.loadCompleted();
       }
@@ -505,13 +544,13 @@ export default class Tree {
 
   storeNode(node) {
     if (!node.id || node.id === '') {
-      node.id = node.tree.genId();
+      node.id = this.generateBranchId();
     }
 
     if (this.branches[node.id]) {
       if (node !== this.branches[node.id]) {
         if (!node.leaf) {
-          node.id = this.genId();
+          node.id = this.generateBranchId();
         } else {
           throw new Error('Two nodes on this tree share the id ' + node.id);
         }
@@ -526,9 +565,12 @@ export default class Tree {
   }
 
   scroll(e) {
-    var z = Math.log(this.zoom) / Math.log(10);
+    if (this._zooming) return;
+    const z = Math.log(this.zoom) / Math.log(10);
     this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
     e.preventDefault();
+    this._zooming = true;
+    setTimeout(() => { this._zooming = false; }, 40);
   }
 
   selectNodes(nIds) {
@@ -538,7 +580,7 @@ export default class Tree {
     var index;
 
     if (this.root) {
-      this.root.setSelected(false, true);
+      this.root.cascadeFlag('selected', false);
       if (typeof nIds === 'string') {
         ns = ns.split(',');
       }
@@ -547,7 +589,7 @@ export default class Tree {
           node = this.branches[nodeId];
           for (index = 0; index < ns.length; index++) {
             if (ns[index] === node.id) {
-              node.setSelected(true, true);
+              node.cascadeFlag('selected', true);
             }
           }
         }
@@ -646,9 +688,6 @@ export default class Tree {
       this.navigator.resize();
     }
     this.adjustForPixelRatio();
-    if (this.drawn) {
-      this.draw();
-    }
   }
 
   setZoom(z) {
@@ -666,40 +705,6 @@ export default class Tree {
   toggleLabels() {
     this.showLabels = !this.showLabels;
     this.draw();
-  }
-
-  viewMetadataColumns(metadataColumnArray) {
-    this.showMetadata = true;
-    if (metadataColumnArray === undefined) {
-      // Select all column headings so that it will draw all columns
-      metadataColumnArray = this.getMetadataColumnHeadings();
-    }
-    // If argument missing or no key id matching, then this array would be undefined
-    if (metadataColumnArray !== undefined) {
-      this.selectedMetadataColumns = metadataColumnArray;
-    }
-    // Fit to canvas window
-    this.fitInPanel();
-    this.draw();
-  }
-
-  getMetadataColumnHeadings() {
-    var metadataColumnArray = [];
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        metadataColumnArray = Object.keys(this.leaves[i].data);
-        break;
-      }
-    }
-    return metadataColumnArray;
-  }
-
-  clearMetadata() {
-    for (var i = 0; i < this.leaves.length; i++) {
-      if (Object.keys(this.leaves[i].data).length > 0) {
-        this.leaves[i].data = {};
-      }
-    }
   }
 
   setMaxLabelLength() {
@@ -727,15 +732,15 @@ export default class Tree {
   }
 
   loadError(error) {
-    fireEvent(this.canvasEl, 'error', { error: error });
+    fireEvent(this.canvasEl, 'error', { error });
   }
 
   subtreeDrawn(node) {
-    fireEvent(this.canvasEl, 'subtree', { node: node });
+    fireEvent(this.canvasEl, 'subtree', { node });
   }
 
-  nodesSelected(nids) {
-    fireEvent(this.canvasEl, 'selected', { nodeIds: nids });
+  nodesUpdated(nodeIds, property) {
+    fireEvent(this.canvasEl, 'updated', { nodeIds, property });
   }
 
   addListener(event, listener) {
@@ -749,21 +754,12 @@ export default class Tree {
     var maxy = this.root.starty;
 
     for (let i = this.leaves.length; i--; ) {
-      let node = this.leaves[i];
-      let x = this.alignLabels ? this.labelAlign.getX(node) : node.centerx;
-      let y = this.alignLabels ? this.labelAlign.getY(node) : node.centery;
-      let theta = node.angle;
-      let pad = node.getNodeSize()
-                + (this.showLabels ? this.maxLabelLength[this.treeType] + node.getLabelSize() : 0)
-                + (this.showMetadata ? this.getMetadataColumnHeadings().length * this.metadataXStep : 0);
+      const bounds = this.leaves[i].getBounds();
 
-      x = x + (pad * Math.cos(theta));
-      y = y + (pad * Math.sin(theta));
-
-      minx = Math.min(minx, x);
-      maxx = Math.max(maxx, x);
-      miny = Math.min(miny, y);
-      maxy = Math.max(maxy, y);
+      minx = Math.min(minx, bounds.minx);
+      maxx = Math.max(maxx, bounds.maxx);
+      miny = Math.min(miny, bounds.miny);
+      maxy = Math.max(maxy, bounds.maxy);
     }
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
@@ -774,7 +770,7 @@ export default class Tree {
     var maxx = bounds[1][0];
     var miny = bounds[0][1];
     var maxy = bounds[1][1];
-    var padding = 50;
+    var padding = this.padding;
     var canvasSize = [
       this.canvas.canvas.width - padding,
       this.canvas.canvas.height - padding
@@ -833,18 +829,7 @@ export default class Tree {
 
   resizeToContainer() {
     this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
-    this.draw();
-    this.history.resizeTree();
   }
-
-  downloadAllLeafIds() {
-    this.root.downloadLeafIdsFromBranch();
-  }
-
-  exportCurrentTreeView() {
-    setupDownloadLink(this.getPngUrl(), 'phylocanvas.png');
-  }
-
 }
 
 Tree.prototype.on = Tree.prototype.addListener;
