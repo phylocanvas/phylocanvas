@@ -1,4 +1,6 @@
-import { Angles } from '../../utils/constants';
+import { constants } from 'phylocanvas-utils';
+
+const { Angles } = constants;
 
 export default {
   getStep(tree) {
@@ -22,8 +24,8 @@ export default {
       node.starty = ((node.parent.totalBranchLength * tree.branchScalar)) * Math.sin(node.angle);
       node.centerx = ((node.totalBranchLength * tree.branchScalar)) * Math.cos(node.angle);
       node.centery = ((node.totalBranchLength * tree.branchScalar)) * Math.sin(node.angle);
-      node.labelOffsetX = ((r + node.getNodeSize() * 4) * Math.cos(node.angle)) - node.centerx;
-      node.labelOffsetY = ((r + node.getNodeSize() * 4) * Math.sin(node.angle)) - node.centery;
+      node.labelOffsetX = (r * Math.cos(node.angle)) - node.centerx;
+      node.labelOffsetY = (r * Math.sin(node.angle)) - node.centery;
 
       for (; node.parent; node = node.parent) {
         if (node.getChildNo() === 0) {

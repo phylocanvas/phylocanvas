@@ -23,9 +23,9 @@
   },
   "homepage": "http://www.phylocanvas.net",
   "scripts": {
-    "build": "webpack",
-    "dev-server": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --port 8000",
-    "test-server": "webpack-dev-server --config webpack-test-server.config.js --port 8001"
+    "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline",
+    "test": "webpack-dev-server --config webpack-test-server.config.js --port 8081",
+    "build": "webpack"
   },
   "dependencies": {},
   "devDependencies": {
@@ -35,10 +35,12 @@
     "babel-runtime": "^5.6.4",
     "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5",
     "chai": "^2.3.0",
-    "eslint": "^0.24.0",
+    "core-js": "^1.0.1",
+    "eslint": "^0.24.1",
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",
+    "phylocanvas-utils": "phylocanvas/phylocanvas-utils",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
   }

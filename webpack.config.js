@@ -44,7 +44,15 @@ function config(options) {
   };
 }
 
+var polyfillConfig = {
+  entry: './src/polyfill',
+  output: {
+    filename: 'polyfill.js'
+  }
+};
+
 module.exports = [
   config({ minify: false }),
-  config({ minify: true })
+  config({ minify: true }),
+  polyfillConfig
 ];

@@ -1,9 +1,16 @@
-import { Angles } from './utils/constants';
-import { setupDownloadLink, createBlobUrl } from './utils/dom';
+import { constants, dom } from 'phylocanvas-utils';
 
 import nodeRenderers from './nodeRenderers';
 
-import { Shapes } from './utils/constants';
+const { Angles, Shapes } = constants;
+const { createBlobUrl } = dom;
+
+const bounds = {
+  minx: 0,
+  maxx: 0,
+  miny: 0,
+  maxy: 0
+};
 
 /**
  * Creates a branch
@@ -42,8 +49,8 @@ export default class Branch {
     /**
      * The center of the end of the node on the y axis
      */
-
     this.centery = 0;
+
     /**
      * the branches that stem from this branch
      */
@@ -64,6 +71,16 @@ export default class Branch {
      * an object to hold custom data for this node
      */
     this.data = {};
+
+    /**
+     * This node's highlight status
+     */
+    this.highlighted = false;
+
+    /**
+     * Whether the user is hovering over the node
+     */
+    this.hovered = false;
 
     /**
      * This node's unique ID
@@ -145,6 +162,25 @@ export default class Branch {
      * @type Tree
      */
     this.tree = {};
+
+    /**
+     * If true, the leaf and label are not rendered.
+     */
+    this.pruned = false;
+
+    /**
+     * Allows label to be individually styled
+     */
+    this.labelStyle = {};
+
+    /**
+     * If false, branch does not respond to mouse events
+     */
+    this.interactive = true;
+  }
+
+  get isHighlighted() {
+    return this.highlighted || this.hovered;
   }
 
   clicked(x, y) {
@@ -167,120 +203,22 @@ export default class Branch {
     }
   }
 
-  drawMetadata() {
-    var padMaxLabelWidth = 0;
-    if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
-      padMaxLabelWidth = this.tree.maxLabelLength[this.tree.treeType];
-    }
-    var tx = this.getLabelStartX() + padMaxLabelWidth;
-    var ty = 0;
-    var metadata = [];
-    var height = this.tree.textSize;
-    var width = this.tree.metadataXStep / 2;
-    var i;
-    var columnName;
-
-    if (this.tree.alignLabels) {
-      if (this.tree.treeType === 'rectangular') {
-        tx += (this.tree.farthestNodeFromRootX - this.centerx);
-      } else if (this.tree.treeType === 'hierarchical') {
-        tx += (this.tree.farthestNodeFromRootY - this.centery);
-      }
-    }
-
-    if (!this.tree.metadataHeadingDrawn && this.tree.alignLabels &&
-      this.tree.treeType !== 'circular' && this.tree.treeType !== 'radial') {
-      this.drawMetadataHeading(tx, ty);
-      this.tree.metadataHeadingDrawn = true;
-    }
-
-    var metadataXStep = this.tree.metadataXStep;
-
-    if (Object.keys(this.data).length > 0) {
-      this.canvas.beginPath();
-
-      // If no columns specified, then draw all columns
-      if (this.tree.selectedMetadataColumns.length > 0) {
-        metadata = this.tree.selectedMetadataColumns;
-      } else {
-        metadata = Object.keys(this.data);
-      }
-
-      ty = ty - (height / 2);
-
-      for (i = 0; i < metadata.length; i++) {
-        columnName = metadata[i];
-        tx += metadataXStep;
-
-        if (window.parseInt(this.data[columnName])) {
-          this.canvas.fillStyle = this.tree.colour1;
-          this.canvas.fillRect(tx, ty, width, height);
-        } else if (window.parseInt(this.data[columnName]) === 0) {
-          this.canvas.fillStyle = this.tree.colour0;
-          this.canvas.fillRect(tx, ty, width, height);
-        }
-      }
-      this.canvas.stroke();
-      this.canvas.closePath();
-    }
-  }
-
-  drawMetadataHeading(tx, ty) {
-    var metadata;
-    var columnName;
-    var i;
-
-    if (this.tree.selectedMetadataColumns.length > 0) {
-      metadata = this.tree.selectedMetadataColumns;
-    } else {
-      metadata = Object.keys(this.data);
-    }
-
-    // Drawing Column headings
-    this.canvas.font = '12px Sans-serif';
-    this.canvas.fillStyle = 'black';
-
-    for (i = 0; i < metadata.length; i++) {
-      columnName = metadata[i];
-      tx += this.tree.metadataXStep;
-      // Rotate canvas to write column headings
-      this.canvas.rotate(-Math.PI / 2);
-      if (this.tree.treeType === 'rectangular') {
-        this.canvas.textAlign = 'left';
-        // x and y axes changed because of rotate
-        // Adding + 6 to adjust the position
-        this.canvas.fillText(columnName, 20, tx + 6);
-      } else if (this.tree.treeType === 'hierarchical') {
-        this.canvas.textAlign = 'right';
-        this.canvas.fillText(columnName, -20, tx + 8);
-      } else if (this.tree.treeType === 'diagonal') {
-        this.canvas.textAlign = 'left';
-        this.canvas.fillText(columnName, 20, tx + 6);
-      }
-      // Rotate canvas back to normal position
-      this.canvas.rotate(Math.PI / 2);
-    }
-  }
-
   drawLabel() {
-    var fSize = this.tree.textSize;
-    var lbl = this.getLabel();
-    var dimensions;
-    var tx;
-    var ty;
+    var fSize = this.getTextSize();
+    var label = this.getLabel();
 
-    this.canvas.font = fSize + 'pt ' + this.tree.font;
-    dimensions = this.canvas.measureText(lbl);
+    this.canvas.font = this.getFontString();
+    this.labelWidth = this.canvas.measureText(label).width;
+
     // finding the maximum label length
     if (this.tree.maxLabelLength[this.tree.treeType] === undefined) {
       this.tree.maxLabelLength[this.tree.treeType] = 0;
     }
-    if (dimensions.width > this.tree.maxLabelLength[this.tree.treeType]) {
-      this.tree.maxLabelLength[this.tree.treeType] = dimensions.width;
+    if (this.labelWidth > this.tree.maxLabelLength[this.tree.treeType]) {
+      this.tree.maxLabelLength[this.tree.treeType] = this.labelWidth;
     }
 
-    tx = this.getLabelStartX();
-    ty = fSize / 2;
+    let tx = this.getLabelStartX();
 
     if (this.tree.alignLabels) {
       tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
@@ -290,15 +228,15 @@ export default class Branch {
         this.angle < (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
       // Angles.Half text position changes
-      tx = -tx - (dimensions.width * 1);
+      tx = -tx - (this.labelWidth * 1);
     }
 
     this.canvas.beginPath();
     this.canvas.fillStyle = this.getTextColour();
-    this.canvas.fillText(lbl, tx, ty);
+    this.canvas.fillText(label, tx, (fSize / 2) );
     this.canvas.closePath();
-    // Make canvas rotate back to actual position so that
-    // metadata drawn after that will not be affected
+
+    // Rotate canvas back to original position
     if (this.angle > Angles.QUARTER &&
         this.angle < (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
@@ -316,6 +254,69 @@ export default class Branch {
     this.maxx = centerX + boundedRadius;
     this.miny = centerY - boundedRadius;
     this.maxy = centerY + boundedRadius;
+  }
+
+  drawCollapsed(centerX, centerY) {
+    var childIds = this.getChildIds();
+    var radius = childIds.length;
+
+    if (this.tree.scaleCollapsedNode) {
+      radius = this.tree.scaleCollapsedNode(radius);
+    }
+
+    this.canvas.globalAlpha = 0.3;
+
+    this.canvas.beginPath();
+
+    this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
+                      this.tree.defaultCollapsedOptions.color : 'purple';
+    this.canvas.fill();
+    this.canvas.globalAlpha = 1;
+
+    this.canvas.closePath();
+  }
+
+  drawLabelConnector(centerX, centerY) {
+    const originalLineWidth = this.canvas.lineWidth;
+    const labelAlign = this.tree.labelAlign;
+
+    this.canvas.lineWidth = this.canvas.lineWidth / 4;
+    this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
+
+    this.canvas.beginPath();
+    this.canvas.moveTo(centerX, centerY);
+    this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+    this.canvas.stroke();
+    this.canvas.closePath();
+
+    this.canvas.strokeStyle = this.getColour();
+    this.canvas.lineWidth = originalLineWidth;
+    this.canvas.moveTo(centerX, centerY);
+  }
+
+  drawLeaf() {
+    nodeRenderers[this.nodeShape](this);
+
+    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
+      this.drawLabel();
+    }
+  }
+
+  drawHighlight(centerX, centerY) {
+    this.canvas.beginPath();
+    const l = this.canvas.lineWidth;
+
+    this.canvas.strokeStyle = this.tree.highlightColour;
+    this.canvas.lineWidth = this.getHighlightLineWidth();
+    const radius = this.getHighlightRadius();
+    this.canvas.arc(centerX, centerY, radius, 0, Angles.FULL, false);
+
+    this.canvas.stroke();
+
+    this.canvas.lineWidth = l;
+    this.canvas.strokeStyle = this.tree.branchColour;
+    this.canvas.closePath();
   }
 
   drawNode() {
@@ -337,81 +338,24 @@ export default class Branch {
 
     this.setNodeDimensions(centerX, centerY, nodeRadius);
 
-    // If branch collapsed
     if (this.collapsed) {
-      var childIds = this.getChildIds();
-      var radius = childIds.length;
-
-      if (this.tree.scaleCollapsedNode) {
-        radius = this.tree.scaleCollapsedNode(radius);
-      }
-
-      this.canvas.globalAlpha = 0.3;
-
-      this.canvas.beginPath();
-
-      this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-      this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
-                        this.tree.defaultCollapsedOptions.color : 'purple';
-      this.canvas.fill();
-      this.canvas.globalAlpha = 1;
-
-      this.canvas.closePath();
-    }
-    else if (this.leaf) {
-      let originalLineWidth = this.canvas.lineWidth;
-
-      // Drawing line connectors to nodes and align all the nodes vertically
+      this.drawCollapsed(centerX, centerY);
+    } else if (this.leaf) {
       if (this.tree.alignLabels) {
-        let labelAlign = this.tree.labelAlign;
-        this.canvas.lineWidth = this.canvas.lineWidth / 4;
-        this.canvas.strokeStyle = this.highlighted ? this.tree.highlightColour : this.getColour();
-
-        this.canvas.beginPath();
-        this.canvas.moveTo(centerX, centerY);
-        this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
-        this.canvas.stroke();
-        this.canvas.closePath();
-
-        this.canvas.strokeStyle = this.getColour();
-        this.canvas.moveTo(centerX, centerY);
+        this.drawLabelConnector(centerX, centerY);
       }
-      // Save canvas
+
       this.canvas.save();
-      // Move to node center position
-      // (setting canvas (0,0) position as (this.centerx, this.centery))
       this.canvas.translate(this.centerx, this.centery);
-      // rotate canvas (mainly for circular, radial trees etc)
       this.canvas.rotate(this.angle);
 
-      // Draw node shape as chosen - default is circle
-      nodeRenderers[this.nodeShape](this);
+      this.drawLeaf();
 
-      if (this.tree.showLabels || (this.tree.hoverLabel && this.highlighted)) {
-        this.drawLabel();
-      }
-
-      if (this.tree.showMetadata) {
-        this.drawMetadata();
-      }
-      // Restore the canvas position to original
       this.canvas.restore();
-
-      // Swapping back the line width if it was changed due to alignLabels
-      this.canvas.lineWidth = originalLineWidth;
     }
 
-    if (this.highlighted) {
-      this.canvas.beginPath();
-      var l = this.canvas.lineWidth;
-      this.canvas.strokeStyle = this.tree.highlightColour;
-      this.canvas.lineWidth = this.tree.highlightWidth / this.tree.zoom;
-      this.canvas.arc(centerX, centerY, (this.leaf ? this.getNodeSize() : 0) +
-        ((5 + (this.tree.highlightWidth / 2)) / this.tree.zoom), 0, Angles.FULL, false);
-      this.canvas.stroke();
-      this.canvas.lineWidth = l;
-      this.canvas.strokeStyle = this.tree.branchColour;
-      this.canvas.closePath();
+    if (this.isHighlighted) {
+      this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
     }
   }
 
@@ -456,27 +400,13 @@ export default class Branch {
     return y;
   }
 
-  setSelected(selected, applyToChildren) {
-    var ids = this.id;
-    var i = 0;
-
-    this.selected = selected;
-    if (applyToChildren) {
-      for (i = 0; i < this.children.length; i++) {
-        ids = ids + ',' + this.children[i].setSelected(selected, applyToChildren);
-      }
+  cascadeFlag(property, value) {
+    if (typeof this[property] === 'undefined') {
+      throw new Error(`Unknown property: ${property}`);
     }
-    return ids;
-  }
-
-  setHighlighted(highlighted) {
-    var i;
-
-    this.highlighted = highlighted;
-    if (!highlighted) {
-      for (i = 0; i < this.children.length; i++) {
-        this.children[i].setHighlighted(highlighted);
-      }
+    this[property] = value;
+    for (let child of this.children) {
+      child.cascadeFlag(property, value);
     }
   }
 
@@ -627,32 +557,22 @@ export default class Branch {
   }
 
   getTextColour() {
-    var textColour;
-    var childColours;
-
     if (this.selected) {
       return this.tree.selectedColour;
     }
 
-    if (this.highlighted) {
-      textColour = this.tree.highlightColour;
-    } else if (this.tree.backColour) {
-      if (this.children.length) {
-        childColours = this.getChildColours();
-
-        if (childColours.length === 1) {
-          textColour = childColours[0];
-        } else {
-          textColour = this.tree.branchColour;
-        }
-      } else {
-        textColour = this.colour;
-      }
-    } else {
-      textColour = this.tree.branchColour;
+    if (this.isHighlighted) {
+      return this.tree.highlightColour;
     }
 
-    return textColour;
+    if (this.tree.backColour && this.children.length) {
+      const childColours = this.getChildColours();
+      if (childColours.length === 1) {
+        return childColours[0];
+      }
+    }
+
+    return this.labelStyle.colour || this.colour || this.tree.branchColour;
   }
 
   getLabel() {
@@ -661,22 +581,63 @@ export default class Branch {
     );
   }
 
+  getTextSize() {
+    return this.labelStyle.textSize || this.tree.textSize;
+  }
+
+  getFontString() {
+    const font = this.labelStyle.font || this.tree.font;
+    return `${this.labelStyle.format || ''} ${this.getTextSize()}pt ${font}`;
+  }
+
   getLabelSize() {
-    return this.tree.canvas.measureText(this.getLabel()).width;
+    this.canvas.font = this.getFontString();
+    return this.canvas.measureText(this.getLabel()).width;
   }
 
   getNodeSize() {
-    return Math.max(0, this.tree.baseNodeSize * this.radius);
+    return this.leaf ?
+      this.tree.baseNodeSize * this.radius :
+      this.tree.baseNodeSize / this.radius;
+  }
+
+  hasLabelConnector() {
+    if (!this.tree.alignLabels) {
+      return false;
+    }
+
+    return (this.tree.labelAlign.getLabelOffset(this) >= 1);
   }
 
   /**
    * Calculates label start position
-   * Diameter of the node + actual node size + extra width(baseNodeSize)
+   * offset + aesthetic padding
    * @method getNodeSize
    * @return CallExpression
    */
   getLabelStartX() {
-    return (this.getNodeSize() + this.tree.baseNodeSize + (this.radius * 2));
+    let offset;
+
+    if (this.isHighlighted && !this.hasLabelConnector()) {
+      offset = this.getNodeSize() + this.getHighlightSize();
+    } else {
+      offset = (this.getNodeSize() * 2);
+    }
+
+    return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
+  }
+
+  getHighlightLineWidth() {
+    return this.tree.highlightWidth / this.tree.zoom;
+  }
+
+  getHighlightRadius() {
+    const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+    return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
+  }
+
+  getHighlightSize() {
+    return this.getHighlightRadius() + this.getHighlightLineWidth();
   }
 
   rotate(evt) {
@@ -701,7 +662,13 @@ export default class Branch {
 
   downloadLeafIdsFromBranch() {
     var downloadData = this.getChildIds().join('\n');
-    setupDownloadLink(createBlobUrl(downloadData), 'pc_leaves.txt');
+    var filename = 'pc_leaf_ids';
+    if (!this.parent) {
+      filename += '_all.txt';
+    } else {
+      filename += '_' + this.id + '.txt';
+    }
+    return createBlobUrl(downloadData);
   }
 
   setDisplay({ colour, shape, size }) {
@@ -714,6 +681,48 @@ export default class Branch {
     if (size) {
       this.radius = size;
     }
+  }
+
+  getTotalLength() {
+    let length = this.getNodeSize();
+
+    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
+      length += this.getLabelStartX() + this.getLabelSize();
+    }
+
+    return length;
+  }
+
+  getBounds() {
+    const { tree } = this;
+    const x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
+    const y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
+    const nodeSize = this.getNodeSize();
+    const totalLength = this.getTotalLength();
+
+    let minx;
+    let maxx;
+    let miny;
+    let maxy;
+    if (this.angle > Angles.QUARTER &&
+        this.angle < (Angles.HALF + Angles.QUARTER)) {
+      minx = x + (totalLength * Math.cos(this.angle));
+      miny = y + (totalLength * Math.sin(this.angle));
+      maxx = x - nodeSize;
+      maxy = y - nodeSize;
+    } else {
+      minx = x - nodeSize;
+      miny = y - nodeSize;
+      maxx = x + (totalLength * Math.cos(this.angle));
+      maxy = y + (totalLength * Math.sin(this.angle));
+    }
+
+    bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
+    bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
+    bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
+    bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+
+    return bounds;
   }
 
 }
