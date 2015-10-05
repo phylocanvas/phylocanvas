@@ -570,7 +570,7 @@ export default class Tree {
     this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
     e.preventDefault();
     this._zooming = true;
-    setTimeout(() => { this._zooming = false; }, 40);
+    setTimeout(() => { this._zooming = false; }, 128);
   }
 
   selectNodes(nIds) {
