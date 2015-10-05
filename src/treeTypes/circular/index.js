@@ -6,10 +6,10 @@ import prerendererOptions from './prerenderer';
 
 const labelAlign = {
   getX(node) {
-    return node.centerx + node.labelOffsetX + (node.getNodeSize() * 2 * Math.cos(node.angle));
+    return node.centerx + node.labelOffsetX + (node.getDiameter() * Math.cos(node.angle));
   },
   getY(node) {
-    return node.centery + node.labelOffsetY + (node.getNodeSize() * 2 * Math.sin(node.angle));
+    return node.centery + node.labelOffsetY + (node.getDiameter() * Math.sin(node.angle));
   },
   getLabelOffset(node) {
     return (node.labelOffsetX) / Math.cos(node.angle);

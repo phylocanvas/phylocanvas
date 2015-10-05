@@ -9,7 +9,7 @@ const labelAlign = {
     return node.centerx;
   },
   getY(node) {
-    return node.tree.farthestNodeFromRootY + node.getNodeSize();
+    return node.tree.farthestNodeFromRootY;
   },
   getLabelOffset(node) {
     return (node.tree.farthestNodeFromRootY - node.centery);
