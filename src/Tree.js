@@ -565,9 +565,12 @@ export default class Tree {
   }
 
   scroll(e) {
-    var z = Math.log(this.zoom) / Math.log(10);
+    if (this._zooming) return;
+    const z = Math.log(this.zoom) / Math.log(10);
     this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
     e.preventDefault();
+    this._zooming = true;
+    setTimeout(() => { this._zooming = false; }, 128);
   }
 
   selectNodes(nIds) {
