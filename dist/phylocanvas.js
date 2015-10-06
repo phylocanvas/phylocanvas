@@ -138,20 +138,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-<<<<<<< HEAD
-	exports.preventDefault = preventDefault;
-	exports.fireEvent = fireEvent;
-	exports.addEvent = addEvent;
-	exports.killEvent = killEvent;
-	exports.createHandler = createHandler;
-	exports.debounce = debounce;
-
-	function preventDefault(event) {
-	  event.preventDefault();
-	  return false;
-	}
-=======
->>>>>>> release/2.0.0
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -192,29 +178,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports["default"] = Parser;
 	module.exports = exports["default"];
-
-	/**
-	 * Returns a function, that, as long as it continues to be invoked, will not
-	 * be triggered. The function will be called after it stops being called for
-	 * N milliseconds. If `immediate` is passed, trigger the function on the
-	 * leading edge, instead of the trailing.
-	 */
-
-	function debounce(func, wait, immediate) {
-	  var timeout;
-	  return function () {
-	    var _this = this;
-	    var args = arguments;
-	    var later = function later() {
-	      timeout = null;
-	      if (!immediate) func.apply(_this, args);
-	    };
-	    var callNow = immediate && !timeout;
-	    clearTimeout(timeout);
-	    timeout = setTimeout(later, wait);
-	    if (callNow) func.apply(_this, args);
-	  };
-	}
 
 /***/ },
 /* 2 */
@@ -423,17 +386,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addListener('mouseup', this.drop.bind(this));
 	    this.addListener('mouseout', this.drop.bind(this));
 
-<<<<<<< HEAD
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'mousewheel', (0, _utilsEvents.debounce)(this.scroll.bind(this), 50, true));
-	    (0, _utilsEvents.addEvent)(this.canvas.canvas, 'DOMMouseScroll', (0, _utilsEvents.debounce)(this.scroll.bind(this), 50, true));
-	    (0, _utilsEvents.addEvent)(window, 'resize', (function () {
-=======
 	    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
 	    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
 	    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
 	    addEvent(window, 'resize', (function () {
->>>>>>> release/2.0.0
 	      this.resizeToContainer();
 	      this.draw();
 	    }).bind(this));
