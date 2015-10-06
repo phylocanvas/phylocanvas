@@ -908,9 +908,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'scroll',
 	    value: function scroll(e) {
+	      var _this3 = this;
+
+	      if (this._zooming) return;
 	      var z = Math.log(this.zoom) / Math.log(10);
 	      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
 	      e.preventDefault();
+	      this._zooming = true;
+	      setTimeout(function () {
+	        _this3._zooming = false;
+	      }, 128);
 	    }
 	  }, {
 	    key: 'selectNodes',
@@ -949,7 +956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setNodeDisplay',
 	    value: function setNodeDisplay(ids, options, waiting) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      if (!ids) return;
 
@@ -994,7 +1001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else if (!waiting) {
 	        (function () {
-	          var _this = _this3;
+	          var _this = _this4;
 	          var timeout = setInterval(function () {
 	            if (this.drawn) {
 	              _this.setNodeColourAndShape(ids, options, true);
@@ -1562,7 +1569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'drawLabelConnector',
-	    value: function drawLabelConnector(centerX, centerY) {
+	    value: function drawLabelConnector() {
 	      var originalLineWidth = this.canvas.lineWidth;
 	      var labelAlign = this.tree.labelAlign;
 
@@ -1570,18 +1577,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
 
 	      this.canvas.beginPath();
-	      this.canvas.moveTo(centerX, centerY);
-	      this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+	      this.canvas.moveTo(this.getRadius(), 0);
+	      this.canvas.lineTo(labelAlign.getLabelOffset(this) + this.getDiameter(), 0);
 	      this.canvas.stroke();
 	      this.canvas.closePath();
 
 	      this.canvas.strokeStyle = this.getColour();
 	      this.canvas.lineWidth = originalLineWidth;
-	      this.canvas.moveTo(centerX, centerY);
 	    }
 	  }, {
 	    key: 'drawLeaf',
 	    value: function drawLeaf() {
+	      if (this.tree.alignLabels) {
+	        this.drawLabelConnector();
+	      }
+
 	      _nodeRenderers2['default'][this.nodeShape](this);
 
 	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
@@ -1608,7 +1618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawNode',
 	    value: function drawNode() {
-	      var nodeRadius = this.getNodeSize();
+	      var nodeRadius = this.getRadius();
 	      /**
 	       * theta = translation to center of node... ensures that the node edge is
 	       * at the end of the branch so the branches don't look shorter than  they
@@ -1626,10 +1636,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.collapsed) {
 	        this.drawCollapsed(centerX, centerY);
 	      } else if (this.leaf) {
-	        if (this.tree.alignLabels) {
-	          this.drawLabelConnector(centerX, centerY);
-	        }
-
 	        this.canvas.save();
 	        this.canvas.translate(this.centerx, this.centery);
 	        this.canvas.rotate(this.angle);
@@ -1944,9 +1950,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.canvas.measureText(this.getLabel()).width;
 	    }
 	  }, {
-	    key: 'getNodeSize',
-	    value: function getNodeSize() {
+	    key: 'getRadius',
+	    value: function getRadius() {
 	      return this.leaf ? this.tree.baseNodeSize * this.radius : this.tree.baseNodeSize / this.radius;
+	    }
+	  }, {
+	    key: 'getDiameter',
+	    value: function getDiameter() {
+	      return this.getRadius() * 2;
 	    }
 	  }, {
 	    key: 'hasLabelConnector',
@@ -1954,8 +1965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.tree.alignLabels) {
 	        return false;
 	      }
-
-	      return this.tree.labelAlign.getLabelOffset(this) >= 1;
+	      return this.tree.labelAlign.getLabelOffset(this) > this.getDiameter();
 	    }
 	  }, {
 	    key: 'getLabelStartX',
@@ -1967,12 +1977,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return CallExpression
 	     */
 	    value: function getLabelStartX() {
-	      var offset = undefined;
+	      var offset = this.getDiameter();
 
 	      if (this.isHighlighted && !this.hasLabelConnector()) {
-	        offset = this.getNodeSize() + this.getHighlightSize();
-	      } else {
-	        offset = this.getNodeSize() * 2;
+	        offset += this.getHighlightSize() - this.getRadius();
 	      }
 
 	      return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
@@ -1986,7 +1994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getHighlightRadius',
 	    value: function getHighlightRadius() {
 	      var offset = this.getHighlightLineWidth() * this.tree.highlightSize;
-	      return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
+	      return this.leaf ? this.getRadius() + offset : offset * 0.666;
 	    }
 	  }, {
 	    key: 'getHighlightSize',
@@ -2047,7 +2055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getTotalLength',
 	    value: function getTotalLength() {
-	      var length = this.getNodeSize();
+	      var length = this.getRadius();
 
 	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
 	        length += this.getLabelStartX() + this.getLabelSize();
@@ -2062,7 +2070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
 	      var y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
-	      var nodeSize = this.getNodeSize();
+	      var nodeSize = this.getRadius();
 	      var totalLength = this.getTotalLength();
 
 	      var minx = undefined;
@@ -2117,7 +2125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['default'] = {
 
 	  circle: function circle(node) {
-	    var r = node.getNodeSize();
+	    var r = node.getRadius();
 	    node.canvas.beginPath();
 	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
 	    node.canvas.stroke();
@@ -2126,7 +2134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  square: function square(node) {
-	    var r = node.getNodeSize();
+	    var r = node.getRadius();
 	    var x1 = 0;
 	    var x2 = r * 2;
 	    var y1 = -r;
@@ -2143,7 +2151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  star: function star(node) {
-	    var r = node.getNodeSize();
+	    var r = node.getRadius();
 	    var cx = r;
 	    var cy = 0;
 	    var spikes = 8;
@@ -2174,7 +2182,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  triangle: function triangle(node) {
-	    var r = node.getNodeSize();
+	    var r = node.getRadius();
 	    var lengthOfSide = 2 * r * Math.cos(30 * Math.PI / 180);
 
 	    node.canvas.beginPath();
@@ -2673,7 +2681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var labelAlign = {
 	  getX: function getX(node) {
-	    return node.tree.farthestNodeFromRootX + node.getNodeSize();
+	    return node.tree.farthestNodeFromRootX;
 	  },
 	  getY: function getY(node) {
 	    return node.centery;
@@ -2828,7 +2836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports["default"] = {
 	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
 	  calculate: function calculate(tree, ystep) {
 	    // Calculate branchScalar based on canvas width and total branch length
@@ -2893,10 +2901,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var labelAlign = {
 	  getX: function getX(node) {
-	    return node.centerx + node.labelOffsetX + node.getNodeSize() * 2 * Math.cos(node.angle);
+	    return node.centerx + node.labelOffsetX + node.getDiameter() * Math.cos(node.angle);
 	  },
 	  getY: function getY(node) {
-	    return node.centery + node.labelOffsetY + node.getNodeSize() * 2 * Math.sin(node.angle);
+	    return node.centery + node.labelOffsetY + node.getDiameter() * Math.sin(node.angle);
 	  },
 	  getLabelOffset: function getLabelOffset(node) {
 	    return node.labelOffsetX / Math.cos(node.angle);
@@ -2967,7 +2975,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  calculate: function calculate(tree, step) {
 	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
 	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = tree.leaves.length * tree.leaves[0].getNodeSize() * 2 / Angles.FULL;
+	    var r = tree.leaves.length * tree.leaves[0].getDiameter() / Angles.FULL;
 	    if (tree.branchScalar * tree.maxBranchLength > r) {
 	      r = tree.branchScalar * tree.maxBranchLength;
 	    } else {
@@ -3158,7 +3166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
 	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
 	  calculateFontSize: function calculateFontSize(ystep) {
-	    return Math.min(ystep / 2, 7.5);
+	    return Math.min(ystep / 2, 10);
 	  }
 	};
 	module.exports = exports['default'];
@@ -3205,7 +3213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.height / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
 	  calculate: function calculate(tree, ystep) {
 	    for (var i = 0; i < tree.leaves.length; i++) {
@@ -3263,7 +3271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return node.centerx;
 	  },
 	  getY: function getY(node) {
-	    return node.tree.farthestNodeFromRootY + node.getNodeSize();
+	    return node.tree.farthestNodeFromRootY;
 	  },
 	  getLabelOffset: function getLabelOffset(node) {
 	    return node.tree.farthestNodeFromRootY - node.centery;
@@ -3318,7 +3326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
 	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.width / (tree.leaves.length + 2), (tree.leaves[0].getNodeSize() + 2) * 2);
+	    return Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
 	  calculate: function calculate(tree, xstep) {
 	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
