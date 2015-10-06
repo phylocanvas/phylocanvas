@@ -277,7 +277,7 @@ export default class Branch {
     this.canvas.closePath();
   }
 
-  drawLabelConnector(centerX, centerY) {
+  drawLabelConnector() {
     const originalLineWidth = this.canvas.lineWidth;
     const labelAlign = this.tree.labelAlign;
 
@@ -285,17 +285,20 @@ export default class Branch {
     this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
 
     this.canvas.beginPath();
-    this.canvas.moveTo(centerX, centerY);
-    this.canvas.lineTo(labelAlign.getX(this), labelAlign.getY(this));
+    this.canvas.moveTo(this.getRadius(), 0);
+    this.canvas.lineTo(labelAlign.getLabelOffset(this) + this.getDiameter(), 0);
     this.canvas.stroke();
     this.canvas.closePath();
 
     this.canvas.strokeStyle = this.getColour();
     this.canvas.lineWidth = originalLineWidth;
-    this.canvas.moveTo(centerX, centerY);
   }
 
   drawLeaf() {
+    if (this.tree.alignLabels) {
+      this.drawLabelConnector();
+    }
+
     nodeRenderers[this.nodeShape](this);
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
@@ -320,7 +323,7 @@ export default class Branch {
   }
 
   drawNode() {
-    var nodeRadius = this.getNodeSize();
+    var nodeRadius = this.getRadius();
     /**
      * theta = translation to center of node... ensures that the node edge is
      * at the end of the branch so the branches don't look shorter than  they
@@ -341,10 +344,6 @@ export default class Branch {
     if (this.collapsed) {
       this.drawCollapsed(centerX, centerY);
     } else if (this.leaf) {
-      if (this.tree.alignLabels) {
-        this.drawLabelConnector(centerX, centerY);
-      }
-
       this.canvas.save();
       this.canvas.translate(this.centerx, this.centery);
       this.canvas.rotate(this.angle);
@@ -595,18 +594,21 @@ export default class Branch {
     return this.canvas.measureText(this.getLabel()).width;
   }
 
-  getNodeSize() {
+  getRadius() {
     return this.leaf ?
       this.tree.baseNodeSize * this.radius :
       this.tree.baseNodeSize / this.radius;
+  }
+
+  getDiameter() {
+    return this.getRadius() * 2;
   }
 
   hasLabelConnector() {
     if (!this.tree.alignLabels) {
       return false;
     }
-
-    return (this.tree.labelAlign.getLabelOffset(this) >= 1);
+    return (this.tree.labelAlign.getLabelOffset(this) > this.getDiameter());
   }
 
   /**
@@ -616,12 +618,10 @@ export default class Branch {
    * @return CallExpression
    */
   getLabelStartX() {
-    let offset;
+    let offset = this.getDiameter();
 
     if (this.isHighlighted && !this.hasLabelConnector()) {
-      offset = this.getNodeSize() + this.getHighlightSize();
-    } else {
-      offset = (this.getNodeSize() * 2);
+      offset += this.getHighlightSize() - this.getRadius();
     }
 
     return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
@@ -633,7 +633,7 @@ export default class Branch {
 
   getHighlightRadius() {
     const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
-    return this.leaf ? this.getNodeSize() + offset : offset * 0.666;
+    return this.leaf ? this.getRadius() + offset : offset * 0.666;
   }
 
   getHighlightSize() {
@@ -684,7 +684,7 @@ export default class Branch {
   }
 
   getTotalLength() {
-    let length = this.getNodeSize();
+    let length = this.getRadius();
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
       length += this.getLabelStartX() + this.getLabelSize();
@@ -697,7 +697,7 @@ export default class Branch {
     const { tree } = this;
     const x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
     const y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
-    const nodeSize = this.getNodeSize();
+    const nodeSize = this.getRadius();
     const totalLength = this.getTotalLength();
 
     let minx;

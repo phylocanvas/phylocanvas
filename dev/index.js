@@ -35,11 +35,10 @@ tree.on('loaded', function () {
   console.log('loaded');
 });
 
-tree.showLabels = true;
 tree.hoverLabel = true;
 tree.alignLabels = true;
 tree.padding = 0;
-tree.setTreeType('diagonal');
+tree.setTreeType('rectangular');
 
 // ./data/tree.nwk
 // (A:0.1,B:0.1,(C:0.1,D:0.1):0.1);

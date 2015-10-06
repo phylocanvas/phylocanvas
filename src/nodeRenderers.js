@@ -5,7 +5,7 @@ const { Angles } = constants;
 export default {
 
   circle(node) {
-    var r = node.getNodeSize();
+    var r = node.getRadius();
     node.canvas.beginPath();
     node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
     node.canvas.stroke();
@@ -14,7 +14,7 @@ export default {
   },
 
   square(node) {
-    var r = node.getNodeSize();
+    var r = node.getRadius();
     var x1 = 0;
     var x2 = r * 2;
     var y1 = -r;
@@ -31,7 +31,7 @@ export default {
   },
 
   star(node) {
-    var r = node.getNodeSize();
+    var r = node.getRadius();
     var cx = r;
     var cy = 0;
     var spikes = 8;
@@ -62,7 +62,7 @@ export default {
   },
 
   triangle(node) {
-    var r = node.getNodeSize();
+    var r = node.getRadius();
     var lengthOfSide = (2 * r) * Math.cos(30 * Math.PI / 180);
 
     node.canvas.beginPath();

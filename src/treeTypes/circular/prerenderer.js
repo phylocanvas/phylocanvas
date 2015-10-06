@@ -9,7 +9,7 @@ export default {
   calculate(tree, step) {
     tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
     // work out radius of tree and the make branch scalar proportinal to the
-    let r = (tree.leaves.length * tree.leaves[0].getNodeSize() * 2) / Angles.FULL;
+    let r = (tree.leaves.length * tree.leaves[0].getDiameter()) / Angles.FULL;
     if (tree.branchScalar * tree.maxBranchLength > r) {
       r = tree.branchScalar * tree.maxBranchLength;
     } else {

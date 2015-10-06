@@ -6,7 +6,7 @@ import prerendererOptions from './prerenderer';
 
 const labelAlign = {
   getX(node) {
-    return node.tree.farthestNodeFromRootX + node.getNodeSize();
+    return node.tree.farthestNodeFromRootX;
   },
   getY(node) {
     return node.centery;
