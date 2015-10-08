@@ -565,10 +565,10 @@ export default class Tree {
   }
 
   scroll(e) {
+    e.preventDefault();
     if (this._zooming) return;
     const z = Math.log(this.zoom) / Math.log(10);
     this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
-    e.preventDefault();
     this._zooming = true;
     setTimeout(() => { this._zooming = false; }, 128);
   }
