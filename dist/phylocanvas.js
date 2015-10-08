@@ -910,10 +910,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function scroll(e) {
 	      var _this3 = this;
 
+	      e.preventDefault();
 	      if (this._zooming) return;
 	      var z = Math.log(this.zoom) / Math.log(10);
 	      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
-	      e.preventDefault();
 	      this._zooming = true;
 	      setTimeout(function () {
 	        _this3._zooming = false;
