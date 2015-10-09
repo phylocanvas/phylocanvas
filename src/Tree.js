@@ -1,7 +1,7 @@
 import { dom, events, canvas } from 'phylocanvas-utils';
 
 import Branch from './Branch';
-import Tooltip from './Tooltip';
+import { ChildNodesTooltip as Tooltip } from './Tooltip';
 import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
