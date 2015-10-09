@@ -11,13 +11,13 @@
 
 import Tree from './Tree';
 import Branch from './Branch';
-import ContextMenu from './ContextMenu';
+import Tooltip from './Tooltip';
 import Parser from './Parser';
 
 import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 
-export { Tree, Branch, ContextMenu, Parser, treeTypes, nodeRenderers };
+export { Tree, Branch, Tooltip, Parser, treeTypes, nodeRenderers };
 
 function decorate(object, fnName, fn) {
   let target = object[fnName] ? object : object.prototype;
