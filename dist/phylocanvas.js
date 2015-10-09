@@ -77,29 +77,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Tree2 = _interopRequireDefault(_Tree);
 
-	var _Branch = __webpack_require__(4);
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _ContextMenu = __webpack_require__(6);
+	var _Tooltip = __webpack_require__(7);
 
-	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
+	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
 	var _Parser = __webpack_require__(1);
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _treeTypes = __webpack_require__(9);
+	var _treeTypes = __webpack_require__(8);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _nodeRenderers = __webpack_require__(5);
+	var _nodeRenderers = __webpack_require__(6);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
 	exports.Tree = _Tree2['default'];
 	exports.Branch = _Branch2['default'];
-	exports.ContextMenu = _ContextMenu2['default'];
+	exports.Tooltip = _Tooltip2['default'];
 	exports.Parser = _Parser2['default'];
 	exports.treeTypes = _treeTypes2['default'];
 	exports.nodeRenderers = _nodeRenderers2['default'];
@@ -197,29 +197,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
-	var _Branch = __webpack_require__(4);
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
-
-	var _ContextMenu = __webpack_require__(6);
-
-	var _ContextMenu2 = _interopRequireDefault(_ContextMenu);
 
 	var _Tooltip = __webpack_require__(7);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
-	var _Navigator = __webpack_require__(8);
+	var _Navigator = __webpack_require__(3);
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 
-	var _treeTypes = __webpack_require__(9);
+	var _treeTypes = __webpack_require__(8);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _parsers = __webpack_require__(27);
+	var _parsers = __webpack_require__(26);
 
 	var _parsers2 = _interopRequireDefault(_parsers);
 
@@ -304,12 +300,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    canvas.style.zIndex = '1';
 	    this.canvasEl.appendChild(canvas);
 
-	    /***
-	     * Right click menu
-	     * Users could pass options while creating the Tree object
-	     */
-	    this.contextMenu = new _ContextMenu2['default'](this, conf.contextMenu);
-
 	    this.defaultCollapsedOptions = {};
 	    this.defaultCollapsed = false;
 	    if (conf.defaultCollapsed !== undefined) {
@@ -379,7 +369,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.resizeToContainer();
 
-	    this.addListener('contextmenu', this.clicked.bind(this));
 	    this.addListener('click', this.clicked.bind(this));
 
 	    this.addListener('mousedown', this.pickup.bind(this));
@@ -458,7 +447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            nodeIds = node.getChildIds();
 	          }
 	          this.draw();
-	        } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
+	        } else if (this.unselectOnClickAway && !this.dragging) {
 	          this.root.cascadeFlag('selected', false);
 	          this.draw();
 	        }
@@ -468,23 +457,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        this.nodesUpdated(nodeIds, 'selected');
-	      } else if (e.button === 2) {
-	        var _root2;
-
-	        e.preventDefault();
-	        node = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
-	        this.contextMenu.open(e.clientX, e.clientY, node && node.interactive ? node : null);
-	        this.contextMenu.closed = false;
-	        this.tooltip.close();
 	      }
 	    }
 	  }, {
 	    key: 'dblclicked',
 	    value: function dblclicked(e) {
-	      var _root3;
+	      var _root2;
 
 	      if (!this.root) return false;
-	      var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
+	      var nd = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
 	      if (nd) {
 	        nd.cascadeFlag('selected', false);
 	        nd.toggleCollapsed();
@@ -524,23 +505,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.setZoom(this.origZoom + this.d);
 	        this.draw();
 	      } else {
-	        var _root4;
+	        var _root3;
 
 	        // hover
 	        var e = event;
-	        var nd = (_root4 = this.root).clicked.apply(_root4, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
+	        var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
 
 	        if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
 	          this.root.cascadeFlag('hovered', false);
 	          nd.hovered = true;
 	          // For mouseover tooltip to show no. of children on the internal nodes
-	          if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
+	          if (!nd.leaf && !nd.hasCollapsedAncestor()) {
 	            this.tooltip.open(e.clientX, e.clientY, nd);
 	          }
 	          this.canvasEl.style.cursor = 'pointer';
 	        } else {
 	          this.tooltip.close();
-	          this.contextMenu.close();
 	          this.root.cascadeFlag('hovered', false);
 	          this.canvasEl.style.cursor = 'auto';
 	        }
@@ -1269,10 +1249,94 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define(t);else{var n=t();for(var r in n)("object"==typeof exports?exports:e)[r]=n[r]}}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var a=n[r]={exports:{},id:r,loaded:!1};return e[r].call(a.exports,a,a.exports,t),a.loaded=!0,a.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0});var a=n(1),o=r(a),i=n(4),s=r(i),c=n(2),u=r(c),f=n(3),l=r(f);t["default"]={canvas:o,constants:s,dom:u,events:l},e.exports=t["default"]},function(e,t,n){"use strict";function r(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function a(e){return(window.devicePixelRatio||1)/r(e)}function o(e){return e=e-c.getX(this.canvas.canvas)+window.pageXOffset,e*=a(this.canvas),e-=this.canvas.canvas.width/2,e-=this.offsetx,e/=this.zoom}function i(e){return e=e-c.getY(this.canvas.canvas)+window.pageYOffset,e*=a(this.canvas),e-=this.canvas.canvas.height/2,e-=this.offsety,e/=this.zoom}function s(e,t,n){return[o.call(n,e),i.call(n,t)]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=r,t.getPixelRatio=a,t.translateClick=s;var c=n(2)},function(e,t,n){"use strict";function r(e){var t=new Blob([e],{type:"text/csv;charset=utf-8"});return l.createObjectURL(t)}function a(e,t){var n=document.createElement("a"),r="undefined"!=typeof n.download;n.href=e,n.target="_blank",r&&(n.download=t),f.fireEvent(n,"click"),r&&l.revokeObjectURL(n.href)}function o(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function s(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function c(e,t){var n=e.className.split(" "),r=n.indexOf(t);-1!==r&&(n.splice(r,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),r=n.indexOf(t);return-1!==r}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=r,t.setupDownloadLink=a,t.getX=o,t.getY=i,t.addClass=s,t.removeClass=c,t.hasClass=u;var f=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function r(e,t){var n,r,a=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(r in a)a.hasOwnProperty(r)&&(n[r]=a[r]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function a(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function o(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n="string"==typeof t?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=r,t.addEvent=a,t.killEvent=o,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI};t.Angles=n;var r={x:"star",s:"square",o:"circle",t:"triangle"};t.Shapes=r}])});
+	/**
+	 * Overview window
+	 *
+	 * @constructor
+	 * @memberof PhyloCanvas
+	 */
+	'use strict';
+
+	function Navigator(tree) {
+	  this.tree = tree;
+	  this.cel = document.createElement('canvas');
+	  this.cel.id = this.tree.canvasEl.id + 'Navi';
+	  this.cel.style.zIndex = '100';
+	  this.cel.style.backgroundColor = '#FFFFFF';
+	  this.cel.width = this.tree.canvas.canvas.width / 3;
+	  this.cel.height = this.tree.canvas.canvas.height / 3;
+	  this.cel.style.position = 'absolute';
+	  this.cel.style.bottom = '0px';
+	  this.cel.style.right = '0px';
+	  this.cel.style.border = '1px solid #CCCCCC';
+	  this.tree.canvasEl.appendChild(this.cel);
+
+	  this.ctx = this.cel.getContext('2d');
+	  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
+	  this.ctx.save();
+	}
+
+	Navigator.prototype.drawFrame = function () {
+	  var w = this.cel.width;
+	  var h = this.cel.height;
+	  var hw = w / 2;
+	  var hh = h / 2;
+	  var url;
+	  var _this;
+	  var z;
+
+	  this.ctx.restore();
+	  this.ctx.save();
+
+	  this.ctx.clearRect(-hw, -hh, w, h);
+
+	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
+
+	  if (!this.tree.drawn) {
+	    url = this.tree.canvas.canvas.toDataURL();
+
+	    this.img = document.createElement('img');
+	    this.img.src = url;
+
+	    _this = this;
+
+	    this.img.onload = function () {
+	      _this.ctx.drawImage(_this.img, -hw, -hh, _this.cel.width, _this.cel.height);
+	    };
+
+	    this.baseOffsetx = this.tree.offsetx;
+	    this.baseOffsety = this.tree.offsety;
+	    this.baseZoom = this.tree.zoom;
+	  } else {
+	    this.ctx.drawImage(this.img, -hw, -hh, this.cel.width, this.cel.height);
+	  }
+
+	  z = 1 / (this.tree.zoom / this.baseZoom);
+
+	  this.ctx.lineWidth = this.ctx.lineWidth / z;
+
+	  this.ctx.translate((this.baseOffsetx - this.tree.offsetx * z) * z, (this.baseOffsety - this.tree.offsety * z) * z);
+	  this.ctx.scale(z, z);
+	  this.ctx.strokeRect(-hw, -hh, w, h);
+	};
+
+	Navigator.prototype.resize = function () {
+	  this.cel.width = this.tree.canvas.canvas.width / 3;
+	  this.cel.height = this.tree.canvas.canvas.height / 3;
+	  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
+	  this.drawFrame();
+	};
+
+	module.exports = Navigator;
 
 /***/ },
 /* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define(t);else{var n=t();for(var r in n)("object"==typeof exports?exports:e)[r]=n[r]}}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var a=n[r]={exports:{},id:r,loaded:!1};return e[r].call(a.exports,a,a.exports,t),a.loaded=!0,a.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0});var a=n(1),o=r(a),i=n(4),s=r(i),c=n(2),u=r(c),f=n(3),l=r(f);t["default"]={canvas:o,constants:s,dom:u,events:l},e.exports=t["default"]},function(e,t,n){"use strict";function r(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function a(e){return(window.devicePixelRatio||1)/r(e)}function o(e){return e=e-c.getX(this.canvas.canvas)+window.pageXOffset,e*=a(this.canvas),e-=this.canvas.canvas.width/2,e-=this.offsetx,e/=this.zoom}function i(e){return e=e-c.getY(this.canvas.canvas)+window.pageYOffset,e*=a(this.canvas),e-=this.canvas.canvas.height/2,e-=this.offsety,e/=this.zoom}function s(e,t,n){return[o.call(n,e),i.call(n,t)]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=r,t.getPixelRatio=a,t.translateClick=s;var c=n(2)},function(e,t,n){"use strict";function r(e){var t=new Blob([e],{type:"text/csv;charset=utf-8"});return l.createObjectURL(t)}function a(e,t){var n=document.createElement("a"),r="undefined"!=typeof n.download;n.href=e,n.target="_blank",r&&(n.download=t),f.fireEvent(n,"click"),r&&l.revokeObjectURL(n.href)}function o(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function s(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function c(e,t){var n=e.className.split(" "),r=n.indexOf(t);-1!==r&&(n.splice(r,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),r=n.indexOf(t);return-1!==r}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=r,t.setupDownloadLink=a,t.getX=o,t.getY=i,t.addClass=s,t.removeClass=c,t.hasClass=u;var f=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function r(e,t){var n,r,a=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(r in a)a.hasOwnProperty(r)&&(n[r]=a[r]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function a(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function o(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n="string"==typeof t?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=r,t.addEvent=a,t.killEvent=o,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI};t.Angles=n;var r={x:"star",s:"square",o:"circle",t:"triangle"};t.Shapes=r}])});
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1287,9 +1351,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
-	var _nodeRenderers = __webpack_require__(5);
+	var _nodeRenderers = __webpack_require__(6);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
@@ -2110,7 +2174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2119,7 +2183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
@@ -2202,229 +2266,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
-
-	var _phylocanvasUtils = __webpack_require__(3);
-
-	var _Tooltip2 = __webpack_require__(7);
-
-	var _Tooltip3 = _interopRequireDefault(_Tooltip2);
-
-	var createHandler = _phylocanvasUtils.events.createHandler;
-	var preventDefault = _phylocanvasUtils.events.preventDefault;
-
-	function createAnchorElement(contextMenu, _ref) {
-	  var _ref$text = _ref.text;
-	  var text = _ref$text === undefined ? 'link' : _ref$text;
-	  var _ref$filename = _ref.filename;
-	  var filename = _ref$filename === undefined ? 'file' : _ref$filename;
-	  var href = _ref.href;
-
-	  var anchorElement = contextMenu.createElement('a', text);
-	  anchorElement.style.padding = '0px';
-	  anchorElement.href = href;
-	  anchorElement.style.textDecoration = 'none';
-	  anchorElement.download = filename;
-	  return anchorElement;
-	}
-
-	function createImageLink(contextMenu) {
-	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'phylocanvas_tree.png', href: contextMenu.tree.getPngUrl() });
-	  return anchorElement;
-	}
-
-	function createLeafIdsLink(contextMenu) {
-	  var leafdata = contextMenu.tree.root.downloadLeafIdsFromBranch();
-	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-root.txt', href: leafdata });
-	  return anchorElement;
-	}
-
-	function createBranchLeafIdsLink(contextMenu, node) {
-	  var leafdata = node.downloadLeafIdsFromBranch();
-	  var anchorElement = createAnchorElement(contextMenu, { text: this.text, filename: 'pc-leaf-ids-' + node.id + '.txt', href: leafdata });
-	  return anchorElement;
-	}
-
-	var DEFAULT_MENU_ITEMS = [{ text: 'Collapse/Expand Branch',
-	  handler: function handler(branch) {
-	    branch.toggleCollapsed();
-	    branch.tree.draw(); // some browsers do not fire mousemove after clicking
-	  },
-	  nodeType: 'internal'
-	}, {
-	  text: 'Rotate Branch',
-	  handler: 'rotate',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Redraw Subtree',
-	  handler: 'redrawTreeFromBranch',
-	  nodeType: 'internal'
-	}, {
-	  text: 'Show/Hide Labels',
-	  handler: 'toggleLabels'
-	}, {
-	  text: 'Redraw Original Tree',
-	  handler: 'redrawOriginalTree'
-	}, {
-	  text: 'Export As Image',
-	  element: createImageLink
-	}, {
-	  text: 'Export Leaf IDs',
-	  element: createLeafIdsLink
-	}, {
-	  text: 'Export Leaf IDs on Branch',
-	  element: createBranchLeafIdsLink,
-	  nodeType: 'internal'
-	}];
-
-	function menuItemApplicable(menuItem, node) {
-	  if (!node) {
-	    return !menuItem.nodeType;
-	  }
-
-	  if (node.leaf && menuItem.nodeType !== 'internal') {
-	    return true;
-	  }
-
-	  if (!node.leaf && menuItem.nodeType === 'internal') {
-	    return true;
-	  }
-
-	  return false;
-	}
-
-	function mouseover(element) {
-	  element.style.backgroundColor = '#d2d2c4';
-	}
-
-	function mouseout(element) {
-	  element.style.backgroundColor = 'transparent';
-	}
-
-	function transferMenuItem(_ref2) {
-	  var handler = _ref2.handler;
-	  var _ref2$text = _ref2.text;
-	  var text = _ref2$text === undefined ? 'New menu Item' : _ref2$text;
-	  var nodeType = _ref2.nodeType;
-	  var element = _ref2.element;
-
-	  return { handler: handler, text: text, nodeType: nodeType, element: element };
-	}
-
-	/**
-	 * The menu that is shown when the PhyloCanvas widget is right-clicked
-	 *
-	 * @constructor
-	 * @memberOf PhyloCanvas
-	 * @extends Tooltip
-	 */
-
-	var ContextMenu = (function (_Tooltip) {
-	  function ContextMenu(tree) {
-	    var menuItems = arguments[1] === undefined ? DEFAULT_MENU_ITEMS : arguments[1];
-
-	    _classCallCheck(this, ContextMenu);
-
-	    _get(Object.getPrototypeOf(ContextMenu.prototype), 'constructor', this).call(this, tree, 'pc-context-menu');
-
-	    this.menuItems = menuItems.map(transferMenuItem);
-	    this.fontSize = '8pt';
-	  }
-
-	  _inherits(ContextMenu, _Tooltip);
-
-	  _createClass(ContextMenu, [{
-	    key: 'click',
-	    value: function click() {
-	      createHandler(this, 'close');
-	    }
-	  }, {
-	    key: 'createContent',
-	    value: function createContent(node) {
-	      var list = document.createElement('ul');
-	      var listElement = undefined;
-	      list.style.margin = '0';
-	      list.style.padding = '0';
-
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = this.menuItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var menuItem = _step.value;
-
-	          if (!menuItemApplicable(menuItem, node)) {
-	            continue;
-	          }
-
-	          if (menuItem.element) {
-	            var anchorElement = menuItem.element(this, node);
-	            listElement = this.createElement('li', anchorElement);
-	          } else {
-	            listElement = this.createElement('li', menuItem.text);
-	          }
-
-	          listElement.style.listStyle = 'none outside none';
-
-	          if (!menuItem.element) {
-	            if (menuItem.nodeType) {
-	              listElement.addEventListener('click', createHandler(node, menuItem.handler));
-	            } else {
-	              listElement.addEventListener('click', createHandler(this.tree, menuItem.handler));
-	            }
-	          }
-	          listElement.addEventListener('click', this.click);
-	          listElement.addEventListener('contextmenu', preventDefault);
-	          listElement.addEventListener('mouseover', createHandler(listElement, mouseover));
-	          listElement.addEventListener('mouseout', createHandler(listElement, mouseout));
-
-	          list.appendChild(listElement);
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-
-	      document.body.addEventListener('click', createHandler(this, 'close'));
-	      this.element.appendChild(list);
-	    }
-	  }]);
-
-	  return ContextMenu;
-	})(_Tooltip3['default']);
-
-	exports['default'] = ContextMenu;
 	module.exports = exports['default'];
 
 /***/ },
@@ -2530,90 +2371,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Overview window
-	 *
-	 * @constructor
-	 * @memberof PhyloCanvas
-	 */
-	'use strict';
-
-	function Navigator(tree) {
-	  this.tree = tree;
-	  this.cel = document.createElement('canvas');
-	  this.cel.id = this.tree.canvasEl.id + 'Navi';
-	  this.cel.style.zIndex = '100';
-	  this.cel.style.backgroundColor = '#FFFFFF';
-	  this.cel.width = this.tree.canvas.canvas.width / 3;
-	  this.cel.height = this.tree.canvas.canvas.height / 3;
-	  this.cel.style.position = 'absolute';
-	  this.cel.style.bottom = '0px';
-	  this.cel.style.right = '0px';
-	  this.cel.style.border = '1px solid #CCCCCC';
-	  this.tree.canvasEl.appendChild(this.cel);
-
-	  this.ctx = this.cel.getContext('2d');
-	  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-	  this.ctx.save();
-	}
-
-	Navigator.prototype.drawFrame = function () {
-	  var w = this.cel.width;
-	  var h = this.cel.height;
-	  var hw = w / 2;
-	  var hh = h / 2;
-	  var url;
-	  var _this;
-	  var z;
-
-	  this.ctx.restore();
-	  this.ctx.save();
-
-	  this.ctx.clearRect(-hw, -hh, w, h);
-
-	  this.ctx.strokeStyle = 'rgba(180,180,255,1)';
-
-	  if (!this.tree.drawn) {
-	    url = this.tree.canvas.canvas.toDataURL();
-
-	    this.img = document.createElement('img');
-	    this.img.src = url;
-
-	    _this = this;
-
-	    this.img.onload = function () {
-	      _this.ctx.drawImage(_this.img, -hw, -hh, _this.cel.width, _this.cel.height);
-	    };
-
-	    this.baseOffsetx = this.tree.offsetx;
-	    this.baseOffsety = this.tree.offsety;
-	    this.baseZoom = this.tree.zoom;
-	  } else {
-	    this.ctx.drawImage(this.img, -hw, -hh, this.cel.width, this.cel.height);
-	  }
-
-	  z = 1 / (this.tree.zoom / this.baseZoom);
-
-	  this.ctx.lineWidth = this.ctx.lineWidth / z;
-
-	  this.ctx.translate((this.baseOffsetx - this.tree.offsetx * z) * z, (this.baseOffsety - this.tree.offsety * z) * z);
-	  this.ctx.scale(z, z);
-	  this.ctx.strokeRect(-hw, -hh, w, h);
-	};
-
-	Navigator.prototype.resize = function () {
-	  this.cel.width = this.tree.canvas.canvas.width / 3;
-	  this.cel.height = this.tree.canvas.canvas.height / 3;
-	  this.ctx.translate(this.cel.width / 2, this.cel.height / 2);
-	  this.drawFrame();
-	};
-
-	module.exports = Navigator;
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -2622,23 +2379,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _rectangular = __webpack_require__(10);
+	var _rectangular = __webpack_require__(9);
 
 	var _rectangular2 = _interopRequireDefault(_rectangular);
 
-	var _circular = __webpack_require__(15);
+	var _circular = __webpack_require__(14);
 
 	var _circular2 = _interopRequireDefault(_circular);
 
-	var _radial = __webpack_require__(18);
+	var _radial = __webpack_require__(17);
 
 	var _radial2 = _interopRequireDefault(_radial);
 
-	var _diagonal = __webpack_require__(21);
+	var _diagonal = __webpack_require__(20);
 
 	var _diagonal2 = _interopRequireDefault(_diagonal);
 
-	var _hierarchical = __webpack_require__(24);
+	var _hierarchical = __webpack_require__(23);
 
 	var _hierarchical2 = _interopRequireDefault(_hierarchical);
 
@@ -2652,7 +2409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2663,19 +2420,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(11);
+	var _BranchRenderer = __webpack_require__(10);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(12);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(13);
+	var _branchRenderer = __webpack_require__(12);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(14);
+	var _prerenderer = __webpack_require__(13);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2699,7 +2456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2743,7 +2500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = BranchRenderer;
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2794,7 +2551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2826,7 +2583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2872,7 +2629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2883,19 +2640,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(11);
+	var _BranchRenderer = __webpack_require__(10);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(12);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(16);
+	var _branchRenderer = __webpack_require__(15);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(17);
+	var _prerenderer = __webpack_require__(16);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2925,7 +2682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2956,7 +2713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2965,7 +2722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
@@ -3015,7 +2772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3026,19 +2783,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(11);
+	var _BranchRenderer = __webpack_require__(10);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(12);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(19);
+	var _branchRenderer = __webpack_require__(18);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(20);
+	var _prerenderer = __webpack_require__(19);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3055,7 +2812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3075,7 +2832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3084,7 +2841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 
@@ -3135,7 +2892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3146,19 +2903,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(11);
+	var _BranchRenderer = __webpack_require__(10);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(12);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(22);
+	var _branchRenderer = __webpack_require__(21);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(23);
+	var _prerenderer = __webpack_require__(22);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3172,7 +2929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3199,7 +2956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3208,7 +2965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
@@ -3239,7 +2996,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3250,19 +3007,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _BranchRenderer = __webpack_require__(11);
+	var _BranchRenderer = __webpack_require__(10);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(12);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(25);
+	var _branchRenderer = __webpack_require__(24);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(26);
+	var _prerenderer = __webpack_require__(25);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3286,7 +3043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3312,7 +3069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports["default"];
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3321,7 +3078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(3);
+	var _phylocanvasUtils = __webpack_require__(4);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports['default'] = {
@@ -3366,7 +3123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3381,11 +3138,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _newick = __webpack_require__(28);
+	var _newick = __webpack_require__(27);
 
 	var _newick2 = _interopRequireDefault(_newick);
 
-	var _nexus = __webpack_require__(29);
+	var _nexus = __webpack_require__(28);
 
 	var _nexus2 = _interopRequireDefault(_nexus);
 
@@ -3396,7 +3153,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3407,7 +3164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _Branch = __webpack_require__(4);
+	var _Branch = __webpack_require__(5);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
@@ -3586,7 +3343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3595,7 +3352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _newick = __webpack_require__(28);
+	var _newick = __webpack_require__(27);
 
 	var format = 'nexus';
 	var fileExtension = /\.n(ex|xs)$/;
