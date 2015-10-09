@@ -2358,7 +2358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.element.style.cursor = 'pointer';
 	    this.element.style.padding = '8px';
 	    this.element.style.marginTop = '16px';
-	    this.element.style.transform = 'translateX(-52%)'; // 52% prevents blurry text in Chrome
+	    this.element.style.transform = 'translateX(-50%)';
 	    this.element.style.borderRadius = '2px';
 	    this.element.style.textAlign = 'center';
 	    this.element.style.fontFamily = this.tree.font || 'sans-serif';
@@ -2371,8 +2371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(ChildNodesTooltip, [{
 	    key: 'createContent',
 	    value: function createContent(node) {
-	      var numChildren = node.getChildIds().length;
-	      this.element.appendChild(document.createTextNode(numChildren + ' ' + (numChildren === 1 ? 'Child Node' : 'Child Nodes')));
+	      this.element.appendChild(document.createTextNode(node.getChildIds().length));
 	    }
 	  }]);
 
