@@ -205,8 +205,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Tooltip = __webpack_require__(7);
 
-	var _Tooltip2 = _interopRequireDefault(_Tooltip);
-
 	var _Navigator = __webpack_require__(3);
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
@@ -309,7 +307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    this.tooltip = new _Tooltip2['default'](this);
+	    this.tooltip = new _Tooltip.ChildNodesTooltip(this);
 
 	    this.drawn = false;
 
@@ -2284,14 +2282,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var Tooltip = (function () {
 	  function Tooltip(tree) {
-	    var className = arguments[1] === undefined ? 'pc-tooltip' : arguments[1];
-	    var element = arguments[2] === undefined ? document.createElement('div') : arguments[2];
+	    var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+	    var _ref$className = _ref.className;
+	    var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
+	    var _ref$element = _ref.element;
+	    var element = _ref$element === undefined ? document.createElement('div') : _ref$element;
+	    var _ref$zIndex = _ref.zIndex;
+	    var zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex;
 
 	    _classCallCheck(this, Tooltip);
 
@@ -2300,9 +2308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.element.className = className;
 	    this.element.style.display = 'none';
 	    this.element.style.position = 'fixed';
-	    this.element.style.border = '1px solid #CCCCCC';
-	    this.element.style.background = '#FFFFFF';
-	    this.element.style.letterSpacing = '0.5px';
+	    this.element.style.zIndex = zIndex;
 	    this.closed = true;
 
 	    this.tree.canvasEl.appendChild(this.element);
@@ -2315,6 +2321,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.closed = true;
 	    }
 	  }, {
+	    key: 'open',
+	    value: function open(x, y, node) {
+	      if (x === undefined) x = 100;
+	      if (y === undefined) y = 100;
+
+	      while (this.element.hasChildNodes()) {
+	        this.element.removeChild(this.element.firstChild);
+	      }
+
+	      this.createContent(node);
+
+	      this.element.style.top = y + 'px';
+	      this.element.style.left = x + 'px';
+
+	      this.element.style.display = 'block';
+
+	      this.closed = false;
+	    }
+	  }]);
+
+	  return Tooltip;
+	})();
+
+	exports['default'] = Tooltip;
+
+	var ChildNodesTooltip = (function (_Tooltip) {
+	  function ChildNodesTooltip(tree, options) {
+	    _classCallCheck(this, ChildNodesTooltip);
+
+	    _get(Object.getPrototypeOf(ChildNodesTooltip.prototype), 'constructor', this).call(this, tree, options);
+
+	    this.element.style.border = '1px solid #CCCCCC';
+	    this.element.style.background = '#FFFFFF';
+	    this.element.style.letterSpacing = '0.5px';
+	  }
+
+	  _inherits(ChildNodesTooltip, _Tooltip);
+
+	  _createClass(ChildNodesTooltip, [{
 	    key: 'createElement',
 	    value: function createElement(tagName, textContent) {
 	      var element = document.createElement(tagName);
@@ -2332,40 +2377,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'createContent',
-
-	    /**
-	     * Shows number of child nodes by default
-	     */
 	    value: function createContent(node) {
 	      this.element.appendChild(this.createElement('div', node.getChildIds().length));
 	    }
-	  }, {
-	    key: 'open',
-	    value: function open(x, y, node) {
-	      if (x === undefined) x = 100;
-	      if (y === undefined) y = 100;
-
-	      while (this.element.hasChildNodes()) {
-	        this.element.removeChild(this.element.firstChild);
-	      }
-
-	      this.createContent(node);
-
-	      this.element.style.top = y + 'px';
-	      this.element.style.left = x + 'px';
-
-	      this.element.style.zIndex = 2000;
-	      this.element.style.display = 'block';
-
-	      this.closed = false;
-	    }
 	  }]);
 
-	  return Tooltip;
-	})();
+	  return ChildNodesTooltip;
+	})(Tooltip);
 
-	exports['default'] = Tooltip;
-	module.exports = exports['default'];
+	exports.ChildNodesTooltip = ChildNodesTooltip;
 
 /***/ },
 /* 8 */
