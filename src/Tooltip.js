@@ -34,10 +34,11 @@ export default class Tooltip {
 
     this.createContent(node);
 
-    this.element.style.top = y + 'px';
-    this.element.style.left = x + 'px';
+    this.element.style.top = `${y}px`;
+    this.element.style.left = `${x}px`;
 
     this.element.style.display = 'block';
+    //
 
     this.closed = false;
   }
@@ -49,29 +50,25 @@ export class ChildNodesTooltip extends Tooltip {
   constructor(tree, options) {
     super(tree, options);
 
-    this.element.style.border = '1px solid #CCCCCC';
-    this.element.style.background = '#FFFFFF';
-    this.element.style.letterSpacing = '0.5px';
-  }
-
-  createElement(tagName, textContent) {
-    var element = document.createElement(tagName);
-    element.style.cursor = 'pointer';
-    element.style.padding = '0.3em 0.5em 0.3em 0.5em';
-    element.style.fontFamily = this.tree.font;
-    element.style.fontSize = this.fontSize || '12pt';
-    element.style.color = 'black';
-    if (typeof textContent === 'object') {
-      element.appendChild(textContent);
-    } else {
-      element.appendChild(document.createTextNode(textContent));
-    }
-    return element;
+    this.element.style.background = 'rgba(97, 97, 97, 0.9)';
+    this.element.style.color = '#fff';
+    this.element.style.cursor = 'pointer';
+    this.element.style.padding = '8px';
+    this.element.style.marginTop = '16px';
+    this.element.style.transform = 'translateX(-52%)'; // 52% prevents blurry text in Chrome
+    this.element.style.borderRadius = '2px';
+    this.element.style.textAlign = 'center';
+    this.element.style.fontFamily = this.tree.font || 'sans-serif';
+    this.element.style.fontSize = '10px';
+    this.element.style.fontWeight = 'bold';
   }
 
   createContent(node) {
+    var numChildren = node.getChildIds().length;
     this.element.appendChild(
-      this.createElement('div', node.getChildIds().length)
+      document.createTextNode(
+        `${numChildren} ${numChildren === 1 ? 'Child Node' : 'Child Nodes'}`
+      )
     );
   }
 }
