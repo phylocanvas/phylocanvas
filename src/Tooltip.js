@@ -55,7 +55,7 @@ export class ChildNodesTooltip extends Tooltip {
     this.element.style.cursor = 'pointer';
     this.element.style.padding = '8px';
     this.element.style.marginTop = '16px';
-    this.element.style.transform = 'translateX(-52%)'; // 52% prevents blurry text in Chrome
+    this.element.style.transform = 'translateX(-50%)';
     this.element.style.borderRadius = '2px';
     this.element.style.textAlign = 'center';
     this.element.style.fontFamily = this.tree.font || 'sans-serif';
@@ -64,11 +64,8 @@ export class ChildNodesTooltip extends Tooltip {
   }
 
   createContent(node) {
-    var numChildren = node.getChildIds().length;
     this.element.appendChild(
-      document.createTextNode(
-        `${numChildren} ${numChildren === 1 ? 'Child Node' : 'Child Nodes'}`
-      )
+      document.createTextNode(node.getChildIds().length)
     );
   }
 }
