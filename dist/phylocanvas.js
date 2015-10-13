@@ -2358,12 +2358,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.element.style.cursor = 'pointer';
 	    this.element.style.padding = '8px';
 	    this.element.style.marginTop = '16px';
-	    this.element.style.transform = 'translateX(-50%)';
 	    this.element.style.borderRadius = '2px';
 	    this.element.style.textAlign = 'center';
 	    this.element.style.fontFamily = this.tree.font || 'sans-serif';
 	    this.element.style.fontSize = '10px';
-	    this.element.style.fontWeight = 'bold';
+	    this.element.style.fontWeight = '500';
 	  }
 
 	  _inherits(ChildNodesTooltip, _Tooltip);
@@ -2371,7 +2370,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(ChildNodesTooltip, [{
 	    key: 'createContent',
 	    value: function createContent(node) {
-	      this.element.appendChild(document.createTextNode(node.getChildIds().length));
+	      var textNode = document.createTextNode(node.getChildIds().length);
+	      this.element.appendChild(textNode);
 	    }
 	  }]);
 
