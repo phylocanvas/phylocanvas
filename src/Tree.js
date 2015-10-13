@@ -524,7 +524,9 @@ export default class Tree {
   }
 
   redrawOriginalTree() {
-    this.load(this.stringRepresentation, { quiet: true });
+    this.load(this.stringRepresentation, { quiet: true }, () => {
+      this.originalTreeRedrawn();
+    });
   }
 
   storeNode(node) {
@@ -722,6 +724,10 @@ export default class Tree {
 
   subtreeDrawn(node) {
     fireEvent(this.canvasEl, 'subtree', { node });
+  }
+
+  originalTreeRedrawn() {
+    fireEvent(this.canvasEl, 'original-tree');
   }
 
   nodesUpdated(nodeIds, property) {

@@ -29,10 +29,28 @@ for (let treeType of Object.keys(phyloComponents.treeTypes)) {
   buttonForm.appendChild(button);
 }
 
+const subtreeButton = document.createElement('button');
+subtreeButton.innerHTML = 'subtree';
+subtreeButton.addEventListener('click', () => {
+  tree.root.children[2].redrawTreeFromBranch();
+});
+document.body.appendChild(subtreeButton);
+
+const resetButton = document.createElement('button');
+resetButton.innerHTML = 'Redraw Original';
+resetButton.addEventListener('click', () => tree.redrawOriginalTree());
+document.body.appendChild(resetButton);
+
+
+
 tree.on('error', function (event) { throw event.error; });
 
 tree.on('loaded', function () {
   console.log('loaded');
+});
+
+tree.on('original-tree', function () {
+  console.log('original');
 });
 
 tree.hoverLabel = true;

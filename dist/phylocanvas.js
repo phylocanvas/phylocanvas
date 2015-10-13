@@ -858,7 +858,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'redrawOriginalTree',
 	    value: function redrawOriginalTree() {
-	      this.load(this.stringRepresentation, { quiet: true });
+	      var _this3 = this;
+
+	      this.load(this.stringRepresentation, { quiet: true }, function () {
+	        _this3.originalTreeRedrawn();
+	      });
 	    }
 	  }, {
 	    key: 'storeNode',
@@ -886,7 +890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'scroll',
 	    value: function scroll(e) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      e.preventDefault();
 	      if (this._zooming) return;
@@ -894,7 +898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
 	      this._zooming = true;
 	      setTimeout(function () {
-	        _this3._zooming = false;
+	        _this4._zooming = false;
 	      }, 128);
 	    }
 	  }, {
@@ -934,7 +938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setNodeDisplay',
 	    value: function setNodeDisplay(ids, options, waiting) {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      if (!ids) return;
 
@@ -979,7 +983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else if (!waiting) {
 	        (function () {
-	          var _this = _this4;
+	          var _this = _this5;
 	          var timeout = setInterval(function () {
 	            if (this.drawn) {
 	              _this.setNodeColourAndShape(ids, options, true);
@@ -1103,6 +1107,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'subtreeDrawn',
 	    value: function subtreeDrawn(node) {
 	      fireEvent(this.canvasEl, 'subtree', { node: node });
+	    }
+	  }, {
+	    key: 'originalTreeRedrawn',
+	    value: function originalTreeRedrawn() {
+	      fireEvent(this.canvasEl, 'original-tree');
 	    }
 	  }, {
 	    key: 'nodesUpdated',
