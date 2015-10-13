@@ -37,7 +37,7 @@ tree.on('loaded', function () {
 
 tree.hoverLabel = true;
 tree.alignLabels = true;
-tree.padding = 0;
+tree.padding = 100;
 tree.setTreeType('rectangular');
 
 // ./data/tree.nwk
@@ -51,8 +51,8 @@ tree.load('(A:0.1,B:0.1,(C:0.1,D:0.1):0.1);', function () {
   tree.setNodeDisplay('D', { colour: 'green' });
   tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
 
-  tree.root.cascadeFlag('interactive', false);
-  tree.updateLeaves(tree.findLeaves('C'), 'interactive', true);
+  // tree.root.cascadeFlag('interactive', false);
+  // tree.updateLeaves(tree.findLeaves('C'), 'interactive', true);
 
   // let branch = tree.branches.C;
   // branch.label = 'Charlie';

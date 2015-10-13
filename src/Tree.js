@@ -1,8 +1,7 @@
 import { dom, events, canvas } from 'phylocanvas-utils';
 
 import Branch from './Branch';
-import ContextMenu from './ContextMenu';
-import Tooltip from './Tooltip';
+import { ChildNodesTooltip as Tooltip } from './Tooltip';
 import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
@@ -84,12 +83,6 @@ export default class Tree {
     canvas.style.zIndex = '1';
     this.canvasEl.appendChild(canvas);
 
-    /***
-     * Right click menu
-     * Users could pass options while creating the Tree object
-     */
-    this.contextMenu = new ContextMenu(this, conf.contextMenu);
-
     this.defaultCollapsedOptions = {};
     this.defaultCollapsed = false;
     if (conf.defaultCollapsed !== undefined) {
@@ -157,7 +150,6 @@ export default class Tree {
 
     this.resizeToContainer();
 
-    this.addListener('contextmenu', this.clicked.bind(this));
     this.addListener('click', this.clicked.bind(this));
 
     this.addListener('mousedown', this.pickup.bind(this));
@@ -238,7 +230,7 @@ export default class Tree {
           nodeIds = node.getChildIds();
         }
         this.draw();
-      } else if (this.unselectOnClickAway && this.contextMenu.closed && !this.dragging) {
+      } else if (this.unselectOnClickAway && !this.dragging) {
         this.root.cascadeFlag('selected', false);
         this.draw();
       }
@@ -248,12 +240,6 @@ export default class Tree {
       }
 
       this.nodesUpdated(nodeIds, 'selected');
-    } else if (e.button === 2) {
-      e.preventDefault();
-      node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
-      this.contextMenu.open(e.clientX, e.clientY, node && node.interactive ? node : null);
-      this.contextMenu.closed = false;
-      this.tooltip.close();
     }
   }
 
@@ -305,13 +291,12 @@ export default class Tree {
         this.root.cascadeFlag('hovered', false);
         nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
-        if (!nd.leaf && !nd.hasCollapsedAncestor() && this.contextMenu.closed) {
+        if (!nd.leaf && !nd.hasCollapsedAncestor()) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
         this.canvasEl.style.cursor = 'pointer';
       } else {
         this.tooltip.close();
-        this.contextMenu.close();
         this.root.cascadeFlag('hovered', false);
         this.canvasEl.style.cursor = 'auto';
       }
