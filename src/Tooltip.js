@@ -9,7 +9,8 @@ export default class Tooltip {
   constructor(tree, {
     className = 'phylocanvas-tooltip',
     element = document.createElement('div'),
-    zIndex = 2000
+    zIndex = 2000,
+    parent = tree.canvasEl
   } = {}) {
     this.tree = tree;
     this.element = element;
@@ -19,7 +20,7 @@ export default class Tooltip {
     this.element.style.zIndex = zIndex;
     this.closed = true;
 
-    this.tree.canvasEl.appendChild(this.element);
+    parent.appendChild(this.element);
   }
 
   close() {

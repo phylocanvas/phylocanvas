@@ -2309,6 +2309,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var element = _ref$element === undefined ? document.createElement('div') : _ref$element;
 	    var _ref$zIndex = _ref.zIndex;
 	    var zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex;
+	    var _ref$parent = _ref.parent;
+	    var parent = _ref$parent === undefined ? tree.canvasEl : _ref$parent;
 
 	    _classCallCheck(this, Tooltip);
 
@@ -2320,7 +2322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.element.style.zIndex = zIndex;
 	    this.closed = true;
 
-	    this.tree.canvasEl.appendChild(this.element);
+	    parent.appendChild(this.element);
 	  }
 
 	  _createClass(Tooltip, [{

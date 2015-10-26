@@ -73,7 +73,7 @@ export default class Tree {
     }
     this.canvasEl.style.boxSizing = 'border-box';
 
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.id = (element.id || '') + '__canvas';
     canvas.className = 'phylocanvas';
     canvas.style.position = 'relative';
