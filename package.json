@@ -30,13 +30,11 @@
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^5.6.4",
-    "babel-eslint": "^3.1.23",
     "babel-loader": "^5.1.4",
     "babel-runtime": "^5.6.4",
     "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5",
     "chai": "^2.3.0",
     "core-js": "^1.0.1",
-    "eslint": "^0.24.1",
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",

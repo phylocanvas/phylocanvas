@@ -31,9 +31,9 @@ const { getBackingStorePixelRatio, getPixelRatio, translateClick } = canvas;
 export default class Tree {
 
   constructor(element, conf = {}) {
-    this.canvasEl =
+    this.wrapperElement =
       (typeof element === 'string' ? document.getElementById(element) : element);
-    addClass(this.canvasEl, 'pc-container');
+    addClass(this.wrapperElement, 'pc-container');
     /**
      *
      * Dictionary of all branches indexed by Id
@@ -68,20 +68,20 @@ export default class Tree {
     this.originalTree = {};
 
     // Set up the element and canvas
-    if (window.getComputedStyle(this.canvasEl).position === 'static') {
-      this.canvasEl.style.position = 'relative';
+    if (window.getComputedStyle(this.wrapperElement).position === 'static') {
+      this.wrapperElement.style.position = 'relative';
     }
-    this.canvasEl.style.boxSizing = 'border-box';
+    this.wrapperElement.style.boxSizing = 'border-box';
 
-    const canvas = document.createElement('canvas');
-    canvas.id = (element.id || '') + '__canvas';
-    canvas.className = 'phylocanvas';
-    canvas.style.position = 'relative';
-    canvas.style.backgroundColor = '#FFFFFF';
-    canvas.height = element.offsetHeight || 400;
-    canvas.width = element.offsetWidth || 400;
-    canvas.style.zIndex = '1';
-    this.canvasEl.appendChild(canvas);
+    const canvasElement = document.createElement('canvas');
+    canvasElement.id = (element.id || '') + '__canvas';
+    canvasElement.className = 'phylocanvas';
+    canvasElement.style.position = 'relative';
+    canvasElement.style.backgroundColor = '#FFFFFF';
+    canvasElement.height = element.offsetHeight || 400;
+    canvasElement.width = element.offsetWidth || 400;
+    canvasElement.style.zIndex = '1';
+    this.wrapperElement.appendChild(canvasElement);
 
     this.defaultCollapsedOptions = {};
     this.defaultCollapsed = false;
@@ -109,7 +109,7 @@ export default class Tree {
     this.origx = null;
     this.origy = null;
 
-    this.canvas = canvas.getContext('2d');
+    this.canvas = canvasElement.getContext('2d');
 
     this.canvas.canvas.onselectstart = function () { return false; };
     this.canvas.fillStyle = '#000000';
@@ -264,28 +264,23 @@ export default class Tree {
 
   drag(event) {
     // get window ratio
-    var ratio = getPixelRatio(this.canvas);
+    const ratio = getPixelRatio(this.canvas);
 
     if (!this.drawn) return false;
 
     if (this.pickedup) {
-      var xmove = (event.clientX - this.startx) * ratio;
-      var ymove = (event.clientY - this.starty) * ratio;
+      const xmove = (event.clientX - this.startx) * ratio;
+      const ymove = (event.clientY - this.starty) * ratio;
       if (Math.abs(xmove) + Math.abs(ymove) > 5) {
         this.dragging = true;
         this.offsetx = this.origx + xmove;
         this.offsety = this.origy + ymove;
         this.draw();
       }
-    } else if (this.zoomPickedUp) {
-      // right click and drag
-      this.d = ((this.starty - event.clientY) / 100);
-      this.setZoom(this.origZoom + this.d);
-      this.draw();
     } else {
       // hover
-      var e = event;
-      var nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
+      const e = event;
+      const nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
 
       if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
         this.root.cascadeFlag('hovered', false);
@@ -294,11 +289,11 @@ export default class Tree {
         if (!nd.leaf && !nd.hasCollapsedAncestor()) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
-        this.canvasEl.style.cursor = 'pointer';
+        this.wrapperElement.style.cursor = 'pointer';
       } else {
         this.tooltip.close();
         this.root.cascadeFlag('hovered', false);
-        this.canvasEl.style.cursor = 'auto';
+        this.wrapperElement.style.cursor = 'auto';
       }
       this.draw();
     }
@@ -349,7 +344,6 @@ export default class Tree {
   drop() {
     if (!this.drawn) return false;
     this.pickedup = false;
-    this.zoomPickedUp = false;
   }
 
   findLeaves(pattern, searchProperty = 'id') {
@@ -497,12 +491,6 @@ export default class Tree {
       this.pickedup = true;
     }
 
-    if (event.button === 2 && this.rightClickZoom) {
-      this.zoomPickedUp = true;
-      this.origZoom = Math.log(this.zoom) / Math.log(10);
-      this.oz = this.zoom;
-      // position in the diagram on which you clicked
-    }
     this.startx = event.clientX;
     this.starty = event.clientY;
   }
@@ -646,7 +634,7 @@ export default class Tree {
 
   setTreeType(type, quiet) {
     if (!(type in treeTypes)) {
-      return fireEvent(this.canvasEl, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
+      return fireEvent(this.wrapperElement, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
     }
 
     let oldType = this.treeType;
@@ -679,7 +667,7 @@ export default class Tree {
 
   setZoom(z) {
     if (z > -2 && z < 2) {
-      var oz = this.zoom;
+      const oz = this.zoom;
       this.zoom = Math.pow(10, z);
 
       this.offsetx = (this.offsetx / oz) * this.zoom;
@@ -700,7 +688,7 @@ export default class Tree {
       this.maxLabelLength[this.treeType] = 0;
     }
 
-    for (var i = 0; i < this.leaves.length; i++) {
+    for (let i = 0; i < this.leaves.length; i++) {
       dimensions = this.canvas.measureText(this.leaves[i].id);
       // finding the maximum label length
       if (dimensions.width > this.maxLabelLength[this.treeType]) {
@@ -711,31 +699,31 @@ export default class Tree {
 
 
   loadCompleted() {
-    fireEvent(this.canvasEl, 'loaded');
+    fireEvent(this.wrapperElement, 'loaded');
   }
 
   loadStarted() {
-    fireEvent(this.canvasEl, 'loading');
+    fireEvent(this.wrapperElement, 'loading');
   }
 
   loadError(error) {
-    fireEvent(this.canvasEl, 'error', { error });
+    fireEvent(this.wrapperElement, 'error', { error });
   }
 
   subtreeDrawn(node) {
-    fireEvent(this.canvasEl, 'subtree', { node });
+    fireEvent(this.wrapperElement, 'subtree', { node });
   }
 
   originalTreeRedrawn() {
-    fireEvent(this.canvasEl, 'original-tree');
+    fireEvent(this.wrapperElement, 'original-tree');
   }
 
   nodesUpdated(nodeIds, property) {
-    fireEvent(this.canvasEl, 'updated', { nodeIds, property });
+    fireEvent(this.wrapperElement, 'updated', { nodeIds, property });
   }
 
   addListener(event, listener) {
-    addEvent(this.canvasEl, event, listener);
+    addEvent(this.wrapperElement, event, listener);
   }
 
   getBounds() {
@@ -785,7 +773,7 @@ export default class Tree {
   }
 
   treeTypeChanged(oldType, newType) {
-    fireEvent(this.canvasEl, 'typechanged', { oldType: oldType, newType: newType });
+    fireEvent(this.wrapperElement, 'typechanged', { oldType: oldType, newType: newType });
   }
 
   resetTree() {
@@ -819,7 +807,7 @@ export default class Tree {
   }
 
   resizeToContainer() {
-    this.setSize(this.canvasEl.offsetWidth, this.canvasEl.offsetHeight);
+    this.setSize(this.wrapperElement.offsetWidth, this.wrapperElement.offsetHeight);
   }
 }
 
