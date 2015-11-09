@@ -7,7 +7,7 @@
 function Navigator(tree) {
   this.tree = tree;
   this.cel = document.createElement('canvas');
-  this.cel.id = this.tree.wrapperElement.id + 'Navi';
+  this.cel.id = this.tree.containerElement.id + 'Navi';
   this.cel.style.zIndex = '100';
   this.cel.style.backgroundColor = '#FFFFFF';
   this.cel.width = this.tree.canvas.canvas.width / 3;
@@ -16,7 +16,7 @@ function Navigator(tree) {
   this.cel.style.bottom = '0px';
   this.cel.style.right = '0px';
   this.cel.style.border = '1px solid #CCCCCC';
-  this.tree.wrapperElement.appendChild(this.cel);
+  this.tree.containerElement.appendChild(this.cel);
 
   this.ctx = this.cel.getContext('2d');
   this.ctx.translate(this.cel.width / 2, this.cel.height / 2);

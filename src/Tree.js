@@ -31,9 +31,9 @@ const { getBackingStorePixelRatio, getPixelRatio, translateClick } = canvas;
 export default class Tree {
 
   constructor(element, conf = {}) {
-    this.wrapperElement =
+    this.containerElement =
       (typeof element === 'string' ? document.getElementById(element) : element);
-    addClass(this.wrapperElement, 'pc-container');
+    addClass(this.containerElement, 'pc-container');
     /**
      *
      * Dictionary of all branches indexed by Id
@@ -68,10 +68,10 @@ export default class Tree {
     this.originalTree = {};
 
     // Set up the element and canvas
-    if (window.getComputedStyle(this.wrapperElement).position === 'static') {
-      this.wrapperElement.style.position = 'relative';
+    if (window.getComputedStyle(this.containerElement).position === 'static') {
+      this.containerElement.style.position = 'relative';
     }
-    this.wrapperElement.style.boxSizing = 'border-box';
+    this.containerElement.style.boxSizing = 'border-box';
 
     const canvasElement = document.createElement('canvas');
     canvasElement.id = (element.id || '') + '__canvas';
@@ -81,7 +81,7 @@ export default class Tree {
     canvasElement.height = element.offsetHeight || 400;
     canvasElement.width = element.offsetWidth || 400;
     canvasElement.style.zIndex = '1';
-    this.wrapperElement.appendChild(canvasElement);
+    this.containerElement.appendChild(canvasElement);
 
     this.defaultCollapsedOptions = {};
     this.defaultCollapsed = false;
@@ -289,11 +289,11 @@ export default class Tree {
         if (!nd.leaf && !nd.hasCollapsedAncestor()) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
-        this.wrapperElement.style.cursor = 'pointer';
+        this.containerElement.style.cursor = 'pointer';
       } else {
         this.tooltip.close();
         this.root.cascadeFlag('hovered', false);
-        this.wrapperElement.style.cursor = 'auto';
+        this.containerElement.style.cursor = 'auto';
       }
       this.draw();
     }
@@ -634,7 +634,7 @@ export default class Tree {
 
   setTreeType(type, quiet) {
     if (!(type in treeTypes)) {
-      return fireEvent(this.wrapperElement, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
+      return fireEvent(this.containerElement, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
     }
 
     let oldType = this.treeType;
@@ -699,31 +699,31 @@ export default class Tree {
 
 
   loadCompleted() {
-    fireEvent(this.wrapperElement, 'loaded');
+    fireEvent(this.containerElement, 'loaded');
   }
 
   loadStarted() {
-    fireEvent(this.wrapperElement, 'loading');
+    fireEvent(this.containerElement, 'loading');
   }
 
   loadError(error) {
-    fireEvent(this.wrapperElement, 'error', { error });
+    fireEvent(this.containerElement, 'error', { error });
   }
 
   subtreeDrawn(node) {
-    fireEvent(this.wrapperElement, 'subtree', { node });
+    fireEvent(this.containerElement, 'subtree', { node });
   }
 
   originalTreeRedrawn() {
-    fireEvent(this.wrapperElement, 'original-tree');
+    fireEvent(this.containerElement, 'original-tree');
   }
 
   nodesUpdated(nodeIds, property) {
-    fireEvent(this.wrapperElement, 'updated', { nodeIds, property });
+    fireEvent(this.containerElement, 'updated', { nodeIds, property });
   }
 
   addListener(event, listener) {
-    addEvent(this.wrapperElement, event, listener);
+    addEvent(this.containerElement, event, listener);
   }
 
   getBounds() {
@@ -773,7 +773,7 @@ export default class Tree {
   }
 
   treeTypeChanged(oldType, newType) {
-    fireEvent(this.wrapperElement, 'typechanged', { oldType: oldType, newType: newType });
+    fireEvent(this.containerElement, 'typechanged', { oldType: oldType, newType: newType });
   }
 
   resetTree() {
@@ -807,7 +807,7 @@ export default class Tree {
   }
 
   resizeToContainer() {
-    this.setSize(this.wrapperElement.offsetWidth, this.wrapperElement.offsetHeight);
+    this.setSize(this.containerElement.offsetWidth, this.containerElement.offsetHeight);
   }
 }
 
