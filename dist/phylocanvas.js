@@ -218,13 +218,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.stringRepresentation = '';
 
 	    /**
-	     *
-	     * used for auto ids for internal nodes
-	     * @private
-	     */
-	    this.lastId = 0;
-
-	    /**
 	     * backColour colour the branches of the tree based on the colour of the
 	     * tips
 	     */
@@ -623,11 +616,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.draw();
 	    }
 	  }, {
-	    key: 'generateBranchId',
-	    value: function generateBranchId() {
-	      return 'pcn' + this.lastId++;
-	    }
-	  }, {
 	    key: 'getPngUrl',
 	    value: function getPngUrl() {
 	      return this.canvas.canvas.toDataURL();
@@ -806,13 +794,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'storeNode',
 	    value: function storeNode(node) {
 	      if (!node.id || node.id === '') {
-	        node.id = this.generateBranchId();
+	        node.id = _Branch2['default'].generateId();
 	      }
 
 	      if (this.branches[node.id]) {
 	        if (node !== this.branches[node.id]) {
 	          if (!node.leaf) {
-	            node.id = this.generateBranchId();
+	            node.id = _Branch2['default'].generateId();
 	          } else {
 	            throw new Error('Two nodes on this tree share the id ' + node.id);
 	          }
@@ -1397,6 +1385,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    this.interactive = true;
 	  }
+
+	  /**
+	   * used for auto ids for internal nodes
+	   * @static
+	   */
 
 	  _createClass(Branch, [{
 	    key: 'clicked',
@@ -2026,6 +2019,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    get: function get() {
 	      return this.highlighted || this.hovered;
 	    }
+	  }], [{
+	    key: 'generateId',
+	    value: function generateId() {
+	      return 'pcn' + this.lastId++;
+	    }
+	  }, {
+	    key: 'lastId',
+	    value: 0,
+	    enumerable: true
 	  }]);
 
 	  return Branch;
@@ -3302,7 +3304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (label) {
 	    branch.label = label;
 	  }
-	  branch.id = label || branch.tree.generateBranchId();
+	  branch.id = label || _Branch2['default'].generateId();
 	  return postLabelIndex + branchLengthStr.length;
 	}
 
@@ -3313,6 +3315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var cleanString = string.replace(/(\r|\n)/g, '');
 	  var currentNode = root;
 
+	  _Branch2['default'].lastId = 0;
 	  for (var i = 0; i < cleanString.length; i++) {
 	    var node = undefined;
 	    switch (cleanString[i]) {

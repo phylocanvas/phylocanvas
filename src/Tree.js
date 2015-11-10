@@ -53,13 +53,6 @@ export default class Tree {
     this.stringRepresentation = '';
 
     /**
-     *
-     * used for auto ids for internal nodes
-     * @private
-     */
-    this.lastId = 0;
-
-    /**
      * backColour colour the branches of the tree based on the colour of the
      * tips
      */
@@ -374,10 +367,6 @@ export default class Tree {
     this.draw();
   }
 
-  generateBranchId() {
-    return 'pcn' + this.lastId++;
-  }
-
   getPngUrl() {
     return this.canvas.canvas.toDataURL();
   }
@@ -519,13 +508,13 @@ export default class Tree {
 
   storeNode(node) {
     if (!node.id || node.id === '') {
-      node.id = this.generateBranchId();
+      node.id = Branch.generateId();
     }
 
     if (this.branches[node.id]) {
       if (node !== this.branches[node.id]) {
         if (!node.leaf) {
-          node.id = this.generateBranchId();
+          node.id = Branch.generateId();
         } else {
           throw new Error('Two nodes on this tree share the id ' + node.id);
         }

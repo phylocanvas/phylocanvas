@@ -32,7 +32,9 @@ for (let treeType of Object.keys(phyloComponents.treeTypes)) {
 const subtreeButton = document.createElement('button');
 subtreeButton.innerHTML = 'subtree';
 subtreeButton.addEventListener('click', () => {
-  tree.root.children[2].redrawTreeFromBranch();
+  const branch = tree.root.children[2];
+  console.log(tree.root);
+  branch.redrawTreeFromBranch();
 });
 document.body.appendChild(subtreeButton);
 
@@ -40,7 +42,6 @@ const resetButton = document.createElement('button');
 resetButton.innerHTML = 'Redraw Original';
 resetButton.addEventListener('click', () => tree.redrawOriginalTree());
 document.body.appendChild(resetButton);
-
 
 
 tree.on('error', function (event) { throw event.error; });

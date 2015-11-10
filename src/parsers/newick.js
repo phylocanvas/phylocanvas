@@ -31,17 +31,17 @@ function parseAnnotations(label, branch) {
   for (let b = 0; b < segments.length; b += 2) {
     let value = segments[b + 1];
     switch (segments[b]) {
-      case 'nsz' :
-        displayOptions.size = window.parseInt(value);
-        break;
-      case 'nsh' :
-        displayOptions.shape = value;
-        break;
-      case 'ncol' :
-        displayOptions.colour = value;
-        break;
-      default:
-        break;
+    case 'nsz' :
+      displayOptions.size = window.parseInt(value);
+      break;
+    case 'nsh' :
+      displayOptions.shape = value;
+      break;
+    case 'ncol' :
+      displayOptions.colour = value;
+      break;
+    default:
+      break;
     }
   }
   branch.setDisplay(displayOptions);
@@ -78,7 +78,7 @@ function parseBranch(branch, string, index) {
   if (label) {
     branch.label = label;
   }
-  branch.id = label || branch.tree.generateBranchId();
+  branch.id = label || Branch.generateId();
   return postLabelIndex + branchLengthStr.length;
 }
 
@@ -86,31 +86,33 @@ function parseFn({ string, root }, callback) {
   let cleanString = string.replace(/(\r|\n)/g, '');
   let currentNode = root;
 
+
+  Branch.lastId = 0;
   for (let i = 0; i < cleanString.length; i++) {
     let node;
     switch (cleanString[i]) {
-      case '(': // new Child
-        node = new Branch();
-        currentNode.addChild(node);
-        currentNode = node;
-        break;
-      case ')': // return to parent
-        currentNode = currentNode.parent;
-        break;
-      case ',': // new sibiling
-        node = new Branch();
-        currentNode.parent.addChild(node);
-        currentNode = node;
-        break;
-      case ';':
-        break;
-      default:
-          try {
-            i = parseBranch(currentNode, cleanString, i);
-          } catch (e) {
-            return callback(e);
-          }
-        break;
+    case '(': // new Child
+      node = new Branch();
+      currentNode.addChild(node);
+      currentNode = node;
+      break;
+    case ')': // return to parent
+      currentNode = currentNode.parent;
+      break;
+    case ',': // new sibling
+      node = new Branch();
+      currentNode.parent.addChild(node);
+      currentNode = node;
+      break;
+    case ';':
+      break;
+    default:
+      try {
+        i = parseBranch(currentNode, cleanString, i);
+      } catch (e) {
+        return callback(e);
+      }
+      break;
     }
   }
   return callback();

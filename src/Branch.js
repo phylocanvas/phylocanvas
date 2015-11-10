@@ -179,6 +179,16 @@ export default class Branch {
     this.interactive = true;
   }
 
+  /**
+   * used for auto ids for internal nodes
+   * @static
+   */
+  static lastId = 0
+
+  static generateId() {
+    return 'pcn' + this.lastId++;
+  }
+
   get isHighlighted() {
     return this.highlighted || this.hovered;
   }
