@@ -86,8 +86,6 @@ function parseFn({ string, root }, callback) {
   let cleanString = string.replace(/(\r|\n)/g, '');
   let currentNode = root;
 
-
-  Branch.lastId = 0;
   for (let i = 0; i < cleanString.length; i++) {
     let node;
     switch (cleanString[i]) {

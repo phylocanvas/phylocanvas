@@ -723,6 +723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.originalTree = {};
 	      this.clearState();
+	      _Branch2['default'].lastId = 0;
 
 	      var root = new _Branch2['default']();
 	      root.id = 'root';
@@ -3315,7 +3316,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var cleanString = string.replace(/(\r|\n)/g, '');
 	  var currentNode = root;
 
-	  _Branch2['default'].lastId = 0;
 	  for (var i = 0; i < cleanString.length; i++) {
 	    var node = undefined;
 	    switch (cleanString[i]) {
@@ -3330,7 +3330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        currentNode = currentNode.parent;
 	        break;
 	      case ',':
-	        // new sibiling
+	        // new sibling
 	        node = new _Branch2['default']();
 	        currentNode.parent.addChild(node);
 	        currentNode = node;

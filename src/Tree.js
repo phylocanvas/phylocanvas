@@ -443,6 +443,7 @@ export default class Tree {
   build(formatString, parser, options) {
     this.originalTree = {};
     this.clearState();
+    Branch.lastId = 0;
 
     let root = new Branch();
     root.id = 'root';
