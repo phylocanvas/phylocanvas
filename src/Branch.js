@@ -5,11 +5,20 @@ import nodeRenderers from './nodeRenderers';
 const { Angles, Shapes } = constants;
 const { createBlobUrl } = dom;
 
-const bounds = {
+/**
+ * Cached objects to reduce garbage
+ */
+const _bounds = {
   minx: 0,
   maxx: 0,
   miny: 0,
-  maxy: 0
+  maxy: 0,
+};
+
+const _leafStyle = {
+  lineWidth: null,
+  strokeStyle: null,
+  fillStyle: null,
 };
 
 /**
@@ -177,6 +186,12 @@ export default class Branch {
      * If false, branch does not respond to mouse events
      */
     this.interactive = true;
+
+    /**
+     * Defines leaf style (lineWidth, strokeStyle, fillStyle) for individual
+     * leaves, independent of branch colour.
+     */
+    this.leafStyle = {};
   }
 
   /**
@@ -288,11 +303,12 @@ export default class Branch {
   }
 
   drawLabelConnector() {
-    const originalLineWidth = this.canvas.lineWidth;
-    const labelAlign = this.tree.labelAlign;
+    const { highlightColour, labelAlign } = this.tree;
+    this.canvas.save();
 
     this.canvas.lineWidth = this.canvas.lineWidth / 4;
-    this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
+    this.canvas.strokeStyle =
+      this.isHighlighted ? highlightColour : this.getColour();
 
     this.canvas.beginPath();
     this.canvas.moveTo(this.getRadius(), 0);
@@ -300,16 +316,21 @@ export default class Branch {
     this.canvas.stroke();
     this.canvas.closePath();
 
-    this.canvas.strokeStyle = this.getColour();
-    this.canvas.lineWidth = originalLineWidth;
+    this.canvas.restore();
   }
 
   drawLeaf() {
-    if (this.tree.alignLabels) {
+    const { alignLabels, canvas } = this.tree;
+
+    if (alignLabels) {
       this.drawLabelConnector();
     }
 
-    nodeRenderers[this.nodeShape](this);
+    canvas.save();
+
+    nodeRenderers[this.nodeShape](canvas, this.getRadius(), this.getLeafStyle());
+
+    canvas.restore();
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
       this.drawLabel();
@@ -317,8 +338,8 @@ export default class Branch {
   }
 
   drawHighlight(centerX, centerY) {
+    this.canvas.save();
     this.canvas.beginPath();
-    const l = this.canvas.lineWidth;
 
     this.canvas.strokeStyle = this.tree.highlightColour;
     this.canvas.lineWidth = this.getHighlightLineWidth();
@@ -327,9 +348,8 @@ export default class Branch {
 
     this.canvas.stroke();
 
-    this.canvas.lineWidth = l;
-    this.canvas.strokeStyle = this.tree.branchColour;
     this.canvas.closePath();
+    this.canvas.restore();
   }
 
   drawNode() {
@@ -345,9 +365,6 @@ export default class Branch {
       (theta * Math.cos(this.angle)) + this.centerx : this.centerx;
     var centerY = this.leaf ?
       (theta * Math.sin(this.angle)) + this.centery : this.centery;
-
-    this.canvas.fillStyle = this.selected ?
-                            this.tree.selectedColour : this.colour;
 
     this.setNodeDimensions(centerX, centerY, nodeRadius);
 
@@ -445,7 +462,7 @@ export default class Branch {
   }
 
   extractChildren() {
-    for (let child of this.children) {
+    for (const child of this.children) {
       this.tree.storeNode(child);
       child.extractChildren();
     }
@@ -525,44 +542,21 @@ export default class Branch {
   /**
    * Get the colour(s) of the branch itself.
    */
-  getColour() {
-    var childColours;
-
+  getColour(specifiedColour) {
     if (this.selected) {
       return this.tree.selectedColour;
-    } else if (this.tree.backColour === true) {
-      if (this.children.length) {
-        childColours = this.getChildColours();
-        if (childColours.length === 1) {
-          return childColours[0];
-        } else {
-          return this.tree.branchColour;
-        }
-      } else {
-        return this.colour;
-      }
-    } else if (typeof this.tree.backColour === 'function') {
-      return this.tree.backColour(this);
-    } else {
-      return this.tree.branchColour;
     }
+
+    return specifiedColour || this.colour || this.tree.branchColour;
   }
 
   getNwk() {
-    var children;
-    var i;
-    var nwk;
-
     if (this.leaf) {
-      return this.id + ':' + this.branchLength;
-    } else {
-      children = [];
-      for (i = 0; i < this.children.length; i++) {
-        children.push(this.children[i].getNwk());
-      }
-      nwk = '(' + children.join(',') + '):' + this.branchLength;
-      return nwk;
+      return `${this.id}:${this.branchLength}`;
     }
+
+    const childNwks = this.children.map(child => child.getNwk());
+    return `(${childNwks.join(',')}):${this.branchLength}`;
   }
 
   getTextColour() {
@@ -628,10 +622,17 @@ export default class Branch {
    * @return CallExpression
    */
   getLabelStartX() {
+    const { lineWidth } = this.getLeafStyle();
+    const hasLabelConnector = this.hasLabelConnector();
+
     let offset = this.getDiameter();
 
-    if (this.isHighlighted && !this.hasLabelConnector()) {
+    if (this.isHighlighted && !hasLabelConnector) {
       offset += this.getHighlightSize() - this.getRadius();
+    }
+
+    if (!this.isHighlighted && !hasLabelConnector) {
+      offset += lineWidth / 2;
     }
 
     return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
@@ -642,7 +643,10 @@ export default class Branch {
   }
 
   getHighlightRadius() {
-    const offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+    let offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+
+    offset += this.getLeafStyle().lineWidth / this.tree.highlightSize;
+
     return this.leaf ? this.getRadius() + offset : offset * 0.666;
   }
 
@@ -681,7 +685,7 @@ export default class Branch {
     return createBlobUrl(downloadData);
   }
 
-  setDisplay({ colour, shape, size }) {
+  setDisplay({ colour, shape, size, leafStyle }) {
     if (colour) {
       this.colour = colour;
     }
@@ -690,6 +694,9 @@ export default class Branch {
     }
     if (size) {
       this.radius = size;
+    }
+    if (leafStyle) {
+      this.leafStyle = leafStyle;
     }
   }
 
@@ -727,12 +734,25 @@ export default class Branch {
       maxy = y + (totalLength * Math.sin(this.angle));
     }
 
-    bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
-    bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
-    bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
-    bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+    // uses a caching object to reduce garbage
+    _bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
+    _bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
+    _bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
+    _bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
 
-    return bounds;
+    return _bounds;
+  }
+
+  getLeafStyle() {
+    const { strokeStyle, fillStyle, lineWidth } = this.leafStyle;
+    const { zoom } = this.tree;
+
+    // uses a caching object to reduce garbage
+    _leafStyle.strokeStyle = this.getColour(strokeStyle);
+    _leafStyle.fillStyle = this.getColour(fillStyle);
+    _leafStyle.lineWidth = (lineWidth || this.tree.lineWidth) / zoom;
+
+    return _leafStyle;
   }
 
 }
