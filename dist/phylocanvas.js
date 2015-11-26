@@ -1211,11 +1211,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Shapes = _phylocanvasUtils.constants.Shapes;
 	var createBlobUrl = _phylocanvasUtils.dom.createBlobUrl;
 
-	var bounds = {
+	/**
+	 * Cached objects to reduce garbage
+	 */
+	var _bounds = {
 	  minx: 0,
 	  maxx: 0,
 	  miny: 0,
 	  maxy: 0
+	};
+
+	var _leafStyle = {
+	  lineWidth: null,
+	  strokeStyle: null,
+	  fillStyle: null
 	};
 
 	/**
@@ -1385,6 +1394,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * If false, branch does not respond to mouse events
 	     */
 	    this.interactive = true;
+
+	    /**
+	     * Defines leaf style (lineWidth, strokeStyle, fillStyle) for individual
+	     * leaves, independent of branch colour.
+	     */
+	    this.leafStyle = {};
 	  }
 
 	  /**
@@ -1489,11 +1504,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawLabelConnector',
 	    value: function drawLabelConnector() {
-	      var originalLineWidth = this.canvas.lineWidth;
-	      var labelAlign = this.tree.labelAlign;
+	      var _tree = this.tree;
+	      var highlightColour = _tree.highlightColour;
+	      var labelAlign = _tree.labelAlign;
+
+	      this.canvas.save();
 
 	      this.canvas.lineWidth = this.canvas.lineWidth / 4;
-	      this.canvas.strokeStyle = this.isHighlighted ? this.tree.highlightColour : this.getColour();
+	      this.canvas.strokeStyle = this.isHighlighted ? highlightColour : this.getColour();
 
 	      this.canvas.beginPath();
 	      this.canvas.moveTo(this.getRadius(), 0);
@@ -1501,17 +1519,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.stroke();
 	      this.canvas.closePath();
 
-	      this.canvas.strokeStyle = this.getColour();
-	      this.canvas.lineWidth = originalLineWidth;
+	      this.canvas.restore();
 	    }
 	  }, {
 	    key: 'drawLeaf',
 	    value: function drawLeaf() {
-	      if (this.tree.alignLabels) {
+	      var _tree2 = this.tree;
+	      var alignLabels = _tree2.alignLabels;
+	      var canvas = _tree2.canvas;
+
+	      if (alignLabels) {
 	        this.drawLabelConnector();
 	      }
 
-	      _nodeRenderers2['default'][this.nodeShape](this);
+	      canvas.save();
+
+	      _nodeRenderers2['default'][this.nodeShape](canvas, this.getRadius(), this.getLeafStyle());
+
+	      canvas.restore();
 
 	      if (this.tree.showLabels || this.tree.hoverLabel && this.isHighlighted) {
 	        this.drawLabel();
@@ -1520,8 +1545,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawHighlight',
 	    value: function drawHighlight(centerX, centerY) {
+	      this.canvas.save();
 	      this.canvas.beginPath();
-	      var l = this.canvas.lineWidth;
 
 	      this.canvas.strokeStyle = this.tree.highlightColour;
 	      this.canvas.lineWidth = this.getHighlightLineWidth();
@@ -1530,9 +1555,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.canvas.stroke();
 
-	      this.canvas.lineWidth = l;
-	      this.canvas.strokeStyle = this.tree.branchColour;
 	      this.canvas.closePath();
+	      this.canvas.restore();
 	    }
 	  }, {
 	    key: 'drawNode',
@@ -1547,8 +1571,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var centerX = this.leaf ? theta * Math.cos(this.angle) + this.centerx : this.centerx;
 	      var centerY = this.leaf ? theta * Math.sin(this.angle) + this.centery : this.centery;
-
-	      this.canvas.fillStyle = this.selected ? this.tree.selectedColour : this.colour;
 
 	      this.setNodeDimensions(centerX, centerY, nodeRadius);
 
@@ -1786,45 +1808,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	  }, {
 	    key: 'getColour',
-	    value: function getColour() {
-	      var childColours;
-
+	    value: function getColour(specifiedColour) {
 	      if (this.selected) {
 	        return this.tree.selectedColour;
-	      } else if (this.tree.backColour === true) {
-	        if (this.children.length) {
-	          childColours = this.getChildColours();
-	          if (childColours.length === 1) {
-	            return childColours[0];
-	          } else {
-	            return this.tree.branchColour;
-	          }
-	        } else {
-	          return this.colour;
-	        }
-	      } else if (typeof this.tree.backColour === 'function') {
-	        return this.tree.backColour(this);
-	      } else {
-	        return this.tree.branchColour;
 	      }
+
+	      return specifiedColour || this.colour || this.tree.branchColour;
 	    }
 	  }, {
 	    key: 'getNwk',
 	    value: function getNwk() {
-	      var children;
-	      var i;
-	      var nwk;
-
 	      if (this.leaf) {
 	        return this.id + ':' + this.branchLength;
-	      } else {
-	        children = [];
-	        for (i = 0; i < this.children.length; i++) {
-	          children.push(this.children[i].getNwk());
-	        }
-	        nwk = '(' + children.join(',') + '):' + this.branchLength;
-	        return nwk;
 	      }
+
+	      var childNwks = this.children.map(function (child) {
+	        return child.getNwk();
+	      });
+	      return '(' + childNwks.join(',') + '):' + this.branchLength;
 	    }
 	  }, {
 	    key: 'getTextColour',
@@ -1896,10 +1897,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getLabelStartX',
 	    value: function getLabelStartX() {
+	      var _getLeafStyle = this.getLeafStyle();
+
+	      var lineWidth = _getLeafStyle.lineWidth;
+
+	      var hasLabelConnector = this.hasLabelConnector();
+
 	      var offset = this.getDiameter();
 
-	      if (this.isHighlighted && !this.hasLabelConnector()) {
+	      if (this.isHighlighted && !hasLabelConnector) {
 	        offset += this.getHighlightSize() - this.getRadius();
+	      }
+
+	      if (!this.isHighlighted && !hasLabelConnector) {
+	        offset += lineWidth / 2;
 	      }
 
 	      return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
@@ -1913,6 +1924,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getHighlightRadius',
 	    value: function getHighlightRadius() {
 	      var offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+
+	      offset += this.getLeafStyle().lineWidth / this.tree.highlightSize;
+
 	      return this.leaf ? this.getRadius() + offset : offset * 0.666;
 	    }
 	  }, {
@@ -1960,6 +1974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var colour = _ref.colour;
 	      var shape = _ref.shape;
 	      var size = _ref.size;
+	      var leafStyle = _ref.leafStyle;
 
 	      if (colour) {
 	        this.colour = colour;
@@ -1969,6 +1984,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (size) {
 	        this.radius = size;
+	      }
+	      if (leafStyle) {
+	        this.leafStyle = leafStyle;
 	      }
 	    }
 	  }, {
@@ -2008,12 +2026,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        maxy = y + totalLength * Math.sin(this.angle);
 	      }
 
-	      bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
-	      bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
-	      bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
-	      bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+	      // uses a caching object to reduce garbage
+	      _bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
+	      _bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
+	      _bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
+	      _bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
 
-	      return bounds;
+	      return _bounds;
+	    }
+	  }, {
+	    key: 'getLeafStyle',
+	    value: function getLeafStyle() {
+	      var _leafStyle2 = this.leafStyle;
+	      var strokeStyle = _leafStyle2.strokeStyle;
+	      var fillStyle = _leafStyle2.fillStyle;
+	      var lineWidth = _leafStyle2.lineWidth;
+	      var zoom = this.tree.zoom;
+
+	      // uses a caching object to reduce garbage
+	      _leafStyle.strokeStyle = this.getColour(strokeStyle);
+	      _leafStyle.fillStyle = this.getColour(fillStyle);
+	      _leafStyle.lineWidth = (lineWidth || this.tree.lineWidth) / zoom;
+
+	      return _leafStyle;
 	    }
 	  }, {
 	    key: 'isHighlighted',
@@ -2050,83 +2085,100 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _phylocanvasUtils = __webpack_require__(2);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
+
+	function commitPath(canvas, _ref) {
+	  var lineWidth = _ref.lineWidth;
+	  var strokeStyle = _ref.strokeStyle;
+	  var fillStyle = _ref.fillStyle;
+
+	  canvas.save();
+
+	  canvas.lineWidth = lineWidth;
+	  canvas.strokeStyle = strokeStyle;
+	  canvas.fillStyle = fillStyle;
+
+	  canvas.fill();
+	  canvas.stroke();
+
+	  canvas.restore();
+	}
+
 	exports['default'] = {
 
-	  circle: function circle(node) {
-	    var r = node.getRadius();
-	    node.canvas.beginPath();
-	    node.canvas.arc(r, 0, r, 0, Angles.FULL, false);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.closePath();
+	  circle: function circle(canvas, radius, style) {
+	    canvas.beginPath();
+	    canvas.arc(radius, 0, radius, 0, Angles.FULL, false);
+	    canvas.closePath();
+
+	    commitPath(canvas, style);
 	  },
 
-	  square: function square(node) {
-	    var r = node.getRadius();
-	    var x1 = 0;
-	    var x2 = r * 2;
-	    var y1 = -r;
-	    var y2 = r;
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(x1, y1);
-	    node.canvas.lineTo(x1, y2);
-	    node.canvas.lineTo(x2, y2);
-	    node.canvas.lineTo(x2, y1);
-	    node.canvas.lineTo(x1, y1);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.closePath();
+	  square: function square(canvas, radius, style) {
+	    var lengthOfSide = radius * Math.sqrt(2);
+	    var startX = radius - lengthOfSide / 2;
+
+	    // connector
+	    canvas.beginPath();
+	    canvas.moveTo(0, 0);
+	    canvas.lineTo(startX, 0);
+	    canvas.stroke();
+	    canvas.closePath();
+
+	    canvas.beginPath();
+	    canvas.moveTo(startX, 0);
+	    canvas.lineTo(startX, lengthOfSide / 2);
+	    canvas.lineTo(startX + lengthOfSide, lengthOfSide / 2);
+	    canvas.lineTo(startX + lengthOfSide, -lengthOfSide / 2);
+	    canvas.lineTo(startX, -lengthOfSide / 2);
+	    canvas.lineTo(startX, 0);
+	    canvas.closePath();
+
+	    commitPath(canvas, style);
 	  },
 
-	  star: function star(node) {
-	    var r = node.getRadius();
-	    var cx = r;
+	  star: function star(canvas, radius, style) {
+	    var cx = radius;
 	    var cy = 0;
 	    var spikes = 8;
-	    var outerRadius = r;
-	    var innerRadius = r * 0.5;
-	    var rot = Math.PI / 2 * 3;
-	    var x = cx;
-	    var y = cy;
+	    var outerRadius = radius;
+	    var innerRadius = radius * 0.5;
 	    var step = Math.PI / spikes;
-	    var i = 0;
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(cx, cy - outerRadius);
-	    for (i = 0; i < spikes; i++) {
-	      x = cx + Math.cos(rot) * outerRadius;
-	      y = cy + Math.sin(rot) * outerRadius;
-	      node.canvas.lineTo(x, y);
+
+	    var rot = Math.PI / 2 * 3;
+
+	    canvas.beginPath();
+	    canvas.moveTo(cx, cy - outerRadius);
+	    for (var i = 0; i < spikes; i++) {
+	      var x = cx + Math.cos(rot) * outerRadius;
+	      var y = cy + Math.sin(rot) * outerRadius;
+	      canvas.lineTo(x, y);
 	      rot += step;
 
 	      x = cx + Math.cos(rot) * innerRadius;
 	      y = cy + Math.sin(rot) * innerRadius;
-	      node.canvas.lineTo(x, y);
+	      canvas.lineTo(x, y);
 	      rot += step;
 	    }
-	    node.canvas.lineTo(cx, cy - outerRadius);
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.closePath();
+	    canvas.lineTo(cx, cy - outerRadius);
+	    canvas.closePath();
+
+	    commitPath(canvas, style);
 	  },
 
-	  triangle: function triangle(node) {
-	    var r = node.getRadius();
-	    var lengthOfSide = 2 * r * Math.cos(30 * Math.PI / 180);
+	  triangle: function triangle(canvas, radius, style) {
+	    var lengthOfSide = 2 * radius * Math.cos(30 * Math.PI / 180);
 
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(0, 0);
-	    node.canvas.rotate(30 * Math.PI / 180);
-	    node.canvas.lineTo(lengthOfSide, 0);
+	    canvas.beginPath();
+	    canvas.moveTo(0, 0);
+	    canvas.rotate(30 * Math.PI / 180);
+	    canvas.lineTo(lengthOfSide, 0);
+	    canvas.rotate(-60 * Math.PI / 180);
+	    canvas.lineTo(lengthOfSide, 0);
+	    canvas.rotate(30 * Math.PI / 180);
+	    canvas.lineTo(0, 0);
+	    canvas.closePath();
 
-	    node.canvas.rotate(-60 * Math.PI / 180);
-	    node.canvas.lineTo(lengthOfSide, 0);
-
-	    node.canvas.rotate(30 * Math.PI / 180);
-	    node.canvas.lineTo(0, 0);
-
-	    node.canvas.stroke();
-	    node.canvas.fill();
-	    node.canvas.closePath();
+	    commitPath(canvas, style);
 	  }
 
 	};
