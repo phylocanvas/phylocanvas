@@ -302,7 +302,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.font = 'sans-serif';
 
 	    this.unselectOnClickAway = true;
-	    this.rightClickZoom = true;
 
 	    if (this.useNavigator) {
 	      this.navigator = new _Navigator2['default'](this);
@@ -336,9 +335,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.farthestNodeFromRootX = 0;
 	    this.farthestNodeFromRootY = 0;
 
-	    // Colour for 1 and 0s. Currently 0s are not drawn
-	    this.colour1 = 'rgba(206,16,16,1)';
-	    this.colour0 = '#ccc';
 	    /**
 	     * Maximum length of label for each tree type.
 	     */
@@ -1975,6 +1971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var shape = _ref.shape;
 	      var size = _ref.size;
 	      var leafStyle = _ref.leafStyle;
+	      var labelStyle = _ref.labelStyle;
 
 	      if (colour) {
 	        this.colour = colour;
@@ -1987,6 +1984,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (leafStyle) {
 	        this.leafStyle = leafStyle;
+	      }
+	      if (labelStyle) {
+	        this.labelStyle = labelStyle;
 	      }
 	    }
 	  }, {
@@ -2040,13 +2040,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _leafStyle2 = this.leafStyle;
 	      var strokeStyle = _leafStyle2.strokeStyle;
 	      var fillStyle = _leafStyle2.fillStyle;
-	      var lineWidth = _leafStyle2.lineWidth;
 	      var zoom = this.tree.zoom;
 
 	      // uses a caching object to reduce garbage
 	      _leafStyle.strokeStyle = this.getColour(strokeStyle);
 	      _leafStyle.fillStyle = this.getColour(fillStyle);
-	      _leafStyle.lineWidth = (lineWidth || this.tree.lineWidth) / zoom;
+
+	      var lineWidth = typeof this.leafStyle.lineWidth !== 'undefined' ? this.leafStyle.lineWidth : this.tree.lineWidth;
+
+	      _leafStyle.lineWidth = lineWidth === 0 ? 0 : Math.max(this.tree.lineWidth / zoom, Math.min(lineWidth, Math.ceil(lineWidth * zoom)));
 
 	      return _leafStyle;
 	    }
@@ -2098,7 +2100,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  canvas.fillStyle = fillStyle;
 
 	  canvas.fill();
-	  canvas.stroke();
+	  if (lineWidth > 0) {
+	    canvas.stroke();
+	  }
 
 	  canvas.restore();
 	}

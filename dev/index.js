@@ -73,14 +73,23 @@ tree.load('(A:0.1,B:0.1,(C:0.2,D:0.1):0.1);', function () {
       lineWidth: 3,
     },
   });
-  tree.setNodeDisplay('C', { colour: 'blue', shape: 'star' });
+  tree.setNodeDisplay('C', {
+    colour: 'blue',
+    shape: 'star',
+    leafStyle: {
+      lineWidth: 0,
+    },
+    labelStyle: {
+      colour: 'red',
+    },
+  });
   tree.setNodeDisplay('D', {
     colour: 'green',
     shape: 'square',
     leafStyle: {
       strokeStyle: '#222',
       fillStyle: 'green',
-      lineWidth: 3,
+      lineWidth: 6,
     },
   });
 

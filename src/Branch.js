@@ -685,7 +685,7 @@ export default class Branch {
     return createBlobUrl(downloadData);
   }
 
-  setDisplay({ colour, shape, size, leafStyle }) {
+  setDisplay({ colour, shape, size, leafStyle, labelStyle }) {
     if (colour) {
       this.colour = colour;
     }
@@ -697,6 +697,9 @@ export default class Branch {
     }
     if (leafStyle) {
       this.leafStyle = leafStyle;
+    }
+    if (labelStyle) {
+      this.labelStyle = labelStyle;
     }
   }
 
@@ -744,13 +747,24 @@ export default class Branch {
   }
 
   getLeafStyle() {
-    const { strokeStyle, fillStyle, lineWidth } = this.leafStyle;
+    const { strokeStyle, fillStyle } = this.leafStyle;
     const { zoom } = this.tree;
 
     // uses a caching object to reduce garbage
     _leafStyle.strokeStyle = this.getColour(strokeStyle);
     _leafStyle.fillStyle = this.getColour(fillStyle);
-    _leafStyle.lineWidth = (lineWidth || this.tree.lineWidth) / zoom;
+
+    const lineWidth =
+      typeof this.leafStyle.lineWidth !== 'undefined' ?
+        this.leafStyle.lineWidth :
+        this.tree.lineWidth;
+
+    _leafStyle.lineWidth =
+      lineWidth === 0 ? 0 :
+        Math.max(
+          this.tree.lineWidth / zoom,
+          Math.min(lineWidth, Math.ceil(lineWidth * zoom))
+        );
 
     return _leafStyle;
   }

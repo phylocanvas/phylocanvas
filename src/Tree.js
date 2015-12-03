@@ -135,7 +135,6 @@ export default class Tree {
     this.font = 'sans-serif';
 
     this.unselectOnClickAway = true;
-    this.rightClickZoom = true;
 
     if (this.useNavigator) {
       this.navigator = new Navigator(this);
@@ -169,9 +168,6 @@ export default class Tree {
     this.farthestNodeFromRootX = 0;
     this.farthestNodeFromRootY = 0;
 
-    // Colour for 1 and 0s. Currently 0s are not drawn
-    this.colour1 = 'rgba(206,16,16,1)';
-    this.colour0 = '#ccc';
     /**
      * Maximum length of label for each tree type.
      */

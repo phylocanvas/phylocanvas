@@ -10,7 +10,9 @@ function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
   canvas.fillStyle = fillStyle;
 
   canvas.fill();
-  canvas.stroke();
+  if (lineWidth > 0) {
+    canvas.stroke();
+  }
 
   canvas.restore();
 }

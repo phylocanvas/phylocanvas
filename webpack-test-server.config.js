@@ -12,16 +12,16 @@ module.exports = {
     loaders: [
       { test: /test\.js$/,
         loader: 'mocha',
-        exclude: path.join(__dirname, 'node_modules')
+        exclude: path.join(__dirname, 'node_modules'),
       },
       { test: /\.js$/,
         loader: 'babel?stage=0',
-        exclude: path.join(__dirname, 'node_modules')
-      }
-    ]
+        exclude: path.join(__dirname, 'node_modules'),
+      },
+    ],
   },
   output: {
-    filename: 'phylocanvas-test.js'
+    filename: 'phylocanvas-test.js',
   },
-  target: 'web'
+  target: 'web',
 };

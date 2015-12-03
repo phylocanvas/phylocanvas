@@ -117,31 +117,43 @@ describe('PhyloCanvas', function () {
       expect(colour).to.equal(colour3);
     });
 
-    it('should be true if parent is collapsed', function () {
-      var branch = new Branch();
-      var branch1 = new Branch();
-      var branch2 = new Branch();
+    describe('hasCollapsedAncestor()', function () {
 
-      branch.addChild(branch1);
-      branch.addChild(branch2);
+      it('should be true if parent is collapsed', function () {
+        var branch = new Branch();
+        var branch1 = new Branch();
+        var branch2 = new Branch();
 
-      branch.collapsed = true;
+        branch.addChild(branch1);
+        branch.addChild(branch2);
 
-      expect(branch1.hasCollapsedAncestor()).to.equal(true);
-      expect(branch2.hasCollapsedAncestor()).to.equal(true);
+        branch.collapsed = true;
+
+        expect(branch1.hasCollapsedAncestor()).to.equal(true);
+        expect(branch2.hasCollapsedAncestor()).to.equal(true);
+      });
+
+      it('should be true if grandparent is collapsed', function () {
+        var branch = new Branch();
+        var branch1 = new Branch();
+        var branch2 = new Branch();
+
+        branch.addChild(branch1);
+        branch1.addChild(branch2);
+
+        branch.collapsed = true;
+
+        expect(branch2.hasCollapsedAncestor()).to.equal(true);
+      });
+
     });
 
-    it('should be true if grandparent is collapsed', function () {
-      var branch = new Branch();
-      var branch1 = new Branch();
-      var branch2 = new Branch();
-
-      branch.addChild(branch1);
-      branch1.addChild(branch2);
-
-      branch.collapsed = true;
-
-      expect(branch2.hasCollapsedAncestor()).to.equal(true);
+    it('should return a line width of 0', function () {
+      const tree = new Tree('test');
+      const branch = new Branch();
+      branch.tree = tree;
+      branch.leafStyle = { lineWidth: 0 };
+      expect(branch.getLeafStyle().lineWidth).to.equal(0);
     });
 
   });
