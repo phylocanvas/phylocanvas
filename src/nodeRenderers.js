@@ -17,26 +17,32 @@ function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
   canvas.restore();
 }
 
+const lengthOfSquareSide = (radius) => radius * Math.sqrt(2);
+
 export default {
 
   circle(canvas, radius, style) {
+    // circle takes same area as square inside given radius
+    const scaledArea = Math.pow(lengthOfSquareSide(radius), 2);
+    const scaledRadius = Math.sqrt(scaledArea / Math.PI);
+
     canvas.beginPath();
-    canvas.arc(radius, 0, radius, 0, Angles.FULL, false);
+    canvas.arc(radius, 0, scaledRadius, 0, Angles.FULL, false);
     canvas.closePath();
 
     commitPath(canvas, style);
   },
 
   square(canvas, radius, style) {
-    const lengthOfSide = radius * Math.sqrt(2);
+    const lengthOfSide = lengthOfSquareSide(radius);
     const startX = radius - lengthOfSide / 2;
 
     // connector
-    canvas.beginPath();
-    canvas.moveTo(0, 0);
-    canvas.lineTo(startX, 0);
-    canvas.stroke();
-    canvas.closePath();
+    // canvas.beginPath();
+    // canvas.moveTo(0, 0);
+    // canvas.lineTo(startX, 0);
+    // canvas.stroke();
+    // canvas.closePath();
 
     canvas.beginPath();
     canvas.moveTo(startX, 0);
@@ -53,9 +59,9 @@ export default {
   star(canvas, radius, style) {
     const cx = radius;
     const cy = 0;
-    const spikes = 8;
+    const spikes = 5;
     const outerRadius = radius;
-    const innerRadius = radius * 0.5;
+    const innerRadius = outerRadius * 0.5;
     const step = Math.PI / spikes;
 
     let rot = Math.PI / 2 * 3;
@@ -81,15 +87,15 @@ export default {
 
   triangle(canvas, radius, style) {
     const lengthOfSide = (2 * radius) * Math.cos(30 * Math.PI / 180);
+    const height = (Math.sqrt(3) / 2) * lengthOfSide;
+    const midpoint = (1 / Math.sqrt(3)) * (lengthOfSide / 2);
 
     canvas.beginPath();
-    canvas.moveTo(0, 0);
-    canvas.rotate(30 * Math.PI / 180);
-    canvas.lineTo(lengthOfSide, 0);
-    canvas.rotate(-60 * Math.PI / 180);
-    canvas.lineTo(lengthOfSide, 0);
-    canvas.rotate(30 * Math.PI / 180);
-    canvas.lineTo(0, 0);
+    canvas.moveTo(radius, midpoint);
+    canvas.lineTo(radius + lengthOfSide / 2, midpoint);
+    canvas.lineTo(radius, -(height - midpoint));
+    canvas.lineTo(radius - lengthOfSide / 2, midpoint);
+    canvas.lineTo(radius, midpoint);
     canvas.closePath();
 
     commitPath(canvas, style);
