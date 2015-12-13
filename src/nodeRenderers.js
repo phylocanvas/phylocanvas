@@ -2,6 +2,14 @@ import { constants } from 'phylocanvas-utils';
 
 const { Angles } = constants;
 
+function drawConnector(canvas, connectingOffset) {
+  canvas.beginPath();
+  canvas.moveTo(0, 0);
+  canvas.lineTo(connectingOffset, 0);
+  canvas.stroke();
+  canvas.closePath();
+}
+
 function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
   canvas.save();
 
@@ -10,7 +18,7 @@ function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
   canvas.fillStyle = fillStyle;
 
   canvas.fill();
-  if (lineWidth > 0) {
+  if (lineWidth > 0 && strokeStyle !== fillStyle) {
     canvas.stroke();
   }
 
@@ -26,6 +34,8 @@ export default {
     const scaledArea = Math.pow(lengthOfSquareSide(radius), 2);
     const scaledRadius = Math.sqrt(scaledArea / Math.PI);
 
+    drawConnector(canvas, radius - scaledRadius);
+
     canvas.beginPath();
     canvas.arc(radius, 0, scaledRadius, 0, Angles.FULL, false);
     canvas.closePath();
@@ -37,12 +47,7 @@ export default {
     const lengthOfSide = lengthOfSquareSide(radius);
     const startX = radius - lengthOfSide / 2;
 
-    // connector
-    // canvas.beginPath();
-    // canvas.moveTo(0, 0);
-    // canvas.lineTo(startX, 0);
-    // canvas.stroke();
-    // canvas.closePath();
+    drawConnector(canvas, startX);
 
     canvas.beginPath();
     canvas.moveTo(startX, 0);
@@ -63,6 +68,8 @@ export default {
     const outerRadius = radius;
     const innerRadius = outerRadius * 0.5;
     const step = Math.PI / spikes;
+
+    drawConnector(canvas, outerRadius - innerRadius);
 
     let rot = Math.PI / 2 * 3;
 
@@ -89,6 +96,8 @@ export default {
     const lengthOfSide = (2 * radius) * Math.cos(30 * Math.PI / 180);
     const height = (Math.sqrt(3) / 2) * lengthOfSide;
     const midpoint = (1 / Math.sqrt(3)) * (lengthOfSide / 2);
+
+    drawConnector(canvas, radius - midpoint);
 
     canvas.beginPath();
     canvas.moveTo(radius, midpoint);

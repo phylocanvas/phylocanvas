@@ -65,32 +65,35 @@ tree.load('(A:0.1,B:0.1,(C:0.2,D:0.1):0.1);', function () {
   tree.backColour = true;
   tree.setNodeSize(10);
   // tree.textSize = 20;
+
+  tree.setNodeDisplay('A', {
+    leafStyle: {
+      fillStyle: 'lightgray',
+    },
+  });
   tree.setNodeDisplay('B', {
     colour: 'red',
     shape: 'triangle',
-    // leafStyle: {
-    //   strokeStyle: '#777',
-    //   lineWidth: 3,
-    // },
+    leafStyle: {
+      fillStyle: 'pink',
+    },
   });
   tree.setNodeDisplay('C', {
-    colour: 'blue',
+    colour: 'green',
     shape: 'star',
-    // leafStyle: {
-    //   lineWidth: 0,
-    // },
+    leafStyle: {
+      fillStyle: 'lightgreen',
+    },
     // labelStyle: {
     //   colour: 'red',
     // },
   });
   tree.setNodeDisplay('D', {
-    colour: 'green',
+    colour: 'blue',
     shape: 'square',
-    // leafStyle: {
-    //   strokeStyle: '#222',
-    //   fillStyle: 'green',
-    //   lineWidth: 1,
-    // },
+    leafStyle: {
+      fillStyle: 'lightblue',
+    },
   });
 
   // tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
