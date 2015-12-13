@@ -64,7 +64,7 @@ export class ChildNodesTooltip extends Tooltip {
   }
 
   createContent(node) {
-    const textNode = document.createTextNode(node.getChildIds().length);
+    const textNode = document.createTextNode(node.getChildProperties('id').length);
     this.element.appendChild(textNode);
   }
 }

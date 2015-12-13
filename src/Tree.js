@@ -186,7 +186,7 @@ export default class Tree {
     var childIds;
     var i;
 
-    childIds = node.getChildIds();
+    childIds = node.getChildProperties('id');
     if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
         childIds.length < this.defaultCollapsedOptions.max) {
       node.collapsed = true;
@@ -216,7 +216,7 @@ export default class Tree {
         this.root.cascadeFlag('selected', false);
         if (this.internalNodesSelectable || node.leaf) {
           node.cascadeFlag('selected', true);
-          nodeIds = node.getChildIds();
+          nodeIds = node.getChildProperties('id');
         }
         this.draw();
       } else if (this.unselectOnClickAway && !this.dragging) {

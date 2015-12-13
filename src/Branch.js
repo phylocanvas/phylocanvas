@@ -1,9 +1,8 @@
-import { constants, dom } from 'phylocanvas-utils';
+import { constants } from 'phylocanvas-utils';
 
 import nodeRenderers from './nodeRenderers';
 
 const { Angles, Shapes } = constants;
-const { createBlobUrl } = dom;
 
 /**
  * Cached objects to reduce garbage
@@ -282,8 +281,8 @@ export default class Branch {
   }
 
   drawCollapsed(centerX, centerY) {
-    var childIds = this.getChildIds();
-    var radius = childIds.length;
+    const childIds = this.getChildProperties('id');
+    let radius = childIds.length;
 
     if (this.tree.scaleCollapsedNode) {
       radius = this.tree.scaleCollapsedNode(radius);
@@ -385,42 +384,35 @@ export default class Branch {
     }
   }
 
-  getChildIds() {
-    var children = [];
-    var x;
-
+  getChildProperties(property) {
     if (this.leaf) {
       // Fix for Issue #68
       // Returning array, as expected
-      return [ this.id ];
-    } else {
-      children = [];
-      for (x = 0; x < this.children.length; x++) {
-        children = children.concat(this.children[x].getChildIds());
-      }
-      return children;
+      return [ this[property] ];
     }
+
+    let children = [];
+    for (let x = 0; x < this.children.length; x++) {
+      children = children.concat(this.children[x].getChildProperties(property));
+    }
+    return children;
   }
 
   getChildCount() {
-    var children = 0;
-    var x;
-
     if (this.leaf) return 1;
 
-    for (x = 0; x < this.children.length; x++) {
+    let children = 0;
+    for (let x = 0; x < this.children.length; x++) {
       children += this.children[x].getChildCount();
     }
     return children;
   }
 
   getChildYTotal() {
-    var y = 0;
-    var i;
-
     if (this.leaf) return this.centery;
 
-    for (i = 0; i < this.children.length; i++) {
+    let y = 0;
+    for (let i = 0; i < this.children.length; i++) {
       y += this.children[i].getChildYTotal();
     }
     return y;
@@ -431,7 +423,7 @@ export default class Branch {
       throw new Error(`Unknown property: ${property}`);
     }
     this[property] = value;
-    for (let child of this.children) {
+    for (const child of this.children) {
       child.cascadeFlag(property, value);
     }
   }
@@ -550,13 +542,13 @@ export default class Branch {
     return specifiedColour || this.colour || this.tree.branchColour;
   }
 
-  getNwk() {
+  getNwk(isRoot = true) {
     if (this.leaf) {
-      return `${this.id}:${this.branchLength}`;
+      return `${this.label}:${this.branchLength}`;
     }
 
-    const childNwks = this.children.map(child => child.getNwk());
-    return `(${childNwks.join(',')}):${this.branchLength}`;
+    const childNwks = this.children.map(child => child.getNwk(false));
+    return `(${childNwks.join(',')}):${this.branchLength}${isRoot ? ';' : ''}`;
   }
 
   getTextColour() {
@@ -655,10 +647,9 @@ export default class Branch {
   }
 
   rotate(evt) {
-    var newChildren = [];
-    var i;
+    const newChildren = [];
 
-    for (i = this.children.length; i--; ) {
+    for (let i = this.children.length; i--; ) {
       newChildren.push(this.children[i]);
     }
 
@@ -672,17 +663,6 @@ export default class Branch {
 
   getChildNo() {
     return this.parent.children.indexOf(this);
-  }
-
-  downloadLeafIdsFromBranch() {
-    var downloadData = this.getChildIds().join('\n');
-    var filename = 'pc_leaf_ids';
-    if (!this.parent) {
-      filename += '_all.txt';
-    } else {
-      filename += '_' + this.id + '.txt';
-    }
-    return createBlobUrl(downloadData);
   }
 
   setDisplay({ colour, shape, size, leafStyle, labelStyle }) {

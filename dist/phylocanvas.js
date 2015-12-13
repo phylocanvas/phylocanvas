@@ -349,7 +349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var childIds;
 	      var i;
 
-	      childIds = node.getChildIds();
+	      childIds = node.getChildProperties('id');
 	      if (childIds && childIds.length > this.defaultCollapsedOptions.min && childIds.length < this.defaultCollapsedOptions.max) {
 	        node.collapsed = true;
 	        return;
@@ -381,7 +381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.root.cascadeFlag('selected', false);
 	          if (this.internalNodesSelectable || node.leaf) {
 	            node.cascadeFlag('selected', true);
-	            nodeIds = node.getChildIds();
+	            nodeIds = node.getChildProperties('id');
 	          }
 	          this.draw();
 	        } else if (this.unselectOnClickAway && !this.dragging) {
@@ -1205,7 +1205,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 	var Shapes = _phylocanvasUtils.constants.Shapes;
-	var createBlobUrl = _phylocanvasUtils.dom.createBlobUrl;
 
 	/**
 	 * Cached objects to reduce garbage
@@ -1479,7 +1478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawCollapsed',
 	    value: function drawCollapsed(centerX, centerY) {
-	      var childIds = this.getChildIds();
+	      var childIds = this.getChildProperties('id');
 	      var radius = childIds.length;
 
 	      if (this.tree.scaleCollapsedNode) {
@@ -1587,32 +1586,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
-	    key: 'getChildIds',
-	    value: function getChildIds() {
-	      var children = [];
-	      var x;
-
+	    key: 'getChildProperties',
+	    value: function getChildProperties(property) {
 	      if (this.leaf) {
 	        // Fix for Issue #68
 	        // Returning array, as expected
-	        return [this.id];
-	      } else {
-	        children = [];
-	        for (x = 0; x < this.children.length; x++) {
-	          children = children.concat(this.children[x].getChildIds());
-	        }
-	        return children;
+	        return [this[property]];
 	      }
+
+	      var children = [];
+	      for (var x = 0; x < this.children.length; x++) {
+	        children = children.concat(this.children[x].getChildProperties(property));
+	      }
+	      return children;
 	    }
 	  }, {
 	    key: 'getChildCount',
 	    value: function getChildCount() {
-	      var children = 0;
-	      var x;
-
 	      if (this.leaf) return 1;
 
-	      for (x = 0; x < this.children.length; x++) {
+	      var children = 0;
+	      for (var x = 0; x < this.children.length; x++) {
 	        children += this.children[x].getChildCount();
 	      }
 	      return children;
@@ -1620,12 +1614,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getChildYTotal',
 	    value: function getChildYTotal() {
-	      var y = 0;
-	      var i;
-
 	      if (this.leaf) return this.centery;
 
-	      for (i = 0; i < this.children.length; i++) {
+	      var y = 0;
+	      for (var i = 0; i < this.children.length; i++) {
 	        y += this.children[i].getChildYTotal();
 	      }
 	      return y;
@@ -1814,14 +1806,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getNwk',
 	    value: function getNwk() {
+	      var isRoot = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
 	      if (this.leaf) {
-	        return this.id + ':' + this.branchLength;
+	        return this.label + ':' + this.branchLength;
 	      }
 
 	      var childNwks = this.children.map(function (child) {
-	        return child.getNwk();
+	        return child.getNwk(false);
 	      });
-	      return '(' + childNwks.join(',') + '):' + this.branchLength;
+	      return '(' + childNwks.join(',') + '):' + this.branchLength + (isRoot ? ';' : '');
 	    }
 	  }, {
 	    key: 'getTextColour',
@@ -1934,9 +1928,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'rotate',
 	    value: function rotate(evt) {
 	      var newChildren = [];
-	      var i;
 
-	      for (i = this.children.length; i--;) {
+	      for (var i = this.children.length; i--;) {
 	        newChildren.push(this.children[i]);
 	      }
 
@@ -1951,18 +1944,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getChildNo',
 	    value: function getChildNo() {
 	      return this.parent.children.indexOf(this);
-	    }
-	  }, {
-	    key: 'downloadLeafIdsFromBranch',
-	    value: function downloadLeafIdsFromBranch() {
-	      var downloadData = this.getChildIds().join('\n');
-	      var filename = 'pc_leaf_ids';
-	      if (!this.parent) {
-	        filename += '_all.txt';
-	      } else {
-	        filename += '_' + this.id + '.txt';
-	      }
-	      return createBlobUrl(downloadData);
 	    }
 	  }, {
 	    key: 'setDisplay',
@@ -2294,7 +2275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(ChildNodesTooltip, [{
 	    key: 'createContent',
 	    value: function createContent(node) {
-	      var textNode = document.createTextNode(node.getChildIds().length);
+	      var textNode = document.createTextNode(node.getChildProperties('id').length);
 	      this.element.appendChild(textNode);
 	    }
 	  }]);
