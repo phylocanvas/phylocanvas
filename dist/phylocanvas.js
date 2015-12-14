@@ -2069,6 +2069,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Angles = _phylocanvasUtils.constants.Angles;
 
+	function drawConnector(canvas, connectingOffset) {
+	  canvas.beginPath();
+	  canvas.moveTo(0, 0);
+	  canvas.lineTo(connectingOffset, 0);
+	  canvas.stroke();
+	  canvas.closePath();
+	}
+
 	function commitPath(canvas, _ref) {
 	  var lineWidth = _ref.lineWidth;
 	  var strokeStyle = _ref.strokeStyle;
@@ -2081,33 +2089,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  canvas.fillStyle = fillStyle;
 
 	  canvas.fill();
-	  if (lineWidth > 0) {
+	  if (lineWidth > 0 && strokeStyle !== fillStyle) {
 	    canvas.stroke();
 	  }
 
 	  canvas.restore();
 	}
 
+	var lengthOfSquareSide = function lengthOfSquareSide(radius) {
+	  return radius * Math.sqrt(2);
+	};
+
 	exports['default'] = {
 
 	  circle: function circle(canvas, radius, style) {
+	    // circle takes same area as square inside given radius
+	    var scaledArea = Math.pow(lengthOfSquareSide(radius), 2);
+	    var scaledRadius = Math.sqrt(scaledArea / Math.PI);
+
+	    drawConnector(canvas, radius - scaledRadius);
+
 	    canvas.beginPath();
-	    canvas.arc(radius, 0, radius, 0, Angles.FULL, false);
+	    canvas.arc(radius, 0, scaledRadius, 0, Angles.FULL, false);
 	    canvas.closePath();
 
 	    commitPath(canvas, style);
 	  },
 
 	  square: function square(canvas, radius, style) {
-	    var lengthOfSide = radius * Math.sqrt(2);
+	    var lengthOfSide = lengthOfSquareSide(radius);
 	    var startX = radius - lengthOfSide / 2;
 
-	    // connector
-	    canvas.beginPath();
-	    canvas.moveTo(0, 0);
-	    canvas.lineTo(startX, 0);
-	    canvas.stroke();
-	    canvas.closePath();
+	    drawConnector(canvas, startX);
 
 	    canvas.beginPath();
 	    canvas.moveTo(startX, 0);
@@ -2124,10 +2137,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  star: function star(canvas, radius, style) {
 	    var cx = radius;
 	    var cy = 0;
-	    var spikes = 8;
+	    var spikes = 5;
 	    var outerRadius = radius;
-	    var innerRadius = radius * 0.5;
+	    var innerRadius = outerRadius * 0.5;
 	    var step = Math.PI / spikes;
+
+	    drawConnector(canvas, outerRadius - innerRadius);
 
 	    var rot = Math.PI / 2 * 3;
 
@@ -2152,15 +2167,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  triangle: function triangle(canvas, radius, style) {
 	    var lengthOfSide = 2 * radius * Math.cos(30 * Math.PI / 180);
+	    var height = Math.sqrt(3) / 2 * lengthOfSide;
+	    var midpoint = 1 / Math.sqrt(3) * (lengthOfSide / 2);
+
+	    drawConnector(canvas, radius - midpoint);
 
 	    canvas.beginPath();
-	    canvas.moveTo(0, 0);
-	    canvas.rotate(30 * Math.PI / 180);
-	    canvas.lineTo(lengthOfSide, 0);
-	    canvas.rotate(-60 * Math.PI / 180);
-	    canvas.lineTo(lengthOfSide, 0);
-	    canvas.rotate(30 * Math.PI / 180);
-	    canvas.lineTo(0, 0);
+	    canvas.moveTo(radius, midpoint);
+	    canvas.lineTo(radius + lengthOfSide / 2, midpoint);
+	    canvas.lineTo(radius, -(height - midpoint));
+	    canvas.lineTo(radius - lengthOfSide / 2, midpoint);
+	    canvas.lineTo(radius, midpoint);
 	    canvas.closePath();
 
 	    commitPath(canvas, style);
