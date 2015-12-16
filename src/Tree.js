@@ -391,8 +391,8 @@ export default class Tree {
       return;
     }
 
-    for (let parserName of Object.keys(parsers)) {
-      let parser = parsers[parserName];
+    for (const parserName of Object.keys(parsers)) {
+      const parser = parsers[parserName];
 
       if (inputString.match(parser.fileExtension) ||
           inputString.match(parser.validator)) {
@@ -401,7 +401,7 @@ export default class Tree {
       }
     }
 
-    let error = new Error('String not recognised as a file or a parseable format string');
+    const error = new Error('String not recognised as a file or a parseable format string');
     if (buildCallback) {
       buildCallback(error);
     }
@@ -441,7 +441,7 @@ export default class Tree {
     this.clearState();
     Branch.lastId = 0;
 
-    let root = new Branch();
+    const root = new Branch();
     root.id = 'root';
     this.branches.root = root;
     this.setRoot(root);
@@ -462,9 +462,8 @@ export default class Tree {
       if (options.callback) {
         options.callback();
       }
-      if (!options.quiet) {
-        this.loadCompleted();
-      }
+
+      this.loadCompleted();
     });
   }
 
@@ -498,9 +497,7 @@ export default class Tree {
   }
 
   redrawOriginalTree() {
-    this.load(this.stringRepresentation, { quiet: true }, () => {
-      this.originalTreeRedrawn();
-    });
+    this.load(this.stringRepresentation);
   }
 
   storeNode(node) {
@@ -698,10 +695,6 @@ export default class Tree {
 
   subtreeDrawn(node) {
     fireEvent(this.containerElement, 'subtree', { node });
-  }
-
-  originalTreeRedrawn() {
-    fireEvent(this.containerElement, 'original-tree');
   }
 
   nodesUpdated(nodeIds, property) {
