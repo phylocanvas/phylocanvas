@@ -742,9 +742,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (options.callback) {
 	          options.callback();
 	        }
-	        if (!options.quiet) {
-	          _this2.loadCompleted();
-	        }
+
+	        _this2.loadCompleted();
 	      });
 	    }
 	  }, {
@@ -781,11 +780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'redrawOriginalTree',
 	    value: function redrawOriginalTree() {
-	      var _this3 = this;
-
-	      this.load(this.stringRepresentation, { quiet: true }, function () {
-	        _this3.originalTreeRedrawn();
-	      });
+	      this.load(this.stringRepresentation);
 	    }
 	  }, {
 	    key: 'storeNode',
@@ -813,7 +808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'scroll',
 	    value: function scroll(e) {
-	      var _this4 = this;
+	      var _this3 = this;
 
 	      e.preventDefault();
 	      if (this._zooming) return;
@@ -821,7 +816,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
 	      this._zooming = true;
 	      setTimeout(function () {
-	        _this4._zooming = false;
+	        _this3._zooming = false;
 	      }, 128);
 	    }
 	  }, {
@@ -861,7 +856,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setNodeDisplay',
 	    value: function setNodeDisplay(ids, options, waiting) {
-	      var _this5 = this;
+	      var _this4 = this;
 
 	      if (!ids) return;
 
@@ -906,7 +901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else if (!waiting) {
 	        (function () {
-	          var _this = _this5;
+	          var _this = _this4;
 	          var timeout = setInterval(function () {
 	            if (this.drawn) {
 	              _this.setNodeColourAndShape(ids, options, true);
@@ -1030,11 +1025,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'subtreeDrawn',
 	    value: function subtreeDrawn(node) {
 	      fireEvent(this.containerElement, 'subtree', { node: node });
-	    }
-	  }, {
-	    key: 'originalTreeRedrawn',
-	    value: function originalTreeRedrawn() {
-	      fireEvent(this.containerElement, 'original-tree');
 	    }
 	  }, {
 	    key: 'nodesUpdated',
