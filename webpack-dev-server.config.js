@@ -1,6 +1,6 @@
-var path = require('path');
+const path = require('path');
 
-var sourceConfig = require('./webpack.config')[0];
+const sourceConfig = require('./webpack.config')[0];
 sourceConfig.debug = true;
 
 module.exports = {
@@ -11,13 +11,16 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js$/,
-        loader: 'babel?stage=0',
-        exclude: path.join(__dirname, 'node_modules')
-      }
-    ]
+        loader: 'babel',
+        exclude: path.join(__dirname, 'node_modules'),
+        query: {
+          presets: [ 'es2015', 'stage-0' ],
+        },
+      },
+    ],
   },
   output: {
-    filename: 'phylocanvas-dev.js'
+    filename: 'phylocanvas-dev.js',
   },
-  target: 'web'
+  target: 'web',
 };

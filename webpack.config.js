@@ -1,22 +1,22 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 function config(options) {
-  var plugins = [
+  const plugins = [
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('production')
-      }
-    })
+        NODE_ENV: JSON.stringify('production'),
+      },
+    }),
   ];
 
   if (options.minify) {
     plugins.push(
       new webpack.optimize.UglifyJsPlugin({
         compressor: {
-          warnings: false
-        }
+          warnings: false,
+        },
       })
     );
   }
@@ -29,30 +29,33 @@ function config(options) {
       publicPath: '/dist/',
       filename: options.minify ? 'phylocanvas.min.js' : 'phylocanvas.js',
       library: 'PhyloCanvas',
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
     module: {
       loaders: [
         { test: /\.js$/,
-          loader: 'babel?stage=0',
-          exclude: path.join(__dirname, 'node_modules')
-        }
-      ]
+          loader: 'babel',
+          exclude: path.join(__dirname, 'node_modules'),
+          query: {
+            presets: [ 'es2015', 'stage-0' ],
+          },
+        },
+      ],
     },
     plugins: plugins,
-    target: 'web'
+    target: 'web',
   };
 }
 
-var polyfillConfig = {
+const polyfillConfig = {
   entry: './src/polyfill',
   output: {
-    filename: 'polyfill.js'
-  }
+    filename: 'polyfill.js',
+  },
 };
 
 module.exports = [
   config({ minify: false }),
   config({ minify: true }),
-  polyfillConfig
+  polyfillConfig,
 ];

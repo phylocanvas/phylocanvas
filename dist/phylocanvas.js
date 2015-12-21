@@ -54,24 +54,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
-	 *
-	 * @author Chris Powell (c.powell@imperial.ac.uk)
-	 * @modified Jyothish NT 01/03/15
-	 */
-
-	/**
-	 * @namespace PhyloCanvas
-	 */
-
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	exports.nodeRenderers = exports.treeTypes = exports.Parser = exports.Tooltip = exports.Branch = exports.Tree = undefined;
 
 	var _Tree = __webpack_require__(1);
 
@@ -97,12 +85,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
-	exports.Tree = _Tree2['default'];
-	exports.Branch = _Branch2['default'];
-	exports.Tooltip = _Tooltip2['default'];
-	exports.Parser = _Parser2['default'];
-	exports.treeTypes = _treeTypes2['default'];
-	exports.nodeRenderers = _nodeRenderers2['default'];
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
+	 *
+	 * @author Chris Powell (c.powell@imperial.ac.uk)
+	 * @modified Jyothish NT 01/03/15
+	 */
+
+	/**
+	 * @namespace PhyloCanvas
+	 */
+
+	exports.Tree = _Tree2.default;
+	exports.Branch = _Branch2.default;
+	exports.Tooltip = _Tooltip2.default;
+	exports.Parser = _Parser2.default;
+	exports.treeTypes = _treeTypes2.default;
+	exports.nodeRenderers = _nodeRenderers2.default;
 
 	function decorate(object, fnName, fn) {
 	  var target = object[fnName] ? object : object.prototype;
@@ -124,10 +125,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function createTree(element) {
 	  var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	  return new _Tree2['default'](element, conf);
+	  return new _Tree2.default(element, conf);
 	}
 
-	exports['default'] = { plugin: plugin, createTree: createTree };
+	exports.default = { plugin: plugin, createTree: createTree };
 
 /***/ },
 /* 1 */
@@ -135,17 +136,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var _phylocanvasUtils = __webpack_require__(2);
 
@@ -166,6 +161,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _parsers = __webpack_require__(25);
 
 	var _parsers2 = _interopRequireDefault(_parsers);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var addClass = _phylocanvasUtils.dom.addClass;
 	var fireEvent = _phylocanvasUtils.events.fireEvent;
@@ -304,7 +305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.unselectOnClickAway = true;
 
 	    if (this.useNavigator) {
-	      this.navigator = new _Navigator2['default'](this);
+	      this.navigator = new _Navigator2.default(this);
 	    }
 
 	    this.resizeToContainer();
@@ -463,6 +464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Draw the frame
 	     */
+
 	  }, {
 	    key: 'draw',
 	    value: function draw(forceRedraw) {
@@ -536,8 +538,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
 	          }
 	        } finally {
 	          if (_didIteratorError) {
@@ -566,8 +568,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError2 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	            _iterator2['return']();
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
 	          }
 	        } finally {
 	          if (_didIteratorError2) {
@@ -591,8 +593,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError3 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-	            _iterator3['return']();
+	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	            _iterator3.return();
 	          }
 	        } finally {
 	          if (_didIteratorError3) {
@@ -624,8 +626,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'load',
-	    value: function load(inputString, options, callback) {
-	      if (options === undefined) options = {};
+	    value: function load(inputString) {
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      var callback = arguments[2];
 
 	      var buildOptions = options;
 	      var buildCallback = callback;
@@ -641,7 +644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      if (buildOptions.format) {
-	        this.build(inputString, _parsers2['default'][buildOptions.format], buildOptions);
+	        this.build(inputString, _parsers2.default[buildOptions.format], buildOptions);
 	        return;
 	      }
 
@@ -650,10 +653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _iteratorError4 = undefined;
 
 	      try {
-	        for (var _iterator4 = Object.keys(_parsers2['default'])[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	        for (var _iterator4 = Object.keys(_parsers2.default)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 	          var parserName = _step4.value;
 
-	          var parser = _parsers2['default'][parserName];
+	          var parser = _parsers2.default[parserName];
 
 	          if (inputString.match(parser.fileExtension) || inputString.match(parser.validator)) {
 	            this.build(inputString, parser, buildOptions);
@@ -665,8 +668,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError4 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-	            _iterator4['return']();
+	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	            _iterator4.return();
 	          }
 	        } finally {
 	          if (_didIteratorError4) {
@@ -719,9 +722,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.originalTree = {};
 	      this.clearState();
-	      _Branch2['default'].lastId = 0;
+	      _Branch2.default.lastId = 0;
 
-	      var root = new _Branch2['default']();
+	      var root = new _Branch2.default();
 	      root.id = 'root';
 	      this.branches.root = root;
 	      this.setRoot(root);
@@ -786,13 +789,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'storeNode',
 	    value: function storeNode(node) {
 	      if (!node.id || node.id === '') {
-	        node.id = _Branch2['default'].generateId();
+	        node.id = _Branch2.default.generateId();
 	      }
 
 	      if (this.branches[node.id]) {
 	        if (node !== this.branches[node.id]) {
 	          if (!node.leaf) {
-	            node.id = _Branch2['default'].generateId();
+	            node.id = _Branch2.default.generateId();
 	          } else {
 	            throw new Error('Two nodes on this tree share the id ' + node.id);
 	          }
@@ -887,8 +890,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _iteratorError5 = err;
 	          } finally {
 	            try {
-	              if (!_iteratorNormalCompletion5 && _iterator5['return']) {
-	                _iterator5['return']();
+	              if (!_iteratorNormalCompletion5 && _iterator5.return) {
+	                _iterator5.return();
 	              }
 	            } finally {
 	              if (_didIteratorError5) {
@@ -939,18 +942,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setTreeType',
 	    value: function setTreeType(type, quiet) {
-	      if (!(type in _treeTypes2['default'])) {
+	      if (!(type in _treeTypes2.default)) {
 	        return fireEvent(this.containerElement, 'error', { error: new Error('"' + type + '" is not a known tree-type.') });
 	      }
 
 	      var oldType = this.treeType;
 	      this.treeType = type;
 
-	      this.branchRenderer = _treeTypes2['default'][type].branchRenderer;
-	      this.prerenderer = _treeTypes2['default'][type].prerenderer;
-	      this.labelAlign = _treeTypes2['default'][type].labelAlign;
-	      this.scaleCollapsedNode = _treeTypes2['default'][type].scaleCollapsedNode;
-	      this.calculateFontSize = _treeTypes2['default'][type].calculateFontSize;
+	      this.branchRenderer = _treeTypes2.default[type].branchRenderer;
+	      this.prerenderer = _treeTypes2.default[type].prerenderer;
+	      this.labelAlign = _treeTypes2.default[type].labelAlign;
+	      this.scaleCollapsedNode = _treeTypes2.default[type].scaleCollapsedNode;
+	      this.calculateFontSize = _treeTypes2.default[type].calculateFontSize;
 
 	      if (this.drawn) {
 	        this.drawn = false;
@@ -1109,8 +1112,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError6 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion6 && _iterator6['return']) {
-	            _iterator6['return']();
+	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+	            _iterator6.return();
 	          }
 	        } finally {
 	          if (_didIteratorError6) {
@@ -1160,10 +1163,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Tree;
 	})();
 
-	exports['default'] = Tree;
+	exports.default = Tree;
 
 	Tree.prototype.on = Tree.prototype.addListener;
-	module.exports = exports['default'];
 
 /***/ },
 /* 2 */
@@ -1177,15 +1179,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var _phylocanvasUtils = __webpack_require__(2);
 
@@ -1193,12 +1191,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 	var Angles = _phylocanvasUtils.constants.Angles;
 	var Shapes = _phylocanvasUtils.constants.Shapes;
 
 	/**
 	 * Cached objects to reduce garbage
 	 */
+
 	var _bounds = {
 	  minx: 0,
 	  maxx: 0,
@@ -1519,7 +1522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      canvas.save();
 
-	      _nodeRenderers2['default'][this.nodeShape](canvas, this.getRadius(), this.getLeafStyle());
+	      _nodeRenderers2.default[this.nodeShape](canvas, this.getRadius(), this.getLeafStyle());
 
 	      canvas.restore();
 
@@ -1634,8 +1637,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
 	          }
 	        } finally {
 	          if (_didIteratorError) {
@@ -1690,8 +1693,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError2 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	            _iterator2['return']();
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
 	          }
 	        } finally {
 	          if (_didIteratorError2) {
@@ -1752,6 +1755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param node {Branch} the node to add as a child
 	     * @memberof Branch
 	     */
+
 	  }, {
 	    key: 'addChild',
 	    value: function addChild(node) {
@@ -1765,6 +1769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Return the node colour of all the nodes that are children of this one.
 	     */
+
 	  }, {
 	    key: 'getChildColours',
 	    value: function getChildColours() {
@@ -1784,6 +1789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Get the colour(s) of the branch itself.
 	     */
+
 	  }, {
 	    key: 'getColour',
 	    value: function getColour(specifiedColour) {
@@ -1874,6 +1880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @method getNodeSize
 	     * @return CallExpression
 	     */
+
 	  }, {
 	    key: 'getLabelStartX',
 	    value: function getLabelStartX() {
@@ -2014,6 +2021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var zoom = this.tree.zoom;
 
 	      // uses a caching object to reduce garbage
+
 	      _leafStyle.strokeStyle = this.getColour(strokeStyle);
 	      _leafStyle.fillStyle = this.getColour(fillStyle);
 
@@ -2033,17 +2041,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function generateId() {
 	      return 'pcn' + this.lastId++;
 	    }
-	  }, {
-	    key: 'lastId',
-	    value: 0,
-	    enumerable: true
 	  }]);
 
 	  return Branch;
 	})();
 
-	exports['default'] = Branch;
-	module.exports = exports['default'];
+	Branch.lastId = 0;
+	exports.default = Branch;
 
 /***/ },
 /* 4 */
@@ -2051,7 +2055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
@@ -2090,8 +2094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return radius * Math.sqrt(2);
 	};
 
-	exports['default'] = {
-
+	exports.default = {
 	  circle: function circle(canvas, radius, style) {
 	    // circle takes same area as square inside given radius
 	    var scaledArea = Math.pow(lengthOfSquareSide(radius), 2);
@@ -2105,7 +2108,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    commitPath(canvas, style);
 	  },
-
 	  square: function square(canvas, radius, style) {
 	    var lengthOfSide = lengthOfSquareSide(radius);
 	    var startX = radius - lengthOfSide / 2;
@@ -2123,7 +2125,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    commitPath(canvas, style);
 	  },
-
 	  star: function star(canvas, radius, style) {
 	    var cx = radius;
 	    var cy = 0;
@@ -2154,7 +2155,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    commitPath(canvas, style);
 	  },
-
 	  triangle: function triangle(canvas, radius, style) {
 	    var lengthOfSide = 2 * radius * Math.cos(30 * Math.PI / 180);
 	    var height = Math.sqrt(3) / 2 * lengthOfSide;
@@ -2172,13 +2172,25 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    commitPath(canvas, style);
 	  }
-
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 5 */
 /***/ function(module, exports) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	/**
 	 * Tooltip
@@ -2186,19 +2198,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @constructor
 	 * @memberOf PhyloCanvas
 	 */
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var Tooltip = (function () {
 	  function Tooltip(tree) {
@@ -2234,9 +2233,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'open',
-	    value: function open(x, y, node) {
-	      if (x === undefined) x = 100;
-	      if (y === undefined) y = 100;
+	    value: function open() {
+	      var x = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
+	      var y = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
+	      var node = arguments[2];
 
 	      while (this.element.hasChildNodes()) {
 	        this.element.removeChild(this.element.firstChild);
@@ -2257,26 +2257,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Tooltip;
 	})();
 
-	exports['default'] = Tooltip;
+	exports.default = Tooltip;
 
-	var ChildNodesTooltip = (function (_Tooltip) {
+	var ChildNodesTooltip = exports.ChildNodesTooltip = (function (_Tooltip) {
 	  _inherits(ChildNodesTooltip, _Tooltip);
 
 	  function ChildNodesTooltip(tree, options) {
 	    _classCallCheck(this, ChildNodesTooltip);
 
-	    _get(Object.getPrototypeOf(ChildNodesTooltip.prototype), 'constructor', this).call(this, tree, options);
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildNodesTooltip).call(this, tree, options));
 
-	    this.element.style.background = 'rgba(97, 97, 97, 0.9)';
-	    this.element.style.color = '#fff';
-	    this.element.style.cursor = 'pointer';
-	    this.element.style.padding = '8px';
-	    this.element.style.marginTop = '16px';
-	    this.element.style.borderRadius = '2px';
-	    this.element.style.textAlign = 'center';
-	    this.element.style.fontFamily = this.tree.font || 'sans-serif';
-	    this.element.style.fontSize = '10px';
-	    this.element.style.fontWeight = '500';
+	    _this.element.style.background = 'rgba(97, 97, 97, 0.9)';
+	    _this.element.style.color = '#fff';
+	    _this.element.style.cursor = 'pointer';
+	    _this.element.style.padding = '8px';
+	    _this.element.style.marginTop = '16px';
+	    _this.element.style.borderRadius = '2px';
+	    _this.element.style.textAlign = 'center';
+	    _this.element.style.fontFamily = _this.tree.font || 'sans-serif';
+	    _this.element.style.fontSize = '10px';
+	    _this.element.style.fontWeight = '500';
+	    return _this;
 	  }
 
 	  _createClass(ChildNodesTooltip, [{
@@ -2290,11 +2291,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ChildNodesTooltip;
 	})(Tooltip);
 
-	exports.ChildNodesTooltip = ChildNodesTooltip;
-
 /***/ },
 /* 6 */
 /***/ function(module, exports) {
+
+	'use strict';
 
 	/**
 	 * Overview window
@@ -2302,8 +2303,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @constructor
 	 * @memberof PhyloCanvas
 	 */
-	'use strict';
-
 	function Navigator(tree) {
 	  this.tree = tree;
 	  this.cel = document.createElement('canvas');
@@ -2382,11 +2381,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _rectangular = __webpack_require__(8);
 
@@ -2408,14 +2405,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _hierarchical2 = _interopRequireDefault(_hierarchical);
 
-	exports['default'] = {
-	  rectangular: _rectangular2['default'],
-	  circular: _circular2['default'],
-	  radial: _radial2['default'],
-	  diagonal: _diagonal2['default'],
-	  hierarchical: _hierarchical2['default']
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  rectangular: _rectangular2.default,
+	  circular: _circular2.default,
+	  radial: _radial2.default,
+	  diagonal: _diagonal2.default,
+	  hierarchical: _hierarchical2.default
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 8 */
@@ -2423,11 +2421,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _BranchRenderer = __webpack_require__(9);
 
@@ -2445,6 +2441,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var labelAlign = {
 	  getX: function getX(node) {
 	    return node.tree.farthestNodeFromRootX;
@@ -2457,12 +2455,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	exports['default'] = {
-	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
-	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  labelAlign: labelAlign
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 9 */
@@ -2514,11 +2511,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2556,8 +2553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Prerenderer;
 	})();
 
-	exports["default"] = Prerenderer;
-	module.exports = exports["default"];
+	exports.default = Prerenderer;
 
 /***/ },
 /* 11 */
@@ -2568,7 +2564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  draw: function draw(tree, node) {
 	    var branchLength = node.branchLength * tree.branchScalar;
 
@@ -2589,7 +2585,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.starty = node.centery;
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 12 */
@@ -2600,7 +2595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
@@ -2635,7 +2630,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 13 */
@@ -2643,11 +2637,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _BranchRenderer = __webpack_require__(9);
 
@@ -2665,6 +2657,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var labelAlign = {
 	  getX: function getX(node) {
 	    return node.centerx + node.labelOffsetX + node.getDiameter() * Math.cos(node.angle);
@@ -2677,9 +2671,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	exports['default'] = {
-	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
-	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  labelAlign: labelAlign,
 	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
 	    return radius / 3;
@@ -2688,7 +2682,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Math.min(ystep * 10 + 4, 40);
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 14 */
@@ -2699,7 +2692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  draw: function draw(tree, node) {
 	    var branchLength = node.totalBranchLength * tree.branchScalar;
 
@@ -2719,7 +2712,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 15 */
@@ -2727,14 +2719,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
 	var _phylocanvasUtils = __webpack_require__(2);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
-	exports['default'] = {
+	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Angles.FULL / tree.leaves.length;
 	  },
@@ -2778,7 +2770,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 16 */
@@ -2786,11 +2777,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _BranchRenderer = __webpack_require__(9);
 
@@ -2808,9 +2797,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
-	exports['default'] = {
-	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
-	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
 	    return radius / 7;
 	  },
@@ -2818,7 +2809,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return Math.min(ystep * 50 + 5, 15);
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 17 */
@@ -2829,7 +2819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  draw: function draw(tree, node) {
 	    node.canvas.beginPath();
 	    node.canvas.moveTo(node.startx, node.starty);
@@ -2838,7 +2828,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.closePath();
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 18 */
@@ -2846,7 +2835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
@@ -2870,7 +2859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	exports['default'] = {
+	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Angles.FULL / tree.leaves.length;
 	  },
@@ -2898,7 +2887,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    prerenderNodes(tree, tree.root);
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 19 */
@@ -2906,11 +2894,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _BranchRenderer = __webpack_require__(9);
 
@@ -2928,14 +2914,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
-	exports['default'] = {
-	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
-	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  calculateFontSize: function calculateFontSize(ystep) {
 	    return Math.min(ystep / 2, 10);
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 20 */
@@ -2946,7 +2933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  draw: function draw(tree, node) {
 	    node.angle = 0;
 	    node.canvas.beginPath();
@@ -2962,7 +2949,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    child.starty = node.centery;
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 21 */
@@ -2970,14 +2956,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
 	var _phylocanvasUtils = __webpack_require__(2);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
-	exports['default'] = {
+	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
@@ -3002,7 +2988,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 22 */
@@ -3010,11 +2995,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _BranchRenderer = __webpack_require__(9);
 
@@ -3032,6 +3015,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var labelAlign = {
 	  getX: function getX(node) {
 	    return node.centerx;
@@ -3044,12 +3029,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	exports['default'] = {
-	  branchRenderer: new _BranchRenderer2['default'](_branchRenderer2['default']),
-	  prerenderer: new _Prerenderer2['default'](_prerenderer2['default']),
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  labelAlign: labelAlign
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 23 */
@@ -3060,7 +3044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports["default"] = {
+	exports.default = {
 	  draw: function draw(tree, node) {
 	    node.canvas.beginPath();
 
@@ -3075,7 +3059,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.closePath();
 	  }
 	};
-	module.exports = exports["default"];
 
 /***/ },
 /* 24 */
@@ -3083,14 +3066,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
 	var _phylocanvasUtils = __webpack_require__(2);
 
 	var Angles = _phylocanvasUtils.constants.Angles;
-	exports['default'] = {
+	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
@@ -3129,7 +3112,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 25 */
@@ -3137,11 +3119,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _Parser = __webpack_require__(26);
 
@@ -3155,11 +3135,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _nexus2 = _interopRequireDefault(_nexus);
 
-	exports['default'] = {
-	  nexus: new _Parser2['default'](_nexus2['default']),
-	  newick: new _Parser2['default'](_newick2['default'])
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  nexus: new _Parser2.default(_nexus2.default),
+	  newick: new _Parser2.default(_newick2.default)
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 26 */
@@ -3167,11 +3148,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -3208,8 +3189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Parser;
 	})();
 
-	exports["default"] = Parser;
-	module.exports = exports["default"];
+	exports.default = Parser;
 
 /***/ },
 /* 27 */
@@ -3217,15 +3197,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _Branch = __webpack_require__(3);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var format = 'newick';
 	var fileExtension = /\.nwk$/;
@@ -3257,8 +3237,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _iteratorError = err;
 	  } finally {
 	    try {
-	      if (!_iteratorNormalCompletion && _iterator['return']) {
-	        _iterator['return']();
+	      if (!_iteratorNormalCompletion && _iterator.return) {
+	        _iterator.return();
 	      }
 	    } finally {
 	      if (_didIteratorError) {
@@ -3318,8 +3298,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _iteratorError2 = err;
 	  } finally {
 	    try {
-	      if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-	        _iterator2['return']();
+	      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	        _iterator2.return();
 	      }
 	    } finally {
 	      if (_didIteratorError2) {
@@ -3349,7 +3329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (label) {
 	    branch.label = label;
 	  }
-	  branch.id = label || _Branch2['default'].generateId();
+	  branch.id = label || _Branch2.default.generateId();
 	  return postLabelIndex + branchLengthStr.length;
 	}
 
@@ -3365,7 +3345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    switch (cleanString[i]) {
 	      case '(':
 	        // new Child
-	        node = new _Branch2['default']();
+	        node = new _Branch2.default();
 	        currentNode.addChild(node);
 	        currentNode = node;
 	        break;
@@ -3375,7 +3355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	      case ',':
 	        // new sibling
-	        node = new _Branch2['default']();
+	        node = new _Branch2.default();
 	        currentNode.parent.addChild(node);
 	        currentNode = node;
 	        break;
@@ -3393,13 +3373,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return callback();
 	}
 
-	exports['default'] = {
+	exports.default = {
 	  format: format,
 	  fileExtension: fileExtension,
 	  validator: validator,
 	  parseFn: parseFn
 	};
-	module.exports = exports['default'];
 
 /***/ },
 /* 28 */
@@ -3407,7 +3386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
@@ -3429,6 +3408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var name = options.name;
 
 	  // get everything between BEGIN TREES and next END;
+
 	  var treeSection = string.match(/BEGIN TREES;[\S\s]+END;/i)[0].replace(/BEGIN TREES;\n/i, '').replace(/END;/i, '');
 	  // get translate section
 
@@ -3495,8 +3475,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _iteratorError = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator['return']) {
-	            _iterator['return']();
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
 	          }
 	        } finally {
 	          if (_didIteratorError) {
@@ -3510,13 +3490,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	exports['default'] = {
+	exports.default = {
 	  parseFn: parseFn,
 	  format: format,
 	  fileExtension: fileExtension,
 	  validator: validator
 	};
-	module.exports = exports['default'];
 
 /***/ }
 /******/ ])
