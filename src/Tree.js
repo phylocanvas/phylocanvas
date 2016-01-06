@@ -522,11 +522,15 @@ export default class Tree {
     }
   }
 
-  scroll(e) {
-    e.preventDefault();
-    if (this._zooming) return;
+  scroll(event) {
+    event.preventDefault();
+
+    if (this._zooming || ('wheelDelta' in event && event.wheelDelta === 0)) {
+      return;
+    }
+
     const z = Math.log(this.zoom) / Math.log(10);
-    this.setZoom(z + (e.detail < 0 || e.wheelDelta > 0 ? 0.12 : -0.12));
+    this.setZoom(z + (event.detail < 0 || event.wheelDelta > 0 ? 0.12 : -0.12));
     this._zooming = true;
     setTimeout(() => { this._zooming = false; }, 128);
   }
