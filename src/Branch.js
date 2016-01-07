@@ -71,9 +71,9 @@ export default class Branch {
     this.collapsed = false;
 
     /**
-     * The colour of the terminal of this node
+     * Custom colour for branch, initialised as null to use tree-level default
      */
-    this.colour = 'rgba(0,0,0,1)';
+    this.colour = null;
 
     /**
      * an object to hold custom data for this node
