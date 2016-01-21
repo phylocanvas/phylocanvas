@@ -135,6 +135,8 @@ export default class Tree {
 
     this.unselectOnClickAway = true;
 
+    this.scrollZoom = conf.scrollZoom === undefined ? true : conf.scrollZoom;
+
     if (this.useNavigator) {
       this.navigator = new Navigator(this);
     }
@@ -148,8 +150,11 @@ export default class Tree {
     this.addListener('mouseout', this.drop.bind(this));
 
     addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    console.log(this.scrollZoom);
+    if (this.scrollZoom) {
+      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    }
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
       this.draw();
