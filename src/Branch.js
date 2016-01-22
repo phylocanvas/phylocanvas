@@ -197,7 +197,7 @@ export default class Branch {
    * used for auto ids for internal nodes
    * @static
    */
-  static lastId = 0
+  static lastId = 0;
 
   static generateId() {
     return 'pcn' + this.lastId++;

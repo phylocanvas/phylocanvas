@@ -12,8 +12,9 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
     // max: 50,
     color: 'green',
   },
+  debug: false,
 });
-
+window.tree = tree;
 // create buttons
 buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -56,14 +57,15 @@ tree.on('original-tree', function () {
 
 tree.hoverLabel = true;
 // tree.alignLabels = true;
-tree.padding = 100;
+tree.padding = 50;
 tree.setTreeType('rectangular');
+tree.backColour = true;
+tree.setNodeSize(10);
 
 // ./data/tree.nwk
 // (A:0.1,B:0.1,(C:0.1,D:0.1):0.1);
 tree.load('(A:0.1,B:0.1,(C:0.2,D:0.1):0.1);', function () {
-  tree.backColour = true;
-  tree.setNodeSize(10);
+
   // tree.textSize = 20;
 
   tree.setNodeDisplay('A', {
@@ -114,7 +116,7 @@ tree.load('(A:0.1,B:0.1,(C:0.2,D:0.1):0.1);', function () {
   // };
   // branch.radius = 2;
 
-  tree.fitInPanel();
+  //tree.fitInPanel();
 
   tree.draw();
 });
