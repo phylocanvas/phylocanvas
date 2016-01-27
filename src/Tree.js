@@ -124,6 +124,7 @@ export default class Tree {
     this.padding = conf.padding || 50;
     this.labelPadding = 5;
 
+    this.multiSelect = true;
     this.hoverLabel = false;
 
     this.internalNodesSelectable = true;
@@ -203,6 +204,19 @@ export default class Tree {
     }
   }
 
+  getNodeAtMousePosition(event) {
+    return this.root.clicked(...translateClick(event, this));
+  }
+
+  getSelectedNodeIds() {
+    return this.leaves.reduce((previousValue, currentValue, currentIndex, array) => {
+      if (currentValue.selected) {
+        previousValue.push(currentValue.id);
+      }
+      return previousValue;
+    }, []);
+  }
+
   clicked(e) {
     var node;
     if (e.button === 0) {
@@ -215,16 +229,26 @@ export default class Tree {
       }
 
       if (!this.root) return false;
-      const pixelRatio = getPixelRatio(this.canvas);
-      node = this.root.clicked(...translateClick(e, this));
+      node = this.getNodeAtMousePosition(e);
 
       if (node && node.interactive) {
-        this.root.cascadeFlag('selected', false);
-        if (this.internalNodesSelectable || node.leaf) {
-          node.cascadeFlag('selected', true);
-          nodeIds = node.getChildProperties('id');
+        if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
+          if (node.leaf) {
+            node.cascadeFlag('selected', !node.selected);
+          } else if (this.internalNodesSelectable) {
+            const allSelected = node.getChildProperties('selected').some(x => x === false);
+            node.cascadeFlag('selected', allSelected);
+          }
+          nodeIds = this.getSelectedNodeIds();
+          this.draw();
+        } else {
+          this.root.cascadeFlag('selected', false);
+          if (this.internalNodesSelectable || node.leaf) {
+            node.cascadeFlag('selected', true);
+            nodeIds = node.getChildProperties('id');
+          }
+          this.draw();
         }
-        this.draw();
       } else if (this.unselectOnClickAway && !this.dragging) {
         this.root.cascadeFlag('selected', false);
         this.draw();
@@ -240,7 +264,7 @@ export default class Tree {
 
   dblclicked(e) {
     if (!this.root) return false;
-    var nd = this.root.clicked(...translateClick(e, this));
+    var nd = this.getNodeAtMousePosition(e);
     if (nd) {
       nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();
@@ -275,7 +299,7 @@ export default class Tree {
     } else {
       // hover
       const e = event;
-      const nd = this.root.clicked(...translateClick(e, this));
+      const nd = this.getNodeAtMousePosition(e);
 
       if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
         this.root.cascadeFlag('hovered', false);
