@@ -136,7 +136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -192,7 +192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  new PhyloCanvas.Tree(element);
 	 */
 
-	var Tree = (function () {
+	var Tree = function () {
 	  function Tree(element) {
 	    var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -233,10 +233,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.containerElement.style.boxSizing = 'border-box';
 
 	    var canvasElement = document.createElement('canvas');
-	    canvasElement.id = (element.id || '') + '__canvas';
+	    canvasElement.id = (this.containerElement.id || '') + '__canvas';
 	    canvasElement.className = 'phylocanvas';
 	    canvasElement.style.position = 'relative';
-	    canvasElement.style.backgroundColor = '#FFFFFF';
 	    canvasElement.height = element.offsetHeight || 400;
 	    canvasElement.width = element.offsetWidth || 400;
 	    canvasElement.style.zIndex = '1';
@@ -258,6 +257,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.highlighters = [];
 
 	    this.zoom = 1;
+	    this.zoomFactor = 0.2;
+	    this.disableZoom = conf.disableZoom || false;
 	    this.pickedup = false;
 	    this.dragging = false;
 	    this.startx = null;this.starty = null;
@@ -289,6 +290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.padding = conf.padding || 50;
 	    this.labelPadding = 5;
 
+	    this.multiSelect = true;
 	    this.hoverLabel = false;
 
 	    this.internalNodesSelectable = true;
@@ -317,12 +319,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addListener('mouseout', this.drop.bind(this));
 
 	    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	    addEvent(window, 'resize', (function () {
+	    if (!this.disableZoom) {
+	      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+	    }
+	    addEvent(window, 'resize', function () {
 	      this.resizeToContainer();
 	      this.draw();
-	    }).bind(this));
+	    }.bind(this));
 
 	    /**
 	     * Align labels vertically
@@ -361,12 +365,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: 'getNodeAtMousePosition',
+	    value: function getNodeAtMousePosition(event) {
+	      var _root;
+
+	      return (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(event, this)));
+	    }
+	  }, {
+	    key: 'getSelectedNodeIds',
+	    value: function getSelectedNodeIds() {
+	      return this.leaves.reduce(function (memo, leaf) {
+	        if (leaf.selected) {
+	          memo.push(leaf.id);
+	        }
+	        return memo;
+	      }, []);
+	    }
+	  }, {
 	    key: 'clicked',
 	    value: function clicked(e) {
 	      var node;
 	      if (e.button === 0) {
-	        var _root;
-
 	        var nodeIds = [];
 	        // if this is triggered by the release after a drag then the click
 	        // shouldn't be triggered.
@@ -376,15 +395,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (!this.root) return false;
-	        node = (_root = this.root).clicked.apply(_root, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
+	        node = this.getNodeAtMousePosition(e);
 
 	        if (node && node.interactive) {
-	          this.root.cascadeFlag('selected', false);
-	          if (this.internalNodesSelectable || node.leaf) {
-	            node.cascadeFlag('selected', true);
-	            nodeIds = node.getChildProperties('id');
+	          if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
+	            if (node.leaf) {
+	              node.cascadeFlag('selected', !node.selected);
+	            } else if (this.internalNodesSelectable) {
+	              var someUnselected = node.getChildProperties('selected').some(function (selected) {
+	                return selected === false;
+	              });
+	              node.cascadeFlag('selected', someUnselected);
+	            }
+	            nodeIds = this.getSelectedNodeIds();
+	            this.draw();
+	          } else {
+	            this.root.cascadeFlag('selected', false);
+	            if (this.internalNodesSelectable || node.leaf) {
+	              node.cascadeFlag('selected', true);
+	              nodeIds = node.getChildProperties('id');
+	            }
+	            this.draw();
 	          }
-	          this.draw();
 	        } else if (this.unselectOnClickAway && !this.dragging) {
 	          this.root.cascadeFlag('selected', false);
 	          this.draw();
@@ -400,10 +432,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'dblclicked',
 	    value: function dblclicked(e) {
-	      var _root2;
-
 	      if (!this.root) return false;
-	      var nd = (_root2 = this.root).clicked.apply(_root2, _toConsumableArray(translateClick(e.clientX, e.clientY, this)));
+	      var nd = this.getNodeAtMousePosition(e);
 	      if (nd) {
 	        nd.cascadeFlag('selected', false);
 	        nd.toggleCollapsed();
@@ -438,11 +468,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.draw();
 	        }
 	      } else {
-	        var _root3;
-
 	        // hover
 	        var e = event;
-	        var nd = (_root3 = this.root).clicked.apply(_root3, _toConsumableArray(translateClick(e.clientX * 1.0, e.clientY * 1.0, this)));
+	        var nd = this.getNodeAtMousePosition(e);
 
 	        if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
 	          this.root.cascadeFlag('hovered', false);
@@ -484,19 +512,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.strokeStyle = this.branchColour;
 	      this.canvas.save();
 
-	      this.canvas.translate(this.canvas.canvas.width / 2 / getBackingStorePixelRatio(this.canvas), this.canvas.canvas.height / 2 / getBackingStorePixelRatio(this.canvas));
-
 	      if (!this.drawn || forceRedraw) {
 	        this.prerenderer.run(this);
 	        if (!forceRedraw) {
 	          this.fitInPanel();
 	        }
 	      }
-
+	      var pixelRatio = getPixelRatio(this.canvas);
 	      this.canvas.lineWidth = this.lineWidth / this.zoom;
-	      this.canvas.translate(this.offsetx, this.offsety);
+	      this.canvas.translate(this.offsetx * pixelRatio, this.offsety * pixelRatio);
 	      this.canvas.scale(this.zoom, this.zoom);
-
 	      this.branchRenderer.render(this, this.root);
 
 	      this.highlighters.forEach(function (render) {
@@ -819,8 +844,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var z = Math.log(this.zoom) / Math.log(10);
-	      this.setZoom(z + (event.detail < 0 || event.wheelDelta > 0 ? 0.12 : -0.12));
+	      var newZoom = Math.log(this.zoom) / Math.log(10) + (event.detail < 0 || event.wheelDelta > 0 ? this.zoomFactor : -this.zoomFactor);
+	      this.setZoom(newZoom, event.offsetX, event.offsetY);
 	      this._zooming = true;
 	      setTimeout(function () {
 	        _this3._zooming = false;
@@ -981,15 +1006,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setZoom',
 	    value: function setZoom(z) {
+	      var zoomPointX = arguments.length <= 1 || arguments[1] === undefined ? this.canvas.canvas.width / 2 : arguments[1];
+	      var zoomPointY = arguments.length <= 2 || arguments[2] === undefined ? this.canvas.canvas.height / 2 : arguments[2];
+
 	      if (z > -2 && z < 2) {
-	        var oz = this.zoom;
-	        this.zoom = Math.pow(10, z);
-
-	        this.offsetx = this.offsetx / oz * this.zoom;
-	        this.offsety = this.offsety / oz * this.zoom;
-
+	        var oldZoom = this.zoom;
+	        var newZoom = Math.pow(10, z);
+	        this.zoom = newZoom;
+	        this.offsetx = this.calculateZoomedOffset(this.offsetx, zoomPointX, oldZoom, newZoom);
+	        this.offsety = this.calculateZoomedOffset(this.offsety, zoomPointY, oldZoom, newZoom);
 	        this.draw();
 	      }
+	    }
+	  }, {
+	    key: 'calculateZoomedOffset',
+	    value: function calculateZoomedOffset(offset, point, oldZoom, newZoom) {
+	      return -1 * ((-1 * offset + point) / oldZoom * newZoom - point);
 	    }
 	  }, {
 	    key: 'toggleLabels',
@@ -1064,17 +1096,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'fitInPanel',
 	    value: function fitInPanel() {
+	      var canvasSize = [this.canvas.canvas.width - this.padding * 2, this.canvas.canvas.height - this.padding * 2];
 	      var bounds = this.getBounds();
-	      var minx = bounds[0][0];
-	      var maxx = bounds[1][0];
-	      var miny = bounds[0][1];
-	      var maxy = bounds[1][1];
-	      var padding = this.padding;
-	      var canvasSize = [this.canvas.canvas.width - padding, this.canvas.canvas.height - padding];
-
-	      this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
-	      this.offsety = (maxy + miny) * this.zoom / -2;
-	      this.offsetx = (maxx + minx) * this.zoom / -2;
+	      var treeSize = [bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]];
+	      var pixelRatio = getPixelRatio(this.canvas);
+	      var xZoomRatio = canvasSize[0] / treeSize[0];
+	      var yZoomRatio = canvasSize[1] / treeSize[1];
+	      this.zoom = Math.min(xZoomRatio, yZoomRatio);
+	      this.offsetx = -1 * bounds[0][0] * this.zoom;
+	      this.offsety = -1 * bounds[0][1] * this.zoom;
+	      if (xZoomRatio > yZoomRatio) {
+	        this.offsetx += this.padding + (canvasSize[0] - treeSize[0] * this.zoom) / 2;
+	        this.offsety += this.padding;
+	      } else {
+	        this.offsetx += this.padding;
+	        this.offsety += this.padding + (canvasSize[1] - treeSize[1] * this.zoom) / 2;
+	      }
+	      this.offsetx = this.offsetx / pixelRatio;
+	      this.offsety = this.offsety / pixelRatio;
 	    }
 	  }, {
 	    key: 'adjustForPixelRatio',
@@ -1165,7 +1204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tree;
-	})();
+	}();
 
 	exports.default = Tree;
 
@@ -1175,7 +1214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define(t);else{var n=t();for(var r in n)("object"==typeof exports?exports:e)[r]=n[r]}}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var a=n[r]={exports:{},id:r,loaded:!1};return e[r].call(a.exports,a,a.exports,t),a.loaded=!0,a.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0});var a=n(1),o=r(a),i=n(4),s=r(i),c=n(2),u=r(c),f=n(3),l=r(f);t["default"]={canvas:o,constants:s,dom:u,events:l},e.exports=t["default"]},function(e,t,n){"use strict";function r(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function a(e){return(window.devicePixelRatio||1)/r(e)}function o(e){return e=e-c.getX(this.canvas.canvas)+window.pageXOffset,e*=a(this.canvas),e-=this.canvas.canvas.width/2,e-=this.offsetx,e/=this.zoom}function i(e){return e=e-c.getY(this.canvas.canvas)+window.pageYOffset,e*=a(this.canvas),e-=this.canvas.canvas.height/2,e-=this.offsety,e/=this.zoom}function s(e,t,n){return[o.call(n,e),i.call(n,t)]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=r,t.getPixelRatio=a,t.translateClick=s;var c=n(2)},function(e,t,n){"use strict";function r(e){var t=new Blob([e],{type:"text/csv;charset=utf-8"});return l.createObjectURL(t)}function a(e,t){var n=document.createElement("a"),r="undefined"!=typeof n.download;n.href=e,n.target="_blank",r&&(n.download=t),f.fireEvent(n,"click"),r&&l.revokeObjectURL(n.href)}function o(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function s(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function c(e,t){var n=e.className.split(" "),r=n.indexOf(t);-1!==r&&(n.splice(r,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),r=n.indexOf(t);return-1!==r}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=r,t.setupDownloadLink=a,t.getX=o,t.getY=i,t.addClass=s,t.removeClass=c,t.hasClass=u;var f=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function r(e,t){var n,r,a=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(r in a)a.hasOwnProperty(r)&&(n[r]=a[r]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function a(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function o(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n="string"==typeof t?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=r,t.addEvent=a,t.killEvent=o,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var n={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI};t.Angles=n;var r={x:"star",s:"square",o:"circle",t:"triangle"};t.Shapes=r}])});
+	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var n=t();for(var o in n)("object"==typeof exports?exports:e)[o]=n[o]}}(this,function(){return function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function o(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0}),t.events=t.dom=t.constants=t.canvas=void 0;var r=n(1),a=o(r),i=n(4),c=o(i),f=n(2),u=o(f),s=n(3),l=o(s);t.canvas=a,t.constants=c,t.dom=u,t.events=l},function(e,t,n){"use strict";function o(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function r(e){return(window.devicePixelRatio||1)/o(e)}function a(e,t){var n=r(t.canvas);return[(e.offsetX-t.offsetx)/t.zoom*n,(e.offsetY-t.offsety)/t.zoom*n]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=o,t.getPixelRatio=r,t.translateClick=a;n(2)},function(e,t,n){"use strict";function o(e){var t=arguments.length<=1||void 0===arguments[1]?"text/plain;charset=utf-8":arguments[1],n=new Blob([e],{type:t});return l.createObjectURL(n)}function r(e,t){var n=document.createElement("a"),o="undefined"!=typeof n.download;n.href=e,n.target="_blank",o&&(n.download=t),(0,s.fireEvent)(n,"click"),o&&l.revokeObjectURL(n.href)}function a(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function c(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function f(e,t){var n=e.className.split(" "),o=n.indexOf(t);-1!==o&&(n.splice(o,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),o=n.indexOf(t);return-1!==o}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=o,t.setupDownloadLink=r,t.getX=a,t.getY=i,t.addClass=c,t.removeClass=f,t.hasClass=u;var s=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function o(e,t){var n,o,r=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(o in r)r.hasOwnProperty(o)&&(n[o]=r[o]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function r(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function a(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n=("undefined"==typeof t?"undefined":c(t))===c("aaa")?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}var c="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol?"symbol":typeof e};Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=o,t.addEvent=r,t.killEvent=a,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});t.Angles={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI},t.Shapes={x:"star",s:"square",o:"circle",t:"triangle"}}])});
 
 /***/ },
 /* 3 */
@@ -1183,7 +1222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1228,7 +1267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 
-	var Branch = (function () {
+	var Branch = function () {
 	  function Branch() {
 	    _classCallCheck(this, Branch);
 
@@ -2048,7 +2087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Branch;
-	})();
+	}();
 
 	Branch.lastId = 0;
 	exports.default = Branch;
@@ -2184,7 +2223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2203,7 +2242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @memberOf PhyloCanvas
 	 */
 
-	var Tooltip = (function () {
+	var Tooltip = function () {
 	  function Tooltip(tree) {
 	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2259,11 +2298,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tooltip;
-	})();
+	}();
 
 	exports.default = Tooltip;
 
-	var ChildNodesTooltip = exports.ChildNodesTooltip = (function (_Tooltip) {
+	var ChildNodesTooltip = exports.ChildNodesTooltip = function (_Tooltip) {
 	  _inherits(ChildNodesTooltip, _Tooltip);
 
 	  function ChildNodesTooltip(tree, options) {
@@ -2293,7 +2332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return ChildNodesTooltip;
-	})(Tooltip);
+	}(Tooltip);
 
 /***/ },
 /* 6 */
@@ -2515,7 +2554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2523,7 +2562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Prerenderer = (function () {
+	var Prerenderer = function () {
 	  function Prerenderer(options) {
 	    _classCallCheck(this, Prerenderer);
 
@@ -2555,7 +2594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Prerenderer;
-	})();
+	}();
 
 	exports.default = Prerenderer;
 
@@ -3152,7 +3191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -3160,7 +3199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Parser = (function () {
+	var Parser = function () {
 	  function Parser(_ref) {
 	    var format = _ref.format;
 	    var parseFn = _ref.parseFn;
@@ -3191,7 +3230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Parser;
-	})();
+	}();
 
 	exports.default = Parser;
 

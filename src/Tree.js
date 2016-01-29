@@ -1,4 +1,4 @@
-import { dom, events, canvas } from 'phylocanvas-utils/src';
+import { dom, events, canvas } from 'phylocanvas-utils';
 
 import Branch from './Branch';
 import { ChildNodesTooltip as Tooltip } from './Tooltip';
@@ -83,8 +83,6 @@ export default class Tree {
         this.defaultCollapsed = true;
       }
     }
-
-    this.debug = conf.debug || false;
 
     this.tooltip = new Tooltip(this);
 
@@ -209,11 +207,11 @@ export default class Tree {
   }
 
   getSelectedNodeIds() {
-    return this.leaves.reduce((previousValue, currentValue, currentIndex, array) => {
-      if (currentValue.selected) {
-        previousValue.push(currentValue.id);
+    return this.leaves.reduce((memo, leaf) => {
+      if (leaf.selected) {
+        memo.push(leaf.id);
       }
-      return previousValue;
+      return memo;
     }, []);
   }
 
@@ -236,8 +234,8 @@ export default class Tree {
           if (node.leaf) {
             node.cascadeFlag('selected', !node.selected);
           } else if (this.internalNodesSelectable) {
-            const allSelected = node.getChildProperties('selected').some(x => x === false);
-            node.cascadeFlag('selected', allSelected);
+            const someUnselected = node.getChildProperties('selected').some(selected => selected === false);
+            node.cascadeFlag('selected', someUnselected);
           }
           nodeIds = this.getSelectedNodeIds();
           this.draw();
@@ -354,11 +352,6 @@ export default class Tree {
 
     // Making default collapsed false so that it will collapse on initial load only
     this.defaultCollapsed = false;
-
-    if (this.debug) {
-      const bounds = this.getBounds();
-      this.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
-    }
 
     this.drawn = true;
   }
@@ -562,9 +555,6 @@ export default class Tree {
       return;
     }
 
-    // const delta = event.wheelDelta ? event.wheelDelta/40 : event.detail ? -event.detail : 0;
-    // const newZoom = parseFloat((delta > 0 ? this.zoom * 2 : this.zoom / 2).toFixed(2));
-
     const newZoom = (Math.log(this.zoom) / Math.log(10)) + (event.detail < 0 || event.wheelDelta > 0 ? this.zoomFactor : -this.zoomFactor);
     this.setZoom(newZoom, event.offsetX, event.offsetY);
     this._zooming = true;
@@ -693,13 +683,13 @@ export default class Tree {
       const oldZoom = this.zoom;
       const newZoom = Math.pow(10, z);
       this.zoom = newZoom;
-      this.offsetx = this.translateScaledPoint(this.offsetx, zoomPointX, oldZoom, newZoom);
-      this.offsety = this.translateScaledPoint(this.offsety, zoomPointY, oldZoom, newZoom);
+      this.offsetx = this.calculateZoomedOffset(this.offsetx, zoomPointX, oldZoom, newZoom);
+      this.offsety = this.calculateZoomedOffset(this.offsety, zoomPointY, oldZoom, newZoom);
       this.draw();
     }
   }
 
-  translateScaledPoint(offset, point, oldZoom, newZoom) {
+  calculateZoomedOffset(offset, point, oldZoom, newZoom) {
     return -1 * ((((-1 * offset) + point) / oldZoom * newZoom) - point);
   }
 

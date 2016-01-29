@@ -15,6 +15,13 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
   debug: false,
 });
 window.tree = tree;
+
+const originalDraw = tree.draw;
+tree.draw = (...args) => {
+  originalDraw.apply(tree, args);
+  const bounds = tree.getBounds();
+  tree.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
+};
 // create buttons
 buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
