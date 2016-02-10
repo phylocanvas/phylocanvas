@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.nodeRenderers = exports.treeTypes = exports.Parser = exports.Tooltip = exports.Branch = exports.Tree = undefined;
+	exports.utils = exports.nodeRenderers = exports.treeTypes = exports.Parser = exports.Tooltip = exports.Branch = exports.Tree = undefined;
 
 	var _Tree = __webpack_require__(1);
 
@@ -85,18 +85,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
+	var _phylocanvasUtils = __webpack_require__(2);
+
+	var utils = _interopRequireWildcard(_phylocanvasUtils);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	/**
-	 * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
-	 *
-	 * @author Chris Powell (c.powell@imperial.ac.uk)
-	 * @modified Jyothish NT 01/03/15
-	 */
-
-	/**
-	 * @namespace PhyloCanvas
-	 */
 
 	exports.Tree = _Tree2.default;
 	exports.Branch = _Branch2.default;
@@ -104,6 +99,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Parser = _Parser2.default;
 	exports.treeTypes = _treeTypes2.default;
 	exports.nodeRenderers = _nodeRenderers2.default;
+	exports.utils = utils; /**
+	                        * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
+	                        *
+	                        * @author Chris Powell (c.powell@imperial.ac.uk)
+	                        * @modified Jyothish NT 01/03/15
+	                        */
+
+	/**
+	 * @namespace PhyloCanvas
+	 */
 
 	function decorate(object, fnName, fn) {
 	  var target = object[fnName] ? object : object.prototype;
@@ -1214,7 +1219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var n=t();for(var o in n)("object"==typeof exports?exports:e)[o]=n[o]}}(this,function(){return function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function o(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0}),t.events=t.dom=t.constants=t.canvas=void 0;var r=n(1),a=o(r),i=n(4),c=o(i),f=n(2),u=o(f),s=n(3),l=o(s);t.canvas=a,t.constants=c,t.dom=u,t.events=l},function(e,t,n){"use strict";function o(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function r(e){return(window.devicePixelRatio||1)/o(e)}function a(e,t){var n=r(t.canvas);return[(e.offsetX-t.offsetx)/t.zoom*n,(e.offsetY-t.offsety)/t.zoom*n]}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=o,t.getPixelRatio=r,t.translateClick=a;n(2)},function(e,t,n){"use strict";function o(e){var t=arguments.length<=1||void 0===arguments[1]?"text/plain;charset=utf-8":arguments[1],n=new Blob([e],{type:t});return l.createObjectURL(n)}function r(e,t){var n=document.createElement("a"),o="undefined"!=typeof n.download;n.href=e,n.target="_blank",o&&(n.download=t),(0,s.fireEvent)(n,"click"),o&&l.revokeObjectURL(n.href)}function a(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function c(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function f(e,t){var n=e.className.split(" "),o=n.indexOf(t);-1!==o&&(n.splice(o,1),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),o=n.indexOf(t);return-1!==o}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=o,t.setupDownloadLink=r,t.getX=a,t.getY=i,t.addClass=c,t.removeClass=f,t.hasClass=u;var s=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function o(e,t){var n,o,r=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(o in r)r.hasOwnProperty(o)&&(n[o]=r[o]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function r(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function a(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n=("undefined"==typeof t?"undefined":c(t))===c("aaa")?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}var c="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol?"symbol":typeof e};Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=o,t.addEvent=r,t.killEvent=a,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});t.Angles={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI},t.Shapes={x:"star",s:"square",o:"circle",t:"triangle"}}])});
+	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var n=t();for(var o in n)("object"==typeof exports?exports:e)[o]=n[o]}}(this,function(){return function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function o(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0}),t.events=t.dom=t.constants=t.canvas=void 0;var r=n(1),a=o(r),i=n(4),f=o(i),u=n(2),s=o(u),c=n(3),l=o(c);t.canvas=a,t.constants=f,t.dom=s,t.events=l},function(e,t,n){"use strict";function o(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function r(e){return(window.devicePixelRatio||1)/o(e)}function a(e,t){var n=r(t.canvas);return[(e.offsetX-t.offsetx)/t.zoom*n,(e.offsetY-t.offsety)/t.zoom*n]}function i(e,t){var n=e.x,o=e.y,a=r(t.canvas);return{x:n?(n-t.offsetx)/t.zoom*a:null,y:o?(o-t.offsety)/t.zoom*a:null}}function f(e,t){var n=e.x,o=e.y,a=r(t.canvas);return{x:n?n/a*t.zoom+t.offsetx:null,y:o?o/a*t.zoom+t.offsety:null}}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=o,t.getPixelRatio=r,t.translateClick=a,t.translatePoint=i,t.undoPointTranslation=f;n(2)},function(e,t,n){"use strict";function o(e){var t=arguments.length<=1||void 0===arguments[1]?"text/plain;charset=utf-8":arguments[1],n=new Blob([e],{type:t});return l.createObjectURL(n)}function r(e,t){var n=document.createElement("a"),o="undefined"!=typeof n.download;n.href=e,n.target="_blank",o&&(n.download=t),(0,c.fireEvent)(n,"click"),o&&l.revokeObjectURL(n.href)}function a(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function f(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),o=n.indexOf(t);-1!==o&&(n.splice(o,1),e.className=n.join(" "))}function s(e,t){var n=e.className.split(" "),o=n.indexOf(t);return-1!==o}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=o,t.setupDownloadLink=r,t.getX=a,t.getY=i,t.addClass=f,t.removeClass=u,t.hasClass=s;var c=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function o(e,t){var n,o,r=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(o in r)r.hasOwnProperty(o)&&(n[o]=r[o]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function r(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function a(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n=("undefined"==typeof t?"undefined":f(t))===f("aaa")?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}var f="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol?"symbol":typeof e};Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=o,t.addEvent=r,t.killEvent=a,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});t.Angles={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI},t.Shapes={x:"star",s:"square",o:"circle",t:"triangle"}}])});
 
 /***/ },
 /* 3 */
