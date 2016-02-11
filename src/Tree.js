@@ -91,6 +91,8 @@ export default class Tree {
     this.highlighters = [];
 
     this.zoom = 1;
+    this.zoomFactor = 0.2;
+    this.disableZoom = conf.disableZoom || false;
     this.pickedup = false;
     this.dragging = false;
     this.startx = null; this.starty = null;
@@ -120,6 +122,7 @@ export default class Tree {
     this.padding = conf.padding || 50;
     this.labelPadding = 5;
 
+    this.multiSelect = true;
     this.hoverLabel = false;
 
     this.internalNodesSelectable = true;
@@ -148,8 +151,10 @@ export default class Tree {
     this.addListener('mouseout', this.drop.bind(this));
 
     addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    if (!this.disableZoom) {
+      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    }
     addEvent(window, 'resize', function () {
       this.resizeToContainer();
       this.draw();
@@ -197,6 +202,19 @@ export default class Tree {
     }
   }
 
+  getNodeAtMousePosition(event) {
+    return this.root.clicked(...translateClick(event, this));
+  }
+
+  getSelectedNodeIds() {
+    return this.leaves.reduce((memo, leaf) => {
+      if (leaf.selected) {
+        memo.push(leaf.id);
+      }
+      return memo;
+    }, []);
+  }
+
   clicked(e) {
     var node;
     if (e.button === 0) {
@@ -209,15 +227,26 @@ export default class Tree {
       }
 
       if (!this.root) return false;
-      node = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
+      node = this.getNodeAtMousePosition(e);
 
       if (node && node.interactive) {
-        this.root.cascadeFlag('selected', false);
-        if (this.internalNodesSelectable || node.leaf) {
-          node.cascadeFlag('selected', true);
-          nodeIds = node.getChildProperties('id');
+        if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
+          if (node.leaf) {
+            node.cascadeFlag('selected', !node.selected);
+          } else if (this.internalNodesSelectable) {
+            const someUnselected = node.getChildProperties('selected').some(selected => selected === false);
+            node.cascadeFlag('selected', someUnselected);
+          }
+          nodeIds = this.getSelectedNodeIds();
+          this.draw();
+        } else {
+          this.root.cascadeFlag('selected', false);
+          if (this.internalNodesSelectable || node.leaf) {
+            node.cascadeFlag('selected', true);
+            nodeIds = node.getChildProperties('id');
+          }
+          this.draw();
         }
-        this.draw();
       } else if (this.unselectOnClickAway && !this.dragging) {
         this.root.cascadeFlag('selected', false);
         this.draw();
@@ -233,7 +262,7 @@ export default class Tree {
 
   dblclicked(e) {
     if (!this.root) return false;
-    var nd = this.root.clicked(...translateClick(e.clientX, e.clientY, this));
+    var nd = this.getNodeAtMousePosition(e);
     if (nd) {
       nd.cascadeFlag('selected', false);
       nd.toggleCollapsed();
@@ -268,7 +297,7 @@ export default class Tree {
     } else {
       // hover
       const e = event;
-      const nd = this.root.clicked(...translateClick(e.clientX * 1.0, e.clientY * 1.0, this));
+      const nd = this.getNodeAtMousePosition(e);
 
       if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
         this.root.cascadeFlag('hovered', false);
@@ -307,18 +336,16 @@ export default class Tree {
     this.canvas.strokeStyle = this.branchColour;
     this.canvas.save();
 
-    this.canvas.translate((this.canvas.canvas.width / 2) / getBackingStorePixelRatio(this.canvas),
-      (this.canvas.canvas.height / 2) / getBackingStorePixelRatio(this.canvas));
-
     if (!this.drawn || forceRedraw) {
       this.prerenderer.run(this);
-      if (!forceRedraw) { this.fitInPanel(); }
+      if (!forceRedraw) {
+        this.fitInPanel();
+      }
     }
-
+    const pixelRatio = getPixelRatio(this.canvas);
     this.canvas.lineWidth = this.lineWidth / this.zoom;
-    this.canvas.translate(this.offsetx, this.offsety);
+    this.canvas.translate(this.offsetx * pixelRatio, this.offsety * pixelRatio);
     this.canvas.scale(this.zoom, this.zoom);
-
     this.branchRenderer.render(this, this.root);
 
     this.highlighters.forEach(render => render());
@@ -528,8 +555,8 @@ export default class Tree {
       return;
     }
 
-    const z = Math.log(this.zoom) / Math.log(10);
-    this.setZoom(z + (event.detail < 0 || event.wheelDelta > 0 ? 0.12 : -0.12));
+    const newZoom = (Math.log(this.zoom) / Math.log(10)) + (event.detail < 0 || event.wheelDelta > 0 ? this.zoomFactor : -this.zoomFactor);
+    this.setZoom(newZoom, event.offsetX, event.offsetY);
     this._zooming = true;
     setTimeout(() => { this._zooming = false; }, 128);
   }
@@ -651,16 +678,19 @@ export default class Tree {
     this.adjustForPixelRatio();
   }
 
-  setZoom(z) {
+  setZoom(z, zoomPointX = (this.canvas.canvas.width / 2), zoomPointY = (this.canvas.canvas.height / 2)) {
     if (z > -2 && z < 2) {
-      const oz = this.zoom;
-      this.zoom = Math.pow(10, z);
-
-      this.offsetx = (this.offsetx / oz) * this.zoom;
-      this.offsety = (this.offsety / oz) * this.zoom;
-
+      const oldZoom = this.zoom;
+      const newZoom = Math.pow(10, z);
+      this.zoom = newZoom;
+      this.offsetx = this.calculateZoomedOffset(this.offsetx, zoomPointX, oldZoom, newZoom);
+      this.offsety = this.calculateZoomedOffset(this.offsety, zoomPointY, oldZoom, newZoom);
       this.draw();
     }
+  }
+
+  calculateZoomedOffset(offset, point, oldZoom, newZoom) {
+    return -1 * ((((-1 * offset) + point) / oldZoom * newZoom) - point);
   }
 
   toggleLabels() {
@@ -726,20 +756,30 @@ export default class Tree {
   }
 
   fitInPanel() {
-    var bounds = this.getBounds();
-    var minx = bounds[0][0];
-    var maxx = bounds[1][0];
-    var miny = bounds[0][1];
-    var maxy = bounds[1][1];
-    var padding = this.padding;
-    var canvasSize = [
-      this.canvas.canvas.width - padding,
-      this.canvas.canvas.height - padding
+    const canvasSize = [
+      this.canvas.canvas.width - this.padding * 2,
+      this.canvas.canvas.height - this.padding * 2,
     ];
-
-    this.zoom = Math.min(canvasSize[0] / (maxx - minx), canvasSize[1] / (maxy - miny));
-    this.offsety = (maxy + miny) * this.zoom / -2;
-    this.offsetx = (maxx + minx) * this.zoom / -2;
+    const bounds = this.getBounds();
+    const treeSize = [
+      bounds[1][0] - bounds[0][0],
+      bounds[1][1] - bounds[0][1],
+    ];
+    const pixelRatio = getPixelRatio(this.canvas);
+    const xZoomRatio = canvasSize[0] / treeSize[0];
+    const yZoomRatio = canvasSize[1] / treeSize[1];
+    this.zoom = Math.min(xZoomRatio, yZoomRatio);
+    this.offsetx = (-1 * bounds[0][0]) * this.zoom;
+    this.offsety = (-1 * bounds[0][1]) * this.zoom;
+    if (xZoomRatio > yZoomRatio) {
+      this.offsetx += this.padding + (canvasSize[0] - (treeSize[0] * this.zoom)) / 2;
+      this.offsety += this.padding;
+    } else {
+      this.offsetx += this.padding;
+      this.offsety += this.padding + (canvasSize[1] - (treeSize[1] * this.zoom)) / 2;
+    }
+    this.offsetx = this.offsetx / pixelRatio;
+    this.offsety = this.offsety / pixelRatio;
   }
 
   adjustForPixelRatio() {
