@@ -4,7 +4,8 @@ const { Angles } = constants;
 
 export default {
   getStep(tree) {
-    return Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+    return tree.canvas.canvas.width / tree.leaves.length;
+    // return Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
   },
   calculate(tree, xstep) {
     tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
