@@ -14,6 +14,13 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
   },
 });
 
+const originalDraw = tree.draw;
+tree.draw = (...args) => {
+  originalDraw.apply(tree, args);
+  const bounds = tree.getBounds();
+  tree.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
+};
+
 // create buttons
 buttonForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -45,15 +52,11 @@ document.body.appendChild(resetButton);
 
 const scaleRange = document.createElement('input');
 scaleRange.type = 'range';
-scaleRange.min = 0;
-scaleRange.max = 0.1;
+scaleRange.min = 0.001;
+scaleRange.max = 100;
 scaleRange.step = 0.001;
 scaleRange.addEventListener('change', () => {
-  console.log(scaleRange.value);
-  tree.branchScalar = scaleRange.value;
-  tree.draw();
-  // tree.fitInPanel();
-  // tree.draw();
+  tree.setBranchScale(scaleRange.value);
 });
 
 document.body.appendChild(scaleRange);
@@ -70,7 +73,7 @@ tree.on('original-tree', function () {
 
 tree.hoverLabel = true;
 // tree.alignLabels = true;
-tree.padding = 100;
+tree.padding = 1;
 tree.setTreeType('rectangular');
 
 // ./data/tree.nwk
@@ -140,5 +143,7 @@ function () {
   tree.fitInPanel();
   tree.draw();
 
-  scaleRange.value = tree.branchScalar;
+  scaleRange.value = 1;
 });
+
+window.phylocanvas = tree;

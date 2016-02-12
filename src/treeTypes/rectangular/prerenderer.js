@@ -1,6 +1,8 @@
 export default {
   getStep(tree) {
-    return tree.canvas.canvas.height / tree.leaves.length;
+    return tree.fillCanvas ?
+      (tree.canvas.canvas.height) / (tree.leaves.length) :
+      Math.max((tree.canvas.canvas.height) / (tree.leaves.length), tree.leaves[0].getDiameter() + tree.labelPadding);
   },
   calculate(tree, ystep) {
     // Calculate branchScalar based on canvas width and total branch length

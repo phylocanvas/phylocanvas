@@ -15,8 +15,11 @@ export default class Prerenderer {
     tree.root.centery = 0;
     tree.farthestNodeFromRootX = 0;
     tree.farthestNodeFromRootY = 0;
+    tree.currentBranchScale = 1;
 
     this.calculate(tree, step);
+
+    tree.initialBranchScalar = tree.branchScalar;
 
     // Assign root startx and starty
     tree.root.startx = tree.root.centerx;

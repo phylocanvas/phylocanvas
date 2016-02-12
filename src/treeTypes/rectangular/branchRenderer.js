@@ -1,6 +1,6 @@
 export default {
   draw(tree, node) {
-    var branchLength = node.branchLength * tree.branchScalar;
+    const branchLength = node.branchLength * tree.branchScalar;
 
     node.angle = 0;
     if (node.parent) {
@@ -17,5 +17,5 @@ export default {
   prepareChild(node, child) {
     child.startx = node.centerx;
     child.starty = node.centery;
-  }
+  },
 };

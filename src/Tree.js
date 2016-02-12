@@ -93,6 +93,13 @@ export default class Tree {
     this.zoom = 1;
     this.zoomFactor = 0.2;
     this.disableZoom = conf.disableZoom || false;
+
+    this.fillCanvas = conf.fillCanvas || false;
+
+    this.branchScaling = true;
+    this.currentBranchScale = 1;
+    this.branchScalingStep = 1.2;
+
     this.pickedup = false;
     this.dragging = false;
     this.startx = null; this.starty = null;
@@ -555,8 +562,14 @@ export default class Tree {
       return;
     }
 
-    const newZoom = (Math.log(this.zoom) / Math.log(10)) + (event.detail < 0 || event.wheelDelta > 0 ? this.zoomFactor : -this.zoomFactor);
-    this.setZoom(newZoom, event.offsetX, event.offsetY);
+    const sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
+    if(this.branchScaling && (event.metaKey || event.ctrlKey)) {
+      this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
+      this.setBranchScale(this.currentBranchScale, { x: event.offsetX, y: event.offsetY });
+    } else {
+      const newZoom = (Math.log(this.zoom) / Math.log(10)) + sign * this.zoomFactor;
+      this.setZoom(newZoom, event.offsetX, event.offsetY);
+    }
     this._zooming = true;
     setTimeout(() => { this._zooming = false; }, 128);
   }
@@ -691,6 +704,25 @@ export default class Tree {
 
   calculateZoomedOffset(offset, point, oldZoom, newZoom) {
     return -1 * ((((-1 * offset) + point) / oldZoom * newZoom) - point);
+  }
+
+  setBranchScale(scale = 1, point = { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 }) {
+    const treeType = treeTypes[this.treeType];
+    if (!treeType.branchScalingAxis || scale < 0) {
+      return;
+    }
+    const offset = this[`offset${treeType.branchScalingAxis}`];
+
+    const branchLength = this.leaves[0].branchLength * this.branchScalar;
+    this.branchScalar = this.initialBranchScalar * scale;
+    const newBranchLength = this.leaves[0].branchLength * this.branchScalar;
+
+    const scaleRatio = newBranchLength / branchLength;
+    const oldPosition = point[treeType.branchScalingAxis];
+    const newPosition = (point[treeType.branchScalingAxis] - offset) * scaleRatio + offset;
+    // const dispossition = oldPosition - newPosition;
+    this[`offset${treeType.branchScalingAxis}`] += (oldPosition - newPosition);
+    this.draw();
   }
 
   toggleLabels() {

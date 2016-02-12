@@ -1,5 +1,11 @@
 export default {
   draw(tree, node) {
+    const branchLength = node.branchLength * tree.branchScalar;
+
+    if (node.parent) {
+      node.centery = node.starty + branchLength;
+    }
+
     node.canvas.beginPath();
 
     if (node !== node.tree.root) {
@@ -11,5 +17,9 @@ export default {
     node.canvas.stroke();
 
     node.canvas.closePath();
-  }
+  },
+  prepareChild(node, child) {
+    child.startx = node.centerx;
+    child.starty = node.centery;
+  },
 };

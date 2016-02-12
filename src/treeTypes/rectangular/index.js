@@ -19,5 +19,6 @@ const labelAlign = {
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
-  labelAlign
+  labelAlign,
+  branchScalingAxis: 'x',
 };
