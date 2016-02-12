@@ -264,6 +264,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.zoom = 1;
 	    this.zoomFactor = 0.2;
 	    this.disableZoom = conf.disableZoom || false;
+
+	    this.fillCanvas = conf.fillCanvas || false;
+
+	    this.branchScaling = true;
+	    this.currentBranchScale = 1;
+	    this.branchScalingStep = 1.2;
+
 	    this.pickedup = false;
 	    this.dragging = false;
 	    this.startx = null;this.starty = null;
@@ -849,8 +856,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var newZoom = Math.log(this.zoom) / Math.log(10) + (event.detail < 0 || event.wheelDelta > 0 ? this.zoomFactor : -this.zoomFactor);
-	      this.setZoom(newZoom, event.offsetX, event.offsetY);
+	      var sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
+	      if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
+	        this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
+	        this.setBranchScale(this.currentBranchScale, { x: event.offsetX, y: event.offsetY });
+	      } else {
+	        var newZoom = Math.log(this.zoom) / Math.log(10) + sign * this.zoomFactor;
+	        this.setZoom(newZoom, event.offsetX, event.offsetY);
+	      }
 	      this._zooming = true;
 	      setTimeout(function () {
 	        _this3._zooming = false;
@@ -1027,6 +1040,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'calculateZoomedOffset',
 	    value: function calculateZoomedOffset(offset, point, oldZoom, newZoom) {
 	      return -1 * ((-1 * offset + point) / oldZoom * newZoom - point);
+	    }
+	  }, {
+	    key: 'setBranchScale',
+	    value: function setBranchScale() {
+	      var scale = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+	      var point = arguments.length <= 1 || arguments[1] === undefined ? { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 } : arguments[1];
+
+	      var treeType = _treeTypes2.default[this.treeType];
+	      if (!treeType.branchScalingAxis || scale < 0) {
+	        return;
+	      }
+	      var offset = this['offset' + treeType.branchScalingAxis];
+
+	      var branchLength = this.leaves[0].branchLength * this.branchScalar;
+	      this.branchScalar = this.initialBranchScalar * scale;
+	      var newBranchLength = this.leaves[0].branchLength * this.branchScalar;
+
+	      var scaleRatio = newBranchLength / branchLength;
+	      var oldPosition = point[treeType.branchScalingAxis];
+	      var newPosition = (point[treeType.branchScalingAxis] - offset) * scaleRatio + offset;
+	      // const dispossition = oldPosition - newPosition;
+	      this['offset' + treeType.branchScalingAxis] += oldPosition - newPosition;
+	      this.draw();
 	    }
 	  }, {
 	    key: 'toggleLabels',
@@ -2506,7 +2542,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = {
 	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  labelAlign: labelAlign
+	  labelAlign: labelAlign,
+	  branchScalingAxis: 'x'
 	};
 
 /***/ },
@@ -2586,8 +2623,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      tree.root.centery = 0;
 	      tree.farthestNodeFromRootX = 0;
 	      tree.farthestNodeFromRootY = 0;
+	      tree.currentBranchScale = 1;
 
 	      this.calculate(tree, step);
+
+	      tree.initialBranchScalar = tree.branchScalar;
 
 	      // Assign root startx and starty
 	      tree.root.startx = tree.root.centerx;
@@ -2645,7 +2685,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = {
 	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+	    return tree.fillCanvas ? tree.canvas.canvas.height / tree.leaves.length : Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
 	  calculate: function calculate(tree, ystep) {
 	    // Calculate branchScalar based on canvas width and total branch length
@@ -3080,7 +3120,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = {
 	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  labelAlign: labelAlign
+	  labelAlign: labelAlign,
+	  branchScalingAxis: 'y'
 	};
 
 /***/ },
@@ -3094,6 +3135,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = {
 	  draw: function draw(tree, node) {
+	    var branchLength = node.branchLength * tree.branchScalar;
+
+	    if (node.parent) {
+	      node.centery = node.starty + branchLength;
+	    }
+
 	    node.canvas.beginPath();
 
 	    if (node !== node.tree.root) {
@@ -3105,6 +3152,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    node.canvas.stroke();
 
 	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
 	  }
 	};
 
@@ -3123,7 +3174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Angles = _phylocanvasUtils.constants.Angles;
 	exports.default = {
 	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+	    return tree.fillCanvas ? tree.canvas.canvas.width / tree.leaves.length : Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
 	  },
 	  calculate: function calculate(tree, xstep) {
 	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
