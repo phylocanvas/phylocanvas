@@ -1296,7 +1296,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
 	exports.getPixelRatio = getPixelRatio;
 	exports.translateClick = translateClick;
-	exports.trackTransforms = trackTransforms;
+	exports.translatePoint = translatePoint;
+	exports.undoPointTranslation = undoPointTranslation;
 
 	var _dom = __webpack_require__(4);
 
@@ -1314,110 +1315,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return (window.devicePixelRatio || 1) / getBackingStorePixelRatio(canvas);
 	}
 
-	function translateClickX(x) {
-	  x = x - (0, _dom.getX)(this.canvas.canvas) + window.pageXOffset;
-	  x *= getPixelRatio(this.canvas);
-	  x -= this.canvas.canvas.width / 2;
-	  x -= this.offsetx;
-	  x = x / this.zoom;
-
-	  return x;
+	function translateClick(event, tree) {
+	  var pixelRatio = getPixelRatio(tree.canvas);
+	  return [(event.offsetX - tree.offsetx) / tree.zoom * pixelRatio, (event.offsetY - tree.offsety) / tree.zoom * pixelRatio];
 	}
 
-	function translateClickY(y) {
-	  y = y - (0, _dom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
-	  y *= getPixelRatio(this.canvas);
-	  y -= this.canvas.canvas.height / 2;
-	  y -= this.offsety;
-	  y = y / this.zoom;
+	function translatePoint(_ref, phylocanvas) {
+	  var x = _ref.x;
+	  var y = _ref.y;
 
-	  return y;
+	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
+	  return {
+	    x: x ? (x - phylocanvas.offsetx) / phylocanvas.zoom * pixelRatio : null,
+	    y: y ? (y - phylocanvas.offsety) / phylocanvas.zoom * pixelRatio : null
+	  };
 	}
 
-	function translateClick(x, y, tree) {
-	  return [translateClickX.call(tree, x), translateClickY.call(tree, y)];
-	}
+	function undoPointTranslation(_ref2, phylocanvas) {
+	  var x = _ref2.x;
+	  var y = _ref2.y;
 
-	/**
-	 * http://phrogz.net/tmp/canvas_zoom_to_cursor.html
-	 *
-	 * Adds ctx.getTransform() - returns an SVGMatrix
-	 * Adds ctx.transformedPoint(x,y) - returns an SVGPoint
-	 */
-	function trackTransforms(ctx) {
-	  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	  var xform = svg.createSVGMatrix();
-	  ctx.getTransform = function () {
-	    return xform;
-	  };
-
-	  // reused object for GC performance
-	  var scaledCoordinates = { x: null, y: null };
-	  var PIXEL_RATIO = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(ctx);
-
-	  var savedTransforms = [];
-	  var save = ctx.save;
-	  ctx.save = function () {
-	    savedTransforms.push(xform.translate(0, 0));
-	    return save.call(ctx);
-	  };
-	  var restore = ctx.restore;
-	  ctx.restore = function () {
-	    xform = savedTransforms.pop();
-	    return restore.call(ctx);
-	  };
-
-	  var scale = ctx.scale;
-	  ctx.scale = function (sx, sy) {
-	    xform = xform.scaleNonUniform(sx, sy);
-	    return scale.call(ctx, sx, sy);
-	  };
-	  var rotate = ctx.rotate;
-	  ctx.rotate = function (radians) {
-	    xform = xform.rotate(radians * 180 / Math.PI);
-	    return rotate.call(ctx, radians);
-	  };
-	  var translate = ctx.translate;
-	  ctx.translate = function (dx, dy) {
-	    xform = xform.translate(dx, dy);
-	    return translate.call(ctx, dx, dy);
-	  };
-	  var transform = ctx.transform;
-	  ctx.transform = function () {
-	    var m2 = svg.createSVGMatrix();
-
-	    for (var _len = arguments.length, matrix = Array(_len), _key = 0; _key < _len; _key++) {
-	      matrix[_key] = arguments[_key];
-	    }
-
-	    m2.a = matrix[0];
-	    m2.b = matrix[1];
-	    m2.c = matrix[2];
-	    m2.d = matrix[3];
-	    m2.e = matrix[4];
-	    m2.f = matrix[5];
-	    xform = xform.multiply(m2);
-	    return transform.call.apply(transform, [ctx].concat(matrix));
-	  };
-	  var setTransform = ctx.setTransform;
-	  ctx.setTransform = function () {
-	    for (var _len2 = arguments.length, matrix = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	      matrix[_key2] = arguments[_key2];
-	    }
-
-	    xform.a = matrix[0];
-	    xform.b = matrix[1];
-	    xform.c = matrix[2];
-	    xform.d = matrix[3];
-	    xform.e = matrix[4];
-	    xform.f = matrix[5];
-	    return setTransform.call.apply(setTransform, [ctx].concat(matrix));
-	  };
-	  var pt = svg.createSVGPoint();
-	  ctx.transformedPoint = function (x, y) {
-	    pt.x = x * PIXEL_RATIO;
-	    pt.y = y * PIXEL_RATIO;
-	    return pt.matrixTransform(xform.inverse());
+	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
+	  return {
+	    x: x ? x / pixelRatio * phylocanvas.zoom + phylocanvas.offsetx : null,
+	    y: y ? y / pixelRatio * phylocanvas.zoom + phylocanvas.offsety : null
 	  };
 	}
 
