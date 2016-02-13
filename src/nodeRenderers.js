@@ -1,4 +1,4 @@
-import { constants } from 'phylocanvas-utils';
+import { constants } from './utils';
 
 const { Angles } = constants;
 

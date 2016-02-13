@@ -1,4 +1,4 @@
-import { dom, events, canvas } from 'phylocanvas-utils';
+import { dom, events, canvas } from './utils';
 
 import Branch from './Branch';
 import { ChildNodesTooltip as Tooltip } from './Tooltip';
@@ -9,7 +9,7 @@ import parsers from './parsers';
 
 const { addClass } = dom;
 const { fireEvent, addEvent } = events;
-const { getBackingStorePixelRatio, getPixelRatio, translateClick } = canvas;
+const { getPixelRatio, translateClick } = canvas;
 
 
 /**

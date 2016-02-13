@@ -16,7 +16,7 @@ import Parser from './Parser';
 
 import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
-import * as utils from 'phylocanvas-utils';
+import * as utils from './utils';
 
 export { Tree, Branch, Tooltip, Parser, treeTypes, nodeRenderers, utils };
 

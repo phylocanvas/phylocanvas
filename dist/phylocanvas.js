@@ -65,29 +65,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Tree2 = _interopRequireDefault(_Tree);
 
-	var _Branch = __webpack_require__(3);
+	var _Branch = __webpack_require__(7);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _Tooltip = __webpack_require__(5);
+	var _Tooltip = __webpack_require__(9);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
-	var _Parser = __webpack_require__(26);
+	var _Parser = __webpack_require__(30);
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _treeTypes = __webpack_require__(7);
+	var _treeTypes = __webpack_require__(11);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _nodeRenderers = __webpack_require__(4);
+	var _nodeRenderers = __webpack_require__(8);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var utils = _interopRequireWildcard(_phylocanvasUtils);
+	var utils = _interopRequireWildcard(_utils);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -141,29 +141,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var _Branch = __webpack_require__(3);
+	var _Branch = __webpack_require__(7);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _Tooltip = __webpack_require__(5);
+	var _Tooltip = __webpack_require__(9);
 
-	var _Navigator = __webpack_require__(6);
+	var _Navigator = __webpack_require__(10);
 
 	var _Navigator2 = _interopRequireDefault(_Navigator);
 
-	var _treeTypes = __webpack_require__(7);
+	var _treeTypes = __webpack_require__(11);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _parsers = __webpack_require__(25);
+	var _parsers = __webpack_require__(29);
 
 	var _parsers2 = _interopRequireDefault(_parsers);
 
@@ -173,12 +173,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var addClass = _phylocanvasUtils.dom.addClass;
-	var fireEvent = _phylocanvasUtils.events.fireEvent;
-	var addEvent = _phylocanvasUtils.events.addEvent;
-	var getBackingStorePixelRatio = _phylocanvasUtils.canvas.getBackingStorePixelRatio;
-	var getPixelRatio = _phylocanvasUtils.canvas.getPixelRatio;
-	var translateClick = _phylocanvasUtils.canvas.translateClick;
+	var addClass = _utils.dom.addClass;
+	var fireEvent = _utils.events.fireEvent;
+	var addEvent = _utils.events.addEvent;
+	var getPixelRatio = _utils.canvas.getPixelRatio;
+	var translateClick = _utils.canvas.translateClick;
 
 	/**
 	 * The instance of a PhyloCanvas Widget
@@ -197,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  new PhyloCanvas.Tree(element);
 	 */
 
-	var Tree = function () {
+	var Tree = (function () {
 	  function Tree(element) {
 	    var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -335,10 +334,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
 	      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
 	    }
-	    addEvent(window, 'resize', function () {
+	    addEvent(window, 'resize', (function () {
 	      this.resizeToContainer();
 	      this.draw();
-	    }.bind(this));
+	    }).bind(this));
 
 	    /**
 	     * Align labels vertically
@@ -1245,7 +1244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tree;
-	}();
+	})();
 
 	exports.default = Tree;
 
@@ -1255,7 +1254,35 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	!function(e,t){if(true)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var n=t();for(var o in n)("object"==typeof exports?exports:e)[o]=n[o]}}(this,function(){return function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function o(e){if(e&&e.__esModule)return e;var t={};if(null!=e)for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&(t[n]=e[n]);return t["default"]=e,t}Object.defineProperty(t,"__esModule",{value:!0}),t.events=t.dom=t.constants=t.canvas=void 0;var r=n(1),a=o(r),i=n(4),f=o(i),u=n(2),s=o(u),c=n(3),l=o(c);t.canvas=a,t.constants=f,t.dom=s,t.events=l},function(e,t,n){"use strict";function o(e){return e.backingStorePixelRatio||e.webkitBackingStorePixelRatio||e.mozBackingStorePixelRatio||e.msBackingStorePixelRatio||e.oBackingStorePixelRatio||1}function r(e){return(window.devicePixelRatio||1)/o(e)}function a(e,t){var n=r(t.canvas);return[(e.offsetX-t.offsetx)/t.zoom*n,(e.offsetY-t.offsety)/t.zoom*n]}function i(e,t){var n=e.x,o=e.y,a=r(t.canvas);return{x:n?(n-t.offsetx)/t.zoom*a:null,y:o?(o-t.offsety)/t.zoom*a:null}}function f(e,t){var n=e.x,o=e.y,a=r(t.canvas);return{x:n?n/a*t.zoom+t.offsetx:null,y:o?o/a*t.zoom+t.offsety:null}}Object.defineProperty(t,"__esModule",{value:!0}),t.getBackingStorePixelRatio=o,t.getPixelRatio=r,t.translateClick=a,t.translatePoint=i,t.undoPointTranslation=f;n(2)},function(e,t,n){"use strict";function o(e){var t=arguments.length<=1||void 0===arguments[1]?"text/plain;charset=utf-8":arguments[1],n=new Blob([e],{type:t});return l.createObjectURL(n)}function r(e,t){var n=document.createElement("a"),o="undefined"!=typeof n.download;n.href=e,n.target="_blank",o&&(n.download=t),(0,c.fireEvent)(n,"click"),o&&l.revokeObjectURL(n.href)}function a(e){for(var t=0;e;)t+=e.offsetLeft,e=e.offsetParent;return t}function i(e){for(var t=0;e;)t+=e.offsetTop,e=e.offsetParent;return t}function f(e,t){var n=e.className.split(" ");-1===n.indexOf(t)&&(n.push(t),e.className=n.join(" "))}function u(e,t){var n=e.className.split(" "),o=n.indexOf(t);-1!==o&&(n.splice(o,1),e.className=n.join(" "))}function s(e,t){var n=e.className.split(" "),o=n.indexOf(t);return-1!==o}Object.defineProperty(t,"__esModule",{value:!0}),t.createBlobUrl=o,t.setupDownloadLink=r,t.getX=a,t.getY=i,t.addClass=f,t.removeClass=u,t.hasClass=s;var c=n(3),l=window.URL||window.webkitURL},function(e,t){"use strict";function n(e){return e.preventDefault(),!1}function o(e,t){var n,o,r=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];document.createEvent?(n=document.createEvent("HTMLEvents"),n.initEvent(t,!0,!0)):(n=document.createEventObject(),n.eventType=t),n.eventName=t;for(o in r)r.hasOwnProperty(o)&&(n[o]=r[o]);document.createEvent?e.dispatchEvent(n):e.fireEvent("on"+n.eventType,n)}function r(e,t,n){e.addEventListener?e.addEventListener(t,n,!1):e.attachEvent("on"+t,function(){return n.call(e,window.event)})}function a(e){e.stopPropagation(),e.preventDefault()}function i(e,t){var n;return n=("undefined"==typeof t?"undefined":f(t))===f("aaa")?function(n){return e[t]?e[t](n):void 0}:function(){return t(e)}}var f="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol?"symbol":typeof e};Object.defineProperty(t,"__esModule",{value:!0}),t.preventDefault=n,t.fireEvent=o,t.addEvent=r,t.killEvent=a,t.createHandler=i},function(e,t){"use strict";Object.defineProperty(t,"__esModule",{value:!0});t.Angles={FORTYFIVE:Math.PI/4,QUARTER:Math.PI/2,HALF:Math.PI,FULL:2*Math.PI},t.Shapes={x:"star",s:"square",o:"circle",t:"triangle"}}])});
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.events = exports.dom = exports.constants = exports.canvas = undefined;
+
+	var _canvas2 = __webpack_require__(3);
+
+	var _canvas = _interopRequireWildcard(_canvas2);
+
+	var _constants2 = __webpack_require__(6);
+
+	var _constants = _interopRequireWildcard(_constants2);
+
+	var _dom2 = __webpack_require__(4);
+
+	var _dom = _interopRequireWildcard(_dom2);
+
+	var _events2 = __webpack_require__(5);
+
+	var _events = _interopRequireWildcard(_events2);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	exports.canvas = _canvas;
+	exports.constants = _constants;
+	exports.dom = _dom;
+	exports.events = _events;
 
 /***/ },
 /* 3 */
@@ -1263,15 +1290,400 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.getBackingStorePixelRatio = getBackingStorePixelRatio;
+	exports.getPixelRatio = getPixelRatio;
+	exports.translateClick = translateClick;
+	exports.trackTransforms = trackTransforms;
+
+	var _dom = __webpack_require__(4);
+
+	/**
+	 * Return backing store pixel ratio of context.
+	 *
+	 * @param context - The rendering context of HTMl5 canvas.
+	 *
+	 */
+	function getBackingStorePixelRatio(context) {
+	  return context.backingStorePixelRatio || context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || 1;
+	}
+
+	function getPixelRatio(canvas) {
+	  return (window.devicePixelRatio || 1) / getBackingStorePixelRatio(canvas);
+	}
+
+	function translateClickX(x) {
+	  x = x - (0, _dom.getX)(this.canvas.canvas) + window.pageXOffset;
+	  x *= getPixelRatio(this.canvas);
+	  x -= this.canvas.canvas.width / 2;
+	  x -= this.offsetx;
+	  x = x / this.zoom;
+
+	  return x;
+	}
+
+	function translateClickY(y) {
+	  y = y - (0, _dom.getY)(this.canvas.canvas) + window.pageYOffset; // account for positioning and scroll
+	  y *= getPixelRatio(this.canvas);
+	  y -= this.canvas.canvas.height / 2;
+	  y -= this.offsety;
+	  y = y / this.zoom;
+
+	  return y;
+	}
+
+	function translateClick(x, y, tree) {
+	  return [translateClickX.call(tree, x), translateClickY.call(tree, y)];
+	}
+
+	/**
+	 * http://phrogz.net/tmp/canvas_zoom_to_cursor.html
+	 *
+	 * Adds ctx.getTransform() - returns an SVGMatrix
+	 * Adds ctx.transformedPoint(x,y) - returns an SVGPoint
+	 */
+	function trackTransforms(ctx) {
+	  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	  var xform = svg.createSVGMatrix();
+	  ctx.getTransform = function () {
+	    return xform;
+	  };
+
+	  // reused object for GC performance
+	  var scaledCoordinates = { x: null, y: null };
+	  var PIXEL_RATIO = (window.devicePixelRatio || 1) / getBackingStorePixelRatio(ctx);
+
+	  var savedTransforms = [];
+	  var save = ctx.save;
+	  ctx.save = function () {
+	    savedTransforms.push(xform.translate(0, 0));
+	    return save.call(ctx);
+	  };
+	  var restore = ctx.restore;
+	  ctx.restore = function () {
+	    xform = savedTransforms.pop();
+	    return restore.call(ctx);
+	  };
+
+	  var scale = ctx.scale;
+	  ctx.scale = function (sx, sy) {
+	    xform = xform.scaleNonUniform(sx, sy);
+	    return scale.call(ctx, sx, sy);
+	  };
+	  var rotate = ctx.rotate;
+	  ctx.rotate = function (radians) {
+	    xform = xform.rotate(radians * 180 / Math.PI);
+	    return rotate.call(ctx, radians);
+	  };
+	  var translate = ctx.translate;
+	  ctx.translate = function (dx, dy) {
+	    xform = xform.translate(dx, dy);
+	    return translate.call(ctx, dx, dy);
+	  };
+	  var transform = ctx.transform;
+	  ctx.transform = function () {
+	    var m2 = svg.createSVGMatrix();
+
+	    for (var _len = arguments.length, matrix = Array(_len), _key = 0; _key < _len; _key++) {
+	      matrix[_key] = arguments[_key];
+	    }
+
+	    m2.a = matrix[0];
+	    m2.b = matrix[1];
+	    m2.c = matrix[2];
+	    m2.d = matrix[3];
+	    m2.e = matrix[4];
+	    m2.f = matrix[5];
+	    xform = xform.multiply(m2);
+	    return transform.call.apply(transform, [ctx].concat(matrix));
+	  };
+	  var setTransform = ctx.setTransform;
+	  ctx.setTransform = function () {
+	    for (var _len2 = arguments.length, matrix = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	      matrix[_key2] = arguments[_key2];
+	    }
+
+	    xform.a = matrix[0];
+	    xform.b = matrix[1];
+	    xform.c = matrix[2];
+	    xform.d = matrix[3];
+	    xform.e = matrix[4];
+	    xform.f = matrix[5];
+	    return setTransform.call.apply(setTransform, [ctx].concat(matrix));
+	  };
+	  var pt = svg.createSVGPoint();
+	  ctx.transformedPoint = function (x, y) {
+	    pt.x = x * PIXEL_RATIO;
+	    pt.y = y * PIXEL_RATIO;
+	    return pt.matrixTransform(xform.inverse());
+	  };
+	}
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.createBlobUrl = createBlobUrl;
+	exports.setupDownloadLink = setupDownloadLink;
+	exports.getX = getX;
+	exports.getY = getY;
+	exports.addClass = addClass;
+	exports.removeClass = removeClass;
+	exports.hasClass = hasClass;
+
+	var _events = __webpack_require__(5);
+
+	var windowURL = window.URL || window.webkitURL;
+
+	function createBlobUrl(data) {
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? 'text/plain;charset=utf-8' : arguments[1];
+
+	  var blob = new Blob([data], { type: type });
+	  return windowURL.createObjectURL(blob);
+	}
+
+	function setupDownloadLink(url, filename) {
+	  var anchor = document.createElement('a');
+	  var isDownloadSupported = typeof anchor.download !== 'undefined';
+
+	  anchor.href = url;
+	  anchor.target = '_blank';
+	  if (isDownloadSupported) {
+	    anchor.download = filename;
+	  }
+	  (0, _events.fireEvent)(anchor, 'click');
+	  if (isDownloadSupported) {
+	    windowURL.revokeObjectURL(anchor.href);
+	  }
+	}
+
+	/**
+	 * Get the x coordinate of oElement
+	 *
+	 * @param domElement - The element to get the X position of.
+	 *
+	 */
+	function getX(domElement) {
+	  var xValue = 0;
+	  while (domElement) {
+	    xValue += domElement.offsetLeft;
+	    domElement = domElement.offsetParent;
+	  }
+	  return xValue;
+	}
+
+	/**
+	 * Get the y coordinate of oElement
+	 *
+	 * @param domElement - The element to get the Y position of.
+	 *
+	 */
+	function getY(domElement) {
+	  var yValue = 0;
+	  while (domElement) {
+	    yValue += domElement.offsetTop;
+	    domElement = domElement.offsetParent;
+	  }
+	  return yValue;
+	}
+
+	function addClass(element, className) {
+	  var classes = element.className.split(' ');
+	  if (classes.indexOf(className) === -1) {
+	    classes.push(className);
+	    element.className = classes.join(' ');
+	  }
+	}
+
+	function removeClass(element, className) {
+	  var classes = element.className.split(' ');
+	  var index = classes.indexOf(className);
+
+	  if (index !== -1) {
+	    classes.splice(index, 1);
+	    element.className = classes.join(' ');
+	  }
+	}
+
+	function hasClass(element, className) {
+	  var classes = element.className.split(' ');
+	  var index = classes.indexOf(className);
+
+	  return index !== -1;
+	}
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.preventDefault = preventDefault;
+	exports.fireEvent = fireEvent;
+	exports.addEvent = addEvent;
+	exports.killEvent = killEvent;
+	exports.createHandler = createHandler;
+
+	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
+	function preventDefault(event) {
+	  event.preventDefault();
+	  return false;
+	}
+
+	function fireEvent(element, type) {
+	  var params = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+	  var event; // The custom event that will be created
+	  var param;
+
+	  if (document.createEvent) {
+	    event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	  } else {
+	    event = document.createEventObject();
+	    event.eventType = type;
+	  }
+
+	  event.eventName = type;
+
+	  for (param in params) {
+	    if (params.hasOwnProperty(param)) {
+	      event[param] = params[param];
+	    }
+	  }
+
+	  if (document.createEvent) {
+	    element.dispatchEvent(event);
+	  } else {
+	    element.fireEvent('on' + event.eventType, event);
+	  }
+	}
+
+	function addEvent(elem, event, fn) {
+	  if (elem.addEventListener) {
+	    elem.addEventListener(event, fn, false);
+	  } else {
+	    elem.attachEvent('on' + event, function () {
+	      // set the this pointer same as addEventListener when fn is called
+	      return fn.call(elem, window.event);
+	    });
+	  }
+	}
+
+	function killEvent(e) {
+	  e.stopPropagation();
+	  e.preventDefault();
+	}
+
+	/**
+	 * Creates a function which can be called from an event handler independent of
+	 * scope.
+	 *
+	 * @param {Object} obj the object the function will be called on
+	 * @param {String} func the name of the function to be called
+	 * @retuns {function}
+	 */
+	function createHandler(obj, func) {
+	  var handler;
+
+	  if ((typeof func === 'undefined' ? 'undefined' : _typeof(func)) === _typeof('aaa')) {
+	    handler = function (e) {
+	      if (obj[func]) {
+	        return obj[func](e);
+	      }
+	    };
+	  } else {
+	    handler = function () {
+	      return func(obj);
+	    };
+	  }
+	  return handler;
+	}
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * An enumeration of certain pre-defined angles to enable faster drawing of
+	 * trees. There are FORTYFIVE, QUARTER, HALF and FULL. Values are all radians.
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	var Angles = exports.Angles = {
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 4
+	   */
+	  FORTYFIVE: Math.PI / 4,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI / 2
+	   */
+	  QUARTER: Math.PI / 2,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI
+	   */
+	  HALF: Math.PI,
+	  /**
+	   * @constant
+	   * @type double
+	   * @description PI * 2
+	   */
+	  FULL: 2 * Math.PI
+	};
+
+	/**
+	 * dictionary to translate newick annotations to branch renderer ids
+	 *
+	 * @enum
+	 * @memberof PhyloCanvas
+	 * @constant
+	 */
+	var Shapes = exports.Shapes = {
+	  x: 'star',
+	  s: 'square',
+	  o: 'circle',
+	  t: 'triangle'
+	};
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var _nodeRenderers = __webpack_require__(4);
+	var _nodeRenderers = __webpack_require__(8);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
@@ -1279,8 +1691,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Angles = _phylocanvasUtils.constants.Angles;
-	var Shapes = _phylocanvasUtils.constants.Shapes;
+	var Angles = _utils.constants.Angles;
+	var Shapes = _utils.constants.Shapes;
 
 	/**
 	 * Cached objects to reduce garbage
@@ -1308,7 +1720,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 
-	var Branch = function () {
+	var Branch = (function () {
 	  function Branch() {
 	    _classCallCheck(this, Branch);
 
@@ -2128,13 +2540,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Branch;
-	}();
+	})();
 
 	Branch.lastId = 0;
 	exports.default = Branch;
 
 /***/ },
-/* 4 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2143,9 +2555,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var Angles = _phylocanvasUtils.constants.Angles;
+	var Angles = _utils.constants.Angles;
 
 	function drawConnector(canvas, connectingOffset) {
 	  canvas.beginPath();
@@ -2259,12 +2671,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 5 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2283,7 +2695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @memberOf PhyloCanvas
 	 */
 
-	var Tooltip = function () {
+	var Tooltip = (function () {
 	  function Tooltip(tree) {
 	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2339,11 +2751,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tooltip;
-	}();
+	})();
 
 	exports.default = Tooltip;
 
-	var ChildNodesTooltip = exports.ChildNodesTooltip = function (_Tooltip) {
+	var ChildNodesTooltip = exports.ChildNodesTooltip = (function (_Tooltip) {
 	  _inherits(ChildNodesTooltip, _Tooltip);
 
 	  function ChildNodesTooltip(tree, options) {
@@ -2373,10 +2785,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return ChildNodesTooltip;
-	}(Tooltip);
+	})(Tooltip);
 
 /***/ },
-/* 6 */
+/* 10 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2460,7 +2872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = Navigator;
 
 /***/ },
-/* 7 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2469,23 +2881,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _rectangular = __webpack_require__(8);
+	var _rectangular = __webpack_require__(12);
 
 	var _rectangular2 = _interopRequireDefault(_rectangular);
 
-	var _circular = __webpack_require__(13);
+	var _circular = __webpack_require__(17);
 
 	var _circular2 = _interopRequireDefault(_circular);
 
-	var _radial = __webpack_require__(16);
+	var _radial = __webpack_require__(20);
 
 	var _radial2 = _interopRequireDefault(_radial);
 
-	var _diagonal = __webpack_require__(19);
+	var _diagonal = __webpack_require__(23);
 
 	var _diagonal2 = _interopRequireDefault(_diagonal);
 
-	var _hierarchical = __webpack_require__(22);
+	var _hierarchical = __webpack_require__(26);
 
 	var _hierarchical2 = _interopRequireDefault(_hierarchical);
 
@@ -2500,7 +2912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2509,19 +2921,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _BranchRenderer = __webpack_require__(9);
+	var _BranchRenderer = __webpack_require__(13);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(10);
+	var _Prerenderer = __webpack_require__(14);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(11);
+	var _branchRenderer = __webpack_require__(15);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(12);
+	var _prerenderer = __webpack_require__(16);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2547,7 +2959,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2591,12 +3003,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = BranchRenderer;
 
 /***/ },
-/* 10 */
+/* 14 */
 /***/ function(module, exports) {
 
 	"use strict";
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2604,7 +3016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Prerenderer = function () {
+	var Prerenderer = (function () {
 	  function Prerenderer(options) {
 	    _classCallCheck(this, Prerenderer);
 
@@ -2639,12 +3051,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Prerenderer;
-	}();
+	})();
 
 	exports.default = Prerenderer;
 
 /***/ },
-/* 11 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2675,7 +3087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 16 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2720,7 +3132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 13 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2729,19 +3141,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _BranchRenderer = __webpack_require__(9);
+	var _BranchRenderer = __webpack_require__(13);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(10);
+	var _Prerenderer = __webpack_require__(14);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(14);
+	var _branchRenderer = __webpack_require__(18);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(15);
+	var _prerenderer = __webpack_require__(19);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2772,7 +3184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2802,7 +3214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2811,9 +3223,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var Angles = _phylocanvasUtils.constants.Angles;
+	var Angles = _utils.constants.Angles;
 	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Angles.FULL / tree.leaves.length;
@@ -2860,7 +3272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 16 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2869,19 +3281,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _BranchRenderer = __webpack_require__(9);
+	var _BranchRenderer = __webpack_require__(13);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(10);
+	var _Prerenderer = __webpack_require__(14);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(17);
+	var _branchRenderer = __webpack_require__(21);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(18);
+	var _prerenderer = __webpack_require__(22);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -2899,7 +3311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 21 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2918,7 +3330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 18 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2927,9 +3339,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var Angles = _phylocanvasUtils.constants.Angles;
+	var Angles = _utils.constants.Angles;
 
 	function prerenderNodes(tree, node) {
 	  if (node.parent) {
@@ -2977,7 +3389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2986,19 +3398,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _BranchRenderer = __webpack_require__(9);
+	var _BranchRenderer = __webpack_require__(13);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(10);
+	var _Prerenderer = __webpack_require__(14);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(20);
+	var _branchRenderer = __webpack_require__(24);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(21);
+	var _prerenderer = __webpack_require__(25);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3013,7 +3425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 20 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3039,7 +3451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3048,9 +3460,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var Angles = _phylocanvasUtils.constants.Angles;
+	var Angles = _utils.constants.Angles;
 	exports.default = {
 	  getStep: function getStep(tree) {
 	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
@@ -3078,7 +3490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 22 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3087,19 +3499,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _BranchRenderer = __webpack_require__(9);
+	var _BranchRenderer = __webpack_require__(13);
 
 	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
 
-	var _Prerenderer = __webpack_require__(10);
+	var _Prerenderer = __webpack_require__(14);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _branchRenderer = __webpack_require__(23);
+	var _branchRenderer = __webpack_require__(27);
 
 	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
 
-	var _prerenderer = __webpack_require__(24);
+	var _prerenderer = __webpack_require__(28);
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
@@ -3125,7 +3537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 23 */
+/* 27 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3160,7 +3572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 24 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3169,9 +3581,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _phylocanvasUtils = __webpack_require__(2);
+	var _utils = __webpack_require__(2);
 
-	var Angles = _phylocanvasUtils.constants.Angles;
+	var Angles = _utils.constants.Angles;
 	exports.default = {
 	  getStep: function getStep(tree) {
 	    return tree.fillCanvas ? tree.canvas.canvas.width / tree.leaves.length : Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
@@ -3213,7 +3625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 25 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3222,15 +3634,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _Parser = __webpack_require__(26);
+	var _Parser = __webpack_require__(30);
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _newick = __webpack_require__(27);
+	var _newick = __webpack_require__(31);
 
 	var _newick2 = _interopRequireDefault(_newick);
 
-	var _nexus = __webpack_require__(28);
+	var _nexus = __webpack_require__(32);
 
 	var _nexus2 = _interopRequireDefault(_nexus);
 
@@ -3242,12 +3654,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 26 */
+/* 30 */
 /***/ function(module, exports) {
 
 	"use strict";
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -3255,7 +3667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Parser = function () {
+	var Parser = (function () {
 	  function Parser(_ref) {
 	    var format = _ref.format;
 	    var parseFn = _ref.parseFn;
@@ -3286,12 +3698,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Parser;
-	}();
+	})();
 
 	exports.default = Parser;
 
 /***/ },
-/* 27 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3300,7 +3712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _Branch = __webpack_require__(3);
+	var _Branch = __webpack_require__(7);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
@@ -3480,7 +3892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 28 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3489,7 +3901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _newick = __webpack_require__(27);
+	var _newick = __webpack_require__(31);
 
 	var format = 'nexus';
 	var fileExtension = /\.n(ex|xs)$/;

@@ -1,4 +1,4 @@
-import { constants } from 'phylocanvas-utils';
+import { constants } from './utils';
 
 import nodeRenderers from './nodeRenderers';
 
