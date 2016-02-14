@@ -224,6 +224,7 @@ export default class Tree {
 
   clicked(e) {
     var node;
+    var appendedSelection = false;
     if (e.button === 0) {
       let nodeIds = [];
       // if this is triggered by the release after a drag then the click
@@ -240,6 +241,7 @@ export default class Tree {
         if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
           if (node.leaf) {
             node.cascadeFlag('selected', !node.selected);
+            appendedSelection = true;
           } else if (this.internalNodesSelectable) {
             const someUnselected = node.getChildProperties('selected').some(selected => selected === false);
             node.cascadeFlag('selected', someUnselected);
@@ -263,7 +265,7 @@ export default class Tree {
         this.dragging = false;
       }
 
-      this.nodesUpdated(nodeIds, 'selected');
+      this.nodesUpdated(nodeIds, 'selected', appendedSelection);
     }
   }
 
@@ -762,8 +764,8 @@ export default class Tree {
     fireEvent(this.containerElement, 'subtree', { node });
   }
 
-  nodesUpdated(nodeIds, property) {
-    fireEvent(this.containerElement, 'updated', { nodeIds, property });
+  nodesUpdated(nodeIds, property, append = false) {
+    fireEvent(this.containerElement, 'updated', { nodeIds, property, append });
   }
 
   addListener(event, listener) {

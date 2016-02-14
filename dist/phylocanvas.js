@@ -396,6 +396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'clicked',
 	    value: function clicked(e) {
 	      var node;
+	      var appendedSelection = false;
 	      if (e.button === 0) {
 	        var nodeIds = [];
 	        // if this is triggered by the release after a drag then the click
@@ -412,6 +413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
 	            if (node.leaf) {
 	              node.cascadeFlag('selected', !node.selected);
+	              appendedSelection = true;
 	            } else if (this.internalNodesSelectable) {
 	              var someUnselected = node.getChildProperties('selected').some(function (selected) {
 	                return selected === false;
@@ -437,7 +439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.dragging = false;
 	        }
 
-	        this.nodesUpdated(nodeIds, 'selected');
+	        this.nodesUpdated(nodeIds, 'selected', appendedSelection);
 	      }
 	    }
 	  }, {
@@ -1108,7 +1110,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'nodesUpdated',
 	    value: function nodesUpdated(nodeIds, property) {
-	      fireEvent(this.containerElement, 'updated', { nodeIds: nodeIds, property: property });
+	      var append = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+	      fireEvent(this.containerElement, 'updated', { nodeIds: nodeIds, property: property, append: append });
 	    }
 	  }, {
 	    key: 'addListener',
