@@ -739,12 +739,7 @@ export default class Branch {
         this.leafStyle.lineWidth :
         this.tree.lineWidth;
 
-    _leafStyle.lineWidth =
-      lineWidth === 0 ? 0 :
-        Math.max(
-          this.tree.lineWidth / zoom,
-          Math.min(lineWidth, Math.ceil(lineWidth * zoom))
-        );
+    _leafStyle.lineWidth = lineWidth / zoom;
 
     return _leafStyle;
   }
