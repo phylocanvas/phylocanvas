@@ -6,13 +6,13 @@ import prerendererOptions from './prerenderer';
 
 const labelAlign = {
   getX(node) {
-    return node.tree.farthestNodeFromRootX;
+    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale;
   },
   getY(node) {
     return node.centery;
   },
   getLabelOffset(node) {
-    return (node.tree.farthestNodeFromRootX - node.centerx);
+    return (node.tree.farthestNodeFromRootX * node.tree.currentBranchScale - node.centerx);
   }
 };
 

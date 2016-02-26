@@ -9,10 +9,10 @@ const labelAlign = {
     return node.centerx;
   },
   getY(node) {
-    return node.tree.farthestNodeFromRootY;
+    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale;
   },
   getLabelOffset(node) {
-    return (node.tree.farthestNodeFromRootY - node.centery);
+    return (node.tree.farthestNodeFromRootY * node.tree.currentBranchScale - node.centery);
   }
 };
 
@@ -20,5 +20,5 @@ export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
-  branchScalingAxis: 'y', 
+  branchScalingAxis: 'y',
 };
