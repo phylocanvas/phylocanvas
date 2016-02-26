@@ -713,16 +713,13 @@ export default class Tree {
     if (!treeType.branchScalingAxis || scale < 0) {
       return;
     }
-    const offset = this[`offset${treeType.branchScalingAxis}`];
 
-    const branchLength = this.leaves[0].branchLength * this.branchScalar;
+    const previoudBranchLength = this.branchScalar;
     this.branchScalar = this.initialBranchScalar * scale;
-    const newBranchLength = this.leaves[0].branchLength * this.branchScalar;
-
-    const scaleRatio = newBranchLength / branchLength;
+    const scaleRatio = this.branchScalar / previoudBranchLength;
+    const offset = this[`offset${treeType.branchScalingAxis}`];
     const oldPosition = point[treeType.branchScalingAxis];
     const newPosition = (point[treeType.branchScalingAxis] - offset) * scaleRatio + offset;
-    // const dispossition = oldPosition - newPosition;
     this[`offset${treeType.branchScalingAxis}`] += (oldPosition - newPosition);
     this.draw();
   }
