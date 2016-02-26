@@ -141,7 +141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -196,7 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  new PhyloCanvas.Tree(element);
 	 */
 
-	var Tree = (function () {
+	var Tree = function () {
 	  function Tree(element) {
 	    var conf = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -334,10 +334,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
 	      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
 	    }
-	    addEvent(window, 'resize', (function () {
+	    addEvent(window, 'resize', function () {
 	      this.resizeToContainer();
 	      this.draw();
-	    }).bind(this));
+	    }.bind(this));
 
 	    /**
 	     * Align labels vertically
@@ -1052,16 +1052,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!treeType.branchScalingAxis || scale < 0) {
 	        return;
 	      }
-	      var offset = this['offset' + treeType.branchScalingAxis];
 
-	      var branchLength = this.leaves[0].branchLength * this.branchScalar;
+	      var previoudBranchLength = this.branchScalar;
 	      this.branchScalar = this.initialBranchScalar * scale;
-	      var newBranchLength = this.leaves[0].branchLength * this.branchScalar;
-
-	      var scaleRatio = newBranchLength / branchLength;
+	      var scaleRatio = this.branchScalar / previoudBranchLength;
+	      var offset = this['offset' + treeType.branchScalingAxis];
 	      var oldPosition = point[treeType.branchScalingAxis];
 	      var newPosition = (point[treeType.branchScalingAxis] - offset) * scaleRatio + offset;
-	      // const dispossition = oldPosition - newPosition;
 	      this['offset' + treeType.branchScalingAxis] += oldPosition - newPosition;
 	      this.draw();
 	    }
@@ -1248,7 +1245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tree;
-	})();
+	}();
 
 	exports.default = Tree;
 
@@ -1450,6 +1447,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
@@ -1458,9 +1457,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.addEvent = addEvent;
 	exports.killEvent = killEvent;
 	exports.createHandler = createHandler;
-
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
 	function preventDefault(event) {
 	  event.preventDefault();
 	  return false;
@@ -1523,13 +1519,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var handler;
 
 	  if ((typeof func === 'undefined' ? 'undefined' : _typeof(func)) === _typeof('aaa')) {
-	    handler = function (e) {
+	    handler = function handler(e) {
 	      if (obj[func]) {
 	        return obj[func](e);
 	      }
 	    };
 	  } else {
-	    handler = function () {
+	    handler = function handler() {
 	      return func(obj);
 	    };
 	  }
@@ -1600,7 +1596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -1645,7 +1641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 */
 
-	var Branch = (function () {
+	var Branch = function () {
 	  function Branch() {
 	    _classCallCheck(this, Branch);
 
@@ -2448,7 +2444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var lineWidth = typeof this.leafStyle.lineWidth !== 'undefined' ? this.leafStyle.lineWidth : this.tree.lineWidth;
 
-	      _leafStyle.lineWidth = lineWidth === 0 ? 0 : Math.max(this.tree.lineWidth / zoom, Math.min(lineWidth, Math.ceil(lineWidth * zoom)));
+	      _leafStyle.lineWidth = lineWidth / zoom;
 
 	      return _leafStyle;
 	    }
@@ -2465,7 +2461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Branch;
-	})();
+	}();
 
 	Branch.lastId = 0;
 	exports.default = Branch;
@@ -2601,7 +2597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2620,7 +2616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @memberOf PhyloCanvas
 	 */
 
-	var Tooltip = (function () {
+	var Tooltip = function () {
 	  function Tooltip(tree) {
 	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2676,11 +2672,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Tooltip;
-	})();
+	}();
 
 	exports.default = Tooltip;
 
-	var ChildNodesTooltip = exports.ChildNodesTooltip = (function (_Tooltip) {
+	var ChildNodesTooltip = exports.ChildNodesTooltip = function (_Tooltip) {
 	  _inherits(ChildNodesTooltip, _Tooltip);
 
 	  function ChildNodesTooltip(tree, options) {
@@ -2710,7 +2706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return ChildNodesTooltip;
-	})(Tooltip);
+	}(Tooltip);
 
 /***/ },
 /* 10 */
@@ -2866,13 +2862,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var labelAlign = {
 	  getX: function getX(node) {
-	    return node.tree.farthestNodeFromRootX;
+	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale;
 	  },
 	  getY: function getY(node) {
 	    return node.centery;
 	  },
 	  getLabelOffset: function getLabelOffset(node) {
-	    return node.tree.farthestNodeFromRootX - node.centerx;
+	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale - node.centerx;
 	  }
 	};
 
@@ -2933,7 +2929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -2941,7 +2937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Prerenderer = (function () {
+	var Prerenderer = function () {
 	  function Prerenderer(options) {
 	    _classCallCheck(this, Prerenderer);
 
@@ -2976,7 +2972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Prerenderer;
-	})();
+	}();
 
 	exports.default = Prerenderer;
 
@@ -3447,10 +3443,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return node.centerx;
 	  },
 	  getY: function getY(node) {
-	    return node.tree.farthestNodeFromRootY;
+	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale;
 	  },
 	  getLabelOffset: function getLabelOffset(node) {
-	    return node.tree.farthestNodeFromRootY - node.centery;
+	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale - node.centery;
 	  }
 	};
 
@@ -3584,7 +3580,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -3592,7 +3588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Parser = (function () {
+	var Parser = function () {
 	  function Parser(_ref) {
 	    var format = _ref.format;
 	    var parseFn = _ref.parseFn;
@@ -3623,7 +3619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 
 	  return Parser;
-	})();
+	}();
 
 	exports.default = Parser;
 
