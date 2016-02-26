@@ -1,0 +1,11 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "globals": {
+    "PhyloCanvas": true
+  },
+  "rules": {
+    "padded-blocks": 0
+  }
+}

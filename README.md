@@ -1,5 +1,19 @@
-#PhyloCanvas - HTML5 Phylogenetic Tree viewer
+#PhyloCanvas
 
-**www.phylocanvas.net**
+A canvas-based phylogenetic tree viewer, no browser plugins or extra libraries required.
 
-PhyloCanvas is released under a GPLv3 Licence and documentation is released under a Creative Commons Share Alike Licence (CC BY-SA)
+Please see **www.phylocanvas.org** for full documentation.
+
+## Development
+```
+npm install
+npm start
+```
+Go to http://localhost:8000/dev
+
+## Building
+```
+npm run build
+```
+
+PhyloCanvas is released under the LGPLv3 Licence and documentation is released under the Creative Commons Attribution-ShareAlike Licence (CC BY-SA).

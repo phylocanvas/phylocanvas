@@ -1,38 +1,46 @@
 {
-  "name": "PhyloCanvas",
-  "version": "1.7.3",
-  "repository": "https://github.com/ImperialCollegeLondon/PhyloCanvas",
-  "main": "src/scripts/PhyloCanvas.js",
+  "name": "phylocanvas",
+  "description": "Canvas-based Phylogenetic Tree Viewer",
+  "version": "2.0.0",
+  "main": "dist/phylocanvas.js",
+  "repository": {
+    "type": "git",
+    "url": "git://git@github.com:PhyloCanvas/PhyloCanvas.git"
+  },
+  "keywords": [
+    "phylocanvas",
+    "phylogeny",
+    "phylogenetic",
+    "tree",
+    "canvas",
+    "newick",
+    "biojs"
+  ],
+  "author": "Centre for Genomic Pathogen Surveillance, Wellcome Trust Sanger Institute",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/PhyloCanvas/PhyloCanvas/issues"
+  },
+  "homepage": "http://www.phylocanvas.net",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline",
+    "test": "webpack-dev-server --config webpack-test-server.config.js --port 8081",
+    "build": "webpack"
+  },
   "dependencies": {},
   "devDependencies": {
-    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#cgps-0.0.5",
-    "grunt": "~0.4.1",
-    "grunt-contrib-copy": "~0.4.1",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-jshint": "~0.6.3",
-    "grunt-contrib-cssmin": "~0.6.0",
-    "grunt-contrib-connect": "~0.5.0",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-htmlmin": "~0.1.3",
-    "grunt-bower-install": "~0.5.0",
-    "grunt-contrib-imagemin": "~0.2.0",
-    "grunt-contrib-watch": "~0.5.2",
-    "grunt-contrib-less": "~0.5.0",
-    "grunt-rev": "~0.1.0",
-    "grunt-autoprefixer": "~0.2.0",
-    "grunt-usemin": "~2.0.0",
-    "grunt-mocha": "~0.4.0",
-    "grunt-modernizr": "~0.3.0",
-    "grunt-svgmin": "~0.2.0",
-    "grunt-concurrent": "~0.3.0",
-    "load-grunt-tasks": "^0.4.0",
-    "time-grunt": "~0.1.1",
-    "jshint-stylish": "~0.1.3",
-    "grunt-bump": "0.0.13",
-    "load-grunt-config": "^0.8.0-beta.1"
-  },
-  "engines": {
-    "node": ">=0.8.0"
+    "babel-core": "^6.3.21",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "babel-runtime": "^6.3.19",
+    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#v1.0.2",
+    "chai": "^2.3.0",
+    "core-js": "^1.0.1",
+    "mocha": "^2.2.4",
+    "mocha-loader": "^0.7.1",
+    "node-libs-browser": "^0.5.0",
+    "webpack": "^1.9.10",
+    "webpack-dev-server": "^1.9.0"
   }
 }
