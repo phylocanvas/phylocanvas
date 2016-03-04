@@ -379,7 +379,7 @@ export default class Branch {
       this.canvas.restore();
     }
 
-    if (this.isHighlighted) {
+    if (this.isHighlighted && (this.tree.highlightInternalNodes || this.leaf)) {
       this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
     }
   }
