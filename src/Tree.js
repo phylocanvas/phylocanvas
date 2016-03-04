@@ -130,8 +130,9 @@ export default class Tree {
     this.labelPadding = 5;
 
     this.multiSelect = true;
+    this.clickFlag = 'selected';
     this.hoverLabel = false;
-
+    this.highlightInternalNodes = false;
     this.internalNodesSelectable = true;
 
     this.showLabels = true;
@@ -214,8 +215,12 @@ export default class Tree {
   }
 
   getSelectedNodeIds() {
+    return this.getNodeIdsWithFlag('selected');
+  }
+
+  getNodeIdsWithFlag(flag, value = true) {
     return this.leaves.reduce((memo, leaf) => {
-      if (leaf.selected) {
+      if (leaf[flag] === value) {
         memo.push(leaf.id);
       }
       return memo;
@@ -224,7 +229,6 @@ export default class Tree {
 
   clicked(e) {
     var node;
-    var appendedSelection = false;
     if (e.button === 0) {
       let nodeIds = [];
       // if this is triggered by the release after a drag then the click
@@ -236,28 +240,27 @@ export default class Tree {
 
       if (!this.root) return false;
       node = this.getNodeAtMousePosition(e);
-
+      const isMultiSelectActive = this.multiSelect && (e.metaKey || e.ctrlKey);
       if (node && node.interactive) {
-        if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
+        if (isMultiSelectActive) {
           if (node.leaf) {
-            node.cascadeFlag('selected', !node.selected);
-            appendedSelection = true;
+            node[this.clickFlag] = !node[this.clickFlag];
           } else if (this.internalNodesSelectable) {
-            const someUnselected = node.getChildProperties('selected').some(selected => selected === false);
-            node.cascadeFlag('selected', someUnselected);
+            const someUnflagged = node.getChildProperties(this.clickFlag).some(prop => prop === false);
+            node.cascadeFlag(this.clickFlag, someUnflagged);
           }
-          nodeIds = this.getSelectedNodeIds();
+          nodeIds = this.getNodeIdsWithFlag(this.clickFlag);
           this.draw();
         } else {
-          this.root.cascadeFlag('selected', false);
+          this.root.cascadeFlag(this.clickFlag, false);
           if (this.internalNodesSelectable || node.leaf) {
-            node.cascadeFlag('selected', true);
+            node.cascadeFlag(this.clickFlag, true);
             nodeIds = node.getChildProperties('id');
           }
           this.draw();
         }
-      } else if (this.unselectOnClickAway && !this.dragging) {
-        this.root.cascadeFlag('selected', false);
+      } else if (this.unselectOnClickAway && !this.dragging && !isMultiSelectActive) {
+        this.root.cascadeFlag(this.clickFlag, false);
         this.draw();
       }
 
@@ -265,7 +268,7 @@ export default class Tree {
         this.dragging = false;
       }
 
-      this.nodesUpdated(nodeIds, 'selected', appendedSelection);
+      this.nodesUpdated(nodeIds, this.clickFlag);
     }
   }
 
