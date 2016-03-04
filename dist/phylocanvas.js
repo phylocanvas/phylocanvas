@@ -302,8 +302,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.labelPadding = 5;
 
 	    this.multiSelect = true;
+	    this.clickFlag = 'selected';
 	    this.hoverLabel = false;
-
+	    this.highlightInternalNodes = false;
 	    this.internalNodesSelectable = true;
 
 	    this.showLabels = true;
@@ -385,8 +386,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getSelectedNodeIds',
 	    value: function getSelectedNodeIds() {
+	      return this.getNodeIdsWithFlag('selected');
+	    }
+	  }, {
+	    key: 'getNodeIdsWithFlag',
+	    value: function getNodeIdsWithFlag(flag) {
+	      var value = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+
 	      return this.leaves.reduce(function (memo, leaf) {
-	        if (leaf.selected) {
+	        if (leaf[flag] === value) {
 	          memo.push(leaf.id);
 	        }
 	        return memo;
@@ -396,7 +404,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'clicked',
 	    value: function clicked(e) {
 	      var node;
-	      var appendedSelection = false;
 	      if (e.button === 0) {
 	        var nodeIds = [];
 	        // if this is triggered by the release after a drag then the click
@@ -408,30 +415,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (!this.root) return false;
 	        node = this.getNodeAtMousePosition(e);
-
+	        var isMultiSelectActive = this.multiSelect && (e.metaKey || e.ctrlKey);
 	        if (node && node.interactive) {
-	          if (this.multiSelect && (e.metaKey || e.ctrlKey)) {
+	          if (isMultiSelectActive) {
 	            if (node.leaf) {
-	              node.cascadeFlag('selected', !node.selected);
-	              appendedSelection = true;
+	              node[this.clickFlag] = !node[this.clickFlag];
 	            } else if (this.internalNodesSelectable) {
-	              var someUnselected = node.getChildProperties('selected').some(function (selected) {
-	                return selected === false;
+	              var someUnflagged = node.getChildProperties(this.clickFlag).some(function (prop) {
+	                return prop === false;
 	              });
-	              node.cascadeFlag('selected', someUnselected);
+	              node.cascadeFlag(this.clickFlag, someUnflagged);
 	            }
-	            nodeIds = this.getSelectedNodeIds();
+	            nodeIds = this.getNodeIdsWithFlag(this.clickFlag);
 	            this.draw();
 	          } else {
-	            this.root.cascadeFlag('selected', false);
+	            this.root.cascadeFlag(this.clickFlag, false);
 	            if (this.internalNodesSelectable || node.leaf) {
-	              node.cascadeFlag('selected', true);
+	              node.cascadeFlag(this.clickFlag, true);
 	              nodeIds = node.getChildProperties('id');
 	            }
 	            this.draw();
 	          }
-	        } else if (this.unselectOnClickAway && !this.dragging) {
-	          this.root.cascadeFlag('selected', false);
+	        } else if (this.unselectOnClickAway && !this.dragging && !isMultiSelectActive) {
+	          this.root.cascadeFlag(this.clickFlag, false);
 	          this.draw();
 	        }
 
@@ -439,7 +445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          this.dragging = false;
 	        }
 
-	        this.nodesUpdated(nodeIds, 'selected', appendedSelection);
+	        this.nodesUpdated(nodeIds, this.clickFlag);
 	      }
 	    }
 	  }, {
@@ -1991,7 +1997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.canvas.restore();
 	      }
 
-	      if (this.isHighlighted) {
+	      if (this.isHighlighted && (this.tree.highlightInternalNodes || this.leaf)) {
 	        this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
 	      }
 	    }
@@ -2597,116 +2603,86 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
+	exports.default = Tooltip;
+	exports.ChildNodesTooltip = ChildNodesTooltip;
 	/**
 	 * Tooltip
 	 *
 	 * @constructor
 	 * @memberOf PhyloCanvas
 	 */
+	function Tooltip(tree) {
+	  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	var Tooltip = function () {
-	  function Tooltip(tree) {
-	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var _ref$className = _ref.className;
+	  var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
+	  var _ref$element = _ref.element;
+	  var element = _ref$element === undefined ? document.createElement('div') : _ref$element;
+	  var _ref$zIndex = _ref.zIndex;
+	  var zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex;
+	  var _ref$parent = _ref.parent;
+	  var parent = _ref$parent === undefined ? tree.containerElement : _ref$parent;
 
-	    var _ref$className = _ref.className;
-	    var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
-	    var _ref$element = _ref.element;
-	    var element = _ref$element === undefined ? document.createElement('div') : _ref$element;
-	    var _ref$zIndex = _ref.zIndex;
-	    var zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex;
-	    var _ref$parent = _ref.parent;
-	    var parent = _ref$parent === undefined ? tree.containerElement : _ref$parent;
+	  this.tree = tree;
+	  this.element = element;
+	  this.element.className = className;
+	  this.element.style.display = 'none';
+	  this.element.style.position = 'fixed';
+	  this.element.style.zIndex = zIndex;
+	  this.closed = true;
 
-	    _classCallCheck(this, Tooltip);
+	  parent.appendChild(this.element);
+	}
 
-	    this.tree = tree;
-	    this.element = element;
-	    this.element.className = className;
-	    this.element.style.display = 'none';
-	    this.element.style.position = 'fixed';
-	    this.element.style.zIndex = zIndex;
-	    this.closed = true;
+	Tooltip.prototype.close = function () {
+	  this.element.style.display = 'none';
+	  this.closed = true;
+	};
 
-	    parent.appendChild(this.element);
+	Tooltip.prototype.open = function () {
+	  var x = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
+	  var y = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
+	  var node = arguments[2];
+
+	  while (this.element.hasChildNodes()) {
+	    this.element.removeChild(this.element.firstChild);
 	  }
 
-	  _createClass(Tooltip, [{
-	    key: 'close',
-	    value: function close() {
-	      this.element.style.display = 'none';
-	      this.closed = true;
-	    }
-	  }, {
-	    key: 'open',
-	    value: function open() {
-	      var x = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
-	      var y = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
-	      var node = arguments[2];
+	  this.createContent(node);
 
-	      while (this.element.hasChildNodes()) {
-	        this.element.removeChild(this.element.firstChild);
-	      }
+	  this.element.style.top = y + 'px';
+	  this.element.style.left = x + 'px';
 
-	      this.createContent(node);
+	  this.element.style.display = 'block';
 
-	      this.element.style.top = y + 'px';
-	      this.element.style.left = x + 'px';
+	  this.closed = false;
+	};
 
-	      this.element.style.display = 'block';
-	      //
+	function ChildNodesTooltip(tree, options) {
+	  Tooltip.call(this, tree, options);
 
-	      this.closed = false;
-	    }
-	  }]);
+	  this.element.style.background = 'rgba(97, 97, 97, 0.9)';
+	  this.element.style.color = '#fff';
+	  this.element.style.cursor = 'pointer';
+	  this.element.style.padding = '8px';
+	  this.element.style.marginTop = '16px';
+	  this.element.style.borderRadius = '2px';
+	  this.element.style.textAlign = 'center';
+	  this.element.style.fontFamily = this.tree.font || 'sans-serif';
+	  this.element.style.fontSize = '10px';
+	  this.element.style.fontWeight = '500';
+	}
 
-	  return Tooltip;
-	}();
+	ChildNodesTooltip.prototype = Object.create(Tooltip.prototype);
+	ChildNodesTooltip.prototype.constructor = ChildNodesTooltip;
 
-	exports.default = Tooltip;
-
-	var ChildNodesTooltip = exports.ChildNodesTooltip = function (_Tooltip) {
-	  _inherits(ChildNodesTooltip, _Tooltip);
-
-	  function ChildNodesTooltip(tree, options) {
-	    _classCallCheck(this, ChildNodesTooltip);
-
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildNodesTooltip).call(this, tree, options));
-
-	    _this.element.style.background = 'rgba(97, 97, 97, 0.9)';
-	    _this.element.style.color = '#fff';
-	    _this.element.style.cursor = 'pointer';
-	    _this.element.style.padding = '8px';
-	    _this.element.style.marginTop = '16px';
-	    _this.element.style.borderRadius = '2px';
-	    _this.element.style.textAlign = 'center';
-	    _this.element.style.fontFamily = _this.tree.font || 'sans-serif';
-	    _this.element.style.fontSize = '10px';
-	    _this.element.style.fontWeight = '500';
-	    return _this;
-	  }
-
-	  _createClass(ChildNodesTooltip, [{
-	    key: 'createContent',
-	    value: function createContent(node) {
-	      var textNode = document.createTextNode(node.getChildProperties('id').length);
-	      this.element.appendChild(textNode);
-	    }
-	  }]);
-
-	  return ChildNodesTooltip;
-	}(Tooltip);
+	ChildNodesTooltip.prototype.createContent = function (node) {
+	  var textNode = document.createTextNode(node.getChildProperties('id').length);
+	  this.element.appendChild(textNode);
+	};
 
 /***/ },
 /* 10 */
