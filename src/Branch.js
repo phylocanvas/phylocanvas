@@ -379,7 +379,7 @@ export default class Branch {
       this.canvas.restore();
     }
 
-    if (this.isHighlighted && (this.tree.highlightInternalNodes || this.leaf)) {
+    if (this.isHighlighted) {
       this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
     }
   }
@@ -418,13 +418,15 @@ export default class Branch {
     return y;
   }
 
-  cascadeFlag(property, value) {
+  cascadeFlag(property, value, predicate) {
     if (typeof this[property] === 'undefined') {
       throw new Error(`Unknown property: ${property}`);
     }
-    this[property] = value;
+    if (typeof predicate === 'undefined' || predicate(this, property, value)) {
+      this[property] = value;
+    }
     for (const child of this.children) {
-      child.cascadeFlag(property, value);
+      child.cascadeFlag(property, value, predicate);
     }
   }
 

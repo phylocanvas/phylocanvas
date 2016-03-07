@@ -76,6 +76,9 @@ tree.hoverLabel = true;
 tree.padding = 1;
 tree.setTreeType('rectangular');
 
+tree.clickFlag = 'highlighted';
+tree.clickFlagPredicate = node => node.leaf;
+
 // ./data/tree.nwk
 // (A:0.1,B:0.1,(C:0.1,D:0.1):0.1);
 tree.load(
