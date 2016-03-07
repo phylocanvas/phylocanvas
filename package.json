@@ -1,7 +1,7 @@
 {
   "name": "phylocanvas",
   "description": "Canvas-based Phylogenetic Tree Viewer",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "dist/phylocanvas.js",
   "repository": {
     "type": "git",
