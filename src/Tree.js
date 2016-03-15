@@ -131,8 +131,8 @@ export default class Tree {
 
     this.multiSelect = true;
     this.clickFlag = 'selected';
+    this.clickFlagPredicate = () => true;
     this.hoverLabel = false;
-    this.highlightInternalNodes = false;
     this.internalNodesSelectable = true;
 
     this.showLabels = true;
@@ -247,20 +247,20 @@ export default class Tree {
             node[this.clickFlag] = !node[this.clickFlag];
           } else if (this.internalNodesSelectable) {
             const someUnflagged = node.getChildProperties(this.clickFlag).some(prop => prop === false);
-            node.cascadeFlag(this.clickFlag, someUnflagged);
+            node.cascadeFlag(this.clickFlag, someUnflagged, this.clickFlagPredicate);
           }
           nodeIds = this.getNodeIdsWithFlag(this.clickFlag);
           this.draw();
         } else {
-          this.root.cascadeFlag(this.clickFlag, false);
+          this.root.cascadeFlag(this.clickFlag, false, this.clickFlagPredicate);
           if (this.internalNodesSelectable || node.leaf) {
-            node.cascadeFlag(this.clickFlag, true);
+            node.cascadeFlag(this.clickFlag, true, this.clickFlagPredicate);
             nodeIds = node.getChildProperties('id');
           }
           this.draw();
         }
       } else if (this.unselectOnClickAway && !this.dragging && !isMultiSelectActive) {
-        this.root.cascadeFlag(this.clickFlag, false);
+        this.root.cascadeFlag(this.clickFlag, false, this.clickFlagPredicate);
         this.draw();
       }
 
