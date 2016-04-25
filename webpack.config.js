@@ -28,7 +28,7 @@ function config(options) {
       path: path.join(__dirname, 'dist'),
       publicPath: '/dist/',
       filename: options.minify ? 'phylocanvas.min.js' : 'phylocanvas.js',
-      library: 'PhyloCanvas',
+      library: 'Phylocanvas',
       libraryTarget: 'umd',
     },
     module: {
@@ -42,7 +42,7 @@ function config(options) {
         },
       ],
     },
-    plugins: plugins,
+    plugins,
     target: 'web',
   };
 }
