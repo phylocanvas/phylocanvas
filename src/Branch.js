@@ -293,8 +293,8 @@ export default class Branch {
     this.canvas.beginPath();
 
     this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
-                      this.tree.defaultCollapsedOptions.color : 'purple';
+    this.canvas.fillStyle = (this.tree.defaultCollapsed.color) ?
+                      this.tree.defaultCollapsed.color : 'purple';
     this.canvas.fill();
     this.canvas.globalAlpha = 1;
 

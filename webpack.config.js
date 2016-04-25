@@ -1,26 +1,22 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const plugins = [
+  new webpack.NoErrorsPlugin(),
+  new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: JSON.stringify('production'),
+    },
+  }),
+];
+
+const uglifyPlugin = new webpack.optimize.UglifyJsPlugin({
+  compressor: {
+    warnings: false,
+  },
+});
+
 function config(options) {
-  const plugins = [
-    new webpack.NoErrorsPlugin(),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production'),
-      },
-    }),
-  ];
-
-  if (options.minify) {
-    plugins.push(
-      new webpack.optimize.UglifyJsPlugin({
-        compressor: {
-          warnings: false,
-        },
-      })
-    );
-  }
-
   return {
     context: path.join(__dirname, 'src'),
     entry: './index',
@@ -42,7 +38,7 @@ function config(options) {
         },
       ],
     },
-    plugins,
+    plugins: options.minify ? plugins.concat([ uglifyPlugin ]) : plugins,
     target: 'web',
   };
 }
@@ -52,6 +48,7 @@ const polyfillConfig = {
   output: {
     filename: 'polyfill.js',
   },
+  plugins: [ uglifyPlugin ],
 };
 
 module.exports = [
