@@ -452,6 +452,9 @@ export default class Branch {
   }
 
   redrawTreeFromBranch() {
+    if (this.collapsed) {
+      this.expand();
+    }
     this.tree.redrawFromBranch(this);
   }
 
