@@ -769,15 +769,14 @@ export default class Tree {
     addEvent(this.containerElement, event, listener);
   }
 
-  getBounds() {
-    var minx = this.root.startx;
-    var maxx = this.root.startx;
-    var miny = this.root.starty;
-    var maxy = this.root.starty;
+  getBounds(leaves = this.leaves) {
+    let minx = leaves[0].startx;
+    let maxx = leaves[0].startx;
+    let miny = leaves[0].starty;
+    let maxy = leaves[0].starty;
 
-    for (let i = this.leaves.length; i--; ) {
-      const bounds = this.leaves[i].getBounds();
-
+    for (const leaf of leaves) {
+      const bounds = leaf.getBounds();
       minx = Math.min(minx, bounds.minx);
       maxx = Math.max(maxx, bounds.maxx);
       miny = Math.min(miny, bounds.miny);
@@ -786,12 +785,11 @@ export default class Tree {
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
 
-  fitInPanel() {
+  fitInPanel(bounds = this.getBounds()) {
     const canvasSize = [
       this.canvas.canvas.width - this.padding * 2,
       this.canvas.canvas.height - this.padding * 2,
     ];
-    const bounds = this.getBounds();
     const treeSize = [
       bounds[1][0] - bounds[0][0],
       bounds[1][1] - bounds[0][1],
@@ -803,11 +801,13 @@ export default class Tree {
     this.offsetx = (-1 * bounds[0][0]) * this.zoom;
     this.offsety = (-1 * bounds[0][1]) * this.zoom;
     if (xZoomRatio > yZoomRatio) {
-      this.offsetx += this.padding + (canvasSize[0] - (treeSize[0] * this.zoom)) / 2;
+      this.offsetx += this.padding +
+                      (canvasSize[0] - (treeSize[0] * this.zoom)) / 2;
       this.offsety += this.padding;
     } else {
       this.offsetx += this.padding;
-      this.offsety += this.padding + (canvasSize[1] - (treeSize[1] * this.zoom)) / 2;
+      this.offsety += this.padding +
+                      (canvasSize[1] - (treeSize[1] * this.zoom)) / 2;
     }
     this.offsetx = this.offsetx / pixelRatio;
     this.offsety = this.offsety / pixelRatio;

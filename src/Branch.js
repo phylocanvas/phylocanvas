@@ -618,37 +618,37 @@ export default class Branch {
    * @method getNodeSize
    * @return CallExpression
    */
-  getLabelStartX() {
-    const { lineWidth } = this.getLeafStyle();
+  getLabelStartX(includeZoom = true) {
+    const { lineWidth } = this.getLeafStyle(includeZoom);
     const hasLabelConnector = this.hasLabelConnector();
 
     let offset = this.getDiameter();
 
     if (this.isHighlighted && !hasLabelConnector) {
-      offset += this.getHighlightSize() - this.getRadius();
+      offset += this.getHighlightSize(includeZoom) - this.getRadius();
     }
 
     if (!this.isHighlighted && !hasLabelConnector) {
       offset += lineWidth / 2;
     }
 
-    return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
+    return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / (includeZoom ? this.tree.zoom : 1));
   }
 
-  getHighlightLineWidth() {
-    return this.tree.highlightWidth / this.tree.zoom;
+  getHighlightLineWidth(includeZoom = true) {
+    return this.tree.highlightWidth / (includeZoom ? this.tree.zoom : 1);
   }
 
-  getHighlightRadius() {
-    let offset = this.getHighlightLineWidth() * this.tree.highlightSize;
+  getHighlightRadius(includeZoom = true) {
+    let offset = this.getHighlightLineWidth(includeZoom) * this.tree.highlightSize;
 
-    offset += this.getLeafStyle().lineWidth / this.tree.highlightSize;
+    offset += this.getLeafStyle(includeZoom).lineWidth / this.tree.highlightSize;
 
     return this.leaf ? this.getRadius() + offset : offset * 0.666;
   }
 
-  getHighlightSize() {
-    return this.getHighlightRadius() + this.getHighlightLineWidth();
+  getHighlightSize(includeZoom = true) {
+    return this.getHighlightRadius(includeZoom) + this.getHighlightLineWidth(includeZoom);
   }
 
   rotate(evt) {
@@ -688,11 +688,11 @@ export default class Branch {
     }
   }
 
-  getTotalLength() {
+  getTotalLength(includeZoom = true) {
     let length = this.getRadius();
 
     if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
-      length += this.getLabelStartX() + this.getLabelSize();
+      length += this.getLabelStartX(includeZoom) + this.getLabelSize();
     }
 
     return length;
@@ -703,7 +703,7 @@ export default class Branch {
     const x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
     const y = tree.alignLabels ? tree.labelAlign.getY(this) : this.centery;
     const nodeSize = this.getRadius();
-    const totalLength = this.getTotalLength();
+    const totalLength = this.getTotalLength(false);
 
     let minx;
     let maxx;
@@ -723,15 +723,16 @@ export default class Branch {
     }
 
     // uses a caching object to reduce garbage
-    _bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
-    _bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
-    _bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
-    _bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+    const step = tree.prerenderer.getStep(tree);
+    _bounds.minx = Math.min(minx, maxx, x - step);
+    _bounds.miny = Math.min(miny, maxy, y - step);
+    _bounds.maxx = Math.max(minx, maxx, x + step);
+    _bounds.maxy = Math.max(miny, maxy, y + step);
 
     return _bounds;
   }
 
-  getLeafStyle() {
+  getLeafStyle(includeZoom = true) {
     const { strokeStyle, fillStyle } = this.leafStyle;
     const { zoom } = this.tree;
 
@@ -744,7 +745,7 @@ export default class Branch {
         this.leafStyle.lineWidth :
         this.tree.lineWidth;
 
-    _leafStyle.lineWidth = lineWidth / zoom;
+    _leafStyle.lineWidth = lineWidth / (includeZoom ? zoom : 1);
 
     return _leafStyle;
   }
