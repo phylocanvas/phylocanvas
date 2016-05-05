@@ -187,7 +187,7 @@ export default class Tree {
   }
 
   get alignLabels() {
-    return this.showLabels && this.labelAlign && this.labelAlignEnabled;
+    return this.labelAlign && this.labelAlignEnabled;
   }
 
   set alignLabels(value) {
