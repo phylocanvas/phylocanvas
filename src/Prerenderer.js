@@ -16,6 +16,7 @@ export default class Prerenderer {
     tree.farthestNodeFromRootX = 0;
     tree.farthestNodeFromRootY = 0;
     tree.currentBranchScale = 1;
+    tree.step = step;
 
     this.calculate(tree, step);
 
