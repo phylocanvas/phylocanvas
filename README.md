@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/phylocanvas/phylocanvas.png?label=ready&title=Ready)](https://waffle.io/phylocanvas/phylocanvas)
 #PhyloCanvas
 
 A canvas-based phylogenetic tree viewer, no browser plugins or extra libraries required.
