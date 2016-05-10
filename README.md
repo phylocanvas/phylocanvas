@@ -3,7 +3,7 @@
 
 A canvas-based phylogenetic tree viewer, no browser plugins or extra libraries required.
 
-Please see **www.phylocanvas.org** for full documentation.
+Please see **www.phylocanvas.org** for documentation.
 
 ## Development
 ```
