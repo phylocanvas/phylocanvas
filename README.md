@@ -2,7 +2,7 @@
 
 ![Phylocanvas Logo](http://phylocanvas.org/img/Phylo.FINAL.svg)
 
-Phylocanvas is a performant, reusable, and extensible tree visualisation library for the web.
+A performant, reusable, and extensible tree visualisation library for the web.
 
 Please see [the wiki](https://github.com/phylocanvas/phylocanvas/wiki) for documentation.
 
