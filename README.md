@@ -4,6 +4,6 @@
 
 Phylocanvas is a performant, reusable, and extensible tree visualisation library for the web.
 
-Please see [the wiki](wiki) for documentation.
+Please see [the wiki](https://github.com/phylocanvas/phylocanvas/wiki) for documentation.
 
 *Phylocanvas* is released under the **LGPLv3** and documentation is released under the **Creative Commons Attribution-ShareAlike Licence (CC BY-SA)**.
