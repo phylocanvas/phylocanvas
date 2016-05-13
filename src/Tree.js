@@ -187,11 +187,11 @@ export default class Tree {
   }
 
   get alignLabels() {
-    return this.showLabels && this.labelAlign && this.labelAlignEnabled;
+    return this.showLabels && this.labelAlignEnabled;
   }
 
   set alignLabels(value) {
-    this.labelAlignEnabled = value;
+    this.labelAlignEnabled = this.labelAlign ? value : false;
   }
 
   setInitialCollapsedBranches(node = this.root) {
