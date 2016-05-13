@@ -785,7 +785,9 @@ export default class Tree {
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
 
-  fitInPanel(bounds = this.getBounds()) {
+  fitInPanel(leaves) {
+    this.zoom = 1; // calculates consistent bounds
+    const bounds = this.getBounds(leaves);
     const canvasSize = [
       this.canvas.canvas.width - this.padding * 2,
       this.canvas.canvas.height - this.padding * 2,
