@@ -46,7 +46,7 @@
   },
   "files": [
     "dist",
-    "polyfill.js",
     "*.md"
+    "polyfill.js",
   ]
 }
