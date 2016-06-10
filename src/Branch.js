@@ -651,19 +651,17 @@ export default class Branch {
     return this.getHighlightRadius() + this.getHighlightLineWidth();
   }
 
-  rotate(evt) {
+  rotate() {
     const newChildren = [];
 
-    for (let i = this.children.length; i--; ) {
+    for (let i = this.children.length; i--;) {
       newChildren.push(this.children[i]);
     }
 
     this.children = newChildren;
 
-    if (!evt.preventredraw) {
-      this.tree.extractNestedBranches();
-      this.tree.draw(true);
-    }
+    this.tree.extractNestedBranches();
+    this.tree.draw(true);
   }
 
   getChildNo() {
