@@ -12,7 +12,10 @@ module.exports = {
     loaders: [
       { test: /\.js$/,
         loader: 'babel',
-        exclude: path.join(__dirname, 'node_modules'),
+        exclude: [
+          path.join(__dirname, 'node_modules'),
+          /polyfill/,
+        ],
         query: {
           presets: [ 'es2015', 'stage-0' ],
         },

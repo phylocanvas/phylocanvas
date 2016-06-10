@@ -1,19 +1,9 @@
-#PhyloCanvas
+[![Stories in Ready](https://badge.waffle.io/phylocanvas/phylocanvas.png?label=ready&title=Ready)](https://waffle.io/phylocanvas/phylocanvas)
 
-A canvas-based phylogenetic tree viewer, no browser plugins or extra libraries required.
+![Phylocanvas Logo](http://phylocanvas.org/img/Phylo.FINAL.svg)
 
-Please see **www.phylocanvas.org** for full documentation.
+A performant, reusable, and extensible tree visualisation library for the web.
 
-## Development
-```
-npm install
-npm start
-```
-Go to http://localhost:8000/dev
+Please see [the wiki](https://github.com/phylocanvas/phylocanvas/wiki) for documentation.
 
-## Building
-```
-npm run build
-```
-
-PhyloCanvas is released under the LGPLv3 Licence and documentation is released under the Creative Commons Attribution-ShareAlike Licence (CC BY-SA).
+*Phylocanvas* is released under the **LGPLv3** and documentation is released under the **Creative Commons Attribution-ShareAlike Licence (CC BY-SA)**.

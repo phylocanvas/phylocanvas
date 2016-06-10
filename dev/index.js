@@ -4,14 +4,12 @@ import PhyloCanvas, * as phyloComponents from '../src/index';
 
 const buttonForm = document.getElementById('buttons');
 const tree = PhyloCanvas.createTree('phylocanvas', {
-  history: {
-    collapsed: true,
-  },
   defaultCollapsed: {
-    // min: 30,
-    // max: 50,
+    min: 30,
+    max: 50,
     color: 'green',
   },
+  padding: 1,
 });
 
 const originalDraw = tree.draw;
@@ -71,9 +69,8 @@ tree.on('original-tree', function () {
   console.log('original');
 });
 
-tree.hoverLabel = true;
 // tree.alignLabels = true;
-tree.padding = 1;
+
 tree.setTreeType('rectangular');
 
 tree.clickFlag = 'highlighted';

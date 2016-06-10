@@ -1,14 +1,15 @@
 {
   "name": "phylocanvas",
-  "description": "Canvas-based Phylogenetic Tree Viewer",
-  "version": "2.2.0",
+  "description": "Phylogenetic tree visualistion for the web",
+  "version": "2.4.0",
   "main": "dist/phylocanvas.js",
   "repository": {
     "type": "git",
-    "url": "git://git@github.com:PhyloCanvas/PhyloCanvas.git"
+    "url": "git://git@github.com:phylocanvas/phylocanvas.git"
   },
   "keywords": [
     "phylocanvas",
+    "phylo",
     "phylogeny",
     "phylogenetic",
     "tree",
@@ -16,12 +17,12 @@
     "newick",
     "biojs"
   ],
-  "author": "Centre for Genomic Pathogen Surveillance, Wellcome Trust Sanger Institute",
+  "author": "The Centre for Genomic Pathogen Surveillance",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/PhyloCanvas/PhyloCanvas/issues"
+    "url": "https://github.com/phylocanvas/phylocanvas/issues"
   },
-  "homepage": "http://www.phylocanvas.net",
+  "homepage": "http://www.phylocanvas.org",
   "scripts": {
     "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --host 0.0.0.0",
     "test": "webpack-dev-server --config webpack-test-server.config.js --port 8081",
@@ -34,13 +35,18 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "babel-runtime": "^6.3.19",
-    "cgps-style": "git://github.com/imperialcollegelondon/javascript.git#v1.0.2",
     "chai": "^2.3.0",
     "core-js": "^2.1.3",
+    "eslint-config-cgps": "github:imperialcollegelondon/eslint-config-cgps",
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
-  }
+  },
+  "files": [
+    "dist",
+    "*.md"
+    "polyfill.js",
+  ]
 }

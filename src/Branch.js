@@ -293,8 +293,8 @@ export default class Branch {
     this.canvas.beginPath();
 
     this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.canvas.fillStyle = (this.tree.defaultCollapsedOptions.color) ?
-                      this.tree.defaultCollapsedOptions.color : 'purple';
+    this.canvas.fillStyle = (this.tree.defaultCollapsed.color) ?
+                      this.tree.defaultCollapsed.color : 'purple';
     this.canvas.fill();
     this.canvas.globalAlpha = 1;
 
@@ -452,6 +452,9 @@ export default class Branch {
   }
 
   redrawTreeFromBranch() {
+    if (this.collapsed) {
+      this.expand();
+    }
     this.tree.redrawFromBranch(this);
   }
 
@@ -720,10 +723,11 @@ export default class Branch {
     }
 
     // uses a caching object to reduce garbage
-    _bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
-    _bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
-    _bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
-    _bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+    const step = tree.prerenderer.getStep(tree);
+    _bounds.minx = Math.min(minx, maxx, x - step);
+    _bounds.miny = Math.min(miny, maxy, y - step);
+    _bounds.maxx = Math.max(minx, maxx, x + step);
+    _bounds.maxy = Math.max(miny, maxy, y + step);
 
     return _bounds;
   }

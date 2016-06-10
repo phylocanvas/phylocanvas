@@ -2,7 +2,7 @@ import Branch from '../Branch';
 
 const format = 'newick';
 const fileExtension = /\.nwk$/;
-const validator = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
+const validator = /^[\w\W\.\*\:(\),-\/]+;?\s*$/gi;
 
 function isTerminatingChar(terminatingChar) {
   return this === terminatingChar;

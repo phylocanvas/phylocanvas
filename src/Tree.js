@@ -30,7 +30,7 @@ const { getPixelRatio, translateClick } = canvas;
  */
 export default class Tree {
 
-  constructor(element, conf = {}) {
+  constructor(element, config = {}) {
     this.containerElement =
       (typeof element === 'string' ? document.getElementById(element) : element);
     addClass(this.containerElement, 'pc-container');
@@ -75,14 +75,7 @@ export default class Tree {
     canvasElement.style.zIndex = '1';
     this.containerElement.appendChild(canvasElement);
 
-    this.defaultCollapsedOptions = {};
-    this.defaultCollapsed = false;
-    if (conf.defaultCollapsed !== undefined) {
-      if (conf.defaultCollapsed.min && conf.defaultCollapsed.max) {
-        this.defaultCollapsedOptions = conf.defaultCollapsed;
-        this.defaultCollapsed = true;
-      }
-    }
+    this.defaultCollapsed = {};
 
     this.tooltip = new Tooltip(this);
 
@@ -92,9 +85,9 @@ export default class Tree {
 
     this.zoom = 1;
     this.zoomFactor = 0.2;
-    this.disableZoom = conf.disableZoom || false;
+    this.disableZoom = false;
 
-    this.fillCanvas = conf.fillCanvas || false;
+    this.fillCanvas = false;
 
     this.branchScaling = true;
     this.currentBranchScale = 1;
@@ -126,7 +119,7 @@ export default class Tree {
     this.selectedNodeSizeIncrease = 0;
     this.branchColour = 'rgba(0,0,0,1)';
     this.branchScalar = 1.0;
-    this.padding = conf.padding || 50;
+    this.padding = 50;
     this.labelPadding = 5;
 
     this.multiSelect = true;
@@ -150,24 +143,6 @@ export default class Tree {
       this.navigator = new Navigator(this);
     }
 
-    this.resizeToContainer();
-
-    this.addListener('click', this.clicked.bind(this));
-
-    this.addListener('mousedown', this.pickup.bind(this));
-    this.addListener('mouseup', this.drop.bind(this));
-    this.addListener('mouseout', this.drop.bind(this));
-
-    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    if (!this.disableZoom) {
-      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-    }
-    addEvent(window, 'resize', function () {
-      this.resizeToContainer();
-      this.draw();
-    }.bind(this));
-
     /**
      * Align labels vertically
      */
@@ -184,6 +159,31 @@ export default class Tree {
      * Maximum length of label for each tree type.
      */
     this.maxLabelLength = {};
+
+
+    /**
+     * Override properties from config
+     */
+    Object.assign(this, config);
+
+
+    this.resizeToContainer();
+
+    this.addListener('click', this.clicked.bind(this));
+
+    this.addListener('mousedown', this.pickup.bind(this));
+    this.addListener('mouseup', this.drop.bind(this));
+    this.addListener('mouseout', this.drop.bind(this));
+
+    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
+    if (!this.disableZoom) {
+      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+    }
+    addEvent(window, 'resize', () => {
+      this.resizeToContainer();
+      this.draw();
+    });
   }
 
   get alignLabels() {
@@ -199,8 +199,8 @@ export default class Tree {
     var i;
 
     childIds = node.getChildProperties('id');
-    if (childIds && childIds.length > this.defaultCollapsedOptions.min &&
-        childIds.length < this.defaultCollapsedOptions.max) {
+    if (childIds && childIds.length > this.defaultCollapsed.min &&
+        childIds.length < this.defaultCollapsed.max) {
       node.collapsed = true;
       return;
     }
@@ -361,9 +361,6 @@ export default class Tree {
     this.branchRenderer.render(this, this.root);
 
     this.highlighters.forEach(render => render());
-
-    // Making default collapsed false so that it will collapse on initial load only
-    this.defaultCollapsed = false;
 
     this.drawn = true;
   }
@@ -772,15 +769,14 @@ export default class Tree {
     addEvent(this.containerElement, event, listener);
   }
 
-  getBounds() {
-    var minx = this.root.startx;
-    var maxx = this.root.startx;
-    var miny = this.root.starty;
-    var maxy = this.root.starty;
+  getBounds(leaves = this.leaves) {
+    let minx = leaves[0].startx;
+    let maxx = leaves[0].startx;
+    let miny = leaves[0].starty;
+    let maxy = leaves[0].starty;
 
-    for (let i = this.leaves.length; i--; ) {
-      const bounds = this.leaves[i].getBounds();
-
+    for (const leaf of leaves) {
+      const bounds = leaf.getBounds();
       minx = Math.min(minx, bounds.minx);
       maxx = Math.max(maxx, bounds.maxx);
       miny = Math.min(miny, bounds.miny);
@@ -789,12 +785,13 @@ export default class Tree {
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
 
-  fitInPanel() {
+  fitInPanel(leaves) {
+    this.zoom = 1; // calculates consistent bounds
+    const bounds = this.getBounds(leaves);
     const canvasSize = [
       this.canvas.canvas.width - this.padding * 2,
       this.canvas.canvas.height - this.padding * 2,
     ];
-    const bounds = this.getBounds();
     const treeSize = [
       bounds[1][0] - bounds[0][0],
       bounds[1][1] - bounds[0][1],
@@ -806,11 +803,13 @@ export default class Tree {
     this.offsetx = (-1 * bounds[0][0]) * this.zoom;
     this.offsety = (-1 * bounds[0][1]) * this.zoom;
     if (xZoomRatio > yZoomRatio) {
-      this.offsetx += this.padding + (canvasSize[0] - (treeSize[0] * this.zoom)) / 2;
+      this.offsetx += this.padding +
+                      (canvasSize[0] - (treeSize[0] * this.zoom)) / 2;
       this.offsety += this.padding;
     } else {
       this.offsetx += this.padding;
-      this.offsety += this.padding + (canvasSize[1] - (treeSize[1] * this.zoom)) / 2;
+      this.offsety += this.padding +
+                      (canvasSize[1] - (treeSize[1] * this.zoom)) / 2;
     }
     this.offsetx = this.offsetx / pixelRatio;
     this.offsety = this.offsety / pixelRatio;
