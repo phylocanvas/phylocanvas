@@ -1124,26 +1124,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getBounds',
 	    value: function getBounds() {
-	      var minx = this.root.startx;
-	      var maxx = this.root.startx;
-	      var miny = this.root.starty;
-	      var maxy = this.root.starty;
+	      var leaves = arguments.length <= 0 || arguments[0] === undefined ? this.leaves : arguments[0];
 
-	      for (var i = this.leaves.length; i--;) {
-	        var bounds = this.leaves[i].getBounds();
+	      var minx = leaves[0].startx;
+	      var maxx = leaves[0].startx;
+	      var miny = leaves[0].starty;
+	      var maxy = leaves[0].starty;
 
-	        minx = Math.min(minx, bounds.minx);
-	        maxx = Math.max(maxx, bounds.maxx);
-	        miny = Math.min(miny, bounds.miny);
-	        maxy = Math.max(maxy, bounds.maxy);
+	      var _iteratorNormalCompletion6 = true;
+	      var _didIteratorError6 = false;
+	      var _iteratorError6 = undefined;
+
+	      try {
+	        for (var _iterator6 = leaves[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+	          var leaf = _step6.value;
+
+	          var bounds = leaf.getBounds();
+	          minx = Math.min(minx, bounds.minx);
+	          maxx = Math.max(maxx, bounds.maxx);
+	          miny = Math.min(miny, bounds.miny);
+	          maxy = Math.max(maxy, bounds.maxy);
+	        }
+	      } catch (err) {
+	        _didIteratorError6 = true;
+	        _iteratorError6 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+	            _iterator6.return();
+	          }
+	        } finally {
+	          if (_didIteratorError6) {
+	            throw _iteratorError6;
+	          }
+	        }
 	      }
+
 	      return [[minx, miny], [maxx, maxy]];
 	    }
 	  }, {
 	    key: 'fitInPanel',
-	    value: function fitInPanel() {
+	    value: function fitInPanel(leaves) {
+	      this.zoom = 1; // calculates consistent bounds
+	      var bounds = this.getBounds(leaves);
 	      var canvasSize = [this.canvas.canvas.width - this.padding * 2, this.canvas.canvas.height - this.padding * 2];
-	      var bounds = this.getBounds();
 	      var treeSize = [bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]];
 	      var pixelRatio = getPixelRatio(this.canvas);
 	      var xZoomRatio = canvasSize[0] / treeSize[0];
@@ -1185,28 +1209,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.originalTree.branches) return;
 
 	      this.branches = this.originalTree.branches;
-	      var _iteratorNormalCompletion6 = true;
-	      var _didIteratorError6 = false;
-	      var _iteratorError6 = undefined;
+	      var _iteratorNormalCompletion7 = true;
+	      var _didIteratorError7 = false;
+	      var _iteratorError7 = undefined;
 
 	      try {
-	        for (var _iterator6 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-	          var n = _step6.value;
+	        for (var _iterator7 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+	          var n = _step7.value;
 
 	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
 	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
-	        _didIteratorError6 = true;
-	        _iteratorError6 = err;
+	        _didIteratorError7 = true;
+	        _iteratorError7 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
-	            _iterator6.return();
+	          if (!_iteratorNormalCompletion7 && _iterator7.return) {
+	            _iterator7.return();
 	          }
 	        } finally {
-	          if (_didIteratorError6) {
-	            throw _iteratorError6;
+	          if (_didIteratorError7) {
+	            throw _iteratorError7;
 	          }
 	        }
 	      }
@@ -2100,6 +2124,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'redrawTreeFromBranch',
 	    value: function redrawTreeFromBranch() {
+	      if (this.collapsed) {
+	        this.expand();
+	      }
 	      this.tree.redrawFromBranch(this);
 	    }
 	  }, {
@@ -2433,10 +2460,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // uses a caching object to reduce garbage
-	      _bounds.minx = Math.min(minx, maxx, x - this.getHighlightSize());
-	      _bounds.miny = Math.min(miny, maxy, y - this.getHighlightSize());
-	      _bounds.maxx = Math.max(minx, maxx, x + this.getHighlightSize());
-	      _bounds.maxy = Math.max(miny, maxy, y + this.getHighlightSize());
+	      var step = tree.prerenderer.getStep(tree);
+	      _bounds.minx = Math.min(minx, maxx, x - step);
+	      _bounds.miny = Math.min(miny, maxy, y - step);
+	      _bounds.maxx = Math.max(minx, maxx, x + step);
+	      _bounds.maxy = Math.max(miny, maxy, y + step);
 
 	      return _bounds;
 	    }
@@ -2939,6 +2967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      tree.farthestNodeFromRootX = 0;
 	      tree.farthestNodeFromRootY = 0;
 	      tree.currentBranchScale = 1;
+	      tree.step = step;
 
 	      this.calculate(tree, step);
 
@@ -3624,7 +3653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var format = 'newick';
 	var fileExtension = /\.nwk$/;
-	var validator = /^[\w\W\.\*\:(\),-\/]+;\s?$/gi;
+	var validator = /^[\w\W\.\*\:(\),-\/]+;?\s*$/gi;
 
 	function isTerminatingChar(terminatingChar) {
 	  return this === terminatingChar;
