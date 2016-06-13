@@ -351,6 +351,32 @@ export default class Branch {
     this.canvas.restore();
   }
 
+  drawBranchLabels() {
+    this.canvas.save();
+    this.canvas.fillStyle = this.getTextColour();
+    this.canvas.font = `${this.tree.textSize}pt ${this.tree.font}`;
+    this.canvas.textBaseline = 'middle';
+    this.canvas.textAlign = 'center';
+    const em = this.canvas.measureText('M').width * 2 / 3;
+
+    const x = this.tree.treeTypeObject.branchScalingAxis === 'y' ?
+      this.centerx :
+      (this.startx + this.centerx) / 2;
+    const y = this.tree.treeTypeObject.branchScalingAxis === 'x' ?
+      this.centery :
+      (this.starty + this.centery) / 2;
+
+    if (this.tree.showBranchLengthLabels) {
+      this.canvas.fillText(this.branchLength.toFixed(2), x, y + em);
+    }
+
+    if (this.tree.showInternalNodeLabels && !this.leaf && this.label) {
+      this.canvas.fillText(this.label, x, y - em);
+    }
+
+    this.canvas.restore();
+  }
+
   drawNode() {
     var nodeRadius = this.getRadius();
     /**
@@ -381,6 +407,10 @@ export default class Branch {
 
     if (this.isHighlighted) {
       this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
+    }
+
+    if (this.tree.root !== this && this.tree.showBranchLengthLabels || this.tree.showInternalNodeLabels) {
+      this.drawBranchLabels();
     }
   }
 

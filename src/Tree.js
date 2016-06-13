@@ -129,7 +129,8 @@ export default class Tree {
     this.internalNodesSelectable = true;
 
     this.showLabels = true;
-    this.showBootstraps = false;
+    this.showBranchLengthLabels = false;
+    this.showInternalNodeLabels = false;
 
     this.setTreeType('radial');
     this.maxBranchLength = 0;
@@ -667,6 +668,7 @@ export default class Tree {
 
     let oldType = this.treeType;
     this.treeType = type;
+    this.treeTypeObject = treeTypes[type];
 
     this.branchRenderer = treeTypes[type].branchRenderer;
     this.prerenderer = treeTypes[type].prerenderer;
