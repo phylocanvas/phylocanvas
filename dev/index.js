@@ -55,8 +55,6 @@ resetButton.innerHTML = 'Redraw Original';
 resetButton.addEventListener('click', () => tree.redrawOriginalTree());
 document.body.appendChild(resetButton);
 
-
-
 const scaleRange = document.createElement('input');
 scaleRange.type = 'range';
 scaleRange.min = 0.001;
@@ -65,8 +63,19 @@ scaleRange.step = 0.001;
 scaleRange.addEventListener('change', () => {
   tree.setBranchScale(scaleRange.value);
 });
-
 document.body.appendChild(scaleRange);
+
+const zoomLabel = document.createElement('label');
+zoomLabel.innerHTML = 'Zoom Enabled';
+const zoomCheckbox = document.createElement('input');
+zoomCheckbox.type = 'checkbox';
+zoomCheckbox.checked = true;
+zoomCheckbox.addEventListener('change', (e) => {
+  tree.disableZoom = !e.target.checked;
+});
+zoomLabel.appendChild(zoomCheckbox);
+document.body.appendChild(zoomLabel);
+
 
 tree.on('error', function (event) { throw event.error; });
 
