@@ -11,7 +11,6 @@ const { addClass } = dom;
 const { fireEvent, addEvent } = events;
 const { getPixelRatio, translateClick } = canvas;
 
-
 /**
  * The instance of a PhyloCanvas Widget
  *
@@ -29,6 +28,8 @@ const { getPixelRatio, translateClick } = canvas;
  *  new PhyloCanvas.Tree(element);
  */
 export default class Tree {
+
+  _point = { x: 0, y: 0 }
 
   constructor(element, config = {}) {
     this.containerElement =
@@ -84,7 +85,7 @@ export default class Tree {
     this.highlighters = [];
 
     this.zoom = 1;
-    this.zoomFactor = 0.2;
+    this.zoomFactor = 3;
     this.disableZoom = false;
 
     this.fillCanvas = false;
@@ -560,23 +561,19 @@ export default class Tree {
   scroll(event) {
     event.preventDefault();
 
-    if (
-      this.disableZoom ||
-      this._zooming ||
-      ('wheelDelta' in event && event.wheelDelta === 0)) {
+    if (this.disableZoom || ('wheelDelta' in event && event.wheelDelta === 0)) {
       return;
     }
 
+    this._point.x = event.offsetX;
+    this._point.y = event.offsetY;
     const sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
-    if(this.branchScaling && (event.metaKey || event.ctrlKey)) {
+    if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
       this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
-      this.setBranchScale(this.currentBranchScale, { x: event.offsetX, y: event.offsetY });
+      this.setBranchScale(this.currentBranchScale, this._point);
     } else {
-      const newZoom = (Math.log(this.zoom) / Math.log(10)) + sign * this.zoomFactor;
-      this.setZoom(newZoom, event.offsetX, event.offsetY);
+      this.smoothZoom(sign, this._point);
     }
-    this._zooming = true;
-    setTimeout(() => { this._zooming = false; }, 128);
   }
 
   selectNodes(nIds) {
@@ -697,15 +694,30 @@ export default class Tree {
     this.adjustForPixelRatio();
   }
 
-  setZoom(z, zoomPointX = (this.canvas.canvas.width / 2), zoomPointY = (this.canvas.canvas.height / 2)) {
-    if (z > -2 && z < 2) {
+  getCentrePoint() {
+    const pixelRatio = getPixelRatio(this.canvas);
+    return {
+      x: (this.canvas.canvas.width / 2) / pixelRatio,
+      y: (this.canvas.canvas.height / 2) / pixelRatio,
+    };
+  }
+
+  setZoom(zoom, { x, y } = this.getCentrePoint()) {
+    if (zoom > 0) {
       const oldZoom = this.zoom;
-      const newZoom = Math.pow(10, z);
-      this.zoom = newZoom;
-      this.offsetx = this.calculateZoomedOffset(this.offsetx, zoomPointX, oldZoom, newZoom);
-      this.offsety = this.calculateZoomedOffset(this.offsety, zoomPointY, oldZoom, newZoom);
+      this.zoom = zoom;
+      this.offsetx = this.calculateZoomedOffset(this.offsetx, x, oldZoom, zoom);
+      this.offsety = this.calculateZoomedOffset(this.offsety, y, oldZoom, zoom);
       this.draw();
     }
+  }
+
+  smoothZoom(steps, point) {
+    this.setZoom(
+      Math.pow(10,
+        (Math.log(this.zoom) / Math.log(10)) + steps * this.zoomFactor * 0.01
+      ), point
+    );
   }
 
   calculateZoomedOffset(offset, point, oldZoom, newZoom) {
