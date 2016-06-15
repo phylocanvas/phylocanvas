@@ -667,7 +667,7 @@ export default class Tree {
 
     let oldType = this.treeType;
     this.treeType = type;
-    this.treeTypeObject = treeTypes[type];
+    this.type = treeTypes[type];
 
     this.branchRenderer = treeTypes[type].branchRenderer;
     this.prerenderer = treeTypes[type].prerenderer;

@@ -359,10 +359,10 @@ export default class Branch {
     this.canvas.textAlign = 'center';
     const em = this.canvas.measureText('M').width * 2 / 3;
 
-    const x = this.tree.treeTypeObject.branchScalingAxis === 'y' ?
+    const x = this.tree.type.branchScalingAxis === 'y' ?
       this.centerx :
       (this.startx + this.centerx) / 2;
-    const y = this.tree.treeTypeObject.branchScalingAxis === 'x' ?
+    const y = this.tree.type.branchScalingAxis === 'x' ?
       this.centery :
       (this.starty + this.centery) / 2;
 
