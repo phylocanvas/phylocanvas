@@ -177,10 +177,9 @@ export default class Tree {
     this.addListener('mouseout', this.drop.bind(this));
 
     addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    if (!this.disableZoom) {
-      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-    }
+    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+
     addEvent(window, 'resize', () => {
       this.resizeToContainer();
       this.draw();
@@ -561,7 +560,10 @@ export default class Tree {
   scroll(event) {
     event.preventDefault();
 
-    if (this._zooming || ('wheelDelta' in event && event.wheelDelta === 0)) {
+    if (
+      this.disableZoom ||
+      this._zooming ||
+      ('wheelDelta' in event && event.wheelDelta === 0)) {
       return;
     }
 
