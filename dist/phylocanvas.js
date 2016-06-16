@@ -1126,10 +1126,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getBounds() {
 	      var leaves = arguments.length <= 0 || arguments[0] === undefined ? this.leaves : arguments[0];
 
-	      var minx = leaves[0].startx;
-	      var maxx = leaves[0].startx;
-	      var miny = leaves[0].starty;
-	      var maxy = leaves[0].starty;
+	      // this.leaves assumes bounds of whole tree, start from root
+	      var initialBounds = leaves === this.leaves ? this.root : leaves[0];
+	      var minx = initialBounds.startx;
+	      var maxx = initialBounds.startx;
+	      var miny = initialBounds.starty;
+	      var maxy = initialBounds.starty;
 
 	      var _iteratorNormalCompletion6 = true;
 	      var _didIteratorError6 = false;
