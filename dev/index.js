@@ -26,11 +26,8 @@ buttonForm.addEventListener('submit', function (e) {
 
 for (const treeType of Object.keys(phyloComponents.treeTypes)) {
   const button = document.createElement('button');
-
   button.innerHTML = treeType;
-
   button.addEventListener('click', tree.setTreeType.bind(tree, treeType));
-
   buttonForm.appendChild(button);
 }
 

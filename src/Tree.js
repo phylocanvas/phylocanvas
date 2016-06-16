@@ -770,10 +770,12 @@ export default class Tree {
   }
 
   getBounds(leaves = this.leaves) {
-    let minx = leaves[0].startx;
-    let maxx = leaves[0].startx;
-    let miny = leaves[0].starty;
-    let maxy = leaves[0].starty;
+    // this.leaves assumes bounds of whole tree, start from root
+    const initialBounds = leaves === this.leaves ? this.root : leaves[0];
+    let minx = initialBounds.startx;
+    let maxx = initialBounds.startx;
+    let miny = initialBounds.starty;
+    let maxy = initialBounds.starty;
 
     for (const leaf of leaves) {
       const bounds = leaf.getBounds();
