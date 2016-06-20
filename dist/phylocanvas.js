@@ -204,6 +204,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _classCallCheck(this, Tree);
 
+	    this._point = { x: 0, y: 0 };
+
 	    this.containerElement = typeof element === 'string' ? document.getElementById(element) : element;
 	    addClass(this.containerElement, 'pc-container');
 	    /**
@@ -256,7 +258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.highlighters = [];
 
 	    this.zoom = 1;
-	    this.zoomFactor = 0.2;
+	    this.zoomFactor = 3;
 	    this.disableZoom = false;
 
 	    this.fillCanvas = false;
@@ -305,7 +307,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.internalNodesSelectable = true;
 
 	    this.showLabels = true;
-	    this.showBootstraps = false;
+	    this.showBranchLengthLabels = false;
+	    this.showInternalNodeLabels = false;
 
 	    this.setTreeType('radial');
 	    this.maxBranchLength = 0;
@@ -350,10 +353,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.addListener('mouseout', this.drop.bind(this));
 
 	    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    if (!this.disableZoom) {
-	      addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	      addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-	    }
+	    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
+	    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+
 	    addEvent(window, 'resize', function () {
 	      _this2.resizeToContainer();
 	      _this2.draw();
@@ -854,26 +856,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'scroll',
 	    value: function scroll(event) {
-	      var _this4 = this;
-
 	      event.preventDefault();
 
-	      if (this._zooming || 'wheelDelta' in event && event.wheelDelta === 0) {
+	      if (this.disableZoom || 'wheelDelta' in event && event.wheelDelta === 0) {
 	        return;
 	      }
 
+	      this._point.x = event.offsetX;
+	      this._point.y = event.offsetY;
 	      var sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
 	      if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
 	        this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
-	        this.setBranchScale(this.currentBranchScale, { x: event.offsetX, y: event.offsetY });
+	        this.setBranchScale(this.currentBranchScale, this._point);
 	      } else {
-	        var newZoom = Math.log(this.zoom) / Math.log(10) + sign * this.zoomFactor;
-	        this.setZoom(newZoom, event.offsetX, event.offsetY);
+	        this.smoothZoom(sign, this._point);
 	      }
-	      this._zooming = true;
-	      setTimeout(function () {
-	        _this4._zooming = false;
-	      }, 128);
 	    }
 	  }, {
 	    key: 'selectNodes',
@@ -912,7 +909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setNodeDisplay',
 	    value: function setNodeDisplay(ids, options, waiting) {
-	      var _this5 = this;
+	      var _this4 = this;
 
 	      if (!ids) return;
 
@@ -957,7 +954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else if (!waiting) {
 	        (function () {
-	          var _this = _this5;
+	          var _this = _this4;
 	          var timeout = setInterval(function () {
 	            if (this.drawn) {
 	              _this.setNodeColourAndShape(ids, options, true);
@@ -1001,6 +998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var oldType = this.treeType;
 	      this.treeType = type;
+	      this.type = _treeTypes2.default[type];
 
 	      this.branchRenderer = _treeTypes2.default[type].branchRenderer;
 	      this.prerenderer = _treeTypes2.default[type].prerenderer;
@@ -1028,19 +1026,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.adjustForPixelRatio();
 	    }
 	  }, {
+	    key: 'getCentrePoint',
+	    value: function getCentrePoint() {
+	      var pixelRatio = getPixelRatio(this.canvas);
+	      return {
+	        x: this.canvas.canvas.width / 2 / pixelRatio,
+	        y: this.canvas.canvas.height / 2 / pixelRatio
+	      };
+	    }
+	  }, {
 	    key: 'setZoom',
-	    value: function setZoom(z) {
-	      var zoomPointX = arguments.length <= 1 || arguments[1] === undefined ? this.canvas.canvas.width / 2 : arguments[1];
-	      var zoomPointY = arguments.length <= 2 || arguments[2] === undefined ? this.canvas.canvas.height / 2 : arguments[2];
+	    value: function setZoom(zoom) {
+	      var _ref = arguments.length <= 1 || arguments[1] === undefined ? this.getCentrePoint() : arguments[1];
 
-	      if (z > -2 && z < 2) {
+	      var x = _ref.x;
+	      var y = _ref.y;
+
+	      if (zoom > 0) {
 	        var oldZoom = this.zoom;
-	        var newZoom = Math.pow(10, z);
-	        this.zoom = newZoom;
-	        this.offsetx = this.calculateZoomedOffset(this.offsetx, zoomPointX, oldZoom, newZoom);
-	        this.offsety = this.calculateZoomedOffset(this.offsety, zoomPointY, oldZoom, newZoom);
+	        this.zoom = zoom;
+	        this.offsetx = this.calculateZoomedOffset(this.offsetx, x, oldZoom, zoom);
+	        this.offsety = this.calculateZoomedOffset(this.offsety, y, oldZoom, zoom);
 	        this.draw();
 	      }
+	    }
+	  }, {
+	    key: 'smoothZoom',
+	    value: function smoothZoom(steps, point) {
+	      this.setZoom(Math.pow(10, Math.log(this.zoom) / Math.log(10) + steps * this.zoomFactor * 0.01), point);
 	    }
 	  }, {
 	    key: 'calculateZoomedOffset',
@@ -1126,10 +1139,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getBounds() {
 	      var leaves = arguments.length <= 0 || arguments[0] === undefined ? this.leaves : arguments[0];
 
-	      var minx = leaves[0].startx;
-	      var maxx = leaves[0].startx;
-	      var miny = leaves[0].starty;
-	      var maxy = leaves[0].starty;
+	      // this.leaves assumes bounds of whole tree, start from root
+	      var initialBounds = leaves === this.leaves ? this.root : leaves[0];
+	      var minx = initialBounds.startx;
+	      var maxx = initialBounds.startx;
+	      var miny = initialBounds.starty;
+	      var maxy = initialBounds.starty;
 
 	      var _iteratorNormalCompletion6 = true;
 	      var _didIteratorError6 = false;
@@ -1997,6 +2012,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.restore();
 	    }
 	  }, {
+	    key: 'drawBranchLabels',
+	    value: function drawBranchLabels() {
+	      this.canvas.save();
+	      this.canvas.fillStyle = this.getTextColour();
+	      this.canvas.font = this.tree.textSize + 'pt ' + this.tree.font;
+	      this.canvas.textBaseline = 'middle';
+	      this.canvas.textAlign = 'center';
+	      var em = this.canvas.measureText('M').width * 2 / 3;
+
+	      var x = this.tree.type.branchScalingAxis === 'y' ? this.centerx : (this.startx + this.centerx) / 2;
+	      var y = this.tree.type.branchScalingAxis === 'x' ? this.centery : (this.starty + this.centery) / 2;
+
+	      if (this.tree.showBranchLengthLabels) {
+	        this.canvas.fillText(this.branchLength.toFixed(2), x, y + em);
+	      }
+
+	      if (this.tree.showInternalNodeLabels && !this.leaf && this.label) {
+	        this.canvas.fillText(this.label, x, y - em);
+	      }
+
+	      this.canvas.restore();
+	    }
+	  }, {
 	    key: 'drawNode',
 	    value: function drawNode() {
 	      var nodeRadius = this.getRadius();
@@ -2026,6 +2064,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (this.isHighlighted) {
 	        this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
+	      }
+
+	      if (this.tree.root !== this && this.tree.showBranchLengthLabels || this.tree.showInternalNodeLabels) {
+	        this.drawBranchLabels();
 	      }
 	    }
 	  }, {
@@ -2378,7 +2420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, {
 	    key: 'rotate',
-	    value: function rotate(evt) {
+	    value: function rotate() {
 	      var newChildren = [];
 
 	      for (var i = this.children.length; i--;) {
@@ -2387,10 +2429,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.children = newChildren;
 
-	      if (!evt.preventredraw) {
-	        this.tree.extractNestedBranches();
-	        this.tree.draw(true);
-	      }
+	      this.tree.extractNestedBranches();
+	      this.tree.draw(true);
 	    }
 	  }, {
 	    key: 'getChildNo',
