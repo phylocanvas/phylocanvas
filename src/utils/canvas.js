@@ -29,18 +29,18 @@ export function translateClick(event, tree) {
   ];
 }
 
-export function translatePoint({ x, y }, phylocanvas) {
+export function translatePoint({ x, y } = { x: 0, y: 0 }, phylocanvas) {
   const pixelRatio = getPixelRatio(phylocanvas.canvas);
   return {
-    x: x ? ((x - phylocanvas.offsetx) / phylocanvas.zoom * pixelRatio) : null,
-    y: y ? ((y - phylocanvas.offsety) / phylocanvas.zoom * pixelRatio) : null,
+    x: (x - phylocanvas.offsetx) / phylocanvas.zoom * pixelRatio,
+    y: (y - phylocanvas.offsety) / phylocanvas.zoom * pixelRatio,
   };
 }
 
-export function undoPointTranslation({ x, y }, phylocanvas) {
+export function undoPointTranslation({ x, y } = { x: 0, y: 0 }, phylocanvas) {
   const pixelRatio = getPixelRatio(phylocanvas.canvas);
   return {
-    x: x ? ((x / pixelRatio * phylocanvas.zoom) + phylocanvas.offsetx) : null,
-    y: y ? ((y / pixelRatio * phylocanvas.zoom) + phylocanvas.offsety) : null,
+    x: (x / pixelRatio * phylocanvas.zoom) + phylocanvas.offsetx,
+    y: (y / pixelRatio * phylocanvas.zoom) + phylocanvas.offsety,
   };
 }
