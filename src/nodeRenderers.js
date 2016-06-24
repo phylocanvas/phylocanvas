@@ -11,7 +11,10 @@ function drawConnector(canvas, connectingOffset) {
 }
 
 function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
-  canvas.save();
+  // canvas.save();
+  const canvasLineWidth = canvas.lineWidth;
+  const canvasStrokeStyle = canvas.strokeStyle;
+  const canvasFillStyle = canvas.fillStyle;
 
   canvas.lineWidth = lineWidth;
   canvas.strokeStyle = strokeStyle;
@@ -22,7 +25,10 @@ function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
     canvas.stroke();
   }
 
-  canvas.restore();
+  // canvas.restore();
+  canvas.lineWidth = canvasLineWidth;
+  canvas.strokeStyle = canvasStrokeStyle;
+  canvas.fillStyle = canvasFillStyle;
 }
 
 const lengthOfSquareSide = (radius) => radius * Math.sqrt(2);

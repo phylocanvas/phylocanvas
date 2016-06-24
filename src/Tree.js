@@ -340,7 +340,7 @@ export default class Tree {
       return;
     }
 
-    this.canvas.restore();
+    // this.canvas.restore();
 
     this.canvas.clearRect(0, 0, this.canvas.canvas.width, this.canvas.canvas.height);
     this.canvas.lineCap = 'round';
@@ -364,6 +364,8 @@ export default class Tree {
     this.highlighters.forEach(render => render());
 
     this.drawn = true;
+
+    this.canvas.restore();
   }
 
   drop() {
