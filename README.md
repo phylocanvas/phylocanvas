@@ -1,4 +1,4 @@
-[![Stories in Ready](https://badge.waffle.io/phylocanvas/phylocanvas.png?label=ready&title=Ready)](https://waffle.io/phylocanvas/phylocanvas)
+[![NPM](https://nodei.co/npm/phylocanvas.png?compact=true)](https://npmjs.org/package/phylocanvas)
 
 # Phylocanvas
 
