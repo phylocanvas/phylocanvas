@@ -856,11 +856,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'scroll',
 	    value: function scroll(event) {
-	      event.preventDefault();
-
 	      if (this.disableZoom || 'wheelDelta' in event && event.wheelDelta === 0) {
 	        return;
 	      }
+
+	      event.preventDefault();
 
 	      this._point.x = event.offsetX;
 	      this._point.y = event.offsetY;
@@ -1366,25 +1366,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return [(event.offsetX - tree.offsetx) / tree.zoom * pixelRatio, (event.offsetY - tree.offsety) / tree.zoom * pixelRatio];
 	}
 
-	function translatePoint(_ref, phylocanvas) {
+	function translatePoint() {
+	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
+
 	  var x = _ref.x;
 	  var y = _ref.y;
+	  var phylocanvas = arguments[1];
 
 	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
 	  return {
-	    x: x ? (x - phylocanvas.offsetx) / phylocanvas.zoom * pixelRatio : null,
-	    y: y ? (y - phylocanvas.offsety) / phylocanvas.zoom * pixelRatio : null
+	    x: (x - phylocanvas.offsetx) / phylocanvas.zoom * pixelRatio,
+	    y: (y - phylocanvas.offsety) / phylocanvas.zoom * pixelRatio
 	  };
 	}
 
-	function undoPointTranslation(_ref2, phylocanvas) {
+	function undoPointTranslation() {
+	  var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
+
 	  var x = _ref2.x;
 	  var y = _ref2.y;
+	  var phylocanvas = arguments[1];
 
 	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
 	  return {
-	    x: x ? x / pixelRatio * phylocanvas.zoom + phylocanvas.offsetx : null,
-	    y: y ? y / pixelRatio * phylocanvas.zoom + phylocanvas.offsety : null
+	    x: x / pixelRatio * phylocanvas.zoom + phylocanvas.offsetx,
+	    y: y / pixelRatio * phylocanvas.zoom + phylocanvas.offsety
 	  };
 	}
 
