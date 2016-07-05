@@ -559,11 +559,11 @@ export default class Tree {
   }
 
   scroll(event) {
-    event.preventDefault();
-
     if (this.disableZoom || ('wheelDelta' in event && event.wheelDelta === 0)) {
       return;
     }
+
+    event.preventDefault();
 
     this._point.x = event.offsetX;
     this._point.y = event.offsetY;
