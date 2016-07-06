@@ -658,10 +658,6 @@ export default class Branch {
       offset += this.getHighlightSize() - this.getRadius();
     }
 
-    if (!this.isHighlighted && !hasLabelConnector) {
-      offset += lineWidth / 2;
-    }
-
     return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
   }
 
