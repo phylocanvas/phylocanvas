@@ -751,7 +751,7 @@ export default class Branch {
     }
 
     // uses a caching object to reduce garbage
-    const step = tree.prerenderer.getStep(tree);
+    const step = tree.prerenderer.getStep(tree) / 2;
     _bounds.minx = Math.min(minx, maxx, x - step);
     _bounds.miny = Math.min(miny, maxy, y - step);
     _bounds.maxx = Math.max(minx, maxx, x + step);
