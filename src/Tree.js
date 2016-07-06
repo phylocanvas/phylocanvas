@@ -493,6 +493,7 @@ export default class Tree {
       this.stringRepresentation = formatString;
       this.saveState();
       this.setInitialCollapsedBranches();
+      fireEvent(this.containerElement, 'beforeFirstDraw');
       this.draw();
       this.saveOriginalTree();
       if (options.callback) {
