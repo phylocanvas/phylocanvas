@@ -1,12 +1,7 @@
 /**
- * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
+ * Phylocanvas - Interactive tree visualisation for the web.
  *
- * @author Chris Powell (c.powell@imperial.ac.uk)
- * @modified Jyothish NT 01/03/15
- */
-
-/**
- * @namespace PhyloCanvas
+ * @copyright 2016 Centre for Genomic Pathogen Surveillance
  */
 
 import Tree from './Tree';
@@ -21,18 +16,34 @@ import * as utils from './utils';
 export { Tree, Branch, Tooltip, Parser, treeTypes, nodeRenderers, utils };
 
 function decorate(object, fnName, fn) {
-  let target = object[fnName] ? object : object.prototype;
-  let originalFn = target[fnName];
+  const target = object[fnName] ? object : object.prototype;
+  const originalFn = target[fnName];
 
   target[fnName] = function (...args) {
     return fn.call(this, originalFn, args);
   };
 }
 
+/**
+ * @module Phylocanvas
+ */
+
+/**
+ * Register a plugin.
+ *
+ * @param {function} pluginFn - Imported plugin module.
+ */
 function plugin(pluginFn) {
   pluginFn.call(this, decorate);
 }
 
+/**
+ * Create an instance of Phylocanvas.
+ *
+ * @param {string|HTMLElement} element - ID or element within which to place Phylocanvas instance.
+ * @param {Object} conf - Configuration object, properties are copied into the Tree instance.
+ * @return an instance of Tree.
+ */
 function createTree(element, conf = {}) {
   return new Tree(element, conf);
 }
