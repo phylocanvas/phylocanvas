@@ -59,7 +59,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.utils = exports.nodeRenderers = exports.treeTypes = exports.Parser = exports.Tooltip = exports.Branch = exports.Tree = undefined;
+	exports.utils = exports.nodeRenderers = exports.treeTypes = exports.Parser = exports.Tooltip = exports.Prerenderer = exports.Branch = exports.Tree = undefined;
 
 	var _Tree = __webpack_require__(1);
 
@@ -68,6 +68,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Branch = __webpack_require__(7);
 
 	var _Branch2 = _interopRequireDefault(_Branch);
+
+	var _Prerenderer = __webpack_require__(14);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
 	var _Tooltip = __webpack_require__(9);
 
@@ -93,22 +97,26 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.Tree = _Tree2.default;
-	exports.Branch = _Branch2.default;
-	exports.Tooltip = _Tooltip2.default;
-	exports.Parser = _Parser2.default;
-	exports.treeTypes = _treeTypes2.default;
-	exports.nodeRenderers = _nodeRenderers2.default;
-	exports.utils = utils; /**
-	                        * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
-	                        *
-	                        * @author Chris Powell (c.powell@imperial.ac.uk)
-	                        * @modified Jyothish NT 01/03/15
-	                        */
+	/**
+	 * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
+	 *
+	 * @author Chris Powell (c.powell@imperial.ac.uk)
+	 * @modified Jyothish NT 01/03/15
+	 */
 
 	/**
 	 * @namespace PhyloCanvas
 	 */
+
+	exports.Tree = _Tree2.default;
+	exports.Branch = _Branch2.default;
+	exports.Prerenderer = _Prerenderer2.default;
+	exports.Tooltip = _Tooltip2.default;
+	exports.Parser = _Parser2.default;
+	exports.treeTypes = _treeTypes2.default;
+	exports.nodeRenderers = _nodeRenderers2.default;
+	exports.utils = utils;
+
 
 	function decorate(object, fnName, fn) {
 	  var target = object[fnName] ? object : object.prototype;
@@ -785,6 +793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this3.stringRepresentation = formatString;
 	        _this3.saveState();
 	        _this3.setInitialCollapsedBranches();
+	        fireEvent(_this3.containerElement, 'beforeFirstDraw');
 	        _this3.draw();
 	        _this3.saveOriginalTree();
 	        if (options.callback) {
@@ -2399,10 +2408,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        offset += this.getHighlightSize() - this.getRadius();
 	      }
 
-	      if (!this.isHighlighted && !hasLabelConnector) {
-	        offset += lineWidth / 2;
-	      }
-
 	      return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
 	    }
 	  }, {
@@ -2506,7 +2511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // uses a caching object to reduce garbage
-	      var step = tree.prerenderer.getStep(tree);
+	      var step = tree.prerenderer.getStep(tree) / 2;
 	      _bounds.minx = Math.min(minx, maxx, x - step);
 	      _bounds.miny = Math.min(miny, maxy, y - step);
 	      _bounds.maxx = Math.max(minx, maxx, x + step);
