@@ -45,11 +45,6 @@ export default class Branch {
     this.branchLength = false;
 
     /**
-     * The Canvas DOM object the parent tree is drawn on
-     */
-    this.canvas = null;
-
-    /**
      * The center of the end of the node on the x axis
      */
     this.centerx = 0;
@@ -206,6 +201,13 @@ export default class Branch {
   get isHighlighted() {
     return this.highlighted || this.hovered;
   }
+
+  /**
+   * The Canvas DOM object the parent tree is drawn on
+   */
+   get canvas() {
+     return this.tree.canvas;
+   }
 
   clicked(x, y) {
     var i;
@@ -543,7 +545,6 @@ export default class Branch {
    */
   addChild(node) {
     node.parent = this;
-    node.canvas = this.canvas;
     node.tree = this.tree;
     this.leaf = false;
     this.children.push(node);
