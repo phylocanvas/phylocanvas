@@ -4,7 +4,7 @@
 
 A performant, reusable, and extensible tree visualisation library for the web.
 
-Please see [**phylocanvas.org**](https://phylocavas.org) for documentation.
+Please see [**phylocanvas.org**](http://phylocanvas.org/) for documentation.
 
 © 2016 Centre for Genomic Pathogen Surveillance
 
