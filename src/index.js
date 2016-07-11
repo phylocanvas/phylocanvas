@@ -6,6 +6,7 @@
 
 import Tree from './Tree';
 import Branch from './Branch';
+import Prerenderer from './Prerenderer';
 import Tooltip from './Tooltip';
 import Parser from './Parser';
 
@@ -13,7 +14,7 @@ import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 import * as utils from './utils';
 
-export { Tree, Branch, Tooltip, Parser, treeTypes, nodeRenderers, utils };
+export { Tree, Branch, Prerenderer, Tooltip, Parser, treeTypes, nodeRenderers, utils };
 
 function decorate(object, fnName, fn) {
   const target = object[fnName] ? object : object.prototype;
