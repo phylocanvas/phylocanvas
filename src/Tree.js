@@ -12,42 +12,46 @@ const { fireEvent, addEvent } = events;
 const { getPixelRatio, translateClick } = canvas;
 
 /**
- * The instance of a PhyloCanvas Widget
+ * A Phylocanvas instance.
  *
- * @constructor
- * @memberof PhyloCanvas
- * @param element {string|HTMLElement} the element or id of an element that phylocanvas
- * will be drawn in
- *
- * {@link PhyoCanvas.Tree}
- *
- * @example
- *  new PhyloCanvas.Tree('element_id');
- *
- * @example
- *  new PhyloCanvas.Tree(element);
+ * @class
+ * @param {string|HTMLElement} element
+ * @param {Object} config
+ * @see {@link module:Phylocanvas~createTree}
  */
-export default class Tree {
-
-  _point = { x: 0, y: 0 }
+class Tree {
 
   constructor(element, config = {}) {
+    this._point = { x: 0, y: 0 };
+
+    /**
+     * Places the instance in the DOM. Events are triggered from here.
+     *
+     * @type HTMLElement
+     */
     this.containerElement =
       (typeof element === 'string' ? document.getElementById(element) : element);
+
     addClass(this.containerElement, 'pc-container');
+
     /**
+     * Dictionary of {Branch} objects indexed by ID.
      *
-     * Dictionary of all branches indexed by Id
+     * @type {Object.<string, Branch>}
      */
     this.branches = {};
+
     /**
+     * List of leaves.
      *
-     * List of leaves
+     * @type Array.<Branch>
      */
     this.leaves = [];
     /**
      * The root node of the tree
      * (not neccesarily a root in the Phylogenetic sense)
+     *
+     * @type Branch
      */
     this.root = false;
 
@@ -56,6 +60,8 @@ export default class Tree {
     /**
      * backColour colour the branches of the tree based on the colour of the
      * tips
+     *
+     * @type boolean
      */
     this.backColour = false;
 
@@ -885,3 +891,5 @@ export default class Tree {
 }
 
 Tree.prototype.on = Tree.prototype.addListener;
+
+export default Tree;

@@ -1,9 +1,3 @@
-/**
- * Phylocanvas - Interactive tree visualisation for the web.
- *
- * @copyright 2016 Centre for Genomic Pathogen Surveillance
- */
-
 import Tree from './Tree';
 import Branch from './Branch';
 import Prerenderer from './Prerenderer';
@@ -26,6 +20,9 @@ function decorate(object, fnName, fn) {
 }
 
 /**
+ * The publicly exported module. Exports the following methods by default, and
+ * contains named exports of internal classes, types, and utils.
+ *
  * @module Phylocanvas
  */
 
@@ -39,14 +36,15 @@ function plugin(pluginFn) {
 }
 
 /**
- * Create an instance of Phylocanvas.
+ * A factory function for Phylocanvas instances to enable decoration by plugins.
  *
  * @param {string|HTMLElement} element - ID or element within which to place Phylocanvas instance.
- * @param {Object} conf - Configuration object, properties are copied into the Tree instance.
- * @return an instance of Tree.
+ * @param {Object} config - Configuration object, properties are copied into the {@link Tree} object.
+ *
+ * @return An instance of {@link Tree}.
  */
-function createTree(element, conf = {}) {
-  return new Tree(element, conf);
+function createTree(element, config = {}) {
+  return new Tree(element, config);
 }
 
 export default { plugin, createTree };

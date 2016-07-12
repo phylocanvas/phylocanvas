@@ -1,10 +1,9 @@
 /**
- * Tooltip
+ * Tooltip base class
  *
- * @constructor
- * @memberOf PhyloCanvas
+ * @class
  */
-export default function Tooltip(tree, {
+function Tooltip(tree, {
   className = 'phylocanvas-tooltip',
   element = document.createElement('div'),
   zIndex = 2000,
@@ -21,12 +20,12 @@ export default function Tooltip(tree, {
   parent.appendChild(this.element);
 }
 
-Tooltip.prototype.close = function() {
+Tooltip.prototype.close = function () {
   this.element.style.display = 'none';
   this.closed = true;
-}
+};
 
-Tooltip.prototype.open = function(x = 100, y = 100, node) {
+Tooltip.prototype.open = function (x = 100, y = 100, node) {
   while (this.element.hasChildNodes()) {
     this.element.removeChild(this.element.firstChild);
   }
@@ -39,7 +38,9 @@ Tooltip.prototype.open = function(x = 100, y = 100, node) {
   this.element.style.display = 'block';
 
   this.closed = false;
-}
+};
+
+export default Tooltip;
 
 export function ChildNodesTooltip(tree, options) {
   Tooltip.call(this, tree, options);
@@ -59,7 +60,7 @@ export function ChildNodesTooltip(tree, options) {
 ChildNodesTooltip.prototype = Object.create(Tooltip.prototype);
 ChildNodesTooltip.prototype.constructor = ChildNodesTooltip;
 
-ChildNodesTooltip.prototype.createContent = function(node) {
+ChildNodesTooltip.prototype.createContent = function (node) {
   const textNode = document.createTextNode(node.getChildProperties('id').length);
   this.element.appendChild(textNode);
-}
+};

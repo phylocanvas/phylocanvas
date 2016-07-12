@@ -4,9 +4,7 @@ import nodeRenderers from './nodeRenderers';
 
 const { Angles, Shapes } = constants;
 
-/**
- * Cached objects to reduce garbage
- */
+// Caching object to reduce garbage
 const _bounds = {
   minx: 0,
   maxx: 0,
@@ -21,14 +19,11 @@ const _leafStyle = {
 };
 
 /**
- * Creates a branch
+ * A branch of the tree.
  *
- * @constructor
- * @memberof PhyloCanvas
- * @public
- *
+ * @class
  */
-export default class Branch {
+class Branch {
 
   constructor() {
     /**
@@ -187,12 +182,6 @@ export default class Branch {
      */
     this.leafStyle = {};
   }
-
-  /**
-   * used for auto ids for internal nodes
-   * @static
-   */
-  static lastId = 0;
 
   static generateId() {
     return 'pcn' + this.lastId++;
@@ -646,8 +635,8 @@ export default class Branch {
   /**
    * Calculates label start position
    * offset + aesthetic padding
-   * @method getNodeSize
-   * @return CallExpression
+   *
+   * @return {number} x coordinate
    */
   getLabelStartX() {
     const { lineWidth } = this.getLeafStyle();
@@ -776,3 +765,7 @@ export default class Branch {
   }
 
 }
+
+Branch.prototype.lastId = 0;
+
+export default Branch;
