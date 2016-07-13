@@ -766,6 +766,7 @@ class Branch {
 
 }
 
-Branch.prototype.lastId = 0;
+// Static property
+Branch.lastId = 0;
 
 export default Branch;

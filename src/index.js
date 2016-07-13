@@ -8,8 +8,6 @@ import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 import * as utils from './utils';
 
-export { Tree, Branch, Prerenderer, Tooltip, Parser, treeTypes, nodeRenderers, utils };
-
 function decorate(object, fnName, fn) {
   const target = object[fnName] ? object : object.prototype;
   const originalFn = target[fnName];
@@ -25,6 +23,8 @@ function decorate(object, fnName, fn) {
  *
  * @module Phylocanvas
  */
+
+export { Tree, Branch, Prerenderer, Tooltip, Parser, treeTypes, nodeRenderers, utils };
 
 /**
  * Register a plugin.

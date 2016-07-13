@@ -35,7 +35,7 @@ class Tree {
     addClass(this.containerElement, 'pc-container');
 
     /**
-     * Dictionary of {Branch} objects indexed by ID.
+     * Dictionary of {@link Branch} objects indexed by ID.
      *
      * @type {Object.<string, Branch>}
      */
@@ -47,6 +47,7 @@ class Tree {
      * @type Array.<Branch>
      */
     this.leaves = [];
+
     /**
      * The root node of the tree
      * (not neccesarily a root in the Phylogenetic sense)
@@ -55,16 +56,25 @@ class Tree {
      */
     this.root = false;
 
+    /**
+     * Stores the unparsed tree.
+     *
+     * @type string
+     */
     this.stringRepresentation = '';
 
     /**
-     * backColour colour the branches of the tree based on the colour of the
-     * tips
+     * Colour the branches of the tree based on the colour of the tips.
      *
      * @type boolean
      */
     this.backColour = false;
 
+    /**
+     * Stores the state of the tree after parsing.
+     *
+     * @type Object
+     */
     this.originalTree = {};
 
     // Set up the element and canvas
@@ -82,86 +92,351 @@ class Tree {
     canvasElement.style.zIndex = '1';
     this.containerElement.appendChild(canvasElement);
 
-    this.defaultCollapsed = {};
-
-    this.tooltip = new Tooltip(this);
-
-    this.drawn = false;
-
-    this.highlighters = [];
-
-    this.zoom = 1;
-    this.zoomFactor = 3;
-    this.disableZoom = false;
-
-    this.fillCanvas = false;
-
-    this.branchScaling = true;
-    this.currentBranchScale = 1;
-    this.branchScalingStep = 1.2;
-
-    this.pickedup = false;
-    this.dragging = false;
-    this.startx = null; this.starty = null;
-    this.pickedup = false;
-    this.baseNodeSize = 1;
-    this.curx = null;
-    this.cury = null;
-    this.origx = null;
-    this.origy = null;
-
+    /**
+     * Canvas drawing context.
+     *
+     * @type CanvasRenderingContext2D
+     */
     this.canvas = canvasElement.getContext('2d');
-
     this.canvas.canvas.onselectstart = function () { return false; };
     this.canvas.fillStyle = '#000000';
     this.canvas.strokeStyle = '#000000';
     this.canvas.save();
 
-    this.offsetx = this.canvas.canvas.width / 2;
-    this.offsety = this.canvas.canvas.height / 2;
-    this.selectedColour = 'rgba(49,151,245,1)';
-    this.highlightColour = 'rgba(49,151,245,1)';
-    this.highlightWidth = 4;
-    this.highlightSize = 2;
-    this.selectedNodeSizeIncrease = 0;
-    this.branchColour = 'rgba(0,0,0,1)';
-    this.branchScalar = 1.0;
-    this.padding = 50;
-    this.labelPadding = 5;
-
-    this.multiSelect = true;
-    this.clickFlag = 'selected';
-    this.clickFlagPredicate = () => true;
-    this.hoverLabel = false;
-    this.internalNodesSelectable = true;
-
-    this.showLabels = true;
-    this.showBranchLengthLabels = false;
-    this.showInternalNodeLabels = false;
-
-    this.setTreeType('radial');
-    this.maxBranchLength = 0;
-    this.lineWidth = 1.0;
-    this.textSize = 7;
-    this.font = 'sans-serif';
-
-    this.unselectOnClickAway = true;
-
-    if (this.useNavigator) {
-      this.navigator = new Navigator(this);
-    }
 
     /**
-     * Align labels vertically
+     * A minimum and maximum number of child branches within which to
+     * automatically collapse branches on the first draw.
+     *
+     * @type {{ min: number, max: number }}
+     */
+    this.defaultCollapsed = {};
+
+    /**
+     * The default tooltip showing number of child branches.
+     *
+     * @type Tooltip
+     */
+    this.tooltip = new Tooltip(this);
+
+    /**
+     * Has Tree been drawn already, true after first draw.
+     *
+     * @type boolean
+     */
+    this.drawn = false;
+
+    /**
+     * Stores highlighting functions used during drawing.
+     *
+     * @type Array.<Function>
+     */
+    this.highlighters = [];
+
+    /**
+     * The current level of zoom.
+     *
+     * @type number
+     */
+    this.zoom = 1;
+
+    /**
+     * Controls the speed of zooming. Recommended values are between 1 and 5.
+     *
+     * @type number
+     * @default
+     */
+    this.zoomFactor = 3;
+
+    /**
+     * @type boolean
+     * @default
+     */
+    this.disableZoom = false;
+
+
+    /**
+     * Force rectangular and hierarchical trees to use the canvas dimensions
+     * instead of the number of leaves for proportion at the prerender stage.
+     *
+     * @type boolean
+     */
+    this.fillCanvas = false;
+
+
+    /**
+     * Enable branch scaling.
+     *
+     * @type boolean
+     * @default
+     */
+    this.branchScaling = true;
+
+    /**
+     * The current branch scale.
+     *
+     * @type number
+     */
+    this.currentBranchScale = 1;
+
+    /**
+     * The ratio at which branches scale.
+     *
+     * @type number
+     */
+    this.branchScalingStep = 1.2;
+
+
+    /**
+     * Whether a click has been detected.
+     *
+     * @type boolean
+     */
+    this.pickedup = false;
+
+    /**
+     * Whether the user is dragging.
+     *
+     * @type boolean
+     */
+    this.dragging = false;
+
+    /**
+     * The starting x coordinate of a drag.
+     *
+     * @type number
+     */
+    this.startx = null;
+    /**
+     * The starting y coordinate of a drag.
+     *
+     * @type number
+     */
+    this.starty = null;
+
+    /**
+     * Factor with which to scale the radius of a leaf.
+     *
+     * @type number
+     * @default
+     */
+    this.baseNodeSize = 1;
+
+    /**
+     * Caches the offsetx when a click is detected.
+     *
+     * @type number
+     */
+    this.origx = null;
+    /**
+     * Caches the offsety when a click is detected.
+     *
+     * @type number
+     */
+    this.origy = null;
+
+
+    /**
+     * The x coordinate from which to begin drawing from.
+     *
+     * @type number
+     */
+    this.offsetx = this.canvas.canvas.width / 2;
+    /**
+     * The y coordinate from which to begin drawing from.
+     *
+     * @type number
+     */
+    this.offsety = this.canvas.canvas.height / 2;
+
+
+    /**
+     * The colour to apply to a selected branch.
+     *
+     * @type string
+     * @default
+     */
+    this.selectedColour = 'rgba(49,151,245,1)';
+
+    /**
+     * The colour to apply to a hihglighted branch.
+     *
+     * @type string
+     * @default
+     */
+    this.highlightColour = 'rgba(49,151,245,1)';
+
+    /**
+     * The line width of the halo on a highlighted branch.
+     *
+     * @type number
+     * @default
+     */
+    this.highlightWidth = 4;
+
+    /**
+     * Scale factor for the size of the the halo on a highlighted branch.
+     *
+     * @type number
+     * @default
+     */
+    this.highlightSize = 2;
+
+    /**
+     * Global branch colour,
+     *
+     * @type string
+     * @default
+     */
+    this.branchColour = 'rgba(0,0,0,1)';
+
+    /**
+     * Scale factor applied to branch lengths defined in the serialised
+     * representation of the tree.
+     *
+     * @type number
+     */
+    this.branchScalar = 1.0;
+
+    /**
+     * Space to add to bounds when fitting the tree to the canvas.
+     *
+     * @type number
+     * @default
+     */
+    this.padding = 50;
+
+    /**
+     * Space between a leaf and its label.
+     *
+     * @type number
+     * @default
+     */
+    this.labelPadding = 5;
+
+
+    /**
+     * Enable/disable shift-click multi-selection.
+     *
+     * @type boolean
+     * @default
+     */
+    this.multiSelect = true;
+
+    /**
+     * Flag to change on branch when clicked.
+     *
+     * @type string
+     * @default
+     */
+    this.clickFlag = 'selected';
+
+    /**
+     * Decide if a branch should be affected when clicked.
+     *
+     * @type function
+     *
+     * @param {Branch} branch
+     * @param {string} property
+     * @param {} value
+     *
+     * @return boolean
+     * @default A function returning true.
+     */
+    this.clickFlagPredicate = () => true;
+
+    /**
+     * Show labels when hovering over node.
+     *
+     * @type boolean
+     * @default
+     */
+    this.hoverLabel = false;
+
+    /**
+     * @type boolean
+     * @default
+     */
+    this.internalNodesSelectable = true;
+
+    /**
+     * @type boolean
+     * @default
+     */
+    this.showLabels = true;
+    /**
+     * @type boolean
+     * @default
+     */
+    this.showBranchLengthLabels = false;
+    /**
+     * @type boolean
+     * @default
+     */
+    this.showInternalNodeLabels = false;
+
+
+    this.setTreeType('radial');
+
+    /**
+     * Stores the length of the longest branch on the tree.
+     *
+     * @type number
+     */
+    this.maxBranchLength = 0;
+
+    /**
+     * The visible width of the branches.
+     *
+     * @type number
+     * @default
+     */
+    this.lineWidth = 1.0;
+
+    /**
+     * The size of the labels, scaled to the size of the tree on first draw.
+     *
+     * @type number
+     */
+    this.textSize = 7;
+
+    /**
+     * The font of the labels.
+     *
+     * @type string
+     */
+    this.font = 'sans-serif';
+
+
+    /**
+     * @type boolean
+     * @default
+     */
+    this.unselectOnClickAway = true;
+
+
+    /**
+     * Align labels to the longest branch
+     *
+     * @type boolean
+     * @default
      */
     this.alignLabels = false;
 
+
     /**
-     * X and Y axes of the node that is farther from the root
-     * Used to align labels vertically
+     * X coordinate of node that is furthest from the root.
+     *
+     * @type number
      */
     this.farthestNodeFromRootX = 0;
+    /**
+     * Y coordinate of node that is furthest from the root.
+     *
+     * @type number
+     */
     this.farthestNodeFromRootY = 0;
+
 
     /**
      * Maximum length of label for each tree type.
@@ -169,9 +444,7 @@ class Tree {
     this.maxLabelLength = {};
 
 
-    /**
-     * Override properties from config
-     */
+    // Override properties from config
     Object.assign(this, config);
 
 
