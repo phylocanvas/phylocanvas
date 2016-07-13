@@ -9,14 +9,19 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
     max: 50,
     color: 'green',
   },
-  padding: 1,
+  padding: 0,
 });
 
 const originalDraw = tree.draw;
 tree.draw = (...args) => {
   originalDraw.apply(tree, args);
   const bounds = tree.getBounds();
-  tree.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
+  tree.canvas.strokeRect(
+    bounds[0][0],
+    bounds[0][1],
+    bounds[1][0] - bounds[0][0],
+    bounds[1][1] - bounds[0][1]
+  );
 };
 
 // create buttons
@@ -101,19 +106,19 @@ function () {
   // tree.setNodeSize(10);
   // tree.textSize = 20;
 
-  tree.setNodeDisplay('A', {
+  tree.branches.A.setDisplay({
     leafStyle: {
       fillStyle: 'lightgray',
     },
   });
-  tree.setNodeDisplay('B', {
+  tree.branches.B.setDisplay({
     colour: 'red',
     shape: 'triangle',
     leafStyle: {
       fillStyle: 'pink',
     },
   });
-  tree.setNodeDisplay('C', {
+  tree.branches.C.setDisplay({
     colour: 'green',
     shape: 'star',
     leafStyle: {
@@ -123,7 +128,7 @@ function () {
     //   colour: 'red',
     // },
   });
-  tree.setNodeDisplay('D', {
+  tree.branches.D.setDisplay({
     colour: 'blue',
     shape: 'square',
     leafStyle: {
