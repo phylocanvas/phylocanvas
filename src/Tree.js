@@ -2,7 +2,6 @@ import { dom, events, canvas } from './utils';
 
 import Branch from './Branch';
 import { ChildNodesTooltip as Tooltip } from './Tooltip';
-import Navigator from './Navigator';
 
 import treeTypes from './treeTypes';
 import parsers from './parsers';
@@ -416,15 +415,6 @@ class Tree {
 
 
     /**
-     * Align labels to the longest branch
-     *
-     * @type boolean
-     * @default
-     */
-    this.alignLabels = false;
-
-
-    /**
      * X coordinate of node that is furthest from the root.
      *
      * @type number
@@ -440,6 +430,8 @@ class Tree {
 
     /**
      * Maximum length of label for each tree type.
+     *
+     * @type Object.<string, number>
      */
     this.maxLabelLength = {};
 
@@ -466,14 +458,23 @@ class Tree {
     });
   }
 
+  /**
+   * Set/get if labels are currently aligned.
+   *
+   * @type boolean
+   */
   get alignLabels() {
     return this.showLabels && this.labelAlign && this.labelAlignEnabled;
   }
-
   set alignLabels(value) {
     this.labelAlignEnabled = value;
   }
 
+  /**
+   * Collapses branches based on {@link Tree#defaultCollapsed}.
+   *
+   * @param {Branch} [node=this.root]
+   */
   setInitialCollapsedBranches(node = this.root) {
     var childIds;
     var i;
@@ -490,14 +491,26 @@ class Tree {
     }
   }
 
+  /**
+   * @param {MouseEvent} event
+   * @returns {Branch}
+   */
   getNodeAtMousePosition(event) {
     return this.root.clicked(...translateClick(event, this));
   }
 
+  /**
+   * @returns {Branch[]} Selected leaves
+   */
   getSelectedNodeIds() {
     return this.getNodeIdsWithFlag('selected');
   }
 
+  /**
+   * @param {string} flag - A boolean property of the branch
+   * @param {boolean} [value=true]
+   * @returns {Branch[]}
+   */
   getNodeIdsWithFlag(flag, value = true) {
     return this.leaves.reduce((memo, leaf) => {
       if (leaf[flag] === value) {
@@ -507,6 +520,11 @@ class Tree {
     }, []);
   }
 
+  /**
+   * Event listener for click events.
+   *
+   * @param {MouseEvent} e
+   */
   clicked(e) {
     var node;
     if (e.button === 0) {
@@ -552,25 +570,11 @@ class Tree {
     }
   }
 
-  dblclicked(e) {
-    if (!this.root) return false;
-    var nd = this.getNodeAtMousePosition(e);
-    if (nd) {
-      nd.cascadeFlag('selected', false);
-      nd.toggleCollapsed();
-    }
-
-    if (!this.pickedup) {
-      this.dragging = false;
-    }
-    this.draw();
-  }
-
-  displayLabels() {
-    this.showLabels = true;
-    this.draw();
-  }
-
+  /**
+   * Handles dragging and hovering.
+   *
+   * @param {MouseEvent} event
+   */
   drag(event) {
     // get window ratio
     const ratio = getPixelRatio(this.canvas);
@@ -609,7 +613,9 @@ class Tree {
   }
 
   /**
-   * Draw the frame
+   * Draws the frame.
+   *
+   * @param {boolean} forceRedraw - Also run the prerenderer.
    */
   draw(forceRedraw) {
     this.highlighters.length = 0;
@@ -645,11 +651,60 @@ class Tree {
     this.canvas.restore();
   }
 
+  /**
+   * Mousedown event handler
+   *
+   * @param {MouseEvent} event
+   */
+  pickup(event) {
+    if (!this.drawn) return false;
+    this.origx = this.offsetx;
+    this.origy = this.offsety;
+
+    if (event.button === 0) {
+      this.pickedup = true;
+    }
+
+    this.startx = event.clientX;
+    this.starty = event.clientY;
+  }
+
+  /**
+   * mouseup event handler.
+   */
   drop() {
     if (!this.drawn) return false;
     this.pickedup = false;
   }
 
+  /**
+   * Mousewheel event handler.
+   *
+   * @param event
+   */
+  scroll(event) {
+    if (this.disableZoom || ('wheelDelta' in event && event.wheelDelta === 0)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    this._point.x = event.offsetX;
+    this._point.y = event.offsetY;
+    const sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
+    if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
+      this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
+      this.setBranchScale(this.currentBranchScale, this._point);
+    } else {
+      this.smoothZoom(sign, this._point);
+    }
+  }
+
+  /**
+   * @param {RegExp} pattern
+   * @param {string} [searchProperty=id].
+   * @return {Branch[]}
+   */
   findLeaves(pattern, searchProperty = 'id') {
     let foundLeaves = [];
 
@@ -662,6 +717,13 @@ class Tree {
     return foundLeaves;
   }
 
+  /**
+   * @param {Branch[]} leaves
+   * @param {string} property
+   * @param {} value
+   *
+   * @fires Tree#updated
+   */
   updateLeaves(leaves, property, value) {
     for (let leaf of this.leaves) {
       leaf[property] = !value;
@@ -673,20 +735,34 @@ class Tree {
     this.nodesUpdated(leaves.map(_ => _.id), property);
   }
 
+  /**
+   * Deselects all branches, implicitly calls {@link Tree#draw}.
+   */
   clearSelect() {
     this.root.cascadeFlag('selected', false);
     this.draw();
   }
 
+  /**
+   * @returns {string} Base64-encoded data uri of canvas
+   */
   getPngUrl() {
     return this.canvas.canvas.toDataURL();
   }
 
-  hideLabels() {
-    this.showLabels = false;
-    this.draw();
-  }
-
+  /**
+   * Loads a serialised representation of a tree, using the first registered
+   * parser that validates the input unless a format is specified.
+   *
+   * @param {string} inputString
+   * @param {} [options] - Specify the format here, options are also passed on
+   *                       to the parser.
+   * @param {function} [callback] - Called synchronously *after* the first draw.
+   *
+   * @fires Tree#error
+   *
+   * @see {@link Tree#build}
+   */
   load(inputString, options = {}, callback) {
     let buildOptions = options;
     let buildCallback = callback;
@@ -723,6 +799,9 @@ class Tree {
     this.loadError(error);
   }
 
+  /**
+   * Builds the {@link Tree#originalTree} object.
+   */
   saveOriginalTree() {
     this.originalTree.branches = this.branches;
     this.originalTree.leaves = this.leaves;
@@ -731,6 +810,9 @@ class Tree {
     this.originalTree.parents = {};
   }
 
+  /**
+   * Clears the branches and leaves of the instance.
+   */
   clearState() {
     this.root = false;
     this.leaves = [];
@@ -738,6 +820,22 @@ class Tree {
     this.drawn = false;
   }
 
+  /**
+   * Build {@link Tree#branches} and {@link Tree#leaves} properties.
+   */
+  extractNestedBranches() {
+    this.branches = {};
+    this.leaves = [];
+
+    this.storeNode(this.root);
+    this.root.extractChildren();
+  }
+
+  /**
+   * High-level API to organising branches and leaves.
+   *
+   * @fires Tree#error
+   */
   saveState() {
     this.extractNestedBranches();
 
@@ -751,6 +849,17 @@ class Tree {
     }
   }
 
+  /**
+   * Builds the object model of a tree.
+   *
+   * @param {string} formatString
+   * @param {Parser} parser
+   * @param {Object} options
+   *
+   * @fires Tree#error
+   * @fires Tree#beforeFirstDraw
+   * @fires Tree#loadCompleted
+   */
   build(formatString, parser, options) {
     this.originalTree = {};
     this.clearState();
@@ -772,7 +881,7 @@ class Tree {
       this.stringRepresentation = formatString;
       this.saveState();
       this.setInitialCollapsedBranches();
-      fireEvent(this.containerElement, 'beforeFirstDraw');
+      this.beforeFirstDraw();
       this.draw();
       this.saveOriginalTree();
       if (options.callback) {
@@ -783,19 +892,13 @@ class Tree {
     });
   }
 
-  pickup(event) {
-    if (!this.drawn) return false;
-    this.origx = this.offsetx;
-    this.origy = this.offsety;
-
-    if (event.button === 0) {
-      this.pickedup = true;
-    }
-
-    this.startx = event.clientX;
-    this.starty = event.clientY;
-  }
-
+  /**
+   * Draw a subtree.
+   *
+   * @param {Branch} node - the new root of the tree.
+   *
+   * @fires Tree#subtree
+   */
   redrawFromBranch(node) {
     this.clearState();
     this.resetTree();
@@ -812,10 +915,18 @@ class Tree {
     this.subtreeDrawn(node.id);
   }
 
+  /**
+   * Reload the serialised version of the tree.
+   */
   redrawOriginalTree() {
     this.load(this.stringRepresentation);
   }
 
+  /**
+   * Traverse the tree, generating ids and filing away objects.
+   *
+   * @param {Branch} node - starting point.
+   */
   storeNode(node) {
     if (!node.id || node.id === '') {
       node.id = Branch.generateId();
@@ -838,107 +949,46 @@ class Tree {
     }
   }
 
-  scroll(event) {
-    if (this.disableZoom || ('wheelDelta' in event && event.wheelDelta === 0)) {
-      return;
-    }
-
-    event.preventDefault();
-
-    this._point.x = event.offsetX;
-    this._point.y = event.offsetY;
-    const sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
-    if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
-      this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
-      this.setBranchScale(this.currentBranchScale, this._point);
-    } else {
-      this.smoothZoom(sign, this._point);
-    }
-  }
-
-  selectNodes(nIds) {
-    var ns = nIds;
-    var node;
-    var nodeId;
-    var index;
-
-    if (this.root) {
-      this.root.cascadeFlag('selected', false);
-      if (typeof nIds === 'string') {
-        ns = ns.split(',');
-      }
-      for (nodeId in this.branches) {
-        if (this.branches.hasOwnProperty(nodeId)) {
-          node = this.branches[nodeId];
-          for (index = 0; index < ns.length; index++) {
-            if (ns[index] === node.id) {
-              node.cascadeFlag('selected', true);
-            }
-          }
-        }
-      }
-      this.draw();
-    }
-  }
-
-  setFont(font) {
-    if (isNaN(font)) {
-      this.font = font;
-      this.draw();
-    }
-  }
-
-  setNodeDisplay(ids, options, waiting) {
-    if (!ids) return;
-
-    if (this.drawn) {
-      let array = [];
-      if (typeof ids === 'string') {
-        array = ids.split(',');
-      } else {
-        array = ids;
-      }
-
-      if (array.length) {
-        for (let id of array) {
-          if (!(id in this.branches)) {
-            continue;
-          }
-          this.branches[id].setDisplay(options);
-        }
-        this.draw();
-      }
-    } else if (!waiting) {
-      let _this = this;
-      let timeout = setInterval(function () {
-        if (this.drawn) {
-          _this.setNodeColourAndShape(ids, options, true);
-          clearInterval(timeout);
-        }
-      });
-    }
-  }
-
+  /**
+   * @param {number} size
+   */
   setNodeSize(size) {
     this.baseNodeSize = Number(size);
     this.draw();
   }
 
+  /**
+   * @param {Branch} node
+   */
   setRoot(node) {
     node.tree = this;
     this.root = node;
   }
 
+  /**
+   * @param {number|string} size
+   */
   setTextSize(size) {
     this.textSize = Number(size);
     this.draw();
   }
 
+  /**
+   * Sets an appropriate font size for the proportions of the tree.
+   *
+   * @param {number} ystep - the space between leaves.
+   */
   setFontSize(ystep) {
     this.textSize = this.calculateFontSize ? this.calculateFontSize(ystep) : Math.min((ystep / 2), 15);
     this.canvas.font = this.textSize + 'pt ' + this.font;
   }
 
+  /**
+   * @param {string} type - The name of a registered tree type.
+   * @param {boolean} [quiet] - Do not broadcast.
+   *
+   * @fires Tree#typechanged
+   */
   setTreeType(type, quiet) {
     if (!(type in treeTypes)) {
       return fireEvent(this.containerElement, 'error', { error: new Error(`"${type}" is not a known tree-type.`) });
@@ -964,6 +1014,12 @@ class Tree {
     }
   }
 
+  /**
+   * Resizes the canvas element.
+   *
+   * @param {number} width
+   * @param {number} height
+   */
   setSize(width, height) {
     this.canvas.canvas.width = width;
     this.canvas.canvas.height = height;
@@ -973,6 +1029,24 @@ class Tree {
     this.adjustForPixelRatio();
   }
 
+  /**
+   * Scale the size of the canvas element to the pixel ratio
+   */
+  adjustForPixelRatio() {
+    var ratio = getPixelRatio(this.canvas);
+
+    this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
+    this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
+
+    if (ratio > 1) {
+      this.canvas.canvas.width *= ratio;
+      this.canvas.canvas.height *= ratio;
+    }
+  }
+
+  /**
+   * @returns {{ x: number, y: number }} point w/ x and y coordinates
+   */
   getCentrePoint() {
     const pixelRatio = getPixelRatio(this.canvas);
     return {
@@ -981,6 +1055,12 @@ class Tree {
     };
   }
 
+  /**
+   * Zoom to a specific level over a specific point.
+   *
+   * @param {number} zoom
+   * @param {{ x: number, y: number }} [point=Tree#getCentrePoint]
+   */
   setZoom(zoom, { x, y } = this.getCentrePoint()) {
     if (zoom > 0) {
       const oldZoom = this.zoom;
@@ -991,6 +1071,12 @@ class Tree {
     }
   }
 
+  /**
+   * Zoom in or out from the current zoom level towards a point.
+   *
+   * @param {number} steps - positive to zoom in, negative to zoom out.
+   * @param {{ x: number, y: number }} point
+   */
   smoothZoom(steps, point) {
     this.setZoom(
       Math.pow(10,
@@ -999,10 +1085,25 @@ class Tree {
     );
   }
 
-  calculateZoomedOffset(offset, point, oldZoom, newZoom) {
-    return -1 * ((((-1 * offset) + point) / oldZoom * newZoom) - point);
+  /**
+   * Magic to enable zooming to a point.
+   *
+   * @author Khalil Abudahab
+   * @param {number} offset
+   * @param {number} coord
+   * @param {number} oldZoom
+   * @param {number} newZoom
+   */
+  calculateZoomedOffset(offset, coord, oldZoom, newZoom) {
+    return -1 * ((((-1 * offset) + coord) / oldZoom * newZoom) - coord);
   }
 
+  /**
+   * Scale branches horizontally
+   *
+   * @param {number} scale
+   * @param {Object} point
+   */
   setBranchScale(scale = 1, point = { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 }) {
     const treeType = treeTypes[this.treeType];
     if (!treeType.branchScalingAxis || scale < 0) {
@@ -1019,11 +1120,17 @@ class Tree {
     this.draw();
   }
 
+  /**
+   * @method
+   */
   toggleLabels() {
     this.showLabels = !this.showLabels;
     this.draw();
   }
 
+  /**
+   * @method
+   */
   setMaxLabelLength() {
     var dimensions;
     if (this.maxLabelLength[this.treeType] === undefined) {
@@ -1039,31 +1146,78 @@ class Tree {
     }
   }
 
-
-  loadCompleted() {
-    fireEvent(this.containerElement, 'loaded');
-  }
-
+  /**
+   * @event Tree#loading
+   */
   loadStarted() {
     fireEvent(this.containerElement, 'loading');
   }
 
+  /**
+   * @event Tree#beforeFirstDraw
+   */
+  beforeFirstDraw() {
+    fireEvent(this.containerElement, 'beforeFirstDraw');
+  }
+
+  /**
+   * @event Tree#loaded
+   */
+  loadCompleted() {
+    fireEvent(this.containerElement, 'loaded');
+  }
+
+  /**
+   * @event Tree#error
+   * @property {Error} error
+   */
   loadError(error) {
     fireEvent(this.containerElement, 'error', { error });
   }
 
+  /**
+   * @event Tree#subtree
+   * @property {Branch} node
+   */
   subtreeDrawn(node) {
     fireEvent(this.containerElement, 'subtree', { node });
   }
 
+  /**
+   * @event Tree#updated
+   * @property {string[]} nodeIds
+   * @property {string} property
+   * @property {boolean} append
+   */
   nodesUpdated(nodeIds, property, append = false) {
     fireEvent(this.containerElement, 'updated', { nodeIds, property, append });
   }
 
+  /**
+   * @event Tree#typechanged
+   * @property {string} oldType
+   * @property {string} newType
+   */
+  treeTypeChanged(oldType, newType) {
+    fireEvent(this.containerElement, 'typechanged', { oldType: oldType, newType: newType });
+  }
+
+  /**
+   * @param {string}
+   * @param {function}
+   */
   addListener(event, listener) {
     addEvent(this.containerElement, event, listener);
   }
 
+  /**
+   * @param {Array.<Branch>} [leaves=this.leaves]
+   *
+   * @returns {Array.<Array.<number>>} bounds - Minimum x and y coordinates in
+   * the first array, maximum x and y coordinates in the second.
+   *
+   * @example const [ [ minx, miny ], [ maxx, maxy ] ] = tree.getBounds()
+   */
   getBounds(leaves = this.leaves) {
     // this.leaves assumes bounds of whole tree, start from root
     const initialBounds = leaves === this.leaves ? this.root : leaves[0];
@@ -1082,6 +1236,11 @@ class Tree {
     return [ [ minx, miny ], [ maxx, maxy ] ];
   }
 
+  /**
+   * Zoom to the provided leaves.
+   *
+   * @param {Array.<Branch>}
+   */
   fitInPanel(leaves) {
     this.zoom = 1; // calculates consistent bounds
     const bounds = this.getBounds(leaves);
@@ -1112,22 +1271,9 @@ class Tree {
     this.offsety = this.offsety / pixelRatio;
   }
 
-  adjustForPixelRatio() {
-    var ratio = getPixelRatio(this.canvas);
-
-    this.canvas.canvas.style.height = this.canvas.canvas.height + 'px';
-    this.canvas.canvas.style.width = this.canvas.canvas.width + 'px';
-
-    if (ratio > 1) {
-      this.canvas.canvas.width *= ratio;
-      this.canvas.canvas.height *= ratio;
-    }
-  }
-
-  treeTypeChanged(oldType, newType) {
-    fireEvent(this.containerElement, 'typechanged', { oldType: oldType, newType: newType });
-  }
-
+  /**
+   * Reapply data in {@link Tree#originalTree}.
+   */
   resetTree() {
     if (!this.originalTree.branches) return;
 
@@ -1141,28 +1287,34 @@ class Tree {
     this.root = this.originalTree.root;
   }
 
+  /**
+   * @param {Branch}
+   */
   rotateBranch(branch) {
     this.branches[branch.id].rotate();
   }
 
-  extractNestedBranches() {
-    this.branches = {};
-    this.leaves = [];
-
-    this.storeNode(this.root);
-    this.root.extractChildren();
-  }
-
+  /**
+   * @returns {string} Newick representation of current object model.
+   */
   exportNwk() {
     var nwk = this.root.getNwk();
     return nwk.substr(0, nwk.lastIndexOf(')') + 1) + ';';
   }
 
+  /**
+   * Resize canvas element to container.
+   */
   resizeToContainer() {
     this.setSize(this.containerElement.offsetWidth, this.containerElement.offsetHeight);
   }
 }
 
+/**
+ * @memberof Tree
+ * @method
+ * @see Tree#addListener
+ */
 Tree.prototype.on = Tree.prototype.addListener;
 
 export default Tree;
