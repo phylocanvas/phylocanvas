@@ -289,7 +289,7 @@ class Branch {
   }
 
   /**
-   * The canvas drawing context of the parent tree.
+   * The canvas {@link https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D drawing context} of the parent tree.
    *
    * @type CanvasRenderingContext2D
    */
