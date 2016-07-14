@@ -1,11 +1,25 @@
 
-export default class Prerenderer {
+/**
+ * Calculates the tree dimensions before the first draw.
+ *
+ * @class
+ */
+class Prerenderer {
 
+  /**
+   * @constructor
+   * @param {Object} options
+   * @param {function} options.getStep - should return the space between each branch.
+   * @param {function} options.calculate
+   */
   constructor(options) {
     this.getStep = options.getStep;
     this.calculate = options.calculate;
   }
 
+  /**
+   * @param {Tree}
+   */
   run(tree) {
     var step = this.getStep(tree);
 
@@ -31,3 +45,5 @@ export default class Prerenderer {
   }
 
 }
+
+export default Prerenderer;

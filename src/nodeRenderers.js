@@ -23,6 +23,15 @@ function commitPath(canvas, { lineWidth, strokeStyle, fillStyle }) {
 
 const lengthOfSquareSide = (radius) => radius * Math.sqrt(2);
 
+/**
+ * @function nodeRenderer
+ * @description a pure function to render a leaf.
+ *
+ * @param {CanvasRenderingContext2D} canvas - See {@link Tree#canvas}
+ * @param {number} radius - See {@link Branch#radius}
+ * @param {Object} style - See {@link Branch#leafStyle}
+ */
+
 export default {
 
   circle(canvas, radius, style) {
