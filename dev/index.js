@@ -2,6 +2,8 @@ require('../src/polyfill');
 
 import PhyloCanvas, * as phyloComponents from '../src/index';
 
+import { undoPointTranslation } from '../src/utils/canvas';
+
 const buttonForm = document.getElementById('buttons');
 const tree = PhyloCanvas.createTree('phylocanvas', {
   defaultCollapsed: {
@@ -16,7 +18,12 @@ const originalDraw = tree.draw;
 tree.draw = (...args) => {
   originalDraw.apply(tree, args);
   const bounds = tree.getBounds();
-  tree.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
+
+  const min = undoPointTranslation({ x: bounds[0][0], y: bounds[0][1] }, tree);
+  const max = undoPointTranslation({ x: bounds[1][0], y: bounds[1][1] }, tree);
+  tree.canvas.strokeRect(
+    min.x, min.y, max.x - min.x, max.y - min.y
+  );
 };
 
 // create buttons
