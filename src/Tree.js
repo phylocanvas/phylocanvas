@@ -107,7 +107,9 @@ class Tree {
      * A minimum and maximum number of child branches within which to
      * automatically collapse branches on the first draw.
      *
-     * @type {{ min: number, max: number }}
+     * @type object
+     * @property {number} min
+     * @property {number} max
      */
     this.defaultCollapsed = {};
 
@@ -755,8 +757,8 @@ class Tree {
    * parser that validates the input unless a format is specified.
    *
    * @param {string} inputString
-   * @param {} [options] - Specify the format here, options are also passed on
-   *                       to the parser.
+   * @param {Object} [options] - also passed on to the parser.
+   * @param {string} [options.format] - specify the parser to use.
    * @param {function} [callback] - Called synchronously *after* the first draw.
    *
    * @fires Tree#error

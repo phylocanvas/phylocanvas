@@ -27,177 +27,283 @@ class Branch {
 
   constructor() {
     /**
-     * The angle clockwise from horizontal the branch is (Used paricularly for
-     * Circular and Radial Trees)
-     * @public
+     * The branch's angle clockwise from horizontal in radians (used paricularly
+     * for circular and radial trees).
      *
+     * @type number
      */
     this.angle = 0;
 
     /**
-     * The Length of the branch
+     * The length of the branch.
+     *
+     * @type number
      */
-    this.branchLength = false;
+    this.branchLength = 0;
 
     /**
-     * The center of the end of the node on the x axis
+     * The center of the end of the node on the x axis.
+     *
+     * @type number
      */
     this.centerx = 0;
 
     /**
-     * The center of the end of the node on the y axis
+     * The center of the end of the node on the y axis.
+     *
+     * @type number
      */
     this.centery = 0;
 
     /**
-     * the branches that stem from this branch
+     * The branches that stem from this branch.
+     *
+     * @type Branch[]
      */
     this.children = [];
 
     /**
-     * true if the node has been collapsed
-     * @type Boolean
+     * True if the node has been collapsed.
+     *
+     * @type boolean
+     * @default
      */
     this.collapsed = false;
 
     /**
-     * Custom colour for branch, initialised as null to use tree-level default
+     * Custom colour for branch, initialised as null to use tree-level default.
+     *
+     * @type string
      */
     this.colour = null;
 
     /**
-     * an object to hold custom data for this node
+     * Holds custom data for this node.
+     *
+     * @type object
      */
     this.data = {};
 
     /**
-     * This node's highlight status
+     * This node's highlight status.
+     *
+     * @type boolean
+     * @default
      */
     this.highlighted = false;
 
     /**
-     * Whether the user is hovering over the node
+     * Whether the user is hovering over the node.
+     *
+     * @type boolean
      */
     this.hovered = false;
 
     /**
-     * This node's unique ID
+     * This node's unique ID.
+     *
+     * @type string
      */
     this.id = '';
 
     /**
-     * when the branch drawing algorithm needs to switch. For example: where the
-     * Circular algorithm needs to change the colour of the branch.
-     */
-    this.interx = 0;
-
-    /**
-     * when the branch drawing algorithm needs to switch. For example: where the
-     * Circular algorithm needs to change the colour of the branch.
-     */
-    this.intery = 0;
-    /**
-     * The text lable for this node
+     * The text label for this node.
+     *
+     * @type string
      */
     this.label = null;
 
     /**
-     * If true, this node have no children
+     * If true, this node has no children.
+     *
+     * @type boolean
+     * @default
      */
     this.leaf = true;
 
     /**
-     * the angle that the last child of this brach 'splays' at, used for
-     * circular and radial trees
+     * The angle that the last child of this brach 'splays' at, used for
+     * circular trees.
+     *
+     * @type number
+     * @default
      */
     this.maxChildAngle = 0;
 
     /**
-     * the angle that the last child of this brach 'splays' at, used for
-     * circular and radial trees
+     * The angle that the last child of this brach 'splays' at, used for
+     * circular trees.
+     *
+     * @type number
+     * @default
      */
     this.minChildAngle = Angles.FULL;
 
     /**
-     * What kind of teminal should be drawn on this node
+     * What kind of teminal should be drawn on this node.
+     *
+     * @type string
+     * @default
      */
     this.nodeShape = 'circle';
 
     /**
-     * The parent branch of this branch
+     * The parent branch of this branch.
+     *
+     * @type Branch
      */
     this.parent = null;
 
     /**
-     * The relative size of the terminal of this node
+     * The relative size of the terminal of this node.
+     *
+     * @type number
+     * @default
      */
     this.radius = 1.0;
 
     /**
-     * true if this branch is currently selected
+     * True if this branch is currently selected.
+     *
+     * @type boolean
      */
     this.selected = false;
 
     /**
-     * the x position of the start of the branch
-     * @type double
+     * The x position of the start of the branch.
+     *
+     * @type number
      */
     this.startx = 0;
 
     /**
-     * the y position of the start of the branch
-     * @type double
+     * The y position of the start of the branch.
+     *
+     * @type number
      */
     this.starty = 0;
 
     /**
-     * The length from the root of the tree to the tip of this branch
+     * The length from the root of the tree to the tip of this branch.
+     *
+     * @type number
      */
     this.totalBranchLength = 0;
 
     /**
-     * The tree object that this branch is part of
+     * The tree object that this branch is part of.
+     *
      * @type Tree
      */
-    this.tree = {};
+    this.tree = null;
 
     /**
-     * If true, the leaf and label are not rendered.
+     * If true, this branch is not rendered.
+     *
+     * @type boolean
+     * @default
      */
     this.pruned = false;
 
     /**
-     * Allows label to be individually styled
+     * Allows label to be individually styled.
+     *
+     * @type object
+     * @property {string} colour
+     * @property {number} textSize
+     * @property {string} font
+     * @property {string} format - e.g. bold, italic
      */
     this.labelStyle = {};
 
     /**
-     * If false, branch does not respond to mouse events
+     * If false, branch does not respond to mouse events.
+     *
+     * @type boolean
+     * @default
      */
     this.interactive = true;
 
     /**
-     * Defines leaf style (lineWidth, strokeStyle, fillStyle) for individual
-     * leaves, independent of branch colour.
+     * Defines leaf style for this branch.
+     *
+     * @type object
+     * @property {number} lineWidth
+     * @property {string} strokeStyle
+     * @property {string} fillStyle
+     *
+     * @example
+     * branch.leafStyle = {
+     *   lineWidth: 2,
+     *   strokeStyle: '#ff0000',
+     *   fillStyle: 'blue'
+     * };
      */
     this.leafStyle = {};
+
+    /**
+     * Minimum x coordintate.
+     *
+     * @type number
+     */
+    this.minx = 0;
+
+    /**
+     * Minimum y coordintate.
+     *
+     * @type number
+     */
+    this.miny = 0;
+
+    /**
+     * Maximum x coordintate.
+     *
+     * @type number
+     */
+    this.maxx = 0;
+
+    /**
+     * Maximum y coordintate.
+     *
+     * @type number
+     */
+    this.maxy = 0;
   }
 
+  /**
+   * For branches without a label.
+   *
+   * @returns {string} new ID
+   */
   static generateId() {
-    return 'pcn' + this.lastId++;
+    return `pcn${this.lastId++}`;
   }
 
+  /**
+   * True if the branch is highlighted or hovered.
+   *
+   * @type boolean
+   */
   get isHighlighted() {
     return this.highlighted || this.hovered;
   }
 
   /**
-   * The Canvas DOM object the parent tree is drawn on
+   * The canvas drawing context of the parent tree.
+   *
+   * @type CanvasRenderingContext2D
    */
-   get canvas() {
-     return this.tree.canvas;
-   }
+  get canvas() {
+    return this.tree.canvas;
+  }
 
+   /**
+    * Determines if this branch has been clicked.
+    *
+    * @param {number}
+    * @param {number}
+    * @returns {Branch}
+    */
   clicked(x, y) {
     var i;
     var child;
@@ -218,6 +324,9 @@ class Branch {
     }
   }
 
+  /**
+   * @method
+   */
   drawLabel() {
     var fSize = this.getTextSize();
     var label = this.getLabel();
@@ -258,6 +367,13 @@ class Branch {
     }
   }
 
+  /**
+   * Sets the minimum and maximum coordinates of the branch.
+   *
+   * @param {number}
+   * @param {number}
+   * @param {number}
+   */
   setNodeDimensions(centerX, centerY, radius) {
     let boundedRadius = radius;
 
@@ -271,6 +387,12 @@ class Branch {
     this.maxy = centerY + boundedRadius;
   }
 
+  /**
+   * Draws the "collapsed tip".
+   *
+   * @param {number}
+   * @param {number}
+   */
   drawCollapsed(centerX, centerY) {
     const childIds = this.getChildProperties('id');
     let radius = childIds.length;
@@ -292,6 +414,11 @@ class Branch {
     this.canvas.closePath();
   }
 
+  /**
+   * For aligned labels.
+   *
+   * @method
+   */
   drawLabelConnector() {
     const { highlightColour, labelAlign } = this.tree;
     this.canvas.save();
@@ -309,6 +436,9 @@ class Branch {
     this.canvas.restore();
   }
 
+  /**
+   * @method
+   */
   drawLeaf() {
     const { alignLabels, canvas } = this.tree;
 
@@ -327,6 +457,10 @@ class Branch {
     }
   }
 
+  /**
+   * @param {number}
+   * @param {number}
+   */
   drawHighlight(centerX, centerY) {
     this.canvas.save();
     this.canvas.beginPath();
@@ -342,6 +476,9 @@ class Branch {
     this.canvas.restore();
   }
 
+  /**
+   * @method
+   */
   drawBranchLabels() {
     this.canvas.save();
     this.canvas.fillStyle = this.getTextColour();
@@ -368,6 +505,9 @@ class Branch {
     this.canvas.restore();
   }
 
+  /**
+   * Draws the line of the branch.
+   */
   drawNode() {
     var nodeRadius = this.getRadius();
     /**
@@ -405,6 +545,12 @@ class Branch {
     }
   }
 
+  /**
+   * Get property values of leaves under this branch.
+   *
+   * @param {string} - property name
+   * @returns {string[]}
+   */
   getChildProperties(property) {
     if (this.leaf) {
       // Fix for Issue #68
@@ -419,6 +565,9 @@ class Branch {
     return children;
   }
 
+  /**
+   * @returns {number}
+   */
   getChildCount() {
     if (this.leaf) return 1;
 
@@ -429,6 +578,9 @@ class Branch {
     return children;
   }
 
+  /**
+   * @returns {number}
+   */
   getChildYTotal() {
     if (this.leaf) return this.centery;
 
@@ -439,6 +591,13 @@ class Branch {
     return y;
   }
 
+  /**
+   * Set a boolean property of this branch and its descendants.
+   *
+   * @param {string}
+   * @param {boolean}
+   * @param {function=}
+   */
   cascadeFlag(property, value, predicate) {
     if (typeof this[property] === 'undefined') {
       throw new Error(`Unknown property: ${property}`);
@@ -451,6 +610,9 @@ class Branch {
     }
   }
 
+  /**
+   * Resets the coordinates and angle of this branch and its descendants.
+   */
   reset() {
     var child;
     var i;
@@ -465,13 +627,16 @@ class Branch {
     this.maxChildAngle = 0;
     for (i = 0; i < this.children.length; i++) {
       try {
-        this.children[child].pcReset();
+        this.children[child].reset();
       } catch (e) {
         return e;
       }
     }
   }
 
+  /**
+   * Set this branch to be the root.
+   */
   redrawTreeFromBranch() {
     if (this.collapsed) {
       this.expand();
@@ -479,6 +644,9 @@ class Branch {
     this.tree.redrawFromBranch(this);
   }
 
+  /**
+   * Store this branch's children.
+   */
   extractChildren() {
     for (const child of this.children) {
       this.tree.storeNode(child);
@@ -486,6 +654,11 @@ class Branch {
     }
   }
 
+  /**
+   * Walks up the tree looking for a collapsed branch.
+   *
+   * @returns {boolean}
+   */
   hasCollapsedAncestor() {
     if (this.parent) {
       return this.parent.collapsed || this.parent.hasCollapsedAncestor();
@@ -493,15 +666,24 @@ class Branch {
     return false;
   }
 
+  /**
+   * @method
+   */
   collapse() {
     // don't collapse the node if it is a leaf... that would be silly!
     this.collapsed = this.leaf === false;
   }
 
+  /**
+   * @method
+   */
   expand() {
     this.collapsed = false;
   }
 
+  /**
+   * @method
+   */
   toggleCollapsed() {
     if (this.collapsed) {
       this.expand();
@@ -510,6 +692,9 @@ class Branch {
     }
   }
 
+  /**
+   * Sums the length of all branches from this one back to the root.
+   */
   setTotalLength() {
     var c;
 
@@ -528,9 +713,9 @@ class Branch {
   }
 
   /**
-   * Add a child branch to this branch
+   * Add a child branch to this branch.
+   *
    * @param node {Branch} the node to add as a child
-   * @memberof Branch
    */
   addChild(node) {
     node.parent = this;
@@ -541,6 +726,8 @@ class Branch {
 
   /**
    * Return the node colour of all the nodes that are children of this one.
+   *
+   * @returns {string[]}
    */
   getChildColours() {
     var colours = [];
@@ -558,6 +745,8 @@ class Branch {
 
   /**
    * Get the colour(s) of the branch itself.
+   *
+   * @returns {string}
    */
   getColour(specifiedColour) {
     if (this.selected) {
@@ -567,6 +756,11 @@ class Branch {
     return specifiedColour || this.colour || this.tree.branchColour;
   }
 
+  /**
+   * Create a newick representation of this branch.
+   *
+   * @returns {string}
+   */
   getNwk(isRoot = true) {
     if (this.leaf) {
       return `${this.label}:${this.branchLength}`;
@@ -576,6 +770,9 @@ class Branch {
     return `(${childNwks.join(',')}):${this.branchLength}${isRoot ? ';' : ''}`;
   }
 
+  /**
+   * @returns {string}
+   */
   getTextColour() {
     if (this.selected) {
       return this.tree.selectedColour;
@@ -595,36 +792,59 @@ class Branch {
     return this.labelStyle.colour || this.colour || this.tree.branchColour;
   }
 
+  /**
+   * Ensures the return value is always a string.
+   *
+   * @returns {string}
+   */
   getLabel() {
     return (
       (this.label !== undefined && this.label !== null) ? this.label : ''
     );
   }
 
+  /**
+   * @returns {number}
+   */
   getTextSize() {
     return this.labelStyle.textSize || this.tree.textSize;
   }
 
+  /**
+   * @returns {string}
+   */
   getFontString() {
     const font = this.labelStyle.font || this.tree.font;
     return `${this.labelStyle.format || ''} ${this.getTextSize()}pt ${font}`;
   }
 
+  /**
+   * @returns {number} length of label in pixels
+   */
   getLabelSize() {
     this.canvas.font = this.getFontString();
     return this.canvas.measureText(this.getLabel()).width;
   }
 
+  /**
+   * @returns {number}
+   */
   getRadius() {
     return this.leaf ?
       this.tree.baseNodeSize * this.radius :
       this.tree.baseNodeSize / this.radius;
   }
 
+  /**
+   * @returns {number}
+   */
   getDiameter() {
     return this.getRadius() * 2;
   }
 
+  /**
+   * @returns {boolean}
+   */
   hasLabelConnector() {
     if (!this.tree.alignLabels) {
       return false;
@@ -651,10 +871,16 @@ class Branch {
     return offset + Math.min(this.tree.labelPadding, this.tree.labelPadding / this.tree.zoom);
   }
 
+  /**
+   * @returns {number}
+   */
   getHighlightLineWidth() {
     return this.tree.highlightWidth / this.tree.zoom;
   }
 
+  /**
+   * @returns {number}
+   */
   getHighlightRadius() {
     let offset = this.getHighlightLineWidth() * this.tree.highlightSize;
 
@@ -663,10 +889,20 @@ class Branch {
     return this.leaf ? this.getRadius() + offset : offset * 0.666;
   }
 
+  /**
+   * Combination of radius and line width
+   *
+   * @returns {number}
+   */
   getHighlightSize() {
     return this.getHighlightRadius() + this.getHighlightLineWidth();
   }
 
+  /**
+   * Reverses the order of the children. Runs the prerenderer again.
+   *
+   * @method
+   */
   rotate() {
     const newChildren = [];
 
@@ -680,10 +916,21 @@ class Branch {
     this.tree.draw(true);
   }
 
+  /**
+   * @returns {number} index of this branch in its parent's array.
+   */
   getChildNo() {
     return this.parent.children.indexOf(this);
   }
 
+  /**
+   * @param {Object} options
+   * @param {string} options.colour
+   * @param {string} options.shape
+   * @param {number} options.size
+   * @param {Object} options.leafStyle See {@link Branch#leafStyle}
+   * @param {Object} options.labelStyle See {@link Branch#labelStyle}
+   */
   setDisplay({ colour, shape, size, leafStyle, labelStyle }) {
     if (colour) {
       this.colour = colour;
@@ -702,6 +949,9 @@ class Branch {
     }
   }
 
+  /**
+   * @returns {number} the node radius plus label length if labels are shown
+   */
   getTotalLength() {
     let length = this.getRadius();
 
@@ -712,6 +962,13 @@ class Branch {
     return length;
   }
 
+  /**
+   * @returns {Object} bounds
+   * @property {number} minx
+   * @property {number} miny
+   * @property {number} maxx
+   * @property {number} maxy
+   */
   getBounds() {
     const { tree } = this;
     const x = tree.alignLabels ? tree.labelAlign.getX(this) : this.centerx;
@@ -746,6 +1003,12 @@ class Branch {
     return _bounds;
   }
 
+  /**
+   * Merges global and local styles together.
+   *
+   * @returns {Object}
+   * @see {@link Branch#leafStyle}
+   */
   getLeafStyle() {
     const { strokeStyle, fillStyle } = this.leafStyle;
     const { zoom } = this.tree;
@@ -766,7 +1029,13 @@ class Branch {
 
 }
 
-// Static property
+/**
+ * Static counter for generated ids.
+ *
+ * @static
+ * @memberof Branch
+ * @type number
+ */
 Branch.lastId = 0;
 
 export default Branch;
