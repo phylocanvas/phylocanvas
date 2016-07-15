@@ -78,7 +78,7 @@ export class ChildNodesTooltip extends Tooltip {
    * @constructor
    * @param {Tree} tree instance
    * @param {Object} [options]
-   * @see {@link Tooltip}
+   * @see Tooltip
    */
   constructor(tree, options) {
     super(tree, options);

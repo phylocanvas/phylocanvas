@@ -1007,7 +1007,7 @@ class Branch {
    * Merges global and local styles together.
    *
    * @returns {Object}
-   * @see {@link Branch#leafStyle}
+   * @see Branch#leafStyle
    */
   getLeafStyle() {
     const { strokeStyle, fillStyle } = this.leafStyle;

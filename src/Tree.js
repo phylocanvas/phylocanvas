@@ -14,13 +14,13 @@ const { getPixelRatio, translateClick } = canvas;
  * A Phylocanvas instance.
  *
  * @class
+ * @see module:Phylocanvas~createTree
  */
 class Tree {
   /**
    * @constructor
    * @param {string|HTMLElement} element
    * @param {Object} config
-   * @see {@link module:Phylocanvas~createTree}
    */
   constructor(element, config = {}) {
     this._point = { x: 0, y: 0 };
@@ -765,7 +765,7 @@ class Tree {
    *
    * @fires Tree#error
    *
-   * @see {@link Tree#build}
+   * @see Tree#build
    */
   load(inputString, options = {}, callback) {
     let buildOptions = options;
