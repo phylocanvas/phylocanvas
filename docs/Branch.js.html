@@ -1,4 +1,33 @@
-import { constants } from './utils';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Phylocanvas API - Source: Branch.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed|Roboto+Mono" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Branch.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { constants } from './utils';
 
 import nodeRenderers from './nodeRenderers';
 
@@ -311,8 +340,8 @@ class Branch {
     if (this.dragging) {
       return;
     }
-    if ((x < (this.maxx) && x > (this.minx)) &&
-        (y < (this.maxy) && y > (this.miny))) {
+    if ((x &lt; (this.maxx) &amp;&amp; x > (this.minx)) &amp;&amp;
+        (y &lt; (this.maxy) &amp;&amp; y > (this.miny))) {
       return this;
     }
 
@@ -348,8 +377,8 @@ class Branch {
       tx += Math.abs(this.tree.labelAlign.getLabelOffset(this));
     }
 
-    if (this.angle > Angles.QUARTER &&
-        this.angle < (Angles.HALF + Angles.QUARTER)) {
+    if (this.angle > Angles.QUARTER &amp;&amp;
+        this.angle &lt; (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
       // Angles.Half text position changes
       tx = -tx - (this.labelWidth * 1);
@@ -361,8 +390,8 @@ class Branch {
     this.canvas.closePath();
 
     // Rotate canvas back to original position
-    if (this.angle > Angles.QUARTER &&
-        this.angle < (Angles.HALF + Angles.QUARTER)) {
+    if (this.angle > Angles.QUARTER &amp;&amp;
+        this.angle &lt; (Angles.HALF + Angles.QUARTER)) {
       this.canvas.rotate(Angles.HALF);
     }
   }
@@ -377,7 +406,7 @@ class Branch {
   setNodeDimensions(centerX, centerY, radius) {
     let boundedRadius = radius;
 
-    if ((radius * this.tree.zoom) < 5 || !this.leaf) {
+    if ((radius * this.tree.zoom) &lt; 5 || !this.leaf) {
       boundedRadius = 5 / this.tree.zoom;
     }
 
@@ -452,7 +481,7 @@ class Branch {
 
     canvas.restore();
 
-    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
+    if (this.tree.showLabels || (this.tree.hoverLabel &amp;&amp; this.isHighlighted)) {
       this.drawLabel();
     }
   }
@@ -498,7 +527,7 @@ class Branch {
       this.canvas.fillText(this.branchLength.toFixed(2), x, y + em);
     }
 
-    if (this.tree.showInternalNodeLabels && !this.leaf && this.label) {
+    if (this.tree.showInternalNodeLabels &amp;&amp; !this.leaf &amp;&amp; this.label) {
       this.canvas.fillText(this.label, x, y - em);
     }
 
@@ -540,7 +569,7 @@ class Branch {
       this.tree.highlighters.push(this.drawHighlight.bind(this, centerX, centerY));
     }
 
-    if (this.tree.root !== this && this.tree.showBranchLengthLabels || this.tree.showInternalNodeLabels) {
+    if (this.tree.root !== this &amp;&amp; this.tree.showBranchLengthLabels || this.tree.showInternalNodeLabels) {
       this.drawBranchLabels();
     }
   }
@@ -559,7 +588,7 @@ class Branch {
     }
 
     let children = [];
-    for (let x = 0; x < this.children.length; x++) {
+    for (let x = 0; x &lt; this.children.length; x++) {
       children = children.concat(this.children[x].getChildProperties(property));
     }
     return children;
@@ -572,7 +601,7 @@ class Branch {
     if (this.leaf) return 1;
 
     let children = 0;
-    for (let x = 0; x < this.children.length; x++) {
+    for (let x = 0; x &lt; this.children.length; x++) {
       children += this.children[x].getChildCount();
     }
     return children;
@@ -585,7 +614,7 @@ class Branch {
     if (this.leaf) return this.centery;
 
     let y = 0;
-    for (let i = 0; i < this.children.length; i++) {
+    for (let i = 0; i &lt; this.children.length; i++) {
       y += this.children[i].getChildYTotal();
     }
     return y;
@@ -625,7 +654,7 @@ class Branch {
     // this.totalBranchLength = 0;
     this.minChildAngle = Angles.FULL;
     this.maxChildAngle = 0;
-    for (i = 0; i < this.children.length; i++) {
+    for (i = 0; i &lt; this.children.length; i++) {
       try {
         this.children[child].reset();
       } catch (e) {
@@ -707,7 +736,7 @@ class Branch {
       this.totalBranchLength = this.branchLength;
       this.tree.maxBranchLength = this.totalBranchLength;
     }
-    for (c = 0; c < this.children.length; c++) {
+    for (c = 0; c &lt; this.children.length; c++) {
       this.children[c].setTotalLength();
     }
   }
@@ -782,7 +811,7 @@ class Branch {
       return this.tree.highlightColour;
     }
 
-    if (this.tree.backColour && this.children.length) {
+    if (this.tree.backColour &amp;&amp; this.children.length) {
       const childColours = this.getChildColours();
       if (childColours.length === 1) {
         return childColours[0];
@@ -799,7 +828,7 @@ class Branch {
    */
   getLabel() {
     return (
-      (this.label !== undefined && this.label !== null) ? this.label : ''
+      (this.label !== undefined &amp;&amp; this.label !== null) ? this.label : ''
     );
   }
 
@@ -864,7 +893,7 @@ class Branch {
 
     let offset = this.getDiameter();
 
-    if (this.isHighlighted && !hasLabelConnector) {
+    if (this.isHighlighted &amp;&amp; !hasLabelConnector) {
       offset += this.getHighlightSize() - this.getRadius();
     }
 
@@ -955,7 +984,7 @@ class Branch {
   getTotalLength() {
     let length = this.getRadius();
 
-    if (this.tree.showLabels || (this.tree.hoverLabel && this.isHighlighted)) {
+    if (this.tree.showLabels || (this.tree.hoverLabel &amp;&amp; this.isHighlighted)) {
       length += this.getLabelStartX() + this.getLabelSize();
     }
 
@@ -980,8 +1009,8 @@ class Branch {
     let maxx;
     let miny;
     let maxy;
-    if (this.angle > Angles.QUARTER &&
-        this.angle < (Angles.HALF + Angles.QUARTER)) {
+    if (this.angle > Angles.QUARTER &amp;&amp;
+        this.angle &lt; (Angles.HALF + Angles.QUARTER)) {
       minx = x + (totalLength * Math.cos(this.angle));
       miny = y + (totalLength * Math.sin(this.angle));
       maxx = x - nodeSize;
@@ -1039,3 +1068,26 @@ class Branch {
 Branch.lastId = 0;
 
 export default Branch;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h3>Modules</h3><ul><li><a href="module-Phylocanvas.html">Phylocanvas</a></li></ul><h3>Classes</h3><ul><li><a href="Branch.html">Branch</a></li><li><a href="BranchRenderer.html">BranchRenderer</a></li><li><a href="Prerenderer.html">Prerenderer</a></li><li><a href="Tooltip.html">Tooltip</a></li><li><a href="ChildNodesTooltip.html">ChildNodesTooltip</a></li><li><a href="Tree.html">Tree</a></li></ul><h3>Events</h3><ul><li><a href="Tree.html#event:loading">loading</a></li><li><a href="Tree.html#event:beforeFirstDraw">beforeFirstDraw</a></li><li><a href="Tree.html#event:loaded">loaded</a></li><li><a href="Tree.html#event:error">error</a></li><li><a href="Tree.html#event:subtree">subtree</a></li><li><a href="Tree.html#event:updated">updated</a></li><li><a href="Tree.html#event:typechanged">typechanged</a></li></ul><h3>Global</h3><ul><li><a href="global.html#nodeRenderer">nodeRenderer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jul 15 2016 12:56:12 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

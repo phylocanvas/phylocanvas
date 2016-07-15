@@ -1,4 +1,33 @@
-import { dom, events, canvas } from './utils';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Phylocanvas API - Source: Tree.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed|Roboto+Mono" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Tree.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { dom, events, canvas } from './utils';
 
 import Branch from './Branch';
 import { ChildNodesTooltip as Tooltip } from './Tooltip';
@@ -38,14 +67,14 @@ class Tree {
     /**
      * Dictionary of {@link Branch} objects indexed by ID.
      *
-     * @type {Object.<string, Branch>}
+     * @type {Object.&lt;string, Branch>}
      */
     this.branches = {};
 
     /**
      * List of leaves.
      *
-     * @type Array.<Branch>
+     * @type Array.&lt;Branch>
      */
     this.leaves = [];
 
@@ -132,7 +161,7 @@ class Tree {
     /**
      * Stores highlighting functions used during drawing.
      *
-     * @type Array.<Function>
+     * @type Array.&lt;Function>
      */
     this.highlighters = [];
 
@@ -435,7 +464,7 @@ class Tree {
     /**
      * Maximum length of label for each tree type.
      *
-     * @type Object.<string, number>
+     * @type Object.&lt;string, number>
      */
     this.maxLabelLength = {};
 
@@ -468,7 +497,7 @@ class Tree {
    * @type boolean
    */
   get alignLabels() {
-    return this.showLabels && this.labelAlign && this.labelAlignEnabled;
+    return this.showLabels &amp;&amp; this.labelAlign &amp;&amp; this.labelAlignEnabled;
   }
   set alignLabels(value) {
     this.labelAlignEnabled = value;
@@ -484,13 +513,13 @@ class Tree {
     var i;
 
     childIds = node.getChildProperties('id');
-    if (childIds && childIds.length > this.defaultCollapsed.min &&
-        childIds.length < this.defaultCollapsed.max) {
+    if (childIds &amp;&amp; childIds.length > this.defaultCollapsed.min &amp;&amp;
+        childIds.length &lt; this.defaultCollapsed.max) {
       node.collapsed = true;
       return;
     }
 
-    for (i = 0; i < node.children.length; i++) {
+    for (i = 0; i &lt; node.children.length; i++) {
       this.setInitialCollapsedBranches(node.children[i]);
     }
   }
@@ -542,8 +571,8 @@ class Tree {
 
       if (!this.root) return false;
       node = this.getNodeAtMousePosition(e);
-      const isMultiSelectActive = this.multiSelect && (e.metaKey || e.ctrlKey);
-      if (node && node.interactive) {
+      const isMultiSelectActive = this.multiSelect &amp;&amp; (e.metaKey || e.ctrlKey);
+      if (node &amp;&amp; node.interactive) {
         if (isMultiSelectActive) {
           if (node.leaf) {
             node[this.clickFlag] = !node[this.clickFlag];
@@ -561,7 +590,7 @@ class Tree {
           }
           this.draw();
         }
-      } else if (this.unselectOnClickAway && !this.dragging && !isMultiSelectActive) {
+      } else if (this.unselectOnClickAway &amp;&amp; !this.dragging &amp;&amp; !isMultiSelectActive) {
         this.root.cascadeFlag(this.clickFlag, false, this.clickFlagPredicate);
         this.draw();
       }
@@ -599,11 +628,11 @@ class Tree {
       const e = event;
       const nd = this.getNodeAtMousePosition(e);
 
-      if (nd && nd.interactive && (this.internalNodesSelectable || nd.leaf)) {
+      if (nd &amp;&amp; nd.interactive &amp;&amp; (this.internalNodesSelectable || nd.leaf)) {
         this.root.cascadeFlag('hovered', false);
         nd.hovered = true;
         // For mouseover tooltip to show no. of children on the internal nodes
-        if (!nd.leaf && !nd.hasCollapsedAncestor()) {
+        if (!nd.leaf &amp;&amp; !nd.hasCollapsedAncestor()) {
           this.tooltip.open(e.clientX, e.clientY, nd);
         }
         this.containerElement.style.cursor = 'pointer';
@@ -687,7 +716,7 @@ class Tree {
    * @param event
    */
   scroll(event) {
-    if (this.disableZoom || ('wheelDelta' in event && event.wheelDelta === 0)) {
+    if (this.disableZoom || ('wheelDelta' in event &amp;&amp; event.wheelDelta === 0)) {
       return;
     }
 
@@ -695,8 +724,8 @@ class Tree {
 
     this._point.x = event.offsetX;
     this._point.y = event.offsetY;
-    const sign = event.detail < 0 || event.wheelDelta > 0 ? 1 : -1;
-    if (this.branchScaling && (event.metaKey || event.ctrlKey)) {
+    const sign = event.detail &lt; 0 || event.wheelDelta > 0 ? 1 : -1;
+    if (this.branchScaling &amp;&amp; (event.metaKey || event.ctrlKey)) {
       this.currentBranchScale *= Math.pow(this.branchScalingStep, sign);
       this.setBranchScale(this.currentBranchScale, this._point);
     } else {
@@ -713,7 +742,7 @@ class Tree {
     let foundLeaves = [];
 
     for (let leaf of this.leaves) {
-      if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
+      if (leaf[searchProperty] &amp;&amp; leaf[searchProperty].match(pattern)) {
         foundLeaves.push(leaf);
       }
     }
@@ -1110,7 +1139,7 @@ class Tree {
    */
   setBranchScale(scale = 1, point = { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 }) {
     const treeType = treeTypes[this.treeType];
-    if (!treeType.branchScalingAxis || scale < 0) {
+    if (!treeType.branchScalingAxis || scale &lt; 0) {
       return;
     }
 
@@ -1141,7 +1170,7 @@ class Tree {
       this.maxLabelLength[this.treeType] = 0;
     }
 
-    for (let i = 0; i < this.leaves.length; i++) {
+    for (let i = 0; i &lt; this.leaves.length; i++) {
       dimensions = this.canvas.measureText(this.leaves[i].id);
       // finding the maximum label length
       if (dimensions.width > this.maxLabelLength[this.treeType]) {
@@ -1215,9 +1244,9 @@ class Tree {
   }
 
   /**
-   * @param {Array.<Branch>} [leaves=this.leaves]
+   * @param {Array.&lt;Branch>} [leaves=this.leaves]
    *
-   * @returns {Array.<Array.<number>>} bounds - Minimum x and y coordinates in
+   * @returns {Array.&lt;Array.&lt;number>>} bounds - Minimum x and y coordinates in
    * the first array, maximum x and y coordinates in the second.
    *
    * @example const [ [ minx, miny ], [ maxx, maxy ] ] = tree.getBounds()
@@ -1243,7 +1272,7 @@ class Tree {
   /**
    * Zoom to the provided leaves.
    *
-   * @param {Array.<Branch>}
+   * @param {Array.&lt;Branch>}
    */
   fitInPanel(leaves) {
     this.zoom = 1; // calculates consistent bounds
@@ -1322,3 +1351,26 @@ class Tree {
 Tree.prototype.on = Tree.prototype.addListener;
 
 export default Tree;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h3>Modules</h3><ul><li><a href="module-Phylocanvas.html">Phylocanvas</a></li></ul><h3>Classes</h3><ul><li><a href="Branch.html">Branch</a></li><li><a href="BranchRenderer.html">BranchRenderer</a></li><li><a href="Prerenderer.html">Prerenderer</a></li><li><a href="Tooltip.html">Tooltip</a></li><li><a href="ChildNodesTooltip.html">ChildNodesTooltip</a></li><li><a href="Tree.html">Tree</a></li></ul><h3>Events</h3><ul><li><a href="Tree.html#event:loading">loading</a></li><li><a href="Tree.html#event:beforeFirstDraw">beforeFirstDraw</a></li><li><a href="Tree.html#event:loaded">loaded</a></li><li><a href="Tree.html#event:error">error</a></li><li><a href="Tree.html#event:subtree">subtree</a></li><li><a href="Tree.html#event:updated">updated</a></li><li><a href="Tree.html#event:typechanged">typechanged</a></li></ul><h3>Global</h3><ul><li><a href="global.html#nodeRenderer">nodeRenderer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jul 15 2016 12:56:12 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -11,7 +11,7 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
     max: 50,
     color: 'green',
   },
-  padding: 1,
+  padding: 0,
 });
 
 const originalDraw = tree.draw;
@@ -108,19 +108,19 @@ function () {
   // tree.setNodeSize(10);
   // tree.textSize = 20;
 
-  tree.setNodeDisplay('A', {
+  tree.branches.A.setDisplay({
     leafStyle: {
       fillStyle: 'lightgray',
     },
   });
-  tree.setNodeDisplay('B', {
+  tree.branches.B.setDisplay({
     colour: 'red',
     shape: 'triangle',
     leafStyle: {
       fillStyle: 'pink',
     },
   });
-  tree.setNodeDisplay('C', {
+  tree.branches.C.setDisplay({
     colour: 'green',
     shape: 'star',
     leafStyle: {
@@ -130,7 +130,7 @@ function () {
     //   colour: 'red',
     // },
   });
-  tree.setNodeDisplay('D', {
+  tree.branches.D.setDisplay({
     colour: 'blue',
     shape: 'square',
     leafStyle: {
