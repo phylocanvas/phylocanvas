@@ -1,9 +1,3 @@
-/**
- * Overview window
- *
- * @constructor
- * @memberof PhyloCanvas
- */
 function Navigator(tree) {
   this.tree = tree;
   this.cel = document.createElement('canvas');

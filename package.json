@@ -26,7 +26,8 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack-dev-server.config.js --hot --inline --host 0.0.0.0",
     "test": "webpack-dev-server --config webpack-test-server.config.js --port 8081",
-    "build": "webpack"
+    "build": "webpack",
+    "docs": "./bin/docs.sh"
   },
   "dependencies": {},
   "devDependencies": {
@@ -38,14 +39,17 @@
     "chai": "^2.3.0",
     "core-js": "^2.1.3",
     "eslint-config-cgps": "github:imperialcollegelondon/eslint-config-cgps",
+    "jsdoc": "^3.4.0",
     "mocha": "^2.2.4",
     "mocha-loader": "^0.7.1",
     "node-libs-browser": "^0.5.0",
+    "phylocanvas-jsdoc-template": "github:phylocanvas/phylocanvas-jsdoc-template",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
   },
   "files": [
     "dist",
+    "docs",
     "*.md",
     "polyfill.js"
   ]

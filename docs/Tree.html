@@ -1,0 +1,10336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Phylocanvas API - Class: Tree</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed|Roboto+Mono" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: Tree</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            <div class="class-description">A Phylocanvas instance.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Tree">new Tree<span class="signature">(element, config)</span><span class="type-signature"></span><a href="#Tree">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">HTMLElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="originalTree"><span class="type-signature"></span>originalTree<span class="type-signature"> :Object</span><a href="#originalTree">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Stores the state of the tree after parsing.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line79">line 79</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="containerElement"><span class="type-signature"></span>containerElement<span class="type-signature"> :HTMLElement</span><a href="#containerElement">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Places the instance in the DOM. Events are triggered from here.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="branches"><span class="type-signature"></span>branches<span class="type-signature"> :Object.&lt;string, <a href="Branch.html">Branch</a>></span><a href="#branches">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Dictionary of <a href="Branch.html">Branch</a> objects indexed by ID.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line43">line 43</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="leaves"><span class="type-signature"></span>leaves<span class="type-signature"> :Array.&lt;<a href="Branch.html">Branch</a>></span><a href="#leaves">⚓</a></h4>
+
+
+
+
+<div class="description">
+    List of leaves.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="root"><span class="type-signature"></span>root<span class="type-signature"> :<a href="Branch.html">Branch</a></span><a href="#root">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The root node of the tree
+(not neccesarily a root in the Phylogenetic sense)
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="stringRepresentation"><span class="type-signature"></span>stringRepresentation<span class="type-signature"> :string</span><a href="#stringRepresentation">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Stores the unparsed tree.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="backColour"><span class="type-signature"></span>backColour<span class="type-signature"> :boolean</span><a href="#backColour">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Colour the branches of the tree based on the colour of the tips.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line72">line 72</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="canvas"><span class="type-signature"></span>canvas<span class="type-signature"> :CanvasRenderingContext2D</span><a href="#canvas">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Canvas drawing context.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line101">line 101</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="defaultCollapsed"><span class="type-signature"></span>defaultCollapsed<span class="type-signature"> :object</span><a href="#defaultCollapsed">⚓</a></h4>
+
+
+
+
+<div class="description">
+    A minimum and maximum number of child branches within which to
+automatically collapse branches on the first draw.
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>min</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line116">line 116</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="tooltip"><span class="type-signature"></span>tooltip<span class="type-signature"> :<a href="Tooltip.html">Tooltip</a></span><a href="#tooltip">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The default tooltip showing number of child branches.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line123">line 123</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="drawn"><span class="type-signature"></span>drawn<span class="type-signature"> :boolean</span><a href="#drawn">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Has Tree been drawn already, true after first draw.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line130">line 130</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="highlighters"><span class="type-signature"></span>highlighters<span class="type-signature"> :Array.&lt;function()></span><a href="#highlighters">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Stores highlighting functions used during drawing.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line137">line 137</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="zoom"><span class="type-signature"></span>zoom<span class="type-signature"> :number</span><a href="#zoom">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The current level of zoom.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line144">line 144</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="zoomFactor"><span class="type-signature"></span>zoomFactor<span class="type-signature"> :number</span><a href="#zoomFactor">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Controls the speed of zooming. Recommended values are between 1 and 5.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>3</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line152">line 152</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="disableZoom"><span class="type-signature"></span>disableZoom<span class="type-signature"> :boolean</span><a href="#disableZoom">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line158">line 158</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="fillCanvas"><span class="type-signature"></span>fillCanvas<span class="type-signature"> :boolean</span><a href="#fillCanvas">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Force rectangular and hierarchical trees to use the canvas dimensions
+instead of the number of leaves for proportion at the prerender stage.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line167">line 167</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="branchScaling"><span class="type-signature"></span>branchScaling<span class="type-signature"> :boolean</span><a href="#branchScaling">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Enable branch scaling.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line176">line 176</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="currentBranchScale"><span class="type-signature"></span>currentBranchScale<span class="type-signature"> :number</span><a href="#currentBranchScale">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The current branch scale.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line183">line 183</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="branchScalingStep"><span class="type-signature"></span>branchScalingStep<span class="type-signature"> :number</span><a href="#branchScalingStep">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The ratio at which branches scale.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line190">line 190</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="pickedup"><span class="type-signature"></span>pickedup<span class="type-signature"> :boolean</span><a href="#pickedup">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Whether a click has been detected.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="dragging"><span class="type-signature"></span>dragging<span class="type-signature"> :boolean</span><a href="#dragging">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Whether the user is dragging.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line205">line 205</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="startx"><span class="type-signature"></span>startx<span class="type-signature"> :number</span><a href="#startx">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The starting x coordinate of a drag.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line212">line 212</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="starty"><span class="type-signature"></span>starty<span class="type-signature"> :number</span><a href="#starty">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The starting y coordinate of a drag.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line218">line 218</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="baseNodeSize"><span class="type-signature"></span>baseNodeSize<span class="type-signature"> :number</span><a href="#baseNodeSize">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Factor with which to scale the radius of a leaf.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>1</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line226">line 226</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="origx"><span class="type-signature"></span>origx<span class="type-signature"> :number</span><a href="#origx">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Caches the offsetx when a click is detected.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line233">line 233</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="origy"><span class="type-signature"></span>origy<span class="type-signature"> :number</span><a href="#origy">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Caches the offsety when a click is detected.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line239">line 239</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="offsetx"><span class="type-signature"></span>offsetx<span class="type-signature"> :number</span><a href="#offsetx">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The x coordinate from which to begin drawing from.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line247">line 247</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="offsety"><span class="type-signature"></span>offsety<span class="type-signature"> :number</span><a href="#offsety">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The y coordinate from which to begin drawing from.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line253">line 253</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="selectedColour"><span class="type-signature"></span>selectedColour<span class="type-signature"> :string</span><a href="#selectedColour">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The colour to apply to a selected branch.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>rgba(49,151,245,1)</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line262">line 262</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="highlightColour"><span class="type-signature"></span>highlightColour<span class="type-signature"> :string</span><a href="#highlightColour">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The colour to apply to a hihglighted branch.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>rgba(49,151,245,1)</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line270">line 270</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="highlightWidth"><span class="type-signature"></span>highlightWidth<span class="type-signature"> :number</span><a href="#highlightWidth">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The line width of the halo on a highlighted branch.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>4</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line278">line 278</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="highlightSize"><span class="type-signature"></span>highlightSize<span class="type-signature"> :number</span><a href="#highlightSize">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Scale factor for the size of the the halo on a highlighted branch.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>2</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line286">line 286</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="branchColour"><span class="type-signature"></span>branchColour<span class="type-signature"> :string</span><a href="#branchColour">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Global branch colour,
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>rgba(0,0,0,1)</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line294">line 294</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="branchScalar"><span class="type-signature"></span>branchScalar<span class="type-signature"> :number</span><a href="#branchScalar">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Scale factor applied to branch lengths defined in the serialised
+representation of the tree.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line302">line 302</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="padding"><span class="type-signature"></span>padding<span class="type-signature"> :number</span><a href="#padding">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Space to add to bounds when fitting the tree to the canvas.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>50</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line310">line 310</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="labelPadding"><span class="type-signature"></span>labelPadding<span class="type-signature"> :number</span><a href="#labelPadding">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Space between a leaf and its label.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>5</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line318">line 318</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="multiSelect"><span class="type-signature"></span>multiSelect<span class="type-signature"> :boolean</span><a href="#multiSelect">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Enable/disable shift-click multi-selection.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line327">line 327</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="clickFlag"><span class="type-signature"></span>clickFlag<span class="type-signature"> :string</span><a href="#clickFlag">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Flag to change on branch when clicked.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>selected</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line335">line 335</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hoverLabel"><span class="type-signature"></span>hoverLabel<span class="type-signature"> :boolean</span><a href="#hoverLabel">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Show labels when hovering over node.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line357">line 357</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="internalNodesSelectable"><span class="type-signature"></span>internalNodesSelectable<span class="type-signature"> :boolean</span><a href="#internalNodesSelectable">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line363">line 363</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="showLabels"><span class="type-signature"></span>showLabels<span class="type-signature"> :boolean</span><a href="#showLabels">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line369">line 369</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="showBranchLengthLabels"><span class="type-signature"></span>showBranchLengthLabels<span class="type-signature"> :boolean</span><a href="#showBranchLengthLabels">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line374">line 374</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="showInternalNodeLabels"><span class="type-signature"></span>showInternalNodeLabels<span class="type-signature"> :boolean</span><a href="#showInternalNodeLabels">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line379">line 379</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="maxBranchLength"><span class="type-signature"></span>maxBranchLength<span class="type-signature"> :number</span><a href="#maxBranchLength">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Stores the length of the longest branch on the tree.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line389">line 389</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="lineWidth"><span class="type-signature"></span>lineWidth<span class="type-signature"> :number</span><a href="#lineWidth">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The visible width of the branches.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>1</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line397">line 397</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="textSize"><span class="type-signature"></span>textSize<span class="type-signature"> :number</span><a href="#textSize">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The size of the labels, scaled to the size of the tree on first draw.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line404">line 404</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="font"><span class="type-signature"></span>font<span class="type-signature"> :string</span><a href="#font">⚓</a></h4>
+
+
+
+
+<div class="description">
+    The font of the labels.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line411">line 411</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="unselectOnClickAway"><span class="type-signature"></span>unselectOnClickAway<span class="type-signature"> :boolean</span><a href="#unselectOnClickAway">⚓</a></h4>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line418">line 418</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="farthestNodeFromRootX"><span class="type-signature"></span>farthestNodeFromRootX<span class="type-signature"> :number</span><a href="#farthestNodeFromRootX">⚓</a></h4>
+
+
+
+
+<div class="description">
+    X coordinate of node that is furthest from the root.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line426">line 426</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="farthestNodeFromRootY"><span class="type-signature"></span>farthestNodeFromRootY<span class="type-signature"> :number</span><a href="#farthestNodeFromRootY">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Y coordinate of node that is furthest from the root.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line432">line 432</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="maxLabelLength"><span class="type-signature"></span>maxLabelLength<span class="type-signature"> :Object.&lt;string, number></span><a href="#maxLabelLength">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Maximum length of label for each tree type.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line440">line 440</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="alignLabels"><span class="type-signature"></span>alignLabels<span class="type-signature"> :boolean</span><a href="#alignLabels">⚓</a></h4>
+
+
+
+
+<div class="description">
+    Set/get if labels are currently aligned.
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line470">line 470</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="clickFlagPredicate">clickFlagPredicate<span class="signature">(branch, property, value)</span><span class="type-signature"></span><a href="#clickFlagPredicate">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Decide if a branch should be affected when clicked.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>branch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    boolean
+</div>
+
+
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>A function returning true.</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line349">line 349</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setInitialCollapsedBranches">setInitialCollapsedBranches<span class="signature">(node<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span><a href="#setInitialCollapsedBranches">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Collapses branches based on <a href="Tree.html#defaultCollapsed">Tree#defaultCollapsed</a>.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    this.root
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line482">line 482</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getNodeAtMousePosition">getNodeAtMousePosition<span class="signature">(event)</span><span class="type-signature"> &rarr; {<a href="Branch.html">Branch</a>}</span><a href="#getNodeAtMousePosition">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">MouseEvent</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line502">line 502</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getSelectedNodeIds">getSelectedNodeIds<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;<a href="Branch.html">Branch</a>>}</span><a href="#getSelectedNodeIds">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Selected leaves
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line509">line 509</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getNodeIdsWithFlag">getNodeIdsWithFlag<span class="signature">(flag, value<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="Branch.html">Branch</a>>}</span><a href="#getNodeIdsWithFlag">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>flag</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            
+                <td class="description last">
+                A boolean property of the branch
+                </td>
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            
+                <td class="description last">
+                
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line518">line 518</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="clicked">clicked<span class="signature">(e)</span><span class="type-signature"></span><a href="#clicked">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Event listener for click events.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>e</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">MouseEvent</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line532">line 532</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="drag">drag<span class="signature">(event)</span><span class="type-signature"></span><a href="#drag">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Handles dragging and hovering.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">MouseEvent</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line582">line 582</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="draw">draw<span class="signature">(forceRedraw)</span><span class="type-signature"></span><a href="#draw">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Draws the frame.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>forceRedraw</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                Also run the prerenderer.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line624">line 624</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="pickup">pickup<span class="signature">(event)</span><span class="type-signature"></span><a href="#pickup">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Mousedown event handler
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">MouseEvent</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line663">line 663</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="drop">drop<span class="signature">()</span><span class="type-signature"></span><a href="#drop">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    mouseup event handler.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line679">line 679</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="scroll">scroll<span class="signature">(event)</span><span class="type-signature"></span><a href="#scroll">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Mousewheel event handler.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line689">line 689</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="findLeaves">findLeaves<span class="signature">(pattern, searchProperty<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="Branch.html">Branch</a>>}</span><a href="#findLeaves">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pattern</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">RegExp</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>searchProperty</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    id
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line712">line 712</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="updateLeaves">updateLeaves<span class="signature">(leaves, property, value)</span><span class="type-signature"></span><a href="#updateLeaves">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>leaves</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:updated">Tree#event:updated</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line731">line 731</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="clearSelect">clearSelect<span class="signature">()</span><span class="type-signature"></span><a href="#clearSelect">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Deselects all branches, implicitly calls <a href="Tree.html#draw">Tree#draw</a>.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line745">line 745</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getPngUrl">getPngUrl<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span><a href="#getPngUrl">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Base64-encoded data uri of canvas
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line753">line 753</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="load">load<span class="signature">(inputString, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span><a href="#load">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Loads a serialised representation of a tree, using the first registered
+parser that validates the input unless a format is specified.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inputString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                
+                </td>
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                also passed on to the parser.
+                    <h6>Properties</h6>
+                    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>format</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                specify the parser to use.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+                
+                </td>
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                Called synchronously *after* the first draw.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:error">Tree#event:error</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line770">line 770</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="Tree.html#build">Tree#build</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="saveOriginalTree">saveOriginalTree<span class="signature">()</span><span class="type-signature"></span><a href="#saveOriginalTree">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Builds the <a href="Tree.html#originalTree">Tree#originalTree</a> object.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line809">line 809</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="clearState">clearState<span class="signature">()</span><span class="type-signature"></span><a href="#clearState">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Clears the branches and leaves of the instance.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line820">line 820</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="extractNestedBranches">extractNestedBranches<span class="signature">()</span><span class="type-signature"></span><a href="#extractNestedBranches">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Build <a href="Tree.html#branches">Tree#branches</a> and <a href="Tree.html#leaves">Tree#leaves</a> properties.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line830">line 830</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="saveState">saveState<span class="signature">()</span><span class="type-signature"></span><a href="#saveState">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    High-level API to organising branches and leaves.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:error">Tree#event:error</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line843">line 843</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="build">build<span class="signature">(formatString, parser, options)</span><span class="type-signature"></span><a href="#build">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Builds the object model of a tree.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>formatString</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parser</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Parser</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:error">Tree#event:error</a></li>
+
+    <li><a href="Tree.html#event:beforeFirstDraw">Tree#event:beforeFirstDraw</a></li>
+
+    <li>Tree#event:loadCompleted</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line867">line 867</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="redrawFromBranch">redrawFromBranch<span class="signature">(node)</span><span class="type-signature"></span><a href="#redrawFromBranch">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Draw a subtree.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                the new root of the tree.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:subtree">Tree#event:subtree</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line906">line 906</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="redrawOriginalTree">redrawOriginalTree<span class="signature">()</span><span class="type-signature"></span><a href="#redrawOriginalTree">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Reload the serialised version of the tree.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line925">line 925</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="storeNode">storeNode<span class="signature">(node)</span><span class="type-signature"></span><a href="#storeNode">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Traverse the tree, generating ids and filing away objects.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                starting point.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line934">line 934</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setNodeSize">setNodeSize<span class="signature">(size)</span><span class="type-signature"></span><a href="#setNodeSize">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>size</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line959">line 959</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setRoot">setRoot<span class="signature">(node)</span><span class="type-signature"></span><a href="#setRoot">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line967">line 967</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setTextSize">setTextSize<span class="signature">(size)</span><span class="type-signature"></span><a href="#setTextSize">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>size</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line975">line 975</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setFontSize">setFontSize<span class="signature">(ystep)</span><span class="type-signature"></span><a href="#setFontSize">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Sets an appropriate font size for the proportions of the tree.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ystep</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                the space between leaves.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line985">line 985</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setTreeType">setTreeType<span class="signature">(type, quiet<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span><a href="#setTreeType">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                The name of a registered tree type.
+                </td>
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>quiet</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            
+                <td class="description last">
+                Do not broadcast.
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+    <li><a href="Tree.html#event:typechanged">Tree#event:typechanged</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line996">line 996</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setSize">setSize<span class="signature">(width, height)</span><span class="type-signature"></span><a href="#setSize">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Resizes the canvas element.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1027">line 1027</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="adjustForPixelRatio">adjustForPixelRatio<span class="signature">()</span><span class="type-signature"></span><a href="#adjustForPixelRatio">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Scale the size of the canvas element to the pixel ratio
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1039">line 1039</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getCentrePoint">getCentrePoint<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span><a href="#getCentrePoint">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    point w/ x and y coordinates
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1054">line 1054</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setZoom">setZoom<span class="signature">(zoom, point<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span><a href="#setZoom">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Zoom to a specific level over a specific point.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>zoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>point</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Tree#getCentrePoint
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1068">line 1068</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="smoothZoom">smoothZoom<span class="signature">(steps, point)</span><span class="type-signature"></span><a href="#smoothZoom">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Zoom in or out from the current zoom level towards a point.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+        <th class="last">Description</th>
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>steps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                positive to zoom in, negative to zoom out.
+                </td>
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>point</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+                <td class="description last">
+                
+                </td>
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1084">line 1084</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="calculateZoomedOffset">calculateZoomedOffset<span class="signature">(offset, coord, oldZoom, newZoom)</span><span class="type-signature"></span><a href="#calculateZoomedOffset">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Magic to enable zooming to a point.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>coord</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>oldZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Khalil Abudahab</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1101">line 1101</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setBranchScale">setBranchScale<span class="signature">(scale, point)</span><span class="type-signature"></span><a href="#setBranchScale">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Scale branches horizontally
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>scale</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>point</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1111">line 1111</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="toggleLabels">toggleLabels<span class="signature">()</span><span class="type-signature"></span><a href="#toggleLabels">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1130">line 1130</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setMaxLabelLength">setMaxLabelLength<span class="signature">()</span><span class="type-signature"></span><a href="#setMaxLabelLength">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1138">line 1138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="addListener">addListener<span class="signature">(event, listener)</span><span class="type-signature"></span><a href="#addListener">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1213">line 1213</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getBounds">getBounds<span class="signature">(leaves<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array.&lt;Array.&lt;number>>}</span><a href="#getBounds">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>leaves</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    this.leaves
+                
+                </td>
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    bounds - Minimum x and y coordinates in
+the first array, maximum x and y coordinates in the second.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;Array.&lt;number>></span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const [ [ minx, miny ], [ maxx, maxy ] ] = tree.getBounds()</code></pre>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1225">line 1225</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="fitInPanel">fitInPanel<span class="signature">(leaves)</span><span class="type-signature"></span><a href="#fitInPanel">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Zoom to the provided leaves.
+</div>
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>leaves</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="Branch.html">Branch</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1248">line 1248</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="resetTree">resetTree<span class="signature">()</span><span class="type-signature"></span><a href="#resetTree">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Reapply data in <a href="Tree.html#originalTree">Tree#originalTree</a>.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1281">line 1281</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="rotateBranch">rotateBranch<span class="signature">(branch)</span><span class="type-signature"></span><a href="#rotateBranch">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>branch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1297">line 1297</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="exportNwk">exportNwk<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span><a href="#exportNwk">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Newick representation of current object model.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1304">line 1304</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="resizeToContainer">resizeToContainer<span class="signature">()</span><span class="type-signature"></span><a href="#resizeToContainer">⚓</a></h4>
+
+    
+
+
+
+<div class="description">
+    Resize canvas element to container.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1312">line 1312</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="on">on<span class="signature">()</span><span class="type-signature"></span><a href="#on">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1322">line 1322</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="Tree.html#addListener">Tree#addListener</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+        
+    
+
+    
+
+    
+        <h3 class="subsection-title">Events</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:loading">loading<a href="#event:loading">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1153">line 1153</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:beforeFirstDraw">beforeFirstDraw<a href="#event:beforeFirstDraw">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1160">line 1160</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:loaded">loaded<a href="#event:loaded">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1167">line 1167</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:error">error<a href="#event:error">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1174">line 1174</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:subtree">subtree<a href="#event:subtree">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Branch.html">Branch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1182">line 1182</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:updated">updated<a href="#event:updated">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>nodeIds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>append</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1190">line 1190</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:typechanged">typechanged<a href="#event:typechanged">⚓</a></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>oldType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Tree.js.html">Tree.js</a>, <a href="Tree.js.html#line1200">line 1200</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h3>Modules</h3><ul><li><a href="module-Phylocanvas.html">Phylocanvas</a></li></ul><h3>Classes</h3><ul><li><a href="Branch.html">Branch</a></li><li><a href="BranchRenderer.html">BranchRenderer</a></li><li><a href="Prerenderer.html">Prerenderer</a></li><li><a href="Tooltip.html">Tooltip</a></li><li><a href="ChildNodesTooltip.html">ChildNodesTooltip</a></li><li><a href="Tree.html">Tree</a></li></ul><h3>Events</h3><ul><li><a href="Tree.html#event:loading">loading</a></li><li><a href="Tree.html#event:beforeFirstDraw">beforeFirstDraw</a></li><li><a href="Tree.html#event:loaded">loaded</a></li><li><a href="Tree.html#event:error">error</a></li><li><a href="Tree.html#event:subtree">subtree</a></li><li><a href="Tree.html#event:updated">updated</a></li><li><a href="Tree.html#event:typechanged">typechanged</a></li></ul><h3>Global</h3><ul><li><a href="global.html#nodeRenderer">nodeRenderer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jul 15 2016 12:56:12 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

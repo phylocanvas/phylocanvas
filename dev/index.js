@@ -2,6 +2,8 @@ require('../src/polyfill');
 
 import PhyloCanvas, * as phyloComponents from '../src/index';
 
+import { undoPointTranslation } from '../src/utils/canvas';
+
 const buttonForm = document.getElementById('buttons');
 const tree = PhyloCanvas.createTree('phylocanvas', {
   defaultCollapsed: {
@@ -9,14 +11,19 @@ const tree = PhyloCanvas.createTree('phylocanvas', {
     max: 50,
     color: 'green',
   },
-  padding: 1,
+  padding: 0,
 });
 
 const originalDraw = tree.draw;
 tree.draw = (...args) => {
   originalDraw.apply(tree, args);
   const bounds = tree.getBounds();
-  tree.canvas.strokeRect(bounds[0][0], bounds[0][1], bounds[1][0] - bounds[0][0], bounds[1][1] - bounds[0][1]);
+
+  const min = undoPointTranslation({ x: bounds[0][0], y: bounds[0][1] }, tree);
+  const max = undoPointTranslation({ x: bounds[1][0], y: bounds[1][1] }, tree);
+  tree.canvas.strokeRect(
+    min.x, min.y, max.x - min.x, max.y - min.y
+  );
 };
 
 // create buttons
@@ -101,19 +108,19 @@ function () {
   // tree.setNodeSize(10);
   // tree.textSize = 20;
 
-  tree.setNodeDisplay('A', {
+  tree.branches.A.setDisplay({
     leafStyle: {
       fillStyle: 'lightgray',
     },
   });
-  tree.setNodeDisplay('B', {
+  tree.branches.B.setDisplay({
     colour: 'red',
     shape: 'triangle',
     leafStyle: {
       fillStyle: 'pink',
     },
   });
-  tree.setNodeDisplay('C', {
+  tree.branches.C.setDisplay({
     colour: 'green',
     shape: 'star',
     leafStyle: {
@@ -123,7 +130,7 @@ function () {
     //   colour: 'red',
     // },
   });
-  tree.setNodeDisplay('D', {
+  tree.branches.D.setDisplay({
     colour: 'blue',
     shape: 'square',
     leafStyle: {

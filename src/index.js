@@ -1,14 +1,3 @@
-/**
- * PhyloCanvas - A JavaScript and HTML5 Canvas Phylogenetic tree drawing tool.
- *
- * @author Chris Powell (c.powell@imperial.ac.uk)
- * @modified Jyothish NT 01/03/15
- */
-
-/**
- * @namespace PhyloCanvas
- */
-
 import Tree from './Tree';
 import Branch from './Branch';
 import Prerenderer from './Prerenderer';
@@ -19,23 +8,43 @@ import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 import * as utils from './utils';
 
-export { Tree, Branch, Prerenderer, Tooltip, Parser, treeTypes, nodeRenderers, utils };
-
 function decorate(object, fnName, fn) {
-  let target = object[fnName] ? object : object.prototype;
-  let originalFn = target[fnName];
+  const target = object[fnName] ? object : object.prototype;
+  const originalFn = target[fnName];
 
   target[fnName] = function (...args) {
     return fn.call(this, originalFn, args);
   };
 }
 
+/**
+ * The publicly exported module. Exports the following methods by default, and
+ * contains named exports of internal classes, types, and utils.
+ *
+ * @module Phylocanvas
+ */
+
+export { Tree, Branch, Prerenderer, Tooltip, Parser, treeTypes, nodeRenderers, utils };
+
+/**
+ * Register a plugin.
+ *
+ * @param {function} pluginFn - Imported plugin module.
+ */
 function plugin(pluginFn) {
   pluginFn.call(this, decorate);
 }
 
-function createTree(element, conf = {}) {
-  return new Tree(element, conf);
+/**
+ * A factory function for Phylocanvas instances to enable decoration by plugins.
+ *
+ * @param {string|HTMLElement} element - ID or element within which to place Phylocanvas instance.
+ * @param {Object} config - Configuration object, properties are copied into the {@link Tree} object.
+ *
+ * @return An instance of {@link Tree}.
+ */
+function createTree(element, config = {}) {
+  return new Tree(element, config);
 }
 
 export default { plugin, createTree };
