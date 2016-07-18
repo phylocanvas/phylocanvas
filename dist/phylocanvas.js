@@ -196,6 +196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A Phylocanvas instance.
 	 *
 	 * @class
+	 * @see module:Phylocanvas~createTree
 	 */
 
 	var Tree = function () {
@@ -203,7 +204,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @constructor
 	   * @param {string|HTMLElement} element
 	   * @param {Object} config
-	   * @see {@link module:Phylocanvas~createTree}
 	   */
 
 	  function Tree(element) {
@@ -1060,7 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *
 	     * @fires Tree#error
 	     *
-	     * @see {@link Tree#build}
+	     * @see Tree#build
 	     */
 
 	  }, {
@@ -3340,7 +3340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Merges global and local styles together.
 	     *
 	     * @returns {Object}
-	     * @see {@link Branch#leafStyle}
+	     * @see Branch#leafStyle
 	     */
 
 	  }, {
@@ -3667,7 +3667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @constructor
 	   * @param {Tree} tree instance
 	   * @param {Object} [options]
-	   * @see {@link Tooltip}
+	   * @see Tooltip
 	   */
 
 	  function ChildNodesTooltip(tree, options) {
