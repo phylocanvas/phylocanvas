@@ -6,7 +6,7 @@ import { ChildNodesTooltip as Tooltip } from './Tooltip';
 import treeTypes from './treeTypes';
 import parsers from './parsers';
 
-const { addClass } = dom;
+const { addClass, setCursorDrag, setCursorDragging } = dom;
 const { fireEvent, addEvent } = events;
 const { getPixelRatio, translateClick } = canvas;
 
@@ -431,6 +431,11 @@ class Tree {
      */
     this.farthestNodeFromRootY = 0;
 
+    /**
+     * Require the 'shift' key to be depressed to allow dragging
+     */
+    this.shiftKeyDrag = false;
+
 
     /**
      * Maximum length of label for each tree type.
@@ -594,6 +599,7 @@ class Tree {
         this.offsety = this.origy + ymove;
         this.draw();
       }
+      setCursorDragging(this.containerElement);
     } else {
       // hover
       const e = event;
@@ -610,7 +616,11 @@ class Tree {
       } else {
         this.tooltip.close();
         this.root.cascadeFlag('hovered', false);
-        this.containerElement.style.cursor = 'auto';
+        if (this.shiftKeyDrag && e.shiftKey) {
+          setCursorDrag(this.containerElement);
+        } else {
+          this.containerElement.style.cursor = 'auto';
+        }
       }
       this.draw();
     }
@@ -661,16 +671,18 @@ class Tree {
    * @param {MouseEvent} event
    */
   pickup(event) {
-    if (!this.drawn) return false;
-    this.origx = this.offsetx;
-    this.origy = this.offsety;
+    if (!this.shiftKeyDrag || event.shiftKey) {
+      if (!this.drawn) return false;
+      this.origx = this.offsetx;
+      this.origy = this.offsety;
 
-    if (event.button === 0) {
-      this.pickedup = true;
+      if (event.button === 0) {
+        this.pickedup = true;
+      }
+
+      this.startx = event.clientX;
+      this.starty = event.clientY;
     }
-
-    this.startx = event.clientX;
-    this.starty = event.clientY;
   }
 
   /**
