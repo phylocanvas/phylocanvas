@@ -76,3 +76,23 @@ export function hasClass(element, className) {
 
   return index !== -1;
 }
+
+/**
+ * Setting the cursor to dragging required vendor prefixes.
+ * @param domElement
+ */
+export function setCursorDragging(domElement) {
+  domElement.style.cursor = "-webkit-grabbing";
+  domElement.style.cursor = "-moz-grabbing";
+  domElement.style.cursor = "grabbing";
+}
+
+/**
+ * Setting the cursor to drag required vendor prefixes.
+ * @param domElement
+ */
+export function setCursorDrag(domElement) {
+  domElement.style.cursor = "-webkit-grab";
+  domElement.style.cursor = "-moz-grab";
+  domElement.style.cursor = "grab";
+}
