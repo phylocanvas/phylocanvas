@@ -217,6 +217,17 @@ class Branch {
     this.labelStyle = {};
 
     /**
+     * Allows label to be individually styled.
+     *
+     * @type object
+     * @property {string} colour
+     * @property {number} textSize
+     * @property {string} font
+     * @property {string} format - e.g. bold, italic
+     */
+    this.internalLabelStyle = null;
+
+    /**
      * If false, branch does not respond to mouse events.
      *
      * @type boolean
@@ -481,8 +492,10 @@ class Branch {
    */
   drawBranchLabels() {
     this.canvas.save();
-    this.canvas.fillStyle = this.getTextColour();
-    this.canvas.font = `${this.tree.textSize}pt ${this.tree.font}`;
+    const labelStyle = this.internalLabelStyle || this.tree.internalLabelStyle;
+    this.canvas.fillStyle = labelStyle.colour;
+    this.canvas.font =
+      `${labelStyle.format} ${labelStyle.textSize}pt ${labelStyle.font}`;
     this.canvas.textBaseline = 'middle';
     this.canvas.textAlign = 'center';
     const em = this.canvas.measureText('M').width * 2 / 3;
@@ -788,7 +801,6 @@ class Branch {
         return childColours[0];
       }
     }
-
     return this.labelStyle.colour || this.colour || this.tree.branchColour;
   }
 

@@ -378,6 +378,22 @@ class Tree {
      */
     this.showInternalNodeLabels = false;
 
+    /**
+     * Global style for internal labels on branches.
+     *
+     * @type object
+     * @property {string} colour
+     * @property {number} textSize
+     * @property {string} font
+     * @property {string} format - e.g. bold, italic
+     */
+    this.internalLabelStyle = {
+      colour: this.branchColour,
+      textSize: this.textSize,
+      font: this.font,
+      format: '',
+    };
+
 
     this.setTreeType('radial');
 

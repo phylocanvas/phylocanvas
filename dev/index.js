@@ -98,6 +98,10 @@ tree.setTreeType('rectangular');
 tree.clickFlag = 'highlighted';
 tree.clickFlagPredicate = node => node.leaf;
 
+tree.showInternalNodeLabels = true;
+tree.showBranchLengthLabels = true;
+tree.internalLabelStyle.colour = 'red';
+
 // ./data/tree.nwk
 // (A:0.1,B:0.1,(C:0.1,D:0.1):0.1);
 tree.load(
