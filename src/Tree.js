@@ -628,7 +628,6 @@ class Tree {
         this.offsety = this.origy + ymove;
         this.draw();
       }
-      setCursorDragging(this.containerElement);
     } else {
       // hover
       const e = event;
@@ -645,7 +644,7 @@ class Tree {
       } else {
         this.tooltip.close();
         this.root.cascadeFlag('hovered', false);
-        if (this.shiftKeyDrag && e.shiftKey) {
+        if (!this.shiftKeyDrag || (this.shiftKeyDrag && e.shiftKey)) {
           setCursorDrag(this.containerElement);
         } else {
           this.containerElement.style.cursor = 'auto';
@@ -707,6 +706,7 @@ class Tree {
 
       if (event.button === 0) {
         this.pickedup = true;
+        setCursorDragging(this.containerElement);
       }
 
       this.startx = event.clientX;
@@ -717,9 +717,12 @@ class Tree {
   /**
    * mouseup event handler.
    */
-  drop() {
+  drop(event) {
     if (!this.drawn) return false;
     this.pickedup = false;
+    if (!this.shiftKeyDrag || event.shiftKey) {
+      setCursorDrag(this.containerElement);
+    }
   }
 
   /**

@@ -81,6 +81,17 @@ zoomCheckbox.addEventListener('change', (e) => {
 zoomLabel.appendChild(zoomCheckbox);
 document.body.appendChild(zoomLabel);
 
+const shiftKeyDragLabel = document.createElement('label');
+shiftKeyDragLabel.innerHTML = 'Shift-key Drag';
+const shiftKeyDragCheckbox = document.createElement('input');
+shiftKeyDragCheckbox.type = 'checkbox';
+shiftKeyDragCheckbox.checked = false;
+shiftKeyDragCheckbox.addEventListener('change', (e) => {
+  tree.shiftKeyDrag = e.target.checked;
+});
+shiftKeyDragLabel.appendChild(shiftKeyDragCheckbox);
+document.body.appendChild(shiftKeyDragLabel);
+
 
 tree.on('error', function (event) { throw event.error; });
 
@@ -142,8 +153,6 @@ function () {
       fillStyle: 'lightblue',
     },
   });
-
-  tree.shiftKeyDrag = true;
 
   // tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
 
