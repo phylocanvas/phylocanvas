@@ -507,7 +507,8 @@ class Branch {
       this.centery :
       (this.starty + this.centery) / 2;
 
-    if (this.tree.showBranchLengthLabels) {
+    if (this.tree.showBranchLengthLabels &&
+      this.tree.branchLengthLabelPredicate(this)) {
       this.canvas.fillText(this.branchLength.toFixed(2), x, y + em);
     }
 

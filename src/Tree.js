@@ -368,11 +368,23 @@ class Tree {
      * @default
      */
     this.showLabels = true;
+
     /**
+     * Global show/hide branch-length labels.
+     *
      * @type boolean
      * @default
      */
     this.showBranchLengthLabels = false;
+    /**
+     * Conditionally display branch-length labels when enabled.
+     *
+     * @type function
+     * @param {Branch} node
+     * @default
+     */
+    this.branchLengthLabelPredicate = Predicates.tautology;
+
     /**
      * @type boolean
      * @default
