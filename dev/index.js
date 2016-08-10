@@ -142,6 +142,8 @@ function () {
     },
   });
 
+  tree.shiftKeyDrag = true;
+
   // tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
 
   // tree.branches.A.radius = 2;
