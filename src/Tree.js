@@ -1,4 +1,4 @@
-import { dom, events, canvas } from './utils';
+import { dom, events, canvas, constants } from './utils';
 
 import Branch from './Branch';
 import { ChildNodesTooltip as Tooltip } from './Tooltip';
@@ -9,6 +9,7 @@ import parsers from './parsers';
 const { addClass } = dom;
 const { fireEvent, addEvent } = events;
 const { getPixelRatio, translateClick } = canvas;
+const { Predicates } = constants;
 
 /**
  * A Phylocanvas instance.
@@ -346,7 +347,7 @@ class Tree {
      * @return boolean
      * @default A function returning true.
      */
-    this.clickFlagPredicate = () => true;
+    this.clickFlagPredicate = Predicates.tautology;
 
     /**
      * Show labels when hovering over node.

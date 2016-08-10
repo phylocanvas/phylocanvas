@@ -47,3 +47,16 @@ export const Shapes = {
   o: 'circle',
   t: 'triangle',
 };
+
+/**
+ * Standard set of predicates.
+ *
+ * @enum
+ * @constant
+ */
+export const Predicates = {
+  tautology: () => true,
+  contradiction: () => false,
+  leafOnly: (node) => node.leaf,
+  nonLeaf: (node) => !node.leaf,
+};
