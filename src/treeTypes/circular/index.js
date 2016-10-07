@@ -21,7 +21,7 @@ export default {
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
   scaleCollapsedNode: function (radius) {
-    return radius / 3;
+    return radius / 2;
   },
   calculateFontSize: function (ystep) {
     return Math.min((ystep * 10) + 4, 40);

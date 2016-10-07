@@ -7,9 +7,9 @@ import { undoPointTranslation } from '../src/utils/canvas';
 const buttonForm = document.getElementById('buttons');
 const tree = PhyloCanvas.createTree('phylocanvas', {
   defaultCollapsed: {
-    min: 30,
+    min: 10,
     max: 50,
-    color: 'green',
+    // color: 'rgba(0, 127, 0, 0.5)',
   },
   padding: 0,
   branchLengthLabelPredicate: (node) => node.branchLength > 200,
@@ -99,9 +99,7 @@ tree.on('loaded', function () {
   console.log('loaded');
 });
 
-tree.on('original-tree', function () {
-  console.log('original');
-});
+tree.on('updated', e => console.log(e));
 
 // tree.alignLabels = true;
 

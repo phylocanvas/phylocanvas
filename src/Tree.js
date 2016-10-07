@@ -105,6 +105,12 @@ class Tree {
     this.canvas.strokeStyle = '#000000';
     this.canvas.save();
 
+    /**
+     * Colour for collapsed sections of the tree.
+     *
+     * @type string
+     */
+    this.collapsedColour = 'rgba(0, 0, 0, 0.5)';
 
     /**
      * A minimum and maximum number of child branches within which to

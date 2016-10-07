@@ -412,17 +412,17 @@ class Branch {
       radius = this.tree.scaleCollapsedNode(radius);
     }
 
-    this.canvas.globalAlpha = 0.3;
-
     this.canvas.beginPath();
 
-    this.canvas.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.canvas.fillStyle = (this.tree.defaultCollapsed.color) ?
-                      this.tree.defaultCollapsed.color : 'purple';
-    this.canvas.fill();
-    this.canvas.globalAlpha = 1;
+    const startAngle = this.angle + Math.PI * 1.75;
+    const endAngle = this.angle + Math.PI / 3.5;
+
+    this.canvas.moveTo(centerX, centerY);
+    this.canvas.arc(centerX, centerY, radius * 2, startAngle, endAngle, false);
+    this.canvas.fillStyle = this.tree.collapsedColour || this.getColour();
 
     this.canvas.closePath();
+    this.canvas.fill();
   }
 
   /**
