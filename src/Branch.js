@@ -405,20 +405,23 @@ class Branch {
    * @param {number}
    */
   drawCollapsed(centerX, centerY) {
-    const childIds = this.getChildProperties('id');
-    let radius = childIds.length;
+    const firstChild = this.children[0];
+    const lastChild = this.children[this.children.length - 1];
 
-    if (this.tree.scaleCollapsedNode) {
-      radius = this.tree.scaleCollapsedNode(radius);
-    }
+    const distance = Math.sqrt(
+      Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2),
+      Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2)
+    );
+
+    const radius = distance / 2;
 
     this.canvas.beginPath();
 
-    const startAngle = this.angle + Math.PI * 1.75;
-    const endAngle = this.angle + Math.PI / 3.5;
+    const startAngle = this.angle + (Math.PI * 2) * 0.875;
+    const endAngle = this.angle + (Math.PI * 2) * 0.125;
 
     this.canvas.moveTo(centerX, centerY);
-    this.canvas.arc(centerX, centerY, radius * 2, startAngle, endAngle, false);
+    this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
     this.canvas.fillStyle = this.tree.collapsedColour || this.getColour();
 
     this.canvas.closePath();

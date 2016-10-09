@@ -2668,20 +2668,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawCollapsed',
 	    value: function drawCollapsed(centerX, centerY) {
-	      var childIds = this.getChildProperties('id');
-	      var radius = childIds.length;
+	      var firstChild = this.children[0];
+	      var lastChild = this.children[this.children.length - 1];
 
-	      if (this.tree.scaleCollapsedNode) {
-	        radius = this.tree.scaleCollapsedNode(radius);
-	      }
+	      var distance = Math.sqrt(Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2), Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2));
+
+	      var radius = distance / 2;
 
 	      this.canvas.beginPath();
 
-	      var startAngle = this.angle + Math.PI * 1.75;
-	      var endAngle = this.angle + Math.PI / 3.5;
+	      var startAngle = this.angle + Math.PI * 2 * 0.875;
+	      var endAngle = this.angle + Math.PI * 2 * 0.125;
 
 	      this.canvas.moveTo(centerX, centerY);
-	      this.canvas.arc(centerX, centerY, radius * 2, startAngle, endAngle, false);
+	      this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
 	      this.canvas.fillStyle = this.tree.collapsedColour || this.getColour();
 
 	      this.canvas.closePath();
@@ -2814,13 +2814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.setNodeDimensions(centerX, centerY, nodeRadius);
 
 	      if (this.collapsed) {
-	        // this.canvas.save();
-	        // // this.canvas.translate(this.centerx, this.centery);
-	        // this.canvas.rotate(this.angle);
-
 	        this.drawCollapsed(centerX, centerY);
-
-	        // this.canvas.restore();
 	      } else if (this.leaf) {
 	        this.canvas.save();
 	        this.canvas.translate(this.centerx, this.centery);

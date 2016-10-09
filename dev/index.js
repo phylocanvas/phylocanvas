@@ -101,6 +101,20 @@ tree.on('loaded', function () {
 
 tree.on('updated', e => console.log(e));
 
+tree.on('click', e => {
+  const node = tree.getNodeAtMousePosition(e);
+  if (node) {
+    node.toggleCollapsed();
+    const firstChild = node.children[0];
+    const lastChild = node.children[node.children.length - 1];
+    console.log(Math.sqrt(
+      Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2),
+      Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2)
+    ))
+    tree.draw();
+  }
+});
+
 // tree.alignLabels = true;
 
 tree.setTreeType('rectangular');
@@ -122,35 +136,35 @@ function () {
   // tree.setNodeSize(10);
   // tree.textSize = 20;
 
-  tree.branches.A.setDisplay({
-    leafStyle: {
-      fillStyle: 'lightgray',
-    },
-  });
-  tree.branches.B.setDisplay({
-    colour: 'red',
-    shape: 'triangle',
-    leafStyle: {
-      fillStyle: 'pink',
-    },
-  });
-  tree.branches.C.setDisplay({
-    colour: 'green',
-    shape: 'star',
-    leafStyle: {
-      fillStyle: 'lightgreen',
-    },
-    // labelStyle: {
-    //   colour: 'red',
-    // },
-  });
-  tree.branches.D.setDisplay({
-    colour: 'blue',
-    shape: 'square',
-    leafStyle: {
-      fillStyle: 'lightblue',
-    },
-  });
+  // tree.branches.A.setDisplay({
+  //   leafStyle: {
+  //     fillStyle: 'lightgray',
+  //   },
+  // });
+  // tree.branches.B.setDisplay({
+  //   colour: 'red',
+  //   shape: 'triangle',
+  //   leafStyle: {
+  //     fillStyle: 'pink',
+  //   },
+  // });
+  // tree.branches.C.setDisplay({
+  //   colour: 'green',
+  //   shape: 'star',
+  //   leafStyle: {
+  //     fillStyle: 'lightgreen',
+  //   },
+  //   // labelStyle: {
+  //   //   colour: 'red',
+  //   // },
+  // });
+  // tree.branches.D.setDisplay({
+  //   colour: 'blue',
+  //   shape: 'square',
+  //   leafStyle: {
+  //     fillStyle: 'lightblue',
+  //   },
+  // });
 
   // tree.updateLeaves(tree.findLeaves('(A|B)'), 'highlighted', true);
 
