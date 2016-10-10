@@ -13,7 +13,7 @@ const labelAlign = {
   },
   getLabelOffset(node) {
     return (node.tree.farthestNodeFromRootX * node.tree.currentBranchScale - node.centerx);
-  }
+  },
 };
 
 export default {
@@ -21,4 +21,10 @@ export default {
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
   branchScalingAxis: 'x',
+  getCollapsedMeasurements(branch) {
+    return {
+      angle: Math.PI / 2,
+      radius: (branch.tree.step * branch.getNumberOfLeaves()) / 4,
+    };
+  },
 };

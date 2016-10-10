@@ -2657,6 +2657,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.miny = centerY - boundedRadius;
 	      this.maxy = centerY + boundedRadius;
 	    }
+	  }, {
+	    key: 'getNumberOfLeaves',
+	    value: function getNumberOfLeaves() {
+	      var numberOfLeaves = 0;
+	      var branches = [this];
+	      while (branches.length) {
+	        var branch = branches.pop();
+	        if (branch.leaf) {
+	          numberOfLeaves++;
+	        } else {
+	          var _iteratorNormalCompletion = true;
+	          var _didIteratorError = false;
+	          var _iteratorError = undefined;
+
+	          try {
+	            for (var _iterator = branch.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	              var child = _step.value;
+
+	              branches.push(child);
+	            }
+	          } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	          } finally {
+	            try {
+	              if (!_iteratorNormalCompletion && _iterator.return) {
+	                _iterator.return();
+	              }
+	            } finally {
+	              if (_didIteratorError) {
+	                throw _iteratorError;
+	              }
+	            }
+	          }
+	        }
+	      }
+	      return numberOfLeaves;
+	    }
 
 	    /**
 	     * Draws the "collapsed tip".
@@ -2668,17 +2706,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawCollapsed',
 	    value: function drawCollapsed(centerX, centerY) {
-	      var firstChild = this.children[0];
-	      var lastChild = this.children[this.children.length - 1];
-
-	      var distance = Math.sqrt(Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2), Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2));
-
-	      var radius = distance / 2;
-
 	      this.canvas.beginPath();
 
-	      var startAngle = this.angle + Math.PI * 2 * 0.875;
-	      var endAngle = this.angle + Math.PI * 2 * 0.125;
+	      var startAngle = this.angle - this.getNumberOfLeaves() * this.tree.step / 2;
+	      var endAngle = this.angle + this.getNumberOfLeaves() * this.tree.step / 2;
+	      var radius = this.getNumberOfLeaves() * this.tree.step / Math.abs(endAngle - startAngle);
 
 	      this.canvas.moveTo(centerX, centerY);
 	      this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
@@ -2906,27 +2938,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (typeof predicate === 'undefined' || predicate(this, property, value)) {
 	        this[property] = value;
 	      }
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
 
 	      try {
-	        for (var _iterator = this.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var child = _step.value;
+	        for (var _iterator2 = this.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var child = _step2.value;
 
 	          child.cascadeFlag(property, value, predicate);
 	        }
 	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
 	          }
 	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
 	          }
 	        }
 	      }
@@ -2979,28 +3011,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'extractChildren',
 	    value: function extractChildren() {
-	      var _iteratorNormalCompletion2 = true;
-	      var _didIteratorError2 = false;
-	      var _iteratorError2 = undefined;
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
 
 	      try {
-	        for (var _iterator2 = this.children[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	          var child = _step2.value;
+	        for (var _iterator3 = this.children[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var child = _step3.value;
 
 	          this.tree.storeNode(child);
 	          child.extractChildren();
 	        }
 	      } catch (err) {
-	        _didIteratorError2 = true;
-	        _iteratorError2 = err;
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	            _iterator2.return();
+	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	            _iterator3.return();
 	          }
 	        } finally {
-	          if (_didIteratorError2) {
-	            throw _iteratorError2;
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
 	          }
 	        }
 	      }

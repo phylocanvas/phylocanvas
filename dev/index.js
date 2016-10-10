@@ -99,25 +99,20 @@ tree.on('loaded', function () {
   console.log('loaded');
 });
 
-tree.on('updated', e => console.log(e));
+// tree.on('updated', e => console.log(e));
 
 tree.on('click', e => {
   const node = tree.getNodeAtMousePosition(e);
   if (node) {
     node.toggleCollapsed();
-    const firstChild = node.children[0];
-    const lastChild = node.children[node.children.length - 1];
-    console.log(Math.sqrt(
-      Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2),
-      Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2)
-    ))
+    node.cascadeFlag('highlighted', false);
     tree.draw();
   }
 });
 
 // tree.alignLabels = true;
 
-tree.setTreeType('rectangular');
+tree.setTreeType('circular');
 
 tree.clickFlag = 'highlighted';
 tree.clickFlagPredicate = node => node.leaf;

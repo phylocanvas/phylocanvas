@@ -13,17 +13,21 @@ const labelAlign = {
   },
   getLabelOffset(node) {
     return (node.labelOffsetX) / Math.cos(node.angle);
-  }
+  },
 };
 
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
-  scaleCollapsedNode: function (radius) {
-    return radius / 2;
+  getCollapsedMeasurements(branch) {
+    const numberOfLeaves = branch.getNumberOfLeaves();
+    return {
+      angle: numberOfLeaves * branch.tree.step,
+      radius: numberOfLeaves, // wedge appears larger if contains many leaves
+    };
   },
-  calculateFontSize: function (ystep) {
+  calculateFontSize(ystep) {
     return Math.min((ystep * 10) + 4, 40);
-  }
+  },
 };

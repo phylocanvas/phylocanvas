@@ -1,5 +1,6 @@
 import { constants } from './utils';
 
+import treeTypes from './treeTypes';
 import nodeRenderers from './nodeRenderers';
 
 const { Angles, Shapes } = constants;
@@ -398,6 +399,22 @@ class Branch {
     this.maxy = centerY + boundedRadius;
   }
 
+  getNumberOfLeaves() {
+    let numberOfLeaves = 0;
+    const branches = [ this ];
+    while (branches.length) {
+      const branch = branches.pop();
+      if (branch.leaf) {
+        numberOfLeaves++;
+      } else {
+        for (const child of branch.children) {
+          branches.push(child);
+        }
+      }
+    }
+    return numberOfLeaves;
+  }
+
   /**
    * Draws the "collapsed tip".
    *
@@ -405,20 +422,13 @@ class Branch {
    * @param {number}
    */
   drawCollapsed(centerX, centerY) {
-    const firstChild = this.children[0];
-    const lastChild = this.children[this.children.length - 1];
-
-    const distance = Math.sqrt(
-      Math.pow(Math.abs(firstChild.centerx - lastChild.centerx), 2),
-      Math.pow(Math.abs(firstChild.centery - lastChild.centery), 2)
-    );
-
-    const radius = distance / 2;
+    const { getCollapsedMeasurements } = treeTypes[this.tree.treeType];
 
     this.canvas.beginPath();
 
-    const startAngle = this.angle + (Math.PI * 2) * 0.875;
-    const endAngle = this.angle + (Math.PI * 2) * 0.125;
+    const { angle, radius } = getCollapsedMeasurements(this);
+    const startAngle = this.angle - angle / 2;
+    const endAngle = this.angle + angle / 2;
 
     this.canvas.moveTo(centerX, centerY);
     this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
@@ -846,9 +856,14 @@ class Branch {
    * @returns {number}
    */
   getRadius() {
-    return this.leaf ?
-      this.tree.baseNodeSize * this.radius :
-      this.tree.baseNodeSize / this.radius;
+    const { baseNodeSize } = this.tree;
+    if (this.leaf) {
+      return baseNodeSize * this.radius;
+    }
+    if (this.collapsed) {
+      return baseNodeSize * this.radius * 3;
+    }
+    return baseNodeSize / this.radius;
   }
 
   /**

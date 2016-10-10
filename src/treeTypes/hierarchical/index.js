@@ -21,4 +21,10 @@ export default {
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
   branchScalingAxis: 'y',
+  getCollapsedMeasurements(branch) {
+    return {
+      angle: Math.PI / 2,
+      radius: (branch.tree.step * branch.getNumberOfLeaves()) / 4,
+    };
+  },
 };
