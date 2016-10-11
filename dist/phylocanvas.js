@@ -145,7 +145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return An instance of {@link Tree}.
 	 */
 	function createTree(element) {
-	  var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	  return new _Tree2.default(element, config);
 	}
@@ -208,11 +208,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {string|HTMLElement} element
 	   * @param {Object} config
 	   */
-
 	  function Tree(element) {
 	    var _this = this;
 
-	    var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    _classCallCheck(this, Tree);
 
@@ -700,7 +699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Branch} [node=this.root]
 	     */
 	    value: function setInitialCollapsedBranches() {
-	      var node = arguments.length <= 0 || arguments[0] === undefined ? this.root : arguments[0];
+	      var node = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.root;
 
 	      var childIds;
 	      var i;
@@ -748,7 +747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getNodeIdsWithFlag',
 	    value: function getNodeIdsWithFlag(flag) {
-	      var value = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+	      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	      return this.leaves.reduce(function (memo, leaf) {
 	        if (leaf[flag] === value) {
@@ -852,7 +851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          this.tooltip.close();
 	          this.root.cascadeFlag('hovered', false);
-	          if (!this.shiftKeyDrag || this.shiftKeyDrag && e.shiftKey) {
+	          if (this.shiftKeyDrag && e.shiftKey) {
 	            setCursorDrag(this.containerElement);
 	          } else {
 	            this.containerElement.style.cursor = 'auto';
@@ -939,8 +938,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function drop(event) {
 	      if (!this.drawn) return false;
 	      this.pickedup = false;
-	      if (!this.shiftKeyDrag || event.shiftKey) {
+	      if (this.shiftKeyDrag && event.shiftKey) {
 	        setCursorDrag(this.containerElement);
+	      } else {
+	        this.containerElement.style.cursor = 'auto';
 	      }
 	    }
 
@@ -979,7 +980,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'findLeaves',
 	    value: function findLeaves(pattern) {
-	      var searchProperty = arguments.length <= 1 || arguments[1] === undefined ? 'id' : arguments[1];
+	      var searchProperty = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'id';
 
 	      var foundLeaves = [];
 
@@ -1117,7 +1118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'load',
 	    value: function load(inputString) {
-	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	      var callback = arguments[2];
 
 	      var buildOptions = options;
@@ -1418,7 +1419,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.branchRenderer = _treeTypes2.default[type].branchRenderer;
 	      this.prerenderer = _treeTypes2.default[type].prerenderer;
 	      this.labelAlign = _treeTypes2.default[type].labelAlign;
-	      this.scaleCollapsedNode = _treeTypes2.default[type].scaleCollapsedNode;
 	      this.calculateFontSize = _treeTypes2.default[type].calculateFontSize;
 
 	      if (this.drawn) {
@@ -1491,7 +1491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setZoom',
 	    value: function setZoom(zoom) {
-	      var _ref = arguments.length <= 1 || arguments[1] === undefined ? this.getCentrePoint() : arguments[1];
+	      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getCentrePoint();
 
 	      var x = _ref.x;
 	      var y = _ref.y;
@@ -1544,8 +1544,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setBranchScale',
 	    value: function setBranchScale() {
-	      var scale = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
-	      var point = arguments.length <= 1 || arguments[1] === undefined ? { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 } : arguments[1];
+	      var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+	      var point = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 };
 
 	      var treeType = _treeTypes2.default[this.treeType];
 	      if (!treeType.branchScalingAxis || scale < 0) {
@@ -1656,7 +1656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'nodesUpdated',
 	    value: function nodesUpdated(nodeIds, property) {
-	      var append = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+	      var append = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
 	      fireEvent(this.containerElement, 'updated', { nodeIds: nodeIds, property: property, append: append });
 	    }
@@ -1696,7 +1696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getBounds',
 	    value: function getBounds() {
-	      var leaves = arguments.length <= 0 || arguments[0] === undefined ? this.leaves : arguments[0];
+	      var leaves = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.leaves;
 
 	      // this.leaves assumes bounds of whole tree, start from root
 	      var initialBounds = leaves === this.leaves ? this.root : leaves[0];
@@ -1932,7 +1932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function translatePoint() {
-	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
+	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
 
 	  var x = _ref.x;
 	  var y = _ref.y;
@@ -1946,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function undoPointTranslation() {
-	  var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
+	  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
 
 	  var x = _ref2.x;
 	  var y = _ref2.y;
@@ -1983,7 +1983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var windowURL = window.URL || window.webkitURL;
 
 	function createBlobUrl(data) {
-	  var type = arguments.length <= 1 || arguments[1] === undefined ? 'text/plain;charset=utf-8' : arguments[1];
+	  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text/plain;charset=utf-8';
 
 	  var blob = new Blob([data], { type: type });
 	  return windowURL.createObjectURL(blob);
@@ -2089,7 +2089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	exports.preventDefault = preventDefault;
 	exports.fireEvent = fireEvent;
@@ -2102,7 +2102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function fireEvent(element, type) {
-	  var params = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	  var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
 	  var event; // The custom event that will be created
 	  var param;
@@ -2578,18 +2578,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {Branch}
 	     */
 	    value: function clicked(x, y) {
-	      var i;
-	      var child;
-
-	      if (this.dragging) {
-	        return;
+	      if (this.dragging || this.hasCollapsedAncestor()) {
+	        return null;
 	      }
 	      if (x < this.maxx && x > this.minx && y < this.maxy && y > this.miny) {
 	        return this;
 	      }
 
-	      for (i = this.children.length - 1; i >= 0; i--) {
-	        child = this.children[i].clicked(x, y);
+	      for (var i = this.children.length - 1; i >= 0; i--) {
+	        var child = this.children[i].clicked(x, y);
 	        if (child) {
 	          return child;
 	        }
@@ -3188,7 +3185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getNwk',
 	    value: function getNwk() {
-	      var isRoot = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+	      var isRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
 	      if (this.leaf) {
 	        return this.label + ':' + this.branchLength;
@@ -3279,9 +3276,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (this.leaf) {
 	        return baseNodeSize * this.radius;
-	      }
-	      if (this.collapsed) {
-	        return baseNodeSize * this.radius * 3;
 	      }
 	      return baseNodeSize / this.radius;
 	    }
@@ -3683,7 +3677,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @class
 	 */
-
 	var BranchRenderer = function () {
 
 	  /**
@@ -3692,7 +3685,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {function} options.draw
 	   * @param {function} [options.prepareChild]
 	   */
-
 	  function BranchRenderer(options) {
 	    _classCallCheck(this, BranchRenderer);
 
@@ -3765,7 +3757,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @class
 	 */
-
 	var Prerenderer = function () {
 
 	  /**
@@ -3774,7 +3765,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {function} options.getStep - should return the space between each branch.
 	   * @param {function} options.calculate
 	   */
-
 	  function Prerenderer(options) {
 	    _classCallCheck(this, Prerenderer);
 
@@ -4569,7 +4559,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @class
 	 */
-
 	var Tooltip = function () {
 	  /**
 	   * @constructor
@@ -4580,9 +4569,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {number} [options.zIndex=2000]
 	   * @param {HTMLElement} [options.parent=tree.containerElement]
 	   */
-
 	  function Tooltip(tree) {
-	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 	    var _ref$className = _ref.className;
 	    var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
@@ -4627,8 +4615,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'open',
 	    value: function open() {
-	      var x = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
-	      var y = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
+	      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
+	      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
 	      var node = arguments[2];
 
 	      while (this.element.hasChildNodes()) {
@@ -4675,11 +4663,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {Object} [options]
 	   * @see Tooltip
 	   */
-
 	  function ChildNodesTooltip(tree, options) {
 	    _classCallCheck(this, ChildNodesTooltip);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildNodesTooltip).call(this, tree, options));
+	    var _this = _possibleConstructorReturn(this, (ChildNodesTooltip.__proto__ || Object.getPrototypeOf(ChildNodesTooltip)).call(this, tree, options));
 
 	    _this.element.style.background = 'rgba(97, 97, 97, 0.9)';
 	    _this.element.style.color = '#fff';
