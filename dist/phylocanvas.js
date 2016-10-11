@@ -69,11 +69,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _Prerenderer = __webpack_require__(13);
+	var _Prerenderer = __webpack_require__(11);
 
 	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
 
-	var _Tooltip = __webpack_require__(9);
+	var _Tooltip = __webpack_require__(27);
 
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 
@@ -81,11 +81,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Parser2 = _interopRequireDefault(_Parser);
 
-	var _treeTypes = __webpack_require__(10);
+	var _treeTypes = __webpack_require__(8);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
-	var _nodeRenderers = __webpack_require__(8);
+	var _nodeRenderers = __webpack_require__(26);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
@@ -145,7 +145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @return An instance of {@link Tree}.
 	 */
 	function createTree(element) {
-	  var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	  return new _Tree2.default(element, config);
 	}
@@ -170,9 +170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Branch2 = _interopRequireDefault(_Branch);
 
-	var _Tooltip = __webpack_require__(9);
+	var _Tooltip = __webpack_require__(27);
 
-	var _treeTypes = __webpack_require__(10);
+	var _treeTypes = __webpack_require__(8);
 
 	var _treeTypes2 = _interopRequireDefault(_treeTypes);
 
@@ -208,10 +208,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {string|HTMLElement} element
 	   * @param {Object} config
 	   */
+
 	  function Tree(element) {
 	    var _this = this;
 
-	    var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	    var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	    _classCallCheck(this, Tree);
 
@@ -699,7 +700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Branch} [node=this.root]
 	     */
 	    value: function setInitialCollapsedBranches() {
-	      var node = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.root;
+	      var node = arguments.length <= 0 || arguments[0] === undefined ? this.root : arguments[0];
 
 	      var childIds;
 	      var i;
@@ -747,7 +748,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getNodeIdsWithFlag',
 	    value: function getNodeIdsWithFlag(flag) {
-	      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+	      var value = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
 	      return this.leaves.reduce(function (memo, leaf) {
 	        if (leaf[flag] === value) {
@@ -978,7 +979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'findLeaves',
 	    value: function findLeaves(pattern) {
-	      var searchProperty = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'id';
+	      var searchProperty = arguments.length <= 1 || arguments[1] === undefined ? 'id' : arguments[1];
 
 	      var foundLeaves = [];
 
@@ -1116,7 +1117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'load',
 	    value: function load(inputString) {
-	      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 	      var callback = arguments[2];
 
 	      var buildOptions = options;
@@ -1490,7 +1491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setZoom',
 	    value: function setZoom(zoom) {
-	      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getCentrePoint();
+	      var _ref = arguments.length <= 1 || arguments[1] === undefined ? this.getCentrePoint() : arguments[1];
 
 	      var x = _ref.x;
 	      var y = _ref.y;
@@ -1543,8 +1544,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setBranchScale',
 	    value: function setBranchScale() {
-	      var scale = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-	      var point = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 };
+	      var scale = arguments.length <= 0 || arguments[0] === undefined ? 1 : arguments[0];
+	      var point = arguments.length <= 1 || arguments[1] === undefined ? { x: this.canvas.canvas.width / 2, y: this.canvas.canvas.height / 2 } : arguments[1];
 
 	      var treeType = _treeTypes2.default[this.treeType];
 	      if (!treeType.branchScalingAxis || scale < 0) {
@@ -1655,7 +1656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'nodesUpdated',
 	    value: function nodesUpdated(nodeIds, property) {
-	      var append = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+	      var append = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
 	      fireEvent(this.containerElement, 'updated', { nodeIds: nodeIds, property: property, append: append });
 	    }
@@ -1695,7 +1696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getBounds',
 	    value: function getBounds() {
-	      var leaves = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.leaves;
+	      var leaves = arguments.length <= 0 || arguments[0] === undefined ? this.leaves : arguments[0];
 
 	      // this.leaves assumes bounds of whole tree, start from root
 	      var initialBounds = leaves === this.leaves ? this.root : leaves[0];
@@ -1931,7 +1932,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function translatePoint() {
-	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
 
 	  var x = _ref.x;
 	  var y = _ref.y;
@@ -1945,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function undoPointTranslation() {
-	  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+	  var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
 
 	  var x = _ref2.x;
 	  var y = _ref2.y;
@@ -1982,7 +1983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var windowURL = window.URL || window.webkitURL;
 
 	function createBlobUrl(data) {
-	  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text/plain;charset=utf-8';
+	  var type = arguments.length <= 1 || arguments[1] === undefined ? 'text/plain;charset=utf-8' : arguments[1];
 
 	  var blob = new Blob([data], { type: type });
 	  return windowURL.createObjectURL(blob);
@@ -2088,7 +2089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 	exports.preventDefault = preventDefault;
 	exports.fireEvent = fireEvent;
@@ -2101,7 +2102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function fireEvent(element, type) {
-	  var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	  var params = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
 	  var event; // The custom event that will be created
 	  var param;
@@ -2263,7 +2264,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(2);
 
-	var _nodeRenderers = __webpack_require__(8);
+	var _treeTypes = __webpack_require__(8);
+
+	var _treeTypes2 = _interopRequireDefault(_treeTypes);
+
+	var _nodeRenderers = __webpack_require__(26);
 
 	var _nodeRenderers2 = _interopRequireDefault(_nodeRenderers);
 
@@ -2661,10 +2666,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'getNumberOfLeaves',
 	    value: function getNumberOfLeaves() {
 	      var numberOfLeaves = 0;
-	      var branches = [this];
-	      while (branches.length) {
-	        var branch = branches.pop();
-	        if (branch.leaf) {
+	      var queue = [this];
+	      while (queue.length) {
+	        var node = queue.pop();
+	        if (node.leaf) {
 	          numberOfLeaves++;
 	        } else {
 	          var _iteratorNormalCompletion = true;
@@ -2672,10 +2677,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var _iteratorError = undefined;
 
 	          try {
-	            for (var _iterator = branch.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	            for (var _iterator = node.children[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	              var child = _step.value;
 
-	              branches.push(child);
+	              queue.push(child);
 	            }
 	          } catch (err) {
 	            _didIteratorError = true;
@@ -2706,17 +2711,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawCollapsed',
 	    value: function drawCollapsed(centerX, centerY) {
+	      var getCollapsedMeasurements = _treeTypes2.default[this.tree.treeType].getCollapsedMeasurements;
+
+
 	      this.canvas.beginPath();
 
-	      var startAngle = this.angle - this.getNumberOfLeaves() * this.tree.step / 2;
-	      var endAngle = this.angle + this.getNumberOfLeaves() * this.tree.step / 2;
-	      var radius = this.getNumberOfLeaves() * this.tree.step / Math.abs(endAngle - startAngle);
+	      var _getCollapsedMeasurem = getCollapsedMeasurements(this);
+
+	      var angle = _getCollapsedMeasurem.angle;
+	      var radius = _getCollapsedMeasurem.radius;
+
+	      var startAngle = this.angle - angle / 2;
+	      var endAngle = this.angle + angle / 2;
 
 	      this.canvas.moveTo(centerX, centerY);
 	      this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
-	      this.canvas.fillStyle = this.tree.collapsedColour || this.getColour();
 
-	      this.canvas.closePath();
+	      var gradient = this.canvas.createRadialGradient(centerX, centerY, radius, centerX, centerY, 0.2 * radius);
+	      gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+	      gradient.addColorStop(1, this.tree.collapsedColour || this.getColour());
+	      this.canvas.fillStyle = gradient;
+
 	      this.canvas.fill();
 	    }
 
@@ -3173,7 +3188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getNwk',
 	    value: function getNwk() {
-	      var isRoot = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+	      var isRoot = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
 
 	      if (this.leaf) {
 	        return this.label + ':' + this.branchLength;
@@ -3260,7 +3275,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getRadius',
 	    value: function getRadius() {
-	      return this.leaf ? this.tree.baseNodeSize * this.radius : this.tree.baseNodeSize / this.radius;
+	      var baseNodeSize = this.tree.baseNodeSize;
+
+	      if (this.leaf) {
+	        return baseNodeSize * this.radius;
+	      }
+	      if (this.collapsed) {
+	        return baseNodeSize * this.radius * 3;
+	      }
+	      return baseNodeSize / this.radius;
 	    }
 
 	    /**
@@ -3556,6 +3579,852 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
+	var _rectangular = __webpack_require__(9);
+
+	var _rectangular2 = _interopRequireDefault(_rectangular);
+
+	var _circular = __webpack_require__(14);
+
+	var _circular2 = _interopRequireDefault(_circular);
+
+	var _radial = __webpack_require__(17);
+
+	var _radial2 = _interopRequireDefault(_radial);
+
+	var _diagonal = __webpack_require__(20);
+
+	var _diagonal2 = _interopRequireDefault(_diagonal);
+
+	var _hierarchical = __webpack_require__(23);
+
+	var _hierarchical2 = _interopRequireDefault(_hierarchical);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  rectangular: _rectangular2.default,
+	  circular: _circular2.default,
+	  radial: _radial2.default,
+	  diagonal: _diagonal2.default,
+	  hierarchical: _hierarchical2.default
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BranchRenderer = __webpack_require__(10);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(11);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(12);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(13);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var _constants = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale;
+	  },
+	  getY: function getY(node) {
+	    return node.centery;
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale - node.centerx;
+	  }
+	};
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
+	  labelAlign: labelAlign,
+	  branchScalingAxis: 'x',
+	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    return {
+	      angle: _constants.Angles.QUARTER,
+	      radius: branch.tree.step * branch.getNumberOfLeaves()
+	    };
+	  }
+	};
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * Draws a branch.
+	 *
+	 * @class
+	 */
+
+	var BranchRenderer = function () {
+
+	  /**
+	   * @constructor
+	   * @param {Object} options
+	   * @param {function} options.draw
+	   * @param {function} [options.prepareChild]
+	   */
+
+	  function BranchRenderer(options) {
+	    _classCallCheck(this, BranchRenderer);
+
+	    if (!options || !options.draw) {
+	      throw new Error('`draw` function is required for branch renderers');
+	    }
+
+	    this.draw = options.draw;
+	    this.prepareChild = options.prepareChild;
+	  }
+
+	  /**
+	   * @param {Tree}
+	   * @param {Branch}
+	   * @param {boolean=} - if true, rendering skipped.
+	   */
+
+
+	  _createClass(BranchRenderer, [{
+	    key: 'render',
+	    value: function render(tree, branch, collapse) {
+	      var i;
+	      if (collapse || !branch) return;
+
+	      if (branch.selected) {
+	        branch.canvas.fillStyle = tree.selectedColour;
+	      } else {
+	        branch.canvas.fillStyle = branch.colour;
+	      }
+	      branch.canvas.strokeStyle = branch.getColour();
+
+	      this.draw(tree, branch);
+
+	      if (branch.pruned) {
+	        return;
+	      }
+
+	      branch.drawNode();
+
+	      for (i = 0; i < branch.children.length; i++) {
+	        if (this.prepareChild) {
+	          this.prepareChild(branch, branch.children[i]);
+	        }
+	        this.render(tree, branch.children[i], branch.collapsed || collapse);
+	      }
+	    }
+	  }]);
+
+	  return BranchRenderer;
+	}();
+
+	exports.default = BranchRenderer;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * Calculates the tree dimensions before the first draw.
+	 *
+	 * @class
+	 */
+
+	var Prerenderer = function () {
+
+	  /**
+	   * @constructor
+	   * @param {Object} options
+	   * @param {function} options.getStep - should return the space between each branch.
+	   * @param {function} options.calculate
+	   */
+
+	  function Prerenderer(options) {
+	    _classCallCheck(this, Prerenderer);
+
+	    this.getStep = options.getStep;
+	    this.calculate = options.calculate;
+	  }
+
+	  /**
+	   * @param {Tree}
+	   */
+
+
+	  _createClass(Prerenderer, [{
+	    key: "run",
+	    value: function run(tree) {
+	      var step = this.getStep(tree);
+
+	      tree.root.startx = 0;
+	      tree.root.starty = 0;
+	      tree.root.centerx = 0;
+	      tree.root.centery = 0;
+	      tree.farthestNodeFromRootX = 0;
+	      tree.farthestNodeFromRootY = 0;
+	      tree.currentBranchScale = 1;
+	      tree.step = step;
+
+	      this.calculate(tree, step);
+
+	      tree.initialBranchScalar = tree.branchScalar;
+
+	      // Assign root startx and starty
+	      tree.root.startx = tree.root.centerx;
+	      tree.root.starty = tree.root.centery;
+	      // Set font size for tree and its branches
+	      tree.setFontSize(step);
+	      tree.setMaxLabelLength();
+	    }
+	  }]);
+
+	  return Prerenderer;
+	}();
+
+	exports.default = Prerenderer;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  draw: function draw(tree, node) {
+	    var branchLength = node.branchLength * tree.branchScalar;
+
+	    node.angle = 0;
+	    if (node.parent) {
+	      node.centerx = node.startx + branchLength;
+	    }
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.startx, node.centery);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  getStep: function getStep(tree) {
+	    return tree.fillCanvas ? tree.canvas.canvas.height / tree.leaves.length : Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+	  },
+	  calculate: function calculate(tree, ystep) {
+	    // Calculate branchScalar based on canvas width and total branch length
+	    // This is used to transform the X coordinate based on the canvas width and no. of branches
+	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
+
+	    // set initial positons of the branches
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = 0; // for rectangle
+	      // Calculate and assign y coordinate for all the leaves
+	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+
+	      // Calculate and assign y coordinate for all the parent branches
+	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
+	        // Get all the children of a parent
+	        var childrenArray = branch.parent.children;
+	        // Assign parent's y coordinate
+	        // Logic: Total ystep of all the children of this parent / 2
+	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BranchRenderer = __webpack_require__(10);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(11);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(15);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(16);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var _constants = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.centerx + node.labelOffsetX + node.getDiameter() * Math.cos(node.angle);
+	  },
+	  getY: function getY(node) {
+	    return node.centery + node.labelOffsetY + node.getDiameter() * Math.sin(node.angle);
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.labelOffsetX / Math.cos(node.angle);
+	  }
+	};
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
+	  labelAlign: labelAlign,
+	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    return {
+	      angle: _constants.Angles.QUARTER,
+	      radius: branch.getNumberOfLeaves() * _constants.Angles.QUARTER
+	    };
+	  },
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep * 10 + 4, 40);
+	  }
+	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  draw: function draw(tree, node) {
+	    var branchLength = node.totalBranchLength * tree.branchScalar;
+
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+
+	    node.canvas.strokeStyle = node.getColour();
+
+	    if (node.children.length > 1 && !node.collapsed) {
+	      node.canvas.beginPath();
+	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
+	      node.canvas.stroke();
+	      node.canvas.closePath();
+	    }
+	  }
+	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _utils = __webpack_require__(2);
+
+	var Angles = _utils.constants.Angles;
+	exports.default = {
+	  getStep: function getStep(tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function calculate(tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+	    // work out radius of tree and the make branch scalar proportinal to the
+	    var r = tree.leaves.length * tree.leaves[0].getDiameter() / Angles.FULL;
+	    if (tree.branchScalar * tree.maxBranchLength > r) {
+	      r = tree.branchScalar * tree.maxBranchLength;
+	    } else {
+	      tree.branchScalar = r / tree.maxBranchLength;
+	    }
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      var node = tree.leaves[i];
+
+	      node.angle = step * i;
+	      node.startx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
+	      node.starty = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
+	      node.centerx = node.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
+	      node.centery = node.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
+	      node.labelOffsetX = r * Math.cos(node.angle) - node.centerx;
+	      node.labelOffsetY = r * Math.sin(node.angle) - node.centery;
+
+	      for (; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.angle = node.angle;
+	          node.parent.minChildAngle = node.angle;
+	        }
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.maxChildAngle = node.angle;
+	          node.parent.angle = (node.parent.minChildAngle + node.parent.maxChildAngle) / 2;
+	          node.parent.startx = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.cos(node.parent.angle);
+	          node.parent.starty = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.sin(node.parent.angle);
+	          node.parent.centerx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.parent.angle);
+	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.parent.angle);
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BranchRenderer = __webpack_require__(10);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(11);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(18);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(19);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var _constants = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
+	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    return {
+	      angle: _constants.Angles.QUARTER,
+	      radius: branch.getNumberOfLeaves() * _constants.Angles.QUARTER
+	    };
+	  },
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep * 50 + 5, 15);
+	  }
+	};
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  draw: function draw(tree, node) {
+	    node.canvas.beginPath();
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+	    node.canvas.closePath();
+	  }
+	};
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _utils = __webpack_require__(2);
+
+	var Angles = _utils.constants.Angles;
+
+
+	function prerenderNodes(tree, node) {
+	  if (node.parent) {
+	    node.startx = node.parent.centerx;
+	    node.starty = node.parent.centery;
+	  } else {
+	    node.startx = 0;
+	    node.starty = 0;
+	  }
+	  node.centerx = node.startx + node.branchLength * tree.branchScalar * Math.cos(node.angle);
+	  node.centery = node.starty + node.branchLength * tree.branchScalar * Math.sin(node.angle);
+
+	  for (var i = 0; i < node.children.length; i++) {
+	    prerenderNodes(tree, node.children[i]);
+	  }
+	}
+
+	exports.default = {
+	  getStep: function getStep(tree) {
+	    return Angles.FULL / tree.leaves.length;
+	  },
+	  calculate: function calculate(tree, step) {
+	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
+
+	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
+	      tree.leaves[i].angle = step * i;
+	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
+
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.angle = 0;
+	        }
+	        node.parent.angle += node.angle * node.getChildCount();
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.angle = node.parent.angle / node.parent.getChildCount();
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+
+	    prerenderNodes(tree, tree.root);
+	  }
+	};
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BranchRenderer = __webpack_require__(10);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(11);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(21);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(22);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var _constants = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
+	  calculateFontSize: function calculateFontSize(ystep) {
+	    return Math.min(ystep / 2, 10);
+	  },
+	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    return {
+	      angle: _constants.Angles.QUARTER,
+	      radius: branch.tree.step * branch.getNumberOfLeaves()
+	    };
+	  }
+	};
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  draw: function draw(tree, node) {
+	    node.angle = 0;
+	    node.canvas.beginPath();
+
+	    node.canvas.moveTo(node.startx, node.starty);
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _utils = __webpack_require__(2);
+
+	var Angles = _utils.constants.Angles;
+	exports.default = {
+	  getStep: function getStep(tree) {
+	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+	  },
+	  calculate: function calculate(tree, ystep) {
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].centerx = 0;
+	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
+	      tree.leaves[i].angle = 0;
+
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.centery = node.parent.getChildYTotal() / node.parent.getChildCount(); // (node.parent.children.length - 1);
+	          node.parent.centerx = node.parent.children[0].centerx + (node.parent.children[0].centery - node.parent.centery) * Math.tan(Angles.FORTYFIVE);
+	          for (var j = 0; j < node.parent.children.length; j++) {
+	            node.parent.children[j].startx = node.parent.centerx;
+	            node.parent.children[j].starty = node.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _BranchRenderer = __webpack_require__(10);
+
+	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
+
+	var _Prerenderer = __webpack_require__(11);
+
+	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
+
+	var _branchRenderer = __webpack_require__(24);
+
+	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
+
+	var _prerenderer = __webpack_require__(25);
+
+	var _prerenderer2 = _interopRequireDefault(_prerenderer);
+
+	var _constants = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var labelAlign = {
+	  getX: function getX(node) {
+	    return node.centerx;
+	  },
+	  getY: function getY(node) {
+	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale;
+	  },
+	  getLabelOffset: function getLabelOffset(node) {
+	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale - node.centery;
+	  }
+	};
+
+	exports.default = {
+	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
+	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
+	  labelAlign: labelAlign,
+	  branchScalingAxis: 'y',
+	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    return {
+	      angle: _constants.Angles.QUARTER,
+	      radius: branch.tree.step * branch.getNumberOfLeaves()
+	    };
+	  }
+	};
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = {
+	  draw: function draw(tree, node) {
+	    var branchLength = node.branchLength * tree.branchScalar;
+
+	    if (node.parent) {
+	      node.centery = node.starty + branchLength;
+	    }
+
+	    node.canvas.beginPath();
+
+	    if (node !== node.tree.root) {
+	      node.canvas.moveTo(node.startx, node.starty);
+	      node.canvas.lineTo(node.centerx, node.starty);
+	    }
+
+	    node.canvas.lineTo(node.centerx, node.centery);
+	    node.canvas.stroke();
+
+	    node.canvas.closePath();
+	  },
+	  prepareChild: function prepareChild(node, child) {
+	    child.startx = node.centerx;
+	    child.starty = node.centery;
+	  }
+	};
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _utils = __webpack_require__(2);
+
+	var Angles = _utils.constants.Angles;
+	exports.default = {
+	  getStep: function getStep(tree) {
+	    return tree.fillCanvas ? tree.canvas.canvas.width / tree.leaves.length : Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
+	  },
+	  calculate: function calculate(tree, xstep) {
+	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
+
+	    for (var i = 0; i < tree.leaves.length; i++) {
+	      tree.leaves[i].angle = Angles.QUARTER;
+	      tree.leaves[i].centerx = i > 0 ? tree.leaves[i - 1].centerx + xstep : 0;
+	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
+
+	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
+	        if (node.getChildNo() === 0) {
+	          node.parent.centerx = node.centerx;
+	        }
+
+	        if (node.getChildNo() === node.parent.children.length - 1) {
+	          node.parent.angle = Angles.QUARTER;
+	          node.parent.centerx = (node.parent.centerx + node.centerx) / 2;
+	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar;
+	          for (var j = 0; j < node.parent.children.length; j++) {
+	            node.parent.children[j].startx = node.parent.centerx;
+	            node.parent.children[j].starty = node.parent.centery;
+	          }
+	        } else {
+	          break;
+	        }
+	      }
+	      // Assign x,y position of the farthest node from the root
+	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
+	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
+	      }
+	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
+	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
+	      }
+	    }
+	  }
+	};
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
 	var _utils = __webpack_require__(2);
 
 	var Angles = _utils.constants.Angles;
@@ -3678,7 +4547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3700,6 +4569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @class
 	 */
+
 	var Tooltip = function () {
 	  /**
 	   * @constructor
@@ -3710,8 +4580,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {number} [options.zIndex=2000]
 	   * @param {HTMLElement} [options.parent=tree.containerElement]
 	   */
+
 	  function Tooltip(tree) {
-	    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	    var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	    var _ref$className = _ref.className;
 	    var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
@@ -3756,8 +4627,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'open',
 	    value: function open() {
-	      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100;
-	      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+	      var x = arguments.length <= 0 || arguments[0] === undefined ? 100 : arguments[0];
+	      var y = arguments.length <= 1 || arguments[1] === undefined ? 100 : arguments[1];
 	      var node = arguments[2];
 
 	      while (this.element.hasChildNodes()) {
@@ -3804,10 +4675,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {Object} [options]
 	   * @see Tooltip
 	   */
+
 	  function ChildNodesTooltip(tree, options) {
 	    _classCallCheck(this, ChildNodesTooltip);
 
-	    var _this = _possibleConstructorReturn(this, (ChildNodesTooltip.__proto__ || Object.getPrototypeOf(ChildNodesTooltip)).call(this, tree, options));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChildNodesTooltip).call(this, tree, options));
 
 	    _this.element.style.background = 'rgba(97, 97, 97, 0.9)';
 	    _this.element.style.color = '#fff';
@@ -3838,814 +4710,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return ChildNodesTooltip;
 	}(Tooltip);
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _rectangular = __webpack_require__(11);
-
-	var _rectangular2 = _interopRequireDefault(_rectangular);
-
-	var _circular = __webpack_require__(16);
-
-	var _circular2 = _interopRequireDefault(_circular);
-
-	var _radial = __webpack_require__(19);
-
-	var _radial2 = _interopRequireDefault(_radial);
-
-	var _diagonal = __webpack_require__(22);
-
-	var _diagonal2 = _interopRequireDefault(_diagonal);
-
-	var _hierarchical = __webpack_require__(25);
-
-	var _hierarchical2 = _interopRequireDefault(_hierarchical);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = {
-	  rectangular: _rectangular2.default,
-	  circular: _circular2.default,
-	  radial: _radial2.default,
-	  diagonal: _diagonal2.default,
-	  hierarchical: _hierarchical2.default
-	};
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _BranchRenderer = __webpack_require__(12);
-
-	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
-
-	var _Prerenderer = __webpack_require__(13);
-
-	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
-
-	var _branchRenderer = __webpack_require__(14);
-
-	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
-
-	var _prerenderer = __webpack_require__(15);
-
-	var _prerenderer2 = _interopRequireDefault(_prerenderer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var labelAlign = {
-	  getX: function getX(node) {
-	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale;
-	  },
-	  getY: function getY(node) {
-	    return node.centery;
-	  },
-	  getLabelOffset: function getLabelOffset(node) {
-	    return node.tree.farthestNodeFromRootX * node.tree.currentBranchScale - node.centerx;
-	  }
-	};
-
-	exports.default = {
-	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
-	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  labelAlign: labelAlign,
-	  branchScalingAxis: 'x'
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Draws a branch.
-	 *
-	 * @class
-	 */
-	var BranchRenderer = function () {
-
-	  /**
-	   * @constructor
-	   * @param {Object} options
-	   * @param {function} options.draw
-	   * @param {function} [options.prepareChild]
-	   */
-	  function BranchRenderer(options) {
-	    _classCallCheck(this, BranchRenderer);
-
-	    if (!options || !options.draw) {
-	      throw new Error('`draw` function is required for branch renderers');
-	    }
-
-	    this.draw = options.draw;
-	    this.prepareChild = options.prepareChild;
-	  }
-
-	  /**
-	   * @param {Tree}
-	   * @param {Branch}
-	   * @param {boolean=} - if true, rendering skipped.
-	   */
-
-
-	  _createClass(BranchRenderer, [{
-	    key: 'render',
-	    value: function render(tree, branch, collapse) {
-	      var i;
-	      if (collapse || !branch) return;
-
-	      if (branch.selected) {
-	        branch.canvas.fillStyle = tree.selectedColour;
-	      } else {
-	        branch.canvas.fillStyle = branch.colour;
-	      }
-	      branch.canvas.strokeStyle = branch.getColour();
-
-	      this.draw(tree, branch);
-
-	      if (branch.pruned) {
-	        return;
-	      }
-
-	      branch.drawNode();
-
-	      for (i = 0; i < branch.children.length; i++) {
-	        if (this.prepareChild) {
-	          this.prepareChild(branch, branch.children[i]);
-	        }
-	        this.render(tree, branch.children[i], branch.collapsed || collapse);
-	      }
-	    }
-	  }]);
-
-	  return BranchRenderer;
-	}();
-
-	exports.default = BranchRenderer;
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Calculates the tree dimensions before the first draw.
-	 *
-	 * @class
-	 */
-	var Prerenderer = function () {
-
-	  /**
-	   * @constructor
-	   * @param {Object} options
-	   * @param {function} options.getStep - should return the space between each branch.
-	   * @param {function} options.calculate
-	   */
-	  function Prerenderer(options) {
-	    _classCallCheck(this, Prerenderer);
-
-	    this.getStep = options.getStep;
-	    this.calculate = options.calculate;
-	  }
-
-	  /**
-	   * @param {Tree}
-	   */
-
-
-	  _createClass(Prerenderer, [{
-	    key: "run",
-	    value: function run(tree) {
-	      var step = this.getStep(tree);
-
-	      tree.root.startx = 0;
-	      tree.root.starty = 0;
-	      tree.root.centerx = 0;
-	      tree.root.centery = 0;
-	      tree.farthestNodeFromRootX = 0;
-	      tree.farthestNodeFromRootY = 0;
-	      tree.currentBranchScale = 1;
-	      tree.step = step;
-
-	      this.calculate(tree, step);
-
-	      tree.initialBranchScalar = tree.branchScalar;
-
-	      // Assign root startx and starty
-	      tree.root.startx = tree.root.centerx;
-	      tree.root.starty = tree.root.centery;
-	      // Set font size for tree and its branches
-	      tree.setFontSize(step);
-	      tree.setMaxLabelLength();
-	    }
-	  }]);
-
-	  return Prerenderer;
-	}();
-
-	exports.default = Prerenderer;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  draw: function draw(tree, node) {
-	    var branchLength = node.branchLength * tree.branchScalar;
-
-	    node.angle = 0;
-	    if (node.parent) {
-	      node.centerx = node.startx + branchLength;
-	    }
-
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.startx, node.centery);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
-	  },
-	  prepareChild: function prepareChild(node, child) {
-	    child.startx = node.centerx;
-	    child.starty = node.centery;
-	  }
-	};
-
-/***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  getStep: function getStep(tree) {
-	    return tree.fillCanvas ? tree.canvas.canvas.height / tree.leaves.length : Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
-	  },
-	  calculate: function calculate(tree, ystep) {
-	    // Calculate branchScalar based on canvas width and total branch length
-	    // This is used to transform the X coordinate based on the canvas width and no. of branches
-	    tree.branchScalar = tree.canvas.canvas.width / tree.maxBranchLength;
-
-	    // set initial positons of the branches
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = 0; // for rectangle
-	      // Calculate and assign y coordinate for all the leaves
-	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-
-	      // Calculate and assign y coordinate for all the parent branches
-	      for (var branch = tree.leaves[i]; branch.parent; branch = branch.parent) {
-	        // Get all the children of a parent
-	        var childrenArray = branch.parent.children;
-	        // Assign parent's y coordinate
-	        // Logic: Total ystep of all the children of this parent / 2
-	        branch.parent.centery = (childrenArray[0].centery + childrenArray[childrenArray.length - 1].centery) / 2;
-	      }
-	    }
-	  }
-	};
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _BranchRenderer = __webpack_require__(12);
-
-	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
-
-	var _Prerenderer = __webpack_require__(13);
-
-	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
-
-	var _branchRenderer = __webpack_require__(17);
-
-	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
-
-	var _prerenderer = __webpack_require__(18);
-
-	var _prerenderer2 = _interopRequireDefault(_prerenderer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var labelAlign = {
-	  getX: function getX(node) {
-	    return node.centerx + node.labelOffsetX + node.getDiameter() * Math.cos(node.angle);
-	  },
-	  getY: function getY(node) {
-	    return node.centery + node.labelOffsetY + node.getDiameter() * Math.sin(node.angle);
-	  },
-	  getLabelOffset: function getLabelOffset(node) {
-	    return node.labelOffsetX / Math.cos(node.angle);
-	  }
-	};
-
-	exports.default = {
-	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
-	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  labelAlign: labelAlign,
-	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
-	    return radius / 2;
-	  },
-	  calculateFontSize: function calculateFontSize(ystep) {
-	    return Math.min(ystep * 10 + 4, 40);
-	  }
-	};
-
-/***/ },
-/* 17 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  draw: function draw(tree, node) {
-	    var branchLength = node.totalBranchLength * tree.branchScalar;
-
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
-
-	    node.canvas.strokeStyle = node.getColour();
-
-	    if (node.children.length > 1 && !node.collapsed) {
-	      node.canvas.beginPath();
-	      node.canvas.arc(0, 0, branchLength, node.minChildAngle, node.maxChildAngle, node.maxChildAngle < node.minChildAngle);
-	      node.canvas.stroke();
-	      node.canvas.closePath();
-	    }
-	  }
-	};
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _utils = __webpack_require__(2);
-
-	var Angles = _utils.constants.Angles;
-	exports.default = {
-	  getStep: function getStep(tree) {
-	    return Angles.FULL / tree.leaves.length;
-	  },
-	  calculate: function calculate(tree, step) {
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-	    // work out radius of tree and the make branch scalar proportinal to the
-	    var r = tree.leaves.length * tree.leaves[0].getDiameter() / Angles.FULL;
-	    if (tree.branchScalar * tree.maxBranchLength > r) {
-	      r = tree.branchScalar * tree.maxBranchLength;
-	    } else {
-	      tree.branchScalar = r / tree.maxBranchLength;
-	    }
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      var node = tree.leaves[i];
-
-	      node.angle = step * i;
-	      node.startx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
-	      node.starty = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
-	      node.centerx = node.totalBranchLength * tree.branchScalar * Math.cos(node.angle);
-	      node.centery = node.totalBranchLength * tree.branchScalar * Math.sin(node.angle);
-	      node.labelOffsetX = r * Math.cos(node.angle) - node.centerx;
-	      node.labelOffsetY = r * Math.sin(node.angle) - node.centery;
-
-	      for (; node.parent; node = node.parent) {
-	        if (node.getChildNo() === 0) {
-	          node.parent.angle = node.angle;
-	          node.parent.minChildAngle = node.angle;
-	        }
-	        if (node.getChildNo() === node.parent.children.length - 1) {
-	          node.parent.maxChildAngle = node.angle;
-	          node.parent.angle = (node.parent.minChildAngle + node.parent.maxChildAngle) / 2;
-	          node.parent.startx = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.cos(node.parent.angle);
-	          node.parent.starty = (node.parent.totalBranchLength - node.parent.branchLength) * tree.branchScalar * Math.sin(node.parent.angle);
-	          node.parent.centerx = node.parent.totalBranchLength * tree.branchScalar * Math.cos(node.parent.angle);
-	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar * Math.sin(node.parent.angle);
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	  }
-	};
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _BranchRenderer = __webpack_require__(12);
-
-	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
-
-	var _Prerenderer = __webpack_require__(13);
-
-	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
-
-	var _branchRenderer = __webpack_require__(20);
-
-	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
-
-	var _prerenderer = __webpack_require__(21);
-
-	var _prerenderer2 = _interopRequireDefault(_prerenderer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = {
-	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
-	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  scaleCollapsedNode: function scaleCollapsedNode(radius) {
-	    return radius / 3;
-	  },
-	  calculateFontSize: function calculateFontSize(ystep) {
-	    return Math.min(ystep * 50 + 5, 15);
-	  }
-	};
-
-/***/ },
-/* 20 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  draw: function draw(tree, node) {
-	    node.canvas.beginPath();
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-	    node.canvas.closePath();
-	  }
-	};
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _utils = __webpack_require__(2);
-
-	var Angles = _utils.constants.Angles;
-
-
-	function prerenderNodes(tree, node) {
-	  if (node.parent) {
-	    node.startx = node.parent.centerx;
-	    node.starty = node.parent.centery;
-	  } else {
-	    node.startx = 0;
-	    node.starty = 0;
-	  }
-	  node.centerx = node.startx + node.branchLength * tree.branchScalar * Math.cos(node.angle);
-	  node.centery = node.starty + node.branchLength * tree.branchScalar * Math.sin(node.angle);
-
-	  for (var i = 0; i < node.children.length; i++) {
-	    prerenderNodes(tree, node.children[i]);
-	  }
-	}
-
-	exports.default = {
-	  getStep: function getStep(tree) {
-	    return Angles.FULL / tree.leaves.length;
-	  },
-	  calculate: function calculate(tree, step) {
-	    tree.branchScalar = Math.min(tree.canvas.canvas.width, tree.canvas.canvas.height) / tree.maxBranchLength;
-
-	    for (var i = 0.0; i < tree.leaves.length; i += 1.0) {
-	      tree.leaves[i].angle = step * i;
-	      tree.leaves[i].centerx = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.cos(tree.leaves[i].angle);
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar * Math.sin(tree.leaves[i].angle);
-
-	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
-	        if (node.getChildNo() === 0) {
-	          node.parent.angle = 0;
-	        }
-	        node.parent.angle += node.angle * node.getChildCount();
-	        if (node.getChildNo() === node.parent.children.length - 1) {
-	          node.parent.angle = node.parent.angle / node.parent.getChildCount();
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-
-	    prerenderNodes(tree, tree.root);
-	  }
-	};
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _BranchRenderer = __webpack_require__(12);
-
-	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
-
-	var _Prerenderer = __webpack_require__(13);
-
-	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
-
-	var _branchRenderer = __webpack_require__(23);
-
-	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
-
-	var _prerenderer = __webpack_require__(24);
-
-	var _prerenderer2 = _interopRequireDefault(_prerenderer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = {
-	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
-	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  calculateFontSize: function calculateFontSize(ystep) {
-	    return Math.min(ystep / 2, 10);
-	  }
-	};
-
-/***/ },
-/* 23 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  draw: function draw(tree, node) {
-	    node.angle = 0;
-	    node.canvas.beginPath();
-
-	    node.canvas.moveTo(node.startx, node.starty);
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-
-	    node.canvas.closePath();
-	  },
-	  prepareChild: function prepareChild(node, child) {
-	    child.startx = node.centerx;
-	    child.starty = node.centery;
-	  }
-	};
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _utils = __webpack_require__(2);
-
-	var Angles = _utils.constants.Angles;
-	exports.default = {
-	  getStep: function getStep(tree) {
-	    return Math.max(tree.canvas.canvas.height / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
-	  },
-	  calculate: function calculate(tree, ystep) {
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].centerx = 0;
-	      tree.leaves[i].centery = i > 0 ? tree.leaves[i - 1].centery + ystep : 0;
-	      tree.leaves[i].angle = 0;
-
-	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
-	        if (node.getChildNo() === node.parent.children.length - 1) {
-	          node.parent.centery = node.parent.getChildYTotal() / node.parent.getChildCount(); // (node.parent.children.length - 1);
-	          node.parent.centerx = node.parent.children[0].centerx + (node.parent.children[0].centery - node.parent.centery) * Math.tan(Angles.FORTYFIVE);
-	          for (var j = 0; j < node.parent.children.length; j++) {
-	            node.parent.children[j].startx = node.parent.centerx;
-	            node.parent.children[j].starty = node.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	    }
-	  }
-	};
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _BranchRenderer = __webpack_require__(12);
-
-	var _BranchRenderer2 = _interopRequireDefault(_BranchRenderer);
-
-	var _Prerenderer = __webpack_require__(13);
-
-	var _Prerenderer2 = _interopRequireDefault(_Prerenderer);
-
-	var _branchRenderer = __webpack_require__(26);
-
-	var _branchRenderer2 = _interopRequireDefault(_branchRenderer);
-
-	var _prerenderer = __webpack_require__(27);
-
-	var _prerenderer2 = _interopRequireDefault(_prerenderer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var labelAlign = {
-	  getX: function getX(node) {
-	    return node.centerx;
-	  },
-	  getY: function getY(node) {
-	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale;
-	  },
-	  getLabelOffset: function getLabelOffset(node) {
-	    return node.tree.farthestNodeFromRootY * node.tree.currentBranchScale - node.centery;
-	  }
-	};
-
-	exports.default = {
-	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
-	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
-	  labelAlign: labelAlign,
-	  branchScalingAxis: 'y'
-	};
-
-/***/ },
-/* 26 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = {
-	  draw: function draw(tree, node) {
-	    var branchLength = node.branchLength * tree.branchScalar;
-
-	    if (node.parent) {
-	      node.centery = node.starty + branchLength;
-	    }
-
-	    node.canvas.beginPath();
-
-	    if (node !== node.tree.root) {
-	      node.canvas.moveTo(node.startx, node.starty);
-	      node.canvas.lineTo(node.centerx, node.starty);
-	    }
-
-	    node.canvas.lineTo(node.centerx, node.centery);
-	    node.canvas.stroke();
-
-	    node.canvas.closePath();
-	  },
-	  prepareChild: function prepareChild(node, child) {
-	    child.startx = node.centerx;
-	    child.starty = node.centery;
-	  }
-	};
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _utils = __webpack_require__(2);
-
-	var Angles = _utils.constants.Angles;
-	exports.default = {
-	  getStep: function getStep(tree) {
-	    return tree.fillCanvas ? tree.canvas.canvas.width / tree.leaves.length : Math.max(tree.canvas.canvas.width / tree.leaves.length, tree.leaves[0].getDiameter() + tree.labelPadding);
-	  },
-	  calculate: function calculate(tree, xstep) {
-	    tree.branchScalar = tree.canvas.canvas.height / tree.maxBranchLength;
-
-	    for (var i = 0; i < tree.leaves.length; i++) {
-	      tree.leaves[i].angle = Angles.QUARTER;
-	      tree.leaves[i].centerx = i > 0 ? tree.leaves[i - 1].centerx + xstep : 0;
-	      tree.leaves[i].centery = tree.leaves[i].totalBranchLength * tree.branchScalar;
-
-	      for (var node = tree.leaves[i]; node.parent; node = node.parent) {
-	        if (node.getChildNo() === 0) {
-	          node.parent.centerx = node.centerx;
-	        }
-
-	        if (node.getChildNo() === node.parent.children.length - 1) {
-	          node.parent.angle = Angles.QUARTER;
-	          node.parent.centerx = (node.parent.centerx + node.centerx) / 2;
-	          node.parent.centery = node.parent.totalBranchLength * tree.branchScalar;
-	          for (var j = 0; j < node.parent.children.length; j++) {
-	            node.parent.children[j].startx = node.parent.centerx;
-	            node.parent.children[j].starty = node.parent.centery;
-	          }
-	        } else {
-	          break;
-	        }
-	      }
-	      // Assign x,y position of the farthest node from the root
-	      if (tree.leaves[i].centerx > tree.farthestNodeFromRootX) {
-	        tree.farthestNodeFromRootX = tree.leaves[i].centerx;
-	      }
-	      if (tree.leaves[i].centery > tree.farthestNodeFromRootY) {
-	        tree.farthestNodeFromRootY = tree.leaves[i].centery;
-	      }
-	    }
-	  }
-	};
 
 /***/ },
 /* 28 */
