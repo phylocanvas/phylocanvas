@@ -4,6 +4,8 @@ import Prerenderer from '../../Prerenderer';
 import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
+import { Angles } from '../../utils/constants';
+
 const labelAlign = {
   getX(node) {
     return node.centerx + node.labelOffsetX + (node.getDiameter() * Math.cos(node.angle));
@@ -21,10 +23,9 @@ export default {
   prerenderer: new Prerenderer(prerendererOptions),
   labelAlign,
   getCollapsedMeasurements(branch) {
-    const numberOfLeaves = branch.getNumberOfLeaves();
     return {
-      angle: numberOfLeaves * branch.tree.step,
-      radius: numberOfLeaves, // wedge appears larger if contains many leaves
+      angle: Angles.QUARTER,
+      radius: branch.getNumberOfLeaves() * Angles.QUARTER,
     };
   },
   calculateFontSize(ystep) {

@@ -4,17 +4,18 @@ import Prerenderer from '../../Prerenderer';
 import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
+import { Angles } from '../../utils/constants';
+
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
   getCollapsedMeasurements(branch) {
-    const numberOfLeaves = branch.getNumberOfLeaves();
     return {
-      angle: numberOfLeaves * branch.tree.step,
-      radius: numberOfLeaves, // wedge appears larger if contains many leaves
+      angle: Angles.QUARTER,
+      radius: branch.getNumberOfLeaves() * Angles.QUARTER,
     };
   },
-  calculateFontSize: function (ystep) {
+  calculateFontSize(ystep) {
     return Math.min((ystep * 50) + 5, 15);
-  }
+  },
 };

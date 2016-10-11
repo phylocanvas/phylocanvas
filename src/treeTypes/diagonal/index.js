@@ -4,6 +4,8 @@ import Prerenderer from '../../Prerenderer';
 import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
+import { Angles } from '../../utils/constants';
+
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
@@ -12,8 +14,8 @@ export default {
   },
   getCollapsedMeasurements(branch) {
     return {
-      angle: Math.PI / 2,
-      radius: (branch.tree.step * branch.getNumberOfLeaves()) / 4,
+      angle: Angles.QUARTER,
+      radius: branch.tree.step * branch.getNumberOfLeaves(),
     };
   },
 };

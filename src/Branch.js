@@ -401,14 +401,14 @@ class Branch {
 
   getNumberOfLeaves() {
     let numberOfLeaves = 0;
-    const branches = [ this ];
-    while (branches.length) {
-      const branch = branches.pop();
-      if (branch.leaf) {
+    const queue = [ this ];
+    while (queue.length) {
+      const node = queue.pop();
+      if (node.leaf) {
         numberOfLeaves++;
       } else {
-        for (const child of branch.children) {
-          branches.push(child);
+        for (const child of node.children) {
+          queue.push(child);
         }
       }
     }
@@ -432,9 +432,14 @@ class Branch {
 
     this.canvas.moveTo(centerX, centerY);
     this.canvas.arc(centerX, centerY, radius, startAngle, endAngle, false);
-    this.canvas.fillStyle = this.tree.collapsedColour || this.getColour();
 
-    this.canvas.closePath();
+    const gradient = this.canvas.createRadialGradient(
+      centerX, centerY, radius, centerX, centerY, 0.2 * radius
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(1, this.tree.collapsedColour || this.getColour());
+    this.canvas.fillStyle = gradient;
+
     this.canvas.fill();
   }
 
