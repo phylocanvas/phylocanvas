@@ -317,19 +317,16 @@ class Branch {
     * @returns {Branch}
     */
   clicked(x, y) {
-    var i;
-    var child;
-
-    if (this.dragging) {
-      return;
+    if (this.dragging || this.hasCollapsedAncestor()) {
+      return null;
     }
     if ((x < (this.maxx) && x > (this.minx)) &&
         (y < (this.maxy) && y > (this.miny))) {
       return this;
     }
 
-    for (i = this.children.length - 1; i >= 0; i--) {
-      child = this.children[i].clicked(x, y);
+    for (let i = this.children.length - 1; i >= 0; i--) {
+      const child = this.children[i].clicked(x, y);
       if (child) {
         return child;
       }
@@ -864,9 +861,6 @@ class Branch {
     const { baseNodeSize } = this.tree;
     if (this.leaf) {
       return baseNodeSize * this.radius;
-    }
-    if (this.collapsed) {
-      return baseNodeSize * this.radius * 3;
     }
     return baseNodeSize / this.radius;
   }
