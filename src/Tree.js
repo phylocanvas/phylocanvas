@@ -650,7 +650,7 @@ class Tree {
       } else {
         this.tooltip.close();
         this.root.cascadeFlag('hovered', false);
-        if (!this.shiftKeyDrag || (this.shiftKeyDrag && e.shiftKey)) {
+        if (this.shiftKeyDrag && e.shiftKey) {
           setCursorDrag(this.containerElement);
         } else {
           this.containerElement.style.cursor = 'auto';
@@ -726,8 +726,10 @@ class Tree {
   drop(event) {
     if (!this.drawn) return false;
     this.pickedup = false;
-    if (!this.shiftKeyDrag || event.shiftKey) {
+    if (this.shiftKeyDrag && event.shiftKey) {
       setCursorDrag(this.containerElement);
+    } else {
+      this.containerElement.style.cursor = 'auto';
     }
   }
 
@@ -1055,7 +1057,6 @@ class Tree {
     this.branchRenderer = treeTypes[type].branchRenderer;
     this.prerenderer = treeTypes[type].prerenderer;
     this.labelAlign = treeTypes[type].labelAlign;
-    this.scaleCollapsedNode = treeTypes[type].scaleCollapsedNode;
     this.calculateFontSize = treeTypes[type].calculateFontSize;
 
     if (this.drawn) {
