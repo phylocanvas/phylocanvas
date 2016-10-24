@@ -4,15 +4,14 @@ import Prerenderer from '../../Prerenderer';
 import branchRendererOptions from './branchRenderer';
 import prerendererOptions from './prerenderer';
 
-import { Angles } from '../../utils/constants';
-
 export default {
   branchRenderer: new BranchRenderer(branchRendererOptions),
   prerenderer: new Prerenderer(prerendererOptions),
   getCollapsedMeasurements(branch) {
+    const { maxBranchLength, branchScalar, step } = branch.tree;
     return {
-      angle: Angles.QUARTER,
-      radius: branch.getNumberOfLeaves() * Angles.QUARTER,
+      angle: branch.getNumberOfLeaves() * step,
+      radius: (maxBranchLength - branch.totalBranchLength) * branchScalar,
     };
   },
   calculateFontSize(ystep) {
