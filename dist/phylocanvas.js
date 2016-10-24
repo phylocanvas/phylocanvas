@@ -3911,8 +3911,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
-	var _constants = __webpack_require__(6);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var labelAlign = {
@@ -3932,9 +3930,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  labelAlign: labelAlign,
 	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    var _branch$tree = branch.tree;
+	    var maxBranchLength = _branch$tree.maxBranchLength;
+	    var branchScalar = _branch$tree.branchScalar;
+	    var step = _branch$tree.step;
+
 	    return {
-	      angle: _constants.Angles.QUARTER,
-	      radius: branch.getNumberOfLeaves() * _constants.Angles.QUARTER
+	      angle: branch.getNumberOfLeaves() * step,
+	      radius: (maxBranchLength - branch.totalBranchLength) * branchScalar
 	    };
 	  },
 	  calculateFontSize: function calculateFontSize(ystep) {
@@ -4056,17 +4059,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _prerenderer2 = _interopRequireDefault(_prerenderer);
 
-	var _constants = __webpack_require__(6);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = {
 	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
+	    var _branch$tree = branch.tree;
+	    var maxBranchLength = _branch$tree.maxBranchLength;
+	    var branchScalar = _branch$tree.branchScalar;
+	    var step = _branch$tree.step;
+
 	    return {
-	      angle: _constants.Angles.QUARTER,
-	      radius: branch.getNumberOfLeaves() * _constants.Angles.QUARTER
+	      angle: branch.getNumberOfLeaves() * step,
+	      radius: (maxBranchLength - branch.totalBranchLength) * branchScalar
 	    };
 	  },
 	  calculateFontSize: function calculateFontSize(ystep) {
