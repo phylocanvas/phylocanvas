@@ -438,6 +438,8 @@ class Branch {
     this.canvas.fillStyle = gradient;
 
     this.canvas.fill();
+
+    this.canvas.closePath();
   }
 
   /**
