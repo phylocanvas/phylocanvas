@@ -1416,6 +1416,14 @@ class Tree {
   resizeToContainer() {
     this.setSize(this.containerElement.offsetWidth, this.containerElement.offsetHeight);
   }
+
+  /**
+   * Removes tracked event listeners and provides a hook for plugins to clean up
+   * after themselves.
+   */
+  cleanup() {
+    this.removeEventListeners();
+  }
 }
 
 /**
