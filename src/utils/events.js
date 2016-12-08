@@ -41,6 +41,14 @@ export function addEvent(elem, event, fn) {
   }
 }
 
+export function removeEvent(elem, event, fn) {
+  if (elem.removeEventListener) {
+    elem.removeEventListener(event, fn, false);
+  } else {
+    console.warn('[Phylocanvas] Unable to remove event, removeEventListener not supported');
+  }
+}
+
 export function killEvent(e) {
   e.stopPropagation();
   e.preventDefault();

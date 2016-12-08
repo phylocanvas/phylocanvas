@@ -7,7 +7,7 @@ import treeTypes from './treeTypes';
 import parsers from './parsers';
 
 const { addClass, setCursorDrag, setCursorDragging } = dom;
-const { fireEvent, addEvent } = events;
+const { fireEvent, addEvent, removeEvent } = events;
 const { getPixelRatio, translateClick } = canvas;
 const { Predicates } = constants;
 
@@ -486,20 +486,60 @@ class Tree {
 
     this.resizeToContainer();
 
-    this.addListener('click', this.clicked.bind(this));
+    /**
+     * Default event listeners. Includes event listeners passed in config, which
+     * will overwrite the default listener of the same event type.
+     *
+     * @type object
+     */
+    this.eventListeners = Object.assign({
+      click: { listener: this.clicked.bind(this) },
+      mousedown: { listener: this.pickup.bind(this) },
+      mouseup: { listener: this.drop.bind(this) },
+      mouseout: { listener: this.drop.bind(this) },
+      mousemove: {
+        target: this.canvas.canvas,
+        listener: this.drag.bind(this),
+      },
+      mousewheel: {
+        target: this.canvas.canvas,
+        listener: this.scroll.bind(this),
+      },
+      DOMMouseScroll: {
+        target: this.canvas.canvas,
+        listener: this.scroll.bind(this),
+      },
+      resize: {
+        target: window,
+        listener: () => {
+          this.resizeToContainer();
+          this.draw();
+        },
+      },
+    }, config.eventListeners);
 
-    this.addListener('mousedown', this.pickup.bind(this));
-    this.addListener('mouseup', this.drop.bind(this));
-    this.addListener('mouseout', this.drop.bind(this));
+    this.addEventListeners();
+  }
 
-    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
+  /**
+   * Attaches events defined in this.eventListeners, called on construction of
+   * new instance.
+   */
+  addEventListeners() {
+    for (const event of Object.keys(this.eventListeners)) {
+      const { target, listener } = this.eventListeners[event];
+      addEvent(target || this.containerElement, event, listener);
+    }
+  }
 
-    addEvent(window, 'resize', () => {
-      this.resizeToContainer();
-      this.draw();
-    });
+  /**
+   * Removes events defined in this.eventListeners. Useful for cleaning up.
+   */
+  removeEventListeners() {
+    for (const event of Object.keys(this.eventListeners)) {
+      const { target, listener } = this.eventListeners[event];
+      removeEvent(target || this.containerElement, event, listener);
+    }
   }
 
   /**
@@ -700,7 +740,7 @@ class Tree {
   }
 
   /**
-   * Mousedown event handler
+   * Mousedown event listener
    *
    * @param {MouseEvent} event
    */
@@ -721,7 +761,7 @@ class Tree {
   }
 
   /**
-   * mouseup event handler.
+   * mouseup event listener.
    */
   drop(event) {
     if (!this.drawn) return false;
@@ -734,7 +774,7 @@ class Tree {
   }
 
   /**
-   * Mousewheel event handler.
+   * Mousewheel event listener.
    *
    * @param event
    */
@@ -1254,7 +1294,7 @@ class Tree {
    * @property {string} newType
    */
   treeTypeChanged(oldType, newType) {
-    fireEvent(this.containerElement, 'typechanged', { oldType: oldType, newType: newType });
+    fireEvent(this.containerElement, 'typechanged', { oldType, newType });
   }
 
   /**
@@ -1262,7 +1302,20 @@ class Tree {
    * @param {function}
    */
   addListener(event, listener) {
+    if (event in this.eventListeners) {
+      console.warn('[Phylocanvas] Duplicate event listener added, it must be manually removed.');
+    } else {
+      this.eventListeners[event] = { listener };
+    }
     addEvent(this.containerElement, event, listener);
+  }
+
+  /**
+   * @param {string}
+   * @param {function}
+   */
+  removeListener(event, listener) {
+    removeEvent(this.containerElement, event, listener);
   }
 
   /**
@@ -1371,5 +1424,12 @@ class Tree {
  * @see Tree#addListener
  */
 Tree.prototype.on = Tree.prototype.addListener;
+
+/**
+ * @memberof Tree
+ * @method
+ * @see Tree#removeListener
+ */
+Tree.prototype.off = Tree.prototype.removeListener;
 
 export default Tree;
