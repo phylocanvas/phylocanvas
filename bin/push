@@ -1,9 +1,0 @@
-#!/bin/bash
-
-npm run build
-
-if [[ `git status --porcelain -- dist` ]]; then
-  git add dist && git commit -m 'Build';
-fi
-
-git push
