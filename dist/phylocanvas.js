@@ -186,13 +186,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var addClass = _utils.dom.addClass;
-	var setCursorDrag = _utils.dom.setCursorDrag;
-	var setCursorDragging = _utils.dom.setCursorDragging;
-	var fireEvent = _utils.events.fireEvent;
-	var addEvent = _utils.events.addEvent;
-	var getPixelRatio = _utils.canvas.getPixelRatio;
-	var translateClick = _utils.canvas.translateClick;
+	var addClass = _utils.dom.addClass,
+	    setCursorDrag = _utils.dom.setCursorDrag,
+	    setCursorDragging = _utils.dom.setCursorDragging;
+	var fireEvent = _utils.events.fireEvent,
+	    addEvent = _utils.events.addEvent,
+	    removeEvent = _utils.events.removeEvent;
+	var getPixelRatio = _utils.canvas.getPixelRatio,
+	    translateClick = _utils.canvas.translateClick;
 	var Predicates = _utils.constants.Predicates;
 
 	/**
@@ -666,30 +667,122 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.resizeToContainer();
 
-	    this.addListener('click', this.clicked.bind(this));
+	    /**
+	     * Default event listeners. Includes event listeners passed in config, which
+	     * will overwrite the default listener of the same event type.
+	     *
+	     * @type object
+	     */
+	    this.eventListeners = Object.assign({
+	      click: { listener: this.clicked.bind(this) },
+	      mousedown: { listener: this.pickup.bind(this) },
+	      mouseup: { listener: this.drop.bind(this) },
+	      mouseout: { listener: this.drop.bind(this) },
+	      mousemove: {
+	        target: this.canvas.canvas,
+	        listener: this.drag.bind(this)
+	      },
+	      mousewheel: {
+	        target: this.canvas.canvas,
+	        listener: this.scroll.bind(this)
+	      },
+	      DOMMouseScroll: {
+	        target: this.canvas.canvas,
+	        listener: this.scroll.bind(this)
+	      },
+	      resize: {
+	        target: window,
+	        listener: function listener() {
+	          _this.resizeToContainer();
+	          _this.draw();
+	        }
+	      }
+	    }, config.eventListeners);
 
-	    this.addListener('mousedown', this.pickup.bind(this));
-	    this.addListener('mouseup', this.drop.bind(this));
-	    this.addListener('mouseout', this.drop.bind(this));
-
-	    addEvent(this.canvas.canvas, 'mousemove', this.drag.bind(this));
-	    addEvent(this.canvas.canvas, 'mousewheel', this.scroll.bind(this));
-	    addEvent(this.canvas.canvas, 'DOMMouseScroll', this.scroll.bind(this));
-
-	    addEvent(window, 'resize', function () {
-	      _this.resizeToContainer();
-	      _this.draw();
-	    });
+	    this.addEventListeners();
 	  }
 
 	  /**
-	   * Set/get if labels are currently aligned.
-	   *
-	   * @type boolean
+	   * Attaches events defined in this.eventListeners, called on construction of
+	   * new instance.
 	   */
 
 
 	  _createClass(Tree, [{
+	    key: 'addEventListeners',
+	    value: function addEventListeners() {
+	      var _iteratorNormalCompletion = true;
+	      var _didIteratorError = false;
+	      var _iteratorError = undefined;
+
+	      try {
+	        for (var _iterator = Object.keys(this.eventListeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	          var event = _step.value;
+	          var _eventListeners$event = this.eventListeners[event],
+	              target = _eventListeners$event.target,
+	              listener = _eventListeners$event.listener;
+
+	          addEvent(target || this.containerElement, event, listener);
+	        }
+	      } catch (err) {
+	        _didIteratorError = true;
+	        _iteratorError = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion && _iterator.return) {
+	            _iterator.return();
+	          }
+	        } finally {
+	          if (_didIteratorError) {
+	            throw _iteratorError;
+	          }
+	        }
+	      }
+	    }
+
+	    /**
+	     * Removes events defined in this.eventListeners. Useful for cleaning up.
+	     */
+
+	  }, {
+	    key: 'removeEventListeners',
+	    value: function removeEventListeners() {
+	      var _iteratorNormalCompletion2 = true;
+	      var _didIteratorError2 = false;
+	      var _iteratorError2 = undefined;
+
+	      try {
+	        for (var _iterator2 = Object.keys(this.eventListeners)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          var event = _step2.value;
+	          var _eventListeners$event2 = this.eventListeners[event],
+	              target = _eventListeners$event2.target,
+	              listener = _eventListeners$event2.listener;
+
+	          removeEvent(target || this.containerElement, event, listener);
+	        }
+	      } catch (err) {
+	        _didIteratorError2 = true;
+	        _iteratorError2 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	            _iterator2.return();
+	          }
+	        } finally {
+	          if (_didIteratorError2) {
+	            throw _iteratorError2;
+	          }
+	        }
+	      }
+	    }
+
+	    /**
+	     * Set/get if labels are currently aligned.
+	     *
+	     * @type boolean
+	     */
+
+	  }, {
 	    key: 'setInitialCollapsedBranches',
 
 
@@ -906,7 +999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Mousedown event handler
+	     * Mousedown event listener
 	     *
 	     * @param {MouseEvent} event
 	     */
@@ -930,7 +1023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * mouseup event handler.
+	     * mouseup event listener.
 	     */
 
 	  }, {
@@ -946,7 +1039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    /**
-	     * Mousewheel event handler.
+	     * Mousewheel event listener.
 	     *
 	     * @param event
 	     */
@@ -984,29 +1077,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var foundLeaves = [];
 
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
+	      var _iteratorNormalCompletion3 = true;
+	      var _didIteratorError3 = false;
+	      var _iteratorError3 = undefined;
 
 	      try {
-	        for (var _iterator = this.leaves[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var leaf = _step.value;
+	        for (var _iterator3 = this.leaves[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	          var leaf = _step3.value;
 
 	          if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
 	            foundLeaves.push(leaf);
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
+	        _didIteratorError3 = true;
+	        _iteratorError3 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
+	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	            _iterator3.return();
 	          }
 	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
+	          if (_didIteratorError3) {
+	            throw _iteratorError3;
 	          }
 	        }
 	      }
@@ -1025,52 +1118,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'updateLeaves',
 	    value: function updateLeaves(leaves, property, value) {
-	      var _iteratorNormalCompletion2 = true;
-	      var _didIteratorError2 = false;
-	      var _iteratorError2 = undefined;
+	      var _iteratorNormalCompletion4 = true;
+	      var _didIteratorError4 = false;
+	      var _iteratorError4 = undefined;
 
 	      try {
-	        for (var _iterator2 = this.leaves[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	          var leaf = _step2.value;
+	        for (var _iterator4 = this.leaves[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	          var leaf = _step4.value;
 
 	          leaf[property] = !value;
 	        }
 	      } catch (err) {
-	        _didIteratorError2 = true;
-	        _iteratorError2 = err;
+	        _didIteratorError4 = true;
+	        _iteratorError4 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	            _iterator2.return();
+	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	            _iterator4.return();
 	          }
 	        } finally {
-	          if (_didIteratorError2) {
-	            throw _iteratorError2;
+	          if (_didIteratorError4) {
+	            throw _iteratorError4;
 	          }
 	        }
 	      }
 
-	      var _iteratorNormalCompletion3 = true;
-	      var _didIteratorError3 = false;
-	      var _iteratorError3 = undefined;
+	      var _iteratorNormalCompletion5 = true;
+	      var _didIteratorError5 = false;
+	      var _iteratorError5 = undefined;
 
 	      try {
-	        for (var _iterator3 = leaves[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	          var _leaf = _step3.value;
+	        for (var _iterator5 = leaves[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+	          var _leaf = _step5.value;
 
 	          _leaf[property] = value;
 	        }
 	      } catch (err) {
-	        _didIteratorError3 = true;
-	        _iteratorError3 = err;
+	        _didIteratorError5 = true;
+	        _iteratorError5 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-	            _iterator3.return();
+	          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+	            _iterator5.return();
 	          }
 	        } finally {
-	          if (_didIteratorError3) {
-	            throw _iteratorError3;
+	          if (_didIteratorError5) {
+	            throw _iteratorError5;
 	          }
 	        }
 	      }
@@ -1139,13 +1232,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var _iteratorNormalCompletion4 = true;
-	      var _didIteratorError4 = false;
-	      var _iteratorError4 = undefined;
+	      var _iteratorNormalCompletion6 = true;
+	      var _didIteratorError6 = false;
+	      var _iteratorError6 = undefined;
 
 	      try {
-	        for (var _iterator4 = Object.keys(_parsers2.default)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-	          var parserName = _step4.value;
+	        for (var _iterator6 = Object.keys(_parsers2.default)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+	          var parserName = _step6.value;
 
 	          var parser = _parsers2.default[parserName];
 
@@ -1155,16 +1248,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError4 = true;
-	        _iteratorError4 = err;
+	        _didIteratorError6 = true;
+	        _iteratorError6 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-	            _iterator4.return();
+	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+	            _iterator6.return();
 	          }
 	        } finally {
-	          if (_didIteratorError4) {
-	            throw _iteratorError4;
+	          if (_didIteratorError6) {
+	            throw _iteratorError6;
 	          }
 	        }
 	      }
@@ -1491,10 +1584,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setZoom',
 	    value: function setZoom(zoom) {
-	      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getCentrePoint();
-
-	      var x = _ref.x;
-	      var y = _ref.y;
+	      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getCentrePoint(),
+	          x = _ref.x,
+	          y = _ref.y;
 
 	      if (zoom > 0) {
 	        var oldZoom = this.zoom;
@@ -1681,7 +1773,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'addListener',
 	    value: function addListener(event, listener) {
+	      if (event in this.eventListeners) {
+	        console.warn('[Phylocanvas] Duplicate event listener added, it must be manually removed.');
+	      } else {
+	        this.eventListeners[event] = { listener: listener };
+	      }
 	      addEvent(this.containerElement, event, listener);
+	    }
+
+	    /**
+	     * @param {string}
+	     * @param {function}
+	     */
+
+	  }, {
+	    key: 'removeListener',
+	    value: function removeListener(event, listener) {
+	      removeEvent(this.containerElement, event, listener);
 	    }
 
 	    /**
@@ -1705,13 +1813,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var miny = initialBounds.starty;
 	      var maxy = initialBounds.starty;
 
-	      var _iteratorNormalCompletion5 = true;
-	      var _didIteratorError5 = false;
-	      var _iteratorError5 = undefined;
+	      var _iteratorNormalCompletion7 = true;
+	      var _didIteratorError7 = false;
+	      var _iteratorError7 = undefined;
 
 	      try {
-	        for (var _iterator5 = leaves[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-	          var leaf = _step5.value;
+	        for (var _iterator7 = leaves[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+	          var leaf = _step7.value;
 
 	          var bounds = leaf.getBounds();
 	          minx = Math.min(minx, bounds.minx);
@@ -1720,16 +1828,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          maxy = Math.max(maxy, bounds.maxy);
 	        }
 	      } catch (err) {
-	        _didIteratorError5 = true;
-	        _iteratorError5 = err;
+	        _didIteratorError7 = true;
+	        _iteratorError7 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion5 && _iterator5.return) {
-	            _iterator5.return();
+	          if (!_iteratorNormalCompletion7 && _iterator7.return) {
+	            _iterator7.return();
 	          }
 	        } finally {
-	          if (_didIteratorError5) {
-	            throw _iteratorError5;
+	          if (_didIteratorError7) {
+	            throw _iteratorError7;
 	          }
 	        }
 	      }
@@ -1777,28 +1885,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.originalTree.branches) return;
 
 	      this.branches = this.originalTree.branches;
-	      var _iteratorNormalCompletion6 = true;
-	      var _didIteratorError6 = false;
-	      var _iteratorError6 = undefined;
+	      var _iteratorNormalCompletion8 = true;
+	      var _didIteratorError8 = false;
+	      var _iteratorError8 = undefined;
 
 	      try {
-	        for (var _iterator6 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-	          var n = _step6.value;
+	        for (var _iterator8 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+	          var n = _step8.value;
 
 	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
 	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
-	        _didIteratorError6 = true;
-	        _iteratorError6 = err;
+	        _didIteratorError8 = true;
+	        _iteratorError8 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
-	            _iterator6.return();
+	          if (!_iteratorNormalCompletion8 && _iterator8.return) {
+	            _iterator8.return();
 	          }
 	        } finally {
-	          if (_didIteratorError6) {
-	            throw _iteratorError6;
+	          if (_didIteratorError8) {
+	            throw _iteratorError8;
 	          }
 	        }
 	      }
@@ -1837,6 +1945,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function resizeToContainer() {
 	      this.setSize(this.containerElement.offsetWidth, this.containerElement.offsetHeight);
 	    }
+
+	    /**
+	     * Removes tracked event listeners and provides a hook for plugins to clean up
+	     * after themselves.
+	     */
+
+	  }, {
+	    key: 'cleanup',
+	    value: function cleanup() {
+	      this.removeEventListeners();
+	    }
 	  }, {
 	    key: 'alignLabels',
 	    get: function get() {
@@ -1858,6 +1977,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	Tree.prototype.on = Tree.prototype.addListener;
+
+	/**
+	 * @memberof Tree
+	 * @method
+	 * @see Tree#removeListener
+	 */
+	Tree.prototype.off = Tree.prototype.removeListener;
 
 	exports.default = Tree;
 
@@ -1932,10 +2058,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function translatePoint() {
-	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+	  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 },
+	      x = _ref.x,
+	      y = _ref.y;
 
-	  var x = _ref.x;
-	  var y = _ref.y;
 	  var phylocanvas = arguments[1];
 
 	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
@@ -1946,10 +2072,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function undoPointTranslation() {
-	  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+	  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 },
+	      x = _ref2.x,
+	      y = _ref2.y;
 
-	  var x = _ref2.x;
-	  var y = _ref2.y;
 	  var phylocanvas = arguments[1];
 
 	  var pixelRatio = getPixelRatio(phylocanvas.canvas);
@@ -2094,6 +2220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.preventDefault = preventDefault;
 	exports.fireEvent = fireEvent;
 	exports.addEvent = addEvent;
+	exports.removeEvent = removeEvent;
 	exports.killEvent = killEvent;
 	exports.createHandler = createHandler;
 	function preventDefault(event) {
@@ -2138,6 +2265,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // set the this pointer same as addEventListener when fn is called
 	      return fn.call(elem, window.event);
 	    });
+	  }
+	}
+
+	function removeEvent(elem, event, fn) {
+	  if (elem.removeEventListener) {
+	    elem.removeEventListener(event, fn, false);
+	  } else {
+	    console.warn('[Phylocanvas] Unable to remove event, removeEventListener not supported');
 	  }
 	}
 
@@ -2276,8 +2411,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Angles = _utils.constants.Angles;
-	var Shapes = _utils.constants.Shapes;
+	var Angles = _utils.constants.Angles,
+	    Shapes = _utils.constants.Shapes;
 
 	// Caching object to reduce garbage
 
@@ -2713,10 +2848,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.canvas.beginPath();
 
-	      var _getCollapsedMeasurem = getCollapsedMeasurements(this);
-
-	      var angle = _getCollapsedMeasurem.angle;
-	      var radius = _getCollapsedMeasurem.radius;
+	      var _getCollapsedMeasurem = getCollapsedMeasurements(this),
+	          angle = _getCollapsedMeasurem.angle,
+	          radius = _getCollapsedMeasurem.radius;
 
 	      var startAngle = this.angle - angle / 2;
 	      var endAngle = this.angle + angle / 2;
@@ -2730,6 +2864,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.canvas.fillStyle = gradient;
 
 	      this.canvas.fill();
+
+	      this.canvas.closePath();
 	    }
 
 	    /**
@@ -2741,9 +2877,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawLabelConnector',
 	    value: function drawLabelConnector() {
-	      var _tree = this.tree;
-	      var highlightColour = _tree.highlightColour;
-	      var labelAlign = _tree.labelAlign;
+	      var _tree = this.tree,
+	          highlightColour = _tree.highlightColour,
+	          labelAlign = _tree.labelAlign;
 
 	      this.canvas.save();
 
@@ -2766,9 +2902,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'drawLeaf',
 	    value: function drawLeaf() {
-	      var _tree2 = this.tree;
-	      var alignLabels = _tree2.alignLabels;
-	      var canvas = _tree2.canvas;
+	      var _tree2 = this.tree,
+	          alignLabels = _tree2.alignLabels,
+	          canvas = _tree2.canvas;
 
 
 	      if (alignLabels) {
@@ -3313,9 +3449,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getLabelStartX',
 	    value: function getLabelStartX() {
-	      var _getLeafStyle = this.getLeafStyle();
-
-	      var lineWidth = _getLeafStyle.lineWidth;
+	      var _getLeafStyle = this.getLeafStyle(),
+	          lineWidth = _getLeafStyle.lineWidth;
 
 	      var hasLabelConnector = this.hasLabelConnector();
 
@@ -3407,11 +3542,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'setDisplay',
 	    value: function setDisplay(_ref) {
-	      var colour = _ref.colour;
-	      var shape = _ref.shape;
-	      var size = _ref.size;
-	      var leafStyle = _ref.leafStyle;
-	      var labelStyle = _ref.labelStyle;
+	      var colour = _ref.colour,
+	          shape = _ref.shape,
+	          size = _ref.size,
+	          leafStyle = _ref.leafStyle,
+	          labelStyle = _ref.labelStyle;
 
 	      if (colour) {
 	        this.colour = colour;
@@ -3500,9 +3635,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getLeafStyle',
 	    value: function getLeafStyle() {
-	      var _leafStyle2 = this.leafStyle;
-	      var strokeStyle = _leafStyle2.strokeStyle;
-	      var fillStyle = _leafStyle2.fillStyle;
+	      var _leafStyle2 = this.leafStyle,
+	          strokeStyle = _leafStyle2.strokeStyle,
+	          fillStyle = _leafStyle2.fillStyle;
 	      var zoom = this.tree.zoom;
 
 	      // uses a caching object to reduce garbage
@@ -3930,10 +4065,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  labelAlign: labelAlign,
 	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
-	    var _branch$tree = branch.tree;
-	    var maxBranchLength = _branch$tree.maxBranchLength;
-	    var branchScalar = _branch$tree.branchScalar;
-	    var step = _branch$tree.step;
+	    var _branch$tree = branch.tree,
+	        maxBranchLength = _branch$tree.maxBranchLength,
+	        branchScalar = _branch$tree.branchScalar,
+	        step = _branch$tree.step;
 
 	    return {
 	      angle: branch.getNumberOfLeaves() * step,
@@ -4065,10 +4200,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  branchRenderer: new _BranchRenderer2.default(_branchRenderer2.default),
 	  prerenderer: new _Prerenderer2.default(_prerenderer2.default),
 	  getCollapsedMeasurements: function getCollapsedMeasurements(branch) {
-	    var _branch$tree = branch.tree;
-	    var maxBranchLength = _branch$tree.maxBranchLength;
-	    var branchScalar = _branch$tree.branchScalar;
-	    var step = _branch$tree.step;
+	    var _branch$tree = branch.tree,
+	        maxBranchLength = _branch$tree.maxBranchLength,
+	        branchScalar = _branch$tree.branchScalar,
+	        step = _branch$tree.step;
 
 	    return {
 	      angle: branch.getNumberOfLeaves() * step,
@@ -4435,9 +4570,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function commitPath(canvas, _ref) {
-	  var lineWidth = _ref.lineWidth;
-	  var strokeStyle = _ref.strokeStyle;
-	  var fillStyle = _ref.fillStyle;
+	  var lineWidth = _ref.lineWidth,
+	      strokeStyle = _ref.strokeStyle,
+	      fillStyle = _ref.fillStyle;
 
 	  canvas.lineWidth = lineWidth;
 	  canvas.strokeStyle = strokeStyle;
@@ -4576,16 +4711,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @param {HTMLElement} [options.parent=tree.containerElement]
 	   */
 	  function Tooltip(tree) {
-	    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-	    var _ref$className = _ref.className;
-	    var className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className;
-	    var _ref$element = _ref.element;
-	    var element = _ref$element === undefined ? document.createElement('div') : _ref$element;
-	    var _ref$zIndex = _ref.zIndex;
-	    var zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex;
-	    var _ref$parent = _ref.parent;
-	    var parent = _ref$parent === undefined ? tree.containerElement : _ref$parent;
+	    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+	        _ref$className = _ref.className,
+	        className = _ref$className === undefined ? 'phylocanvas-tooltip' : _ref$className,
+	        _ref$element = _ref.element,
+	        element = _ref$element === undefined ? document.createElement('div') : _ref$element,
+	        _ref$zIndex = _ref.zIndex,
+	        zIndex = _ref$zIndex === undefined ? 2000 : _ref$zIndex,
+	        _ref$parent = _ref.parent,
+	        parent = _ref$parent === undefined ? tree.containerElement : _ref$parent;
 
 	    _classCallCheck(this, Tooltip);
 
@@ -4749,10 +4883,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Parser = function () {
 	  function Parser(_ref) {
-	    var format = _ref.format;
-	    var parseFn = _ref.parseFn;
-	    var fileExtension = _ref.fileExtension;
-	    var validator = _ref.validator;
+	    var format = _ref.format,
+	        parseFn = _ref.parseFn,
+	        fileExtension = _ref.fileExtension,
+	        validator = _ref.validator;
 
 	    _classCallCheck(this, Parser);
 
@@ -4765,10 +4899,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Parser, [{
 	    key: "parse",
 	    value: function parse(_ref2, callback) {
-	      var formatString = _ref2.formatString;
-	      var root = _ref2.root;
-	      var _ref2$options = _ref2.options;
-	      var options = _ref2$options === undefined ? { validate: true } : _ref2$options;
+	      var formatString = _ref2.formatString,
+	          root = _ref2.root,
+	          _ref2$options = _ref2.options,
+	          options = _ref2$options === undefined ? { validate: true } : _ref2$options;
 
 	      if (formatString.match(this.validator) || options.validate === false) {
 	        return this.parseFn({ string: formatString, root: root, options: options }, callback);
@@ -4925,8 +5059,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function parseFn(_ref, callback) {
-	  var string = _ref.string;
-	  var root = _ref.root;
+	  var string = _ref.string,
+	      root = _ref.root;
 
 	  var cleanString = string.replace(/(\r|\n)/g, '');
 	  var currentNode = root;
@@ -4988,9 +5122,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var validator = /^#NEXUS[\s\n;\w\W\.\*\:(\),-=\[\]\/&]+$/i;
 
 	function parseFn(_ref, callback) {
-	  var string = _ref.string;
-	  var root = _ref.root;
-	  var options = _ref.options;
+	  var string = _ref.string,
+	      root = _ref.root,
+	      options = _ref.options;
 
 	  if (!string.match(/BEGIN TREES/gi)) {
 	    return callback(new Error('The nexus file does not contain a tree block'));
