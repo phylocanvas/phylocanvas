@@ -516,12 +516,17 @@ class Tree {
     this.resizeToContainer();
 
     /**
-     * Default event listeners. Includes event listeners passed in config, which
-     * will overwrite the default listener of the same event type.
+     * Event listener cache.
      *
      * @type object
      */
-    this.eventListeners = Object.assign({
+    this.eventListeners = {};
+
+    /**
+     * Default event listeners. Listeners passed in `config.eventListeners` will
+     * overwrite the listener of the same type.
+     */
+    const eventListeners = Object.assign({
       click: { listener: this.clicked.bind(this) },
       mousedown: { listener: this.pickup.bind(this) },
       mouseup: { listener: this.drop.bind(this) },
@@ -545,19 +550,11 @@ class Tree {
           this.draw();
         },
       },
-    }, config.eventListeners);
+    }, config.eventListeners || {});
 
-    this.addEventListeners();
-  }
-
-  /**
-   * Attaches events defined in this.eventListeners, called on construction of
-   * new instance.
-   */
-  addEventListeners() {
-    for (const event of Object.keys(this.eventListeners)) {
-      const { target, listener } = this.eventListeners[event];
-      addEvent(target || this.containerElement, event, listener);
+    for (const event of Object.keys(eventListeners)) {
+      const { listener, target } = eventListeners[event];
+      this.addListener(event, listener, target);
     }
   }
 
@@ -566,8 +563,10 @@ class Tree {
    */
   removeEventListeners() {
     for (const event of Object.keys(this.eventListeners)) {
-      const { target, listener } = this.eventListeners[event];
-      removeEvent(target || this.containerElement, event, listener);
+      for (const def of this.eventListeners[event]) {
+        const { target, listener } = def;
+        removeEvent(target || this.containerElement, event, listener);
+      }
     }
   }
 
@@ -1330,21 +1329,18 @@ class Tree {
    * @param {string}
    * @param {function}
    */
-  addListener(event, listener) {
-    if (event in this.eventListeners) {
-      console.warn('[Phylocanvas] Duplicate event listener added, it must be manually removed.');
-    } else {
-      this.eventListeners[event] = { listener };
-    }
-    addEvent(this.containerElement, event, listener);
+  addListener(event, listener, target) {
+    if (!this.eventListeners[event]) this.eventListeners[event] = [];
+    this.eventListeners[event].push({ listener, target });
+    addEvent(target || this.containerElement, event, listener);
   }
 
   /**
    * @param {string}
    * @param {function}
    */
-  removeListener(event, listener) {
-    removeEvent(this.containerElement, event, listener);
+  removeListener(event, listener, target) {
+    removeEvent(target || this.containerElement, event, listener);
   }
 
   /**
@@ -1415,7 +1411,7 @@ class Tree {
     if (!this.originalTree.branches) return;
 
     this.branches = this.originalTree.branches;
-    for (let n of Object.keys(this.originalTree.branchLengths)) {
+    for (const n of Object.keys(this.originalTree.branchLengths)) {
       this.branches[n].branchLength = this.originalTree.branchLengths[n];
       this.branches[n].parent = this.originalTree.parents[n];
     }

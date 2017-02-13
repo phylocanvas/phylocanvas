@@ -668,12 +668,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.resizeToContainer();
 
 	    /**
-	     * Default event listeners. Includes event listeners passed in config, which
-	     * will overwrite the default listener of the same event type.
+	     * Event listener cache.
 	     *
 	     * @type object
 	     */
-	    this.eventListeners = Object.assign({
+	    this.eventListeners = {};
+
+	    /**
+	     * Default event listeners. Listeners passed in `config.eventListeners` will
+	     * overwrite the listener of the same type.
+	     */
+	    var eventListeners = Object.assign({
 	      click: { listener: this.clicked.bind(this) },
 	      mousedown: { listener: this.pickup.bind(this) },
 	      mouseup: { listener: this.drop.bind(this) },
@@ -697,54 +702,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	          _this.draw();
 	        }
 	      }
-	    }, config.eventListeners);
+	    }, config.eventListeners || {});
 
-	    this.addEventListeners();
+	    var _iteratorNormalCompletion = true;
+	    var _didIteratorError = false;
+	    var _iteratorError = undefined;
+
+	    try {
+	      for (var _iterator = Object.keys(eventListeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	        var event = _step.value;
+	        var _eventListeners$event = eventListeners[event],
+	            listener = _eventListeners$event.listener,
+	            target = _eventListeners$event.target;
+
+	        this.addListener(event, listener, target);
+	      }
+	    } catch (err) {
+	      _didIteratorError = true;
+	      _iteratorError = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion && _iterator.return) {
+	          _iterator.return();
+	        }
+	      } finally {
+	        if (_didIteratorError) {
+	          throw _iteratorError;
+	        }
+	      }
+	    }
 	  }
 
 	  /**
-	   * Attaches events defined in this.eventListeners, called on construction of
-	   * new instance.
+	   * Removes events defined in this.eventListeners. Useful for cleaning up.
 	   */
 
 
 	  _createClass(Tree, [{
-	    key: 'addEventListeners',
-	    value: function addEventListeners() {
-	      var _iteratorNormalCompletion = true;
-	      var _didIteratorError = false;
-	      var _iteratorError = undefined;
-
-	      try {
-	        for (var _iterator = Object.keys(this.eventListeners)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	          var event = _step.value;
-	          var _eventListeners$event = this.eventListeners[event],
-	              target = _eventListeners$event.target,
-	              listener = _eventListeners$event.listener;
-
-	          addEvent(target || this.containerElement, event, listener);
-	        }
-	      } catch (err) {
-	        _didIteratorError = true;
-	        _iteratorError = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion && _iterator.return) {
-	            _iterator.return();
-	          }
-	        } finally {
-	          if (_didIteratorError) {
-	            throw _iteratorError;
-	          }
-	        }
-	      }
-	    }
-
-	    /**
-	     * Removes events defined in this.eventListeners. Useful for cleaning up.
-	     */
-
-	  }, {
 	    key: 'removeEventListeners',
 	    value: function removeEventListeners() {
 	      var _iteratorNormalCompletion2 = true;
@@ -754,11 +748,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	      try {
 	        for (var _iterator2 = Object.keys(this.eventListeners)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 	          var event = _step2.value;
-	          var _eventListeners$event2 = this.eventListeners[event],
-	              target = _eventListeners$event2.target,
-	              listener = _eventListeners$event2.listener;
+	          var _iteratorNormalCompletion3 = true;
+	          var _didIteratorError3 = false;
+	          var _iteratorError3 = undefined;
 
-	          removeEvent(target || this.containerElement, event, listener);
+	          try {
+	            for (var _iterator3 = this.eventListeners[event][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+	              var def = _step3.value;
+	              var target = def.target,
+	                  listener = def.listener;
+
+	              removeEvent(target || this.containerElement, event, listener);
+	            }
+	          } catch (err) {
+	            _didIteratorError3 = true;
+	            _iteratorError3 = err;
+	          } finally {
+	            try {
+	              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+	                _iterator3.return();
+	              }
+	            } finally {
+	              if (_didIteratorError3) {
+	                throw _iteratorError3;
+	              }
+	            }
+	          }
 	        }
 	      } catch (err) {
 	        _didIteratorError2 = true;
@@ -1077,29 +1092,29 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var foundLeaves = [];
 
-	      var _iteratorNormalCompletion3 = true;
-	      var _didIteratorError3 = false;
-	      var _iteratorError3 = undefined;
+	      var _iteratorNormalCompletion4 = true;
+	      var _didIteratorError4 = false;
+	      var _iteratorError4 = undefined;
 
 	      try {
-	        for (var _iterator3 = this.leaves[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	          var leaf = _step3.value;
+	        for (var _iterator4 = this.leaves[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+	          var leaf = _step4.value;
 
 	          if (leaf[searchProperty] && leaf[searchProperty].match(pattern)) {
 	            foundLeaves.push(leaf);
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError3 = true;
-	        _iteratorError3 = err;
+	        _didIteratorError4 = true;
+	        _iteratorError4 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-	            _iterator3.return();
+	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+	            _iterator4.return();
 	          }
 	        } finally {
-	          if (_didIteratorError3) {
-	            throw _iteratorError3;
+	          if (_didIteratorError4) {
+	            throw _iteratorError4;
 	          }
 	        }
 	      }
@@ -1118,40 +1133,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'updateLeaves',
 	    value: function updateLeaves(leaves, property, value) {
-	      var _iteratorNormalCompletion4 = true;
-	      var _didIteratorError4 = false;
-	      var _iteratorError4 = undefined;
-
-	      try {
-	        for (var _iterator4 = this.leaves[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-	          var leaf = _step4.value;
-
-	          leaf[property] = !value;
-	        }
-	      } catch (err) {
-	        _didIteratorError4 = true;
-	        _iteratorError4 = err;
-	      } finally {
-	        try {
-	          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-	            _iterator4.return();
-	          }
-	        } finally {
-	          if (_didIteratorError4) {
-	            throw _iteratorError4;
-	          }
-	        }
-	      }
-
 	      var _iteratorNormalCompletion5 = true;
 	      var _didIteratorError5 = false;
 	      var _iteratorError5 = undefined;
 
 	      try {
-	        for (var _iterator5 = leaves[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-	          var _leaf = _step5.value;
+	        for (var _iterator5 = this.leaves[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+	          var leaf = _step5.value;
 
-	          _leaf[property] = value;
+	          leaf[property] = !value;
 	        }
 	      } catch (err) {
 	        _didIteratorError5 = true;
@@ -1164,6 +1154,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } finally {
 	          if (_didIteratorError5) {
 	            throw _iteratorError5;
+	          }
+	        }
+	      }
+
+	      var _iteratorNormalCompletion6 = true;
+	      var _didIteratorError6 = false;
+	      var _iteratorError6 = undefined;
+
+	      try {
+	        for (var _iterator6 = leaves[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+	          var _leaf = _step6.value;
+
+	          _leaf[property] = value;
+	        }
+	      } catch (err) {
+	        _didIteratorError6 = true;
+	        _iteratorError6 = err;
+	      } finally {
+	        try {
+	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+	            _iterator6.return();
+	          }
+	        } finally {
+	          if (_didIteratorError6) {
+	            throw _iteratorError6;
 	          }
 	        }
 	      }
@@ -1232,13 +1247,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var _iteratorNormalCompletion6 = true;
-	      var _didIteratorError6 = false;
-	      var _iteratorError6 = undefined;
+	      var _iteratorNormalCompletion7 = true;
+	      var _didIteratorError7 = false;
+	      var _iteratorError7 = undefined;
 
 	      try {
-	        for (var _iterator6 = Object.keys(_parsers2.default)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-	          var parserName = _step6.value;
+	        for (var _iterator7 = Object.keys(_parsers2.default)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+	          var parserName = _step7.value;
 
 	          var parser = _parsers2.default[parserName];
 
@@ -1248,16 +1263,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        }
 	      } catch (err) {
-	        _didIteratorError6 = true;
-	        _iteratorError6 = err;
+	        _didIteratorError7 = true;
+	        _iteratorError7 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion6 && _iterator6.return) {
-	            _iterator6.return();
+	          if (!_iteratorNormalCompletion7 && _iterator7.return) {
+	            _iterator7.return();
 	          }
 	        } finally {
-	          if (_didIteratorError6) {
-	            throw _iteratorError6;
+	          if (_didIteratorError7) {
+	            throw _iteratorError7;
 	          }
 	        }
 	      }
@@ -1772,13 +1787,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  }, {
 	    key: 'addListener',
-	    value: function addListener(event, listener) {
-	      if (event in this.eventListeners) {
-	        console.warn('[Phylocanvas] Duplicate event listener added, it must be manually removed.');
-	      } else {
-	        this.eventListeners[event] = { listener: listener };
-	      }
-	      addEvent(this.containerElement, event, listener);
+	    value: function addListener(event, listener, target) {
+	      if (!this.eventListeners[event]) this.eventListeners[event] = [];
+	      this.eventListeners[event].push({ listener: listener, target: target });
+	      addEvent(target || this.containerElement, event, listener);
 	    }
 
 	    /**
@@ -1788,8 +1800,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  }, {
 	    key: 'removeListener',
-	    value: function removeListener(event, listener) {
-	      removeEvent(this.containerElement, event, listener);
+	    value: function removeListener(event, listener, target) {
+	      removeEvent(target || this.containerElement, event, listener);
 	    }
 
 	    /**
@@ -1813,13 +1825,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var miny = initialBounds.starty;
 	      var maxy = initialBounds.starty;
 
-	      var _iteratorNormalCompletion7 = true;
-	      var _didIteratorError7 = false;
-	      var _iteratorError7 = undefined;
+	      var _iteratorNormalCompletion8 = true;
+	      var _didIteratorError8 = false;
+	      var _iteratorError8 = undefined;
 
 	      try {
-	        for (var _iterator7 = leaves[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-	          var leaf = _step7.value;
+	        for (var _iterator8 = leaves[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+	          var leaf = _step8.value;
 
 	          var bounds = leaf.getBounds();
 	          minx = Math.min(minx, bounds.minx);
@@ -1828,16 +1840,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	          maxy = Math.max(maxy, bounds.maxy);
 	        }
 	      } catch (err) {
-	        _didIteratorError7 = true;
-	        _iteratorError7 = err;
+	        _didIteratorError8 = true;
+	        _iteratorError8 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion7 && _iterator7.return) {
-	            _iterator7.return();
+	          if (!_iteratorNormalCompletion8 && _iterator8.return) {
+	            _iterator8.return();
 	          }
 	        } finally {
-	          if (_didIteratorError7) {
-	            throw _iteratorError7;
+	          if (_didIteratorError8) {
+	            throw _iteratorError8;
 	          }
 	        }
 	      }
@@ -1885,28 +1897,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.originalTree.branches) return;
 
 	      this.branches = this.originalTree.branches;
-	      var _iteratorNormalCompletion8 = true;
-	      var _didIteratorError8 = false;
-	      var _iteratorError8 = undefined;
+	      var _iteratorNormalCompletion9 = true;
+	      var _didIteratorError9 = false;
+	      var _iteratorError9 = undefined;
 
 	      try {
-	        for (var _iterator8 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-	          var n = _step8.value;
+	        for (var _iterator9 = Object.keys(this.originalTree.branchLengths)[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+	          var n = _step9.value;
 
 	          this.branches[n].branchLength = this.originalTree.branchLengths[n];
 	          this.branches[n].parent = this.originalTree.parents[n];
 	        }
 	      } catch (err) {
-	        _didIteratorError8 = true;
-	        _iteratorError8 = err;
+	        _didIteratorError9 = true;
+	        _iteratorError9 = err;
 	      } finally {
 	        try {
-	          if (!_iteratorNormalCompletion8 && _iterator8.return) {
-	            _iterator8.return();
+	          if (!_iteratorNormalCompletion9 && _iterator9.return) {
+	            _iterator9.return();
 	          }
 	        } finally {
-	          if (_didIteratorError8) {
-	            throw _iteratorError8;
+	          if (_didIteratorError9) {
+	            throw _iteratorError9;
 	          }
 	        }
 	      }
