@@ -1,0 +1,20 @@
+{
+  "name": "@cgps/phylocanvas-plugin-interactions",
+  "version": "3.18.0",
+  "description": "",
+  "main": "dist/phylocanvas-plugin-interactions.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-interactions.js --output-library=PhylocanvasPluginInteractions",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0",
+    "pan-zoom": "phylocanvas/pan-zoom#v2.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

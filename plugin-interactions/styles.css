@@ -1,0 +1,19 @@
+.phylocanvas-tooltip {
+  background: rgba(97, 97, 97, 0.9);
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  margin-top: 16px;
+  opacity: 0;
+  padding: 8px;
+  pointer-events: none;
+  text-align: center;
+  transition: opacity 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+.phylocanvas-tooltip-visible {
+  opacity: 1;
+}

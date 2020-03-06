@@ -1,0 +1,19 @@
+{
+  "name": "@cgps/phylocanvas-plugin-deferred-render",
+  "version": "3.18.0",
+  "description": "Phylocanvas plugin to defer tree rendering",
+  "main": "dist/phylocanvas-plugin-deferred-render.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-deferred-render.js --output-library=PhylocanvasPluginDeferredRender",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

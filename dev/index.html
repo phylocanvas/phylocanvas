@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 10px auto;
+      /*max-width: 60em;*/
+      /*text-align: center;*/
+    }
+    h1 {
+      font-size: 24px;
+    }
+    canvas {
+      /*width: 100%;*/
+      /*height: 30em;*/
+      border: 1px dashed mediumseagreen;
+      background-color: papayawhip;
+      display: block;
+    }
+    #graph-container {
+      top: 1px;
+      bottom: 1px;
+      left: 1px;
+      right: 1px;
+      position: absolute;
+      /*width: 100%;
+      height: 400px;*/
+      border: 1px dashed mediumseagreen;
+      background-color: papayawhip;
+    }
+    button {
+      text-transform: capitalize;
+      margin: 0 .25em;
+    }
+    canvas {
+      margin: 16px;
+      /*position: absolute;
+      top: 64px;
+      left: 16px;*/
+    }
+    .wrapper {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <h1>Phylocanvas Dev Page</h1>
+  <form id="buttons"></form>
+  <div class="wrapper">
+    <canvas id="phylocanvas" width="800" height="600"></canvas>
+  </div>
+  <canvas id="phylocanvas2" width="800" height="300"></canvas>
+  <script type="application/javascript" src="/phylocanvas-dev.js"></script>
+</body>
+</html>

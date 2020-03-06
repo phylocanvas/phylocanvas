@@ -1,0 +1,108 @@
+.phylocanvas-context-menu {
+  background-color: #fff;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  transform: scale3d(0.75, 0.75, 1);
+  transition-property: transform, opacity;
+  transition: 0.28s cubic-bezier(.4,0,.2,1);
+  visibility: hidden;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.phylocanvas-context-menu.visible {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+  visibility: visible;
+}
+
+.phylocanvas-context-menu ul {
+  padding: 8px 0;
+}
+
+.phylocanvas-context-menu > ul + ul {
+  border-top: 1px solid #e0e0e0;
+}
+
+.phylocanvas-context-menu li {
+  height: 40px;
+}
+
+.phylocanvas-context-menu li:hover,
+.phylocanvas-context-menu li:focus,
+.phylocanvas-context-menu li:active {
+  background: #eee;
+}
+
+.phylocanvas-context-menu li > * {
+  background: none;
+  border: none;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 40px;
+  margin: 0;
+  padding: 0 16px;
+  outline: none;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+}
+
+.phylocanvas-context-menu li > .phylocanvas-context-menu-about {
+  text-align: center;
+  height: 100%;
+  display: flex;
+}
+
+.phylocanvas-context-menu li > .phylocanvas-context-menu-has-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  outline: none;
+}
+
+.phylocanvas-context-menu-about > img {
+  margin: 0 auto;
+  max-width: 124px;
+}
+
+.phylocanvas-context-menu-toggle {
+  width: 24px;
+  height: 12px;
+  margin-right: 4px;
+  border-radius: 12px;
+  background: #dbdbdb;
+  position: relative;
+}
+
+.phylocanvas-context-menu-toggle::before {
+  content: '';
+  height: 20px;
+  width: 20px;
+  margin-left: -8px;
+  background: #b8b8b8;
+  box-sizing: border-box;
+  position: absolute;
+  border-radius: 50%;
+  top: -4px;
+  transition-property: transform;
+  transition: 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+.phylocanvas-context-menu-toggle.is-active {
+  background: rgba(60, 115, 131, 0.54);
+}
+
+.phylocanvas-context-menu-toggle.is-active::before {
+  transform: translateX(20px);
+  background: #3c7383;
+}

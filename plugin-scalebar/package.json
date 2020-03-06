@@ -1,0 +1,19 @@
+{
+  "name": "@cgps/phylocanvas-plugin-scalebar",
+  "version": "3.18.0",
+  "description": "",
+  "main": "dist/phylocanvas-plugin-scalebar.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-scalebar.js --output-library=PhylocanvasPluginScalebar",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "The Centre for Genomic Pathogen Surveillance",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

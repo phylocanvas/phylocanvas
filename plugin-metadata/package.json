@@ -1,0 +1,19 @@
+{
+  "name": "@cgps/phylocanvas-plugin-metadata",
+  "version": "3.18.0",
+  "description": "",
+  "main": "dist/phylocanvas-plugin-metadata.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-metadata.js --output-library=PhylocanvasPluginMetadata",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@cgps/phylocanvas-plugin-context-menu",
+  "version": "3.18.0",
+  "description": "",
+  "main": "dist/phylocanvas-plugin-context-menu.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-context-menu.js --output-library=PhylocanvasPluginContextMenu",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

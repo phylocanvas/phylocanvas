@@ -1,0 +1,22 @@
+{
+  "name": "phylocanvas",
+  "license": "LGPL-3.0-only",
+  "private": true,
+  "scripts": {
+    "postinstall": "lerna bootstrap --ignore @cgps/phylocanvas-plugin-template",
+    "start": "cd dev && yarn start",
+    "clean": "lerna clean",
+    "release": "lerna publish",
+    "build": "lerna run build --ignore @cgps/phylocanvas-plugin-template",
+    "link": "lerna exec yarn link"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "eslint-config-cgps": "github:cgps-dev/eslint-config-cgps#v2.0.0",
+    "lerna": "^3.4.3",
+    "webpack": "^4.37.0",
+    "webpack-cli": "^3.3.6"
+  }
+}

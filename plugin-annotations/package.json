@@ -1,0 +1,19 @@
+{
+  "name": "@cgps/phylocanvas-plugin-annotations",
+  "version": "3.18.0",
+  "description": "",
+  "main": "dist/phylocanvas-plugin-annotations.js",
+  "scripts": {
+    "build": "webpack --config='../webpack.config.js' --output-filename=phylocanvas-plugin-annotations.js --output-library=PhylocanvasPluginAnnotations",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "LGPL-3.0-only",
+  "devDependencies": {
+    "@cgps/phylocanvas": "^3.18.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
