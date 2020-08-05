@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "The Centre for Genomic Pathogen Surveillance",
   "license": "LGPL-3.0-only",
-  "devDependencies": {
+  "dependencies": {
     "@cgps/phylocanvas": "^3.18.0",
     "canvas2svg": "^1.0.16"
   },

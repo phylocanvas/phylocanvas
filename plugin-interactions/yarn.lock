@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@cgps/phylocanvas@^3.18.0":
+  version "3.18.0"
+  resolved "https://registry.yarnpkg.com/@cgps/phylocanvas/-/phylocanvas-3.18.0.tgz#344ff9fb07e0dcbfc2e65c92b359fb7717a4da3a"
+  integrity sha512-zVyNXAFZ4vnuymv/8twzbyVwu0lYC8W71nbWxpopZUxge4YfMzVmt/r6P5eJfvMpHxbY96QwRyaTd4z9vrybew==
+
 dprop@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dprop/-/dprop-1.0.0.tgz#5f45a60a60fa3ac1d0f68b6b435831f2ff665468"
@@ -36,9 +41,9 @@ mouse-wheel@^1.2.0:
     signum "^1.0.0"
     to-px "^1.0.1"
 
-pan-zoom@phylocanvas/pan-zoom#v2.0.1:
+"pan-zoom@https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8":
   version "2.0.0"
-  resolved "https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8"
+  resolved "https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8#dfef85fc82c1f2841b7ffad6d8d1335f441d83e1"
   dependencies:
     impetus "^0.8.3"
     mouse-wheel "^1.2.0"

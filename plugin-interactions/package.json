@@ -10,9 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "LGPL-3.0-only",
-  "devDependencies": {
+  "dependencies": {
     "@cgps/phylocanvas": "^3.18.0",
-    "pan-zoom": "phylocanvas/pan-zoom#v2.0.1"
+    "pan-zoom": "https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8"
   },
   "publishConfig": {
     "access": "public"
