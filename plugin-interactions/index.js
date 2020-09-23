@@ -41,9 +41,15 @@ export default function (tree, decorate) {
     }
 
     if (tree.state.interactions.tooltip) {
-      if (node && !node.isLeaf) {
-        showTooltip(tooltip.element, e.clientX, e.clientY, node.totalLeaves);
-        tooltip.visible = true;
+      if (node) {
+        if (!node.isLeaf) {
+          showTooltip(tooltip.element, e.clientX, e.clientY, node.totalLeaves);
+          tooltip.visible = true;
+        }
+        else if (tree.state.tooltipContent && typeof tree.state.tooltipContent == 'function' && node.isLeaf) {
+          showTooltip(tooltip.element, e.clientX, e.clientY, tree.state.tooltipContent(node));
+          tooltip.visible = true;
+        }
       } else if (tooltip.visible) {
         hideTooltip(tooltip.element);
         tooltip.visible = false;
