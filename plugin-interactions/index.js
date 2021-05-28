@@ -116,9 +116,6 @@ export default function (tree, decorate) {
     }
   });
 
-  tree.ctx.canvas.onselectstart = function () {
-    return false;
-  };
 
   decorate('getInitialState', (delegate, args) => {
     const [ options ] = args;
