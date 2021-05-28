@@ -1,10 +1,11 @@
 import defaults from './defaults';
-import panzoom from 'pan-zoom';
+import panzoom from '@thesoulfresh/pan-zoom/src/index';
 import { utils } from '@cgps/phylocanvas';
 
 import { createTooltipElement, showTooltip, hideTooltip } from './tooltip';
 
 export default function (tree, decorate) {
+
   const panning = {
     mousedown: false,
     offsetX: undefined,
@@ -87,7 +88,7 @@ export default function (tree, decorate) {
   tree.ctx.canvas.addEventListener('mouseup', onMouseUp);
   tree.ctx.canvas.addEventListener('touchend', onMouseUp);
 
-  panzoom(tree.ctx.canvas, ({ dx, dy, dz, x, y, event }) => {
+  const unpanzoom = panzoom(tree.ctx.canvas, ({ dx, dy, dz, x, y, event }) => {
     if (dz !== 0 && dx === 0 && dy === 0) {
       if (tree.state.interactions.zoom) {
         if (event && (event.metaKey || event.ctrlKey)) {
@@ -139,6 +140,7 @@ export default function (tree, decorate) {
   });
 
   decorate('destroy', (delegate, args) => {
+    unpanzoom();
     tree.ctx.canvas.removeEventListener('mousemove', onMouseMove);
     tree.ctx.canvas.removeEventListener('mousedown', onMouseDown);
     tree.ctx.canvas.removeEventListener('touchstart', onMouseDown);

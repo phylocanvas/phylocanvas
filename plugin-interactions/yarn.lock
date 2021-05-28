@@ -7,6 +7,18 @@
   resolved "https://registry.yarnpkg.com/@cgps/phylocanvas/-/phylocanvas-3.18.0.tgz#344ff9fb07e0dcbfc2e65c92b359fb7717a4da3a"
   integrity sha512-zVyNXAFZ4vnuymv/8twzbyVwu0lYC8W71nbWxpopZUxge4YfMzVmt/r6P5eJfvMpHxbY96QwRyaTd4z9vrybew==
 
+"@thesoulfresh/pan-zoom@https://github.com/soulfresh/pan-zoom":
+  version "4.1.4"
+  resolved "https://github.com/soulfresh/pan-zoom#b48986789275c797851b69bfc963eadd5752649e"
+  dependencies:
+    dprop "^1.0.0"
+    gl-vec2 "^1.3.0"
+    has-passive-events "^1.0.0"
+    lodash.debounce "^4.0.8"
+    mouse-event-offset "^3.0.2"
+    raf "^3.4.0"
+    touch-position "^2.0.0"
+
 dprop@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dprop/-/dprop-1.0.0.tgz#5f45a60a60fa3ac1d0f68b6b435831f2ff665468"
@@ -17,70 +29,44 @@ events@^1.0.2:
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
   integrity sha1-nr23Y1rQmccNzEwqH1AEKI6L2SQ=
 
-gl-vec2@^1.0.0:
+gl-vec2@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/gl-vec2/-/gl-vec2-1.3.0.tgz#83d472ed46034de8e09cbc857123fb6c81c51199"
   integrity sha512-YiqaAuNsheWmUV0Sa8k94kBB0D6RWjwZztyO+trEYS8KzJ6OQB/4686gdrf59wld4hHFIvaxynO3nRxpk1Ij/A==
 
-impetus@^0.8.3:
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/impetus/-/impetus-0.8.7.tgz#59521c25633911e9cbc509317679f0f0b88d92e8"
-  integrity sha1-WVIcJWM5EenLxQkxdnnw8LiNkug=
+has-passive-events@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/has-passive-events/-/has-passive-events-1.0.0.tgz#75fc3dc6dada182c58f24ebbdc018276d1ea3515"
+  integrity sha512-2vSj6IeIsgvsRMyeQ0JaCX5Q3lX4zMn5HpoVc7MEhQ6pv8Iq9rsXjsp+E5ZwaT7T0xhMT0KmU8gtt1EFVdbJiw==
+  dependencies:
+    is-browser "^2.0.1"
+
+is-browser@^2.0.1:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/is-browser/-/is-browser-2.1.0.tgz#fc084d59a5fced307d6708c59356bad7007371a9"
+  integrity sha512-F5rTJxDQ2sW81fcfOR1GnCXT6sVJC104fCyfj+mjpwNEwaPYSn5fte5jiHmBg3DHsIoL/l8Kvw5VN5SsTRcRFQ==
+
+lodash.debounce@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
 mouse-event-offset@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/mouse-event-offset/-/mouse-event-offset-3.0.2.tgz#dfd86a6e248c6ba8cad53b905d5037a2063e9984"
   integrity sha1-39hqbiSMa6jK1TuQXVA3ogY+mYQ=
 
-mouse-wheel@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/mouse-wheel/-/mouse-wheel-1.2.0.tgz#6d2903b1ea8fb48e61f1b53b9036773f042cdb5c"
-  integrity sha1-bSkDseqPtI5h8bU7kDZ3PwQs21w=
+performance-now@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
+  integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
+
+raf@^3.4.0:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.1.tgz#0742e99a4a6552f445d73e3ee0328af0ff1ede39"
+  integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
   dependencies:
-    right-now "^1.0.0"
-    signum "^1.0.0"
-    to-px "^1.0.1"
-
-"pan-zoom@https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8":
-  version "2.0.0"
-  resolved "https://codeload.github.com/phylocanvas/pan-zoom/tar.gz/7337694b7888400243a98430820b10808a0168a8#dfef85fc82c1f2841b7ffad6d8d1335f441d83e1"
-  dependencies:
-    impetus "^0.8.3"
-    mouse-wheel "^1.2.0"
-    touch-pinch "^1.0.0"
-    touch-position "^2.0.0"
-
-parse-unit@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/parse-unit/-/parse-unit-1.0.1.tgz#7e1bb6d5bef3874c28e392526a2541170291eecf"
-  integrity sha1-fhu21b7zh0wo45JSaiVBFwKR7s8=
-
-right-now@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/right-now/-/right-now-1.0.0.tgz#6e89609deebd7dcdaf8daecc9aea39cf585a0918"
-  integrity sha1-bolgne69fc2vja7Mmuo5z1haCRg=
-
-signum@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/signum/-/signum-1.0.0.tgz#74a7d2bf2a20b40eba16a92b152124f1d559fa77"
-  integrity sha1-dKfSvyogtA66FqkrFSEk8dVZ+nc=
-
-to-px@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/to-px/-/to-px-1.0.1.tgz#5bbaed5e5d4f76445bcc903c293a2307dd324646"
-  integrity sha1-W7rtXl1PdkRbzJA8KTojB90yRkY=
-  dependencies:
-    parse-unit "^1.0.1"
-
-touch-pinch@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/touch-pinch/-/touch-pinch-1.0.1.tgz#52f2aeee263139730570d0ccdf8d443a92b3b36d"
-  integrity sha1-UvKu7iYxOXMFcNDM341EOpKzs20=
-  dependencies:
-    dprop "^1.0.0"
-    events "^1.0.2"
-    gl-vec2 "^1.0.0"
-    mouse-event-offset "^3.0.2"
+    performance-now "^2.1.0"
 
 touch-position@^2.0.0:
   version "2.0.0"
