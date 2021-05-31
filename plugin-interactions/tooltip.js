@@ -6,6 +6,8 @@ export function createTooltipElement() {
   element.className = 'phylocanvas-tooltip';
   element.style.position = 'absolute';
   element.style.pointerEvents = 'none';
+  element.style.left = `${0}px`;
+  element.style.top = `${0}px`;
 
   return element;
 }

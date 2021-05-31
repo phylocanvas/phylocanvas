@@ -10,9 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "LGPL-3.0-only",
-  "devDependencies": {
+  "dependencies": {
     "@cgps/phylocanvas": "^3.18.0",
-    "pan-zoom": "phylocanvas/pan-zoom#v2.0.1"
+    "@thesoulfresh/pan-zoom": "https://github.com/soulfresh/pan-zoom#release/4.1.4"
   },
   "publishConfig": {
     "access": "public"

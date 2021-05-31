@@ -1,10 +1,11 @@
 import defaults from './defaults';
-import panzoom from 'pan-zoom';
+import panzoom from '@thesoulfresh/pan-zoom/src/index';
 import { utils } from '@cgps/phylocanvas';
 
 import { createTooltipElement, showTooltip, hideTooltip } from './tooltip';
 
 export default function (tree, decorate) {
+
   const panning = {
     mousedown: false,
     offsetX: undefined,
@@ -41,9 +42,15 @@ export default function (tree, decorate) {
     }
 
     if (tree.state.interactions.tooltip) {
-      if (node && !node.isLeaf) {
-        showTooltip(tooltip.element, e.clientX, e.clientY, node.totalLeaves);
-        tooltip.visible = true;
+      if (node) {
+        if (!node.isLeaf) {
+          showTooltip(tooltip.element, e.clientX, e.clientY, node.totalLeaves);
+          tooltip.visible = true;
+        }
+        else if (tree.state.tooltipContent && typeof tree.state.tooltipContent == 'function' && node.isLeaf) {
+          showTooltip(tooltip.element, e.clientX, e.clientY, tree.state.tooltipContent(node));
+          tooltip.visible = true;
+        }
       } else if (tooltip.visible) {
         hideTooltip(tooltip.element);
         tooltip.visible = false;
@@ -81,7 +88,7 @@ export default function (tree, decorate) {
   tree.ctx.canvas.addEventListener('mouseup', onMouseUp);
   tree.ctx.canvas.addEventListener('touchend', onMouseUp);
 
-  panzoom(tree.ctx.canvas, ({ dx, dy, dz, x, y, event }) => {
+  const unpanzoom = panzoom(tree.ctx.canvas, ({ dx, dy, dz, x, y, event }) => {
     if (dz !== 0 && dx === 0 && dy === 0) {
       if (tree.state.interactions.zoom) {
         if (event && (event.metaKey || event.ctrlKey)) {
@@ -109,9 +116,6 @@ export default function (tree, decorate) {
     }
   });
 
-  tree.ctx.canvas.onselectstart = function () {
-    return false;
-  };
 
   decorate('getInitialState', (delegate, args) => {
     const [ options ] = args;
@@ -133,6 +137,7 @@ export default function (tree, decorate) {
   });
 
   decorate('destroy', (delegate, args) => {
+    unpanzoom();
     tree.ctx.canvas.removeEventListener('mousemove', onMouseMove);
     tree.ctx.canvas.removeEventListener('mousedown', onMouseDown);
     tree.ctx.canvas.removeEventListener('touchstart', onMouseDown);
