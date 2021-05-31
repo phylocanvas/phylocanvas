@@ -12,7 +12,7 @@
   "license": "LGPL-3.0-only",
   "dependencies": {
     "@cgps/phylocanvas": "^3.18.0",
-    "@thesoulfresh/pan-zoom": "https://github.com/soulfresh/pan-zoom"
+    "@thesoulfresh/pan-zoom": "https://github.com/soulfresh/pan-zoom#release/4.1.4"
   },
   "publishConfig": {
     "access": "public"
